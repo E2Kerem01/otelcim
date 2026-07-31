@@ -96,8 +96,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           listingsAsync.when(
             data: (listings) {
               if (listings.isEmpty) {
-                return const SliverFillRemaining(
-                  child: Center(child: Text('Bu kriterlere uygun ilan bulunamadı.')),
+                return SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.hotel_outlined, size: 64, color: Colors.grey.shade400),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Henüz İlan Bulunmuyor',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Sistemde aktif ilan bulunmamaktadır. Örnek ilanları veritabanına ekleyebilir veya yeni bir ilan oluşturabilirsiniz.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              await ref.read(listingServiceProvider).seedSampleListings();
+                            },
+                            icon: const Icon(Icons.download_rounded),
+                            label: const Text('Örnek İlanları Veritabanına Yükle'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            onPressed: () => context.push('/create-listing'),
+                            icon: const Icon(Icons.add_circle_outline),
+                            label: const Text('İlk İlanı Sen Oluştur'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
               }
               return SliverPadding(
