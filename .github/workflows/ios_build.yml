@@ -26,10 +26,13 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install dependencies
+      - name: Install dependencies & CocoaPods
         run: |
           flutter doctor -v
           flutter pub get
+          cd ios
+          pod install || pod install --repo-update
+          cd ..
 
       - name: Build iOS Application (No Codesign)
         run: |
