@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "317702297035",
+    "project_id": "otelcim-7f0ba",
+    "storage_bucket": "otelcim-7f0ba.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317702297035:android:1e5a05db8fb1d67b6fd24e",
+        "android_client_info": {
+          "package_name": "com.example.otelcim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCu9zcPmJVvimuqaJKEgxHs5K5v_yFowqI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
