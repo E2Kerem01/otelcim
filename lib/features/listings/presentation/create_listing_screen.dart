@@ -36,7 +36,14 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final user = ref.read(authServiceProvider).currentUser;
-    if (user == null) return;
+    if (user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('İlan yayınlamak için lütfen giriş yapın.')),
+        );
+      }
+      return;
+    }
 
     setState(() => _submitting = true);
     try {
@@ -57,12 +64,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('İlanınız başarıyla yayınlandı!')),
         );
-        _formKey.currentState!.reset();
-        _titleController.clear();
-        _descController.clear();
-        _salaryController.clear();
-        _locationController.clear();
-        _contactController.clear();
+        Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
