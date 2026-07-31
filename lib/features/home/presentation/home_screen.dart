@@ -96,6 +96,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           listingsAsync.when(
             data: (listings) {
               if (listings.isEmpty) {
+                // Auto seed sample listings into Firestore if database is empty
+                Future.microtask(() => ref.read(listingServiceProvider).seedSampleListings());
                 return SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
