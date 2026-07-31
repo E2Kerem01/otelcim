@@ -27,8 +27,7 @@ jobs:
           cd ..
 
       - name: Build iOS Application (No Codesign)
-        run: |
-          flutter build ios --release --no-codesign CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+        run: flutter build ios --release --no-codesign
 
       - name: Package IPA
         run: |
