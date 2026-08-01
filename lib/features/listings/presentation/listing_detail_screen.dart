@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../shared/constants/categories.dart';
 import '../../../shared/models/report.dart';
+import '../../../shared/services/analytics_service.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
@@ -43,6 +45,35 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     }
   }
 
+  Future<void> _shareListing(Listing listing) async {
+    final text = '''
+${listing.title}
+
+📍 ${listing.location}
+💰 ${listing.salary}
+📂 ${listingCategoryLabel(listing.category)}
+
+${listing.description}
+
+İletişim: ${listing.posterName}
+${listing.contactInfo}
+
+🔗 Otelcim Uygulamasını İndir: https://otelcim.app
+''';
+
+    try {
+      await SharePlus.instance.share(ShareParams(text: text, subject: listing.title));
+      await ref.read(analyticsServiceProvider).logShareListing(
+            listingId: listing.id,
+            listingTitle: listing.title,
+            category: listing.category,
+            location: listing.location,
+          );
+    } catch (e) {
+      debugPrint('Error sharing listing: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final listingAsync = ref.watch(_listingProvider(widget.listingId));
@@ -52,6 +83,16 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
       appBar: AppBar(
         title: const Text('İlan Detayı'),
         actions: [
+          listingAsync.maybeWhen(
+            data: (listing) {
+              if (listing == null) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.share_outlined),
+                onPressed: () => _shareListing(listing),
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
+          ),
           listingAsync.maybeWhen(
             data: (listing) {
               if (listing == null || listing.posterId == myUid) return const SizedBox.shrink();
