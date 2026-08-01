@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/models/message.dart';
+import '../../../shared/models/report.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
+import '../../../shared/widgets/report_sheet.dart';
 
 class ChatDetailScreen extends ConsumerStatefulWidget {
   const ChatDetailScreen({super.key, required this.conversationId});
@@ -16,6 +18,7 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
 
 class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   final _messageController = TextEditingController();
+  String? _otherParticipantId;
 
   @override
   void initState() {
@@ -23,6 +26,16 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(currentChatIdProvider.notifier).state = widget.conversationId;
     });
+    _loadOtherParticipant();
+  }
+
+  Future<void> _loadOtherParticipant() async {
+    final myUid = ref.read(authStateProvider).value?.uid;
+    if (myUid == null) return;
+    final conversation = await ref.read(chatServiceProvider).getConversation(widget.conversationId);
+    if (conversation != null && mounted) {
+      setState(() => _otherParticipantId = conversation.otherParticipant(myUid));
+    }
   }
 
   @override
@@ -51,7 +64,27 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     final messagesStream = ref.watch(chatServiceProvider).watchMessages(widget.conversationId);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sohbet')),
+      appBar: AppBar(
+        title: const Text('Sohbet'),
+        actions: [
+          if (_otherParticipantId != null)
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'report') {
+                  showReportSheet(
+                    context,
+                    ref,
+                    targetId: _otherParticipantId!,
+                    targetType: ReportTargetType.user,
+                  );
+                }
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem(value: 'report', child: Text('Kullanıcıyı Bildir')),
+              ],
+            ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(

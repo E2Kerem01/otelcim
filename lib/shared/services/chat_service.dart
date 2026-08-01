@@ -23,6 +23,12 @@ class ChatService {
     });
   }
 
+  Future<Conversation?> getConversation(String conversationId) async {
+    final doc = await _db.collection('conversations').doc(conversationId).get();
+    if (!doc.exists) return null;
+    return Conversation.fromDoc(doc);
+  }
+
   Stream<List<Message>> watchMessages(String conversationId) {
     return _db
         .collection('conversations')

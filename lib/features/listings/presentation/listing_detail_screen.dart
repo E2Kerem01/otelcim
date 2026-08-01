@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/constants/categories.dart';
+import '../../../shared/models/report.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../../shared/widgets/report_sheet.dart';
 import '../domain/listing_model.dart';
 
 final _listingProvider = FutureProvider.family<Listing?, String>((ref, listingId) {
@@ -47,7 +49,32 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     final myUid = ref.watch(authStateProvider).value?.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('İlan Detayı')),
+      appBar: AppBar(
+        title: const Text('İlan Detayı'),
+        actions: [
+          listingAsync.maybeWhen(
+            data: (listing) {
+              if (listing == null || listing.posterId == myUid) return const SizedBox.shrink();
+              return PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'report') {
+                    showReportSheet(
+                      context,
+                      ref,
+                      targetId: listing.id,
+                      targetType: ReportTargetType.listing,
+                    );
+                  }
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(value: 'report', child: Text('İlanı Bildir')),
+                ],
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
+          ),
+        ],
+      ),
       body: listingAsync.when(
         data: (listing) {
           if (listing == null) {
