@@ -9,7 +9,7 @@ import '../../../shared/services/analytics_service.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
-import '../../../shared/widgets/report_sheet.dart';
+import '../../../shared/widgets/report_dialog.dart';
 import '../domain/listing_model.dart';
 
 final _listingProvider = FutureProvider.family<Listing?, String>((ref, listingId) {
@@ -98,6 +98,17 @@ ${listing.contactInfo}
     }
   }
 
+  void _showReportDialog(Listing listing) {
+    showDialog(
+      context: context,
+      builder: (context) => ReportDialog(
+        targetType: TargetType.listing,
+        targetId: listing.id,
+        targetName: listing.title,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final listingAsync = ref.watch(_listingProvider(widget.listingId));
@@ -123,16 +134,20 @@ ${listing.contactInfo}
               return PopupMenuButton<String>(
                 onSelected: (value) {
                   if (value == 'report') {
-                    showReportSheet(
-                      context,
-                      ref,
-                      targetId: listing.id,
-                      targetType: ReportTargetType.listing,
-                    );
+                    _showReportDialog(listing);
                   }
                 },
                 itemBuilder: (context) => const [
-                  PopupMenuItem(value: 'report', child: Text('İlanı Bildir')),
+                  PopupMenuItem(
+                    value: 'report',
+                    child: Row(
+                      children: [
+                        Icon(Icons.flag_outlined, color: Colors.red),
+                        SizedBox(width: 12),
+                        Text('İlanı Bildir'),
+                      ],
+                    ),
+                  ),
                 ],
               );
             },

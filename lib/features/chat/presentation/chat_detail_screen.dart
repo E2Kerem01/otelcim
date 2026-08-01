@@ -5,7 +5,7 @@ import '../../../shared/models/message.dart';
 import '../../../shared/models/report.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
-import '../../../shared/widgets/report_sheet.dart';
+import '../../../shared/widgets/report_dialog.dart';
 
 class ChatDetailScreen extends ConsumerStatefulWidget {
   const ChatDetailScreen({super.key, required this.conversationId});
@@ -58,6 +58,18 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         );
   }
 
+  void _showReportDialog() {
+    if (_otherParticipantId == null) return;
+    showDialog(
+      context: context,
+      builder: (context) => ReportDialog(
+        targetType: ReportTargetType.user,
+        targetId: _otherParticipantId!,
+        targetName: 'Kullanıcı',
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final myUid = ref.watch(authStateProvider).value?.uid;
@@ -71,16 +83,20 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'report') {
-                  showReportSheet(
-                    context,
-                    ref,
-                    targetId: _otherParticipantId!,
-                    targetType: ReportTargetType.user,
-                  );
+                  _showReportDialog();
                 }
               },
               itemBuilder: (context) => const [
-                PopupMenuItem(value: 'report', child: Text('Kullanıcıyı Bildir')),
+                PopupMenuItem(
+                  value: 'report',
+                  child: Row(
+                    children: [
+                      Icon(Icons.flag_outlined, color: Colors.red),
+                      SizedBox(width: 12),
+                      Text('Kullanıcıyı Bildir'),
+                    ],
+                  ),
+                ),
               ],
             ),
         ],
