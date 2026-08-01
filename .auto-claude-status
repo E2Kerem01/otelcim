@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "002-user-profile-setup-editing",
+  "state": "building",
+  "subtasks": {
+    "completed": 4,
+    "total": 11,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Services Layer",
+    "id": null,
+    "total": 2
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 6,
+    "started_at": "2026-07-31T09:54:33.021630"
+  },
+  "last_update": "2026-07-31T10:09:41.174679"
+}
