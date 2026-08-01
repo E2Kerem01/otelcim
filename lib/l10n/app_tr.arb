@@ -43,5 +43,37 @@
   "hasAccountPrompt": "Zaten hesabın var mı? Giriş yap",
   "@hasAccountPrompt": {
     "description": "Prompt to login when account exists"
+  },
+  "onboardingWelcome": "Otelcim'e Hoş Geldiniz!",
+  "@onboardingWelcome": {
+    "description": "Welcome message on role selection screen"
+  },
+  "onboardingRolePrompt": "Size en uygun deneyimi sunabilmemiz için lütfen rolünüzü seçin:",
+  "@onboardingRolePrompt": {
+    "description": "Prompt to select user role"
+  },
+  "roleJobSeeker": "İş Arıyorum",
+  "@roleJobSeeker": {
+    "description": "Job seeker role title"
+  },
+  "roleJobSeekerDescription": "Otel ve turizm sektöründe iş arıyorum. İlanları görmek ve başvurmak istiyorum.",
+  "@roleJobSeekerDescription": {
+    "description": "Job seeker role description"
+  },
+  "roleEmployer": "Personel Arıyorum",
+  "@roleEmployer": {
+    "description": "Employer role title"
+  },
+  "roleEmployerDescription": "Otelim veya işletmem için çalışan arıyorum. İlan vermek istiyorum.",
+  "@roleEmployerDescription": {
+    "description": "Employer role description"
+  },
+  "roleSelectionError": "Lütfen bir rol seçin",
+  "@roleSelectionError": {
+    "description": "Error message when no role is selected"
+  },
+  "continueButton": "Devam Et",
+  "@continueButton": {
+    "description": "Continue button text"
   }
 }

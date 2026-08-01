@@ -10,5 +10,13 @@
   "registerButton": "Register",
   "registerTitle": "Register",
   "noAccountPrompt": "Don't have an account? Register",
-  "hasAccountPrompt": "Already have an account? Sign in"
+  "hasAccountPrompt": "Already have an account? Sign in",
+  "onboardingWelcome": "Welcome to Otelcim!",
+  "onboardingRolePrompt": "Please select your role to provide you with the best experience:",
+  "roleJobSeeker": "Looking for a Job",
+  "roleJobSeekerDescription": "I'm looking for a job in the hotel and tourism industry. I want to view and apply to job listings.",
+  "roleEmployer": "Looking for Staff",
+  "roleEmployerDescription": "I'm looking for employees for my hotel or business. I want to post job listings.",
+  "roleSelectionError": "Please select a role",
+  "continueButton": "Continue"
 }
