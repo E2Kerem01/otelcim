@@ -41,12 +41,21 @@ class MyListingsScreen extends ConsumerWidget {
                   subtitle: Text(
                     '${listingCategoryLabel(listing.category)} · ${listing.status == ListingStatus.active ? 'Aktif' : 'Kapalı'}',
                   ),
-                  trailing: listing.status == ListingStatus.active
-                      ? TextButton(
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined),
+                        tooltip: 'Düzenle',
+                        onPressed: () => context.push('/listing/${listing.id}/edit'),
+                      ),
+                      if (listing.status == ListingStatus.active)
+                        TextButton(
                           onPressed: () => ref.read(listingServiceProvider).closeListing(listing.id),
                           child: const Text('Kapat'),
-                        )
-                      : null,
+                        ),
+                    ],
+                  ),
                   onTap: () => context.push('/listing/${listing.id}'),
                 ),
               );
