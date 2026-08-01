@@ -111,5 +111,41 @@
   "signOut": "Çıkış Yap",
   "@signOut": {
     "description": "Sign out button text"
+  },
+  "categoryReception": "Resepsiyon",
+  "@categoryReception": {
+    "description": "Reception category label"
+  },
+  "categoryHousekeeping": "Kat Hizmetleri",
+  "@categoryHousekeeping": {
+    "description": "Housekeeping category label"
+  },
+  "categoryKitchenChef": "Mutfak / Aşçı",
+  "@categoryKitchenChef": {
+    "description": "Kitchen/Chef category label"
+  },
+  "categoryServiceWaiter": "Servis / Garson",
+  "@categoryServiceWaiter": {
+    "description": "Service/Waiter category label"
+  },
+  "categorySecurity": "Güvenlik",
+  "@categorySecurity": {
+    "description": "Security category label"
+  },
+  "categoryAnimation": "Animasyon",
+  "@categoryAnimation": {
+    "description": "Animation category label"
+  },
+  "categoryManagement": "Yönetim",
+  "@categoryManagement": {
+    "description": "Management category label"
+  },
+  "categoryTechnicalService": "Teknik Servis",
+  "@categoryTechnicalService": {
+    "description": "Technical Service category label"
+  },
+  "categoryOther": "Diğer",
+  "@categoryOther": {
+    "description": "Other category label"
   }
 }

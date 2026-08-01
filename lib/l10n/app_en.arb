@@ -27,5 +27,14 @@
   "profileTitle": "My Account",
   "editProfile": "Edit Profile",
   "myListings": "My Listings",
-  "signOut": "Sign Out"
+  "signOut": "Sign Out",
+  "categoryReception": "Reception",
+  "categoryHousekeeping": "Housekeeping",
+  "categoryKitchenChef": "Kitchen / Chef",
+  "categoryServiceWaiter": "Service / Waiter",
+  "categorySecurity": "Security",
+  "categoryAnimation": "Animation",
+  "categoryManagement": "Management",
+  "categoryTechnicalService": "Technical Service",
+  "categoryOther": "Other"
 }
