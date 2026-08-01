@@ -79,6 +79,7 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
 
   @override
   Widget build(BuildContext context) {
+    final router = ref.watch(routerProvider);
     return MaterialApp.router(
       title: 'Otelcim',
       debugShowCheckedModeBanner: false,
