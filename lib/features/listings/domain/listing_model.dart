@@ -31,8 +31,8 @@ class Listing {
     this.updatedAt,
   });
 
-  factory Listing.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? <String, dynamic>{};
+  factory Listing.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? <String, dynamic>{};
     return Listing(
       id: doc.id,
       posterId: data['posterId'] as String? ?? '',

@@ -25,8 +25,8 @@ class Conversation {
 
   String otherParticipant(String myUid) => myUid == posterId ? seekerId : posterId;
 
-  factory Conversation.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? <String, dynamic>{};
+  factory Conversation.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? <String, dynamic>{};
     return Conversation(
       id: doc.id,
       listingId: data['listingId'] as String? ?? '',
