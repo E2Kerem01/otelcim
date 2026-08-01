@@ -11,13 +11,20 @@ class ChatService {
   final FirebaseFirestore _db;
 
   Stream<List<Conversation>> watchConversations(String uid) {
-    return _db
-        .collection('conversations')
-        .where('participantIds', arrayContains: uid)
-        .orderBy('updatedAt', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs.map(Conversation.fromDoc).toList())
-        .handleError((error) {
+    return _db.collection('conversations').snapshots().map((snap) {
+      var conversations = snap.docs
+          .map(Conversation.fromDoc)
+          .where((c) => c.posterId == uid || c.seekerId == uid)
+          .toList();
+
+      conversations.sort((a, b) {
+        final tA = a.updatedAt ?? a.createdAt ?? DateTime.now();
+        final tB = b.updatedAt ?? b.createdAt ?? DateTime.now();
+        return tB.compareTo(tA);
+      });
+
+      return conversations;
+    }).handleError((error) {
       debugPrint('Firestore watchConversations warning: $error');
       return <Conversation>[];
     });
@@ -34,10 +41,16 @@ class ChatService {
         .collection('conversations')
         .doc(conversationId)
         .collection('messages')
-        .orderBy('sentAt', descending: false)
         .snapshots()
-        .map((snap) => snap.docs.map(Message.fromDoc).toList())
-        .handleError((error) {
+        .map((snap) {
+      var messages = snap.docs.map(Message.fromDoc).toList();
+      messages.sort((a, b) {
+        final tA = a.sentAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final tB = b.sentAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return tA.compareTo(tB);
+      });
+      return messages;
+    }).handleError((error) {
       debugPrint('Firestore watchMessages warning: $error');
       return <Message>[];
     });

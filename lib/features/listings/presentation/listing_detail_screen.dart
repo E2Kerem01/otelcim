@@ -30,7 +30,25 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
 
   Future<void> _messageOwner(Listing listing) async {
     final user = ref.read(authServiceProvider).currentUser;
-    if (user == null) return;
+    if (user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Mesaj göndermek için lütfen giriş yapın.')),
+        );
+        context.push('/login');
+      }
+      return;
+    }
+
+    if (listing.posterId == user.uid) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kendi ilanınıza mesaj gönderemezsiniz.')),
+        );
+      }
+      return;
+    }
+
     setState(() => _startingChat = true);
     try {
       final conversationId = await ref.read(chatServiceProvider).getOrCreateConversation(
@@ -40,6 +58,12 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
             seekerId: user.uid,
           );
       if (mounted) context.push('/chat/$conversationId');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sohbet başlatılamadı: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _startingChat = false);
     }

@@ -20,11 +20,45 @@ class ChatListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final uid = ref.watch(authStateProvider).value?.uid;
-    if (uid == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    final currentUser = ref.watch(authServiceProvider).currentUser;
+    if (currentUser == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Mesajlarım')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.chat_bubble_outline_rounded, size: 64, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                const Text(
+                  'Mesajlaşmak İçin Giriş Yapın',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'İlan sahipleriyle iletişime geçmek ve gelen mesajlarınızı görmek için lütfen hesabınıza giriş yapın.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () => context.push('/login'),
+                  icon: const Icon(Icons.login_rounded),
+                  label: const Text('Giriş Yap / Kayıt Ol'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     }
-    final conversationsAsync = ref.watch(chatServiceProvider).watchConversations(uid);
+
+    final conversationsAsync = ref.watch(chatServiceProvider).watchConversations(currentUser.uid);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mesajlarım')),
@@ -39,7 +73,28 @@ class ChatListScreen extends ConsumerWidget {
           }
           final conversations = snapshot.data ?? [];
           if (conversations.isEmpty) {
-            return const Center(child: Text('Henüz mesajınız yok.'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.mark_email_unread_outlined, size: 64, color: Colors.grey.shade400),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Henüz Mesajınız Yok',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'İlan detay sayfasından ilan sahibine mesaj göndererek hemen iletişim başlatabilirsiniz.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return ListView.separated(
             itemCount: conversations.length,
