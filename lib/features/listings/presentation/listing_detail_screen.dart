@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../shared/constants/categories.dart';
 import '../../../shared/services/auth_service.dart';
@@ -41,13 +42,43 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     }
   }
 
+  void _shareListing(Listing listing) {
+    final text = '''
+${listing.title}
+
+📍 ${listing.location}
+💰 ${listing.salary}
+📂 ${listingCategoryLabel(listing.category)}
+
+${listing.description}
+
+İletişim: ${listing.posterName}
+${listing.contactInfo}
+''';
+    Share.share(text, subject: listing.title);
+  }
+
   @override
   Widget build(BuildContext context) {
     final listingAsync = ref.watch(_listingProvider(widget.listingId));
     final myUid = ref.watch(authStateProvider).value?.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('İlan Detayı')),
+      appBar: AppBar(
+        title: const Text('İlan Detayı'),
+        actions: [
+          listingAsync.maybeWhen(
+            data: (listing) {
+              if (listing == null) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.share_outlined),
+                onPressed: () => _shareListing(listing),
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
+          ),
+        ],
+      ),
       body: listingAsync.when(
         data: (listing) {
           if (listing == null) {
