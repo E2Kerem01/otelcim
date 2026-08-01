@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/constants/categories.dart';
+import '../../../shared/models/report.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../../shared/widgets/report_dialog.dart';
 import '../domain/listing_model.dart';
 
 final _listingProvider = FutureProvider.family<Listing?, String>((ref, listingId) {
@@ -41,13 +43,53 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     }
   }
 
+  void _showReportDialog(Listing listing) {
+    showDialog(
+      context: context,
+      builder: (context) => ReportDialog(
+        targetType: TargetType.listing,
+        targetId: listing.id,
+        targetName: listing.title,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final listingAsync = ref.watch(_listingProvider(widget.listingId));
     final myUid = ref.watch(authStateProvider).value?.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('İlan Detayı')),
+      appBar: AppBar(
+        title: const Text('İlan Detayı'),
+        actions: listingAsync.maybeWhen(
+          data: (listing) {
+            if (listing == null) return null;
+            return [
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'report') {
+                    _showReportDialog(listing);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'report',
+                    child: Row(
+                      children: [
+                        Icon(Icons.flag_outlined),
+                        SizedBox(width: 12),
+                        Text('Bildir'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ];
+          },
+          orElse: () => null,
+        ),
+      ),
       body: listingAsync.when(
         data: (listing) {
           if (listing == null) {
