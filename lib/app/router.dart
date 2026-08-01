@@ -26,22 +26,26 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/splash',
+    initialLocation: '/',
     refreshListenable: authService,
     redirect: (context, state) {
       final isLoggedIn = authService.currentUser != null;
-      final loggingInPath = state.matchedLocation == '/login' || state.matchedLocation == '/register';
-      final onSplash = state.matchedLocation == '/splash';
+      final location = state.matchedLocation;
 
-      if (!isLoggedIn) {
-        return loggingInPath ? null : '/login';
+      final isProtected = location == '/create-listing' ||
+          location.startsWith('/chat') ||
+          location.startsWith('/profile') ||
+          location == '/my-listings' ||
+          location == '/onboarding';
+
+      if (!isLoggedIn && isProtected) {
+        return '/login';
       }
-      if (isLoggedIn && loggingInPath) {
-        return authService.consumeJustRegistered() ? '/onboarding' : '/';
-      }
-      if (isLoggedIn && onSplash) {
+
+      if (isLoggedIn && (location == '/login' || location == '/register')) {
         return '/';
       }
+
       return null;
     },
     routes: [
