@@ -159,6 +159,124 @@ class ListingService {
       return null;
     }
   }
+
+  /// Fetches paginated active listings with cursor support
+  ///
+  /// [limit] - Number of listings to fetch (default: 20)
+  /// [startAfter] - Document snapshot cursor for pagination
+  /// [category] - Optional category filter
+  /// [searchQuery] - Optional search query (client-side filtering)
+  Future<PaginatedListingsResult> getPaginatedListings({
+    int limit = 20,
+    DocumentSnapshot? startAfter,
+    String? category,
+    String? searchQuery,
+  }) async {
+    try {
+      Query query = _db.collection('listings');
+
+      // Apply category filter at query level if provided
+      if (category != null && category.isNotEmpty) {
+        query = query.where('category', isEqualTo: category);
+      }
+
+      // Filter by active status
+      query = query.where('status', isEqualTo: 'active');
+
+      // Order by createdAt descending for most recent first
+      query = query.orderBy('createdAt', descending: true);
+
+      // Apply cursor for pagination
+      if (startAfter != null) {
+        query = query.startAfterDocument(startAfter);
+      }
+
+      // Fetch one extra to determine if there are more results
+      query = query.limit(limit + 1);
+
+      final snapshot = await query.get();
+
+      var listings = snapshot.docs
+          .map(Listing.fromDoc)
+          .toList();
+
+      // Apply search query filter client-side if provided
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        final q = searchQuery.toLowerCase();
+        listings = listings
+            .where((l) =>
+                l.title.toLowerCase().contains(q) ||
+                l.location.toLowerCase().contains(q) ||
+                l.description.toLowerCase().contains(q))
+            .toList();
+      }
+
+      // Check if there are more results
+      final hasMore = listings.length > limit;
+
+      // Trim to requested limit
+      if (hasMore) {
+        listings = listings.sublist(0, limit);
+      }
+
+      // Get last document for next cursor
+      DocumentSnapshot? lastDoc;
+      if (listings.isNotEmpty && snapshot.docs.isNotEmpty) {
+        // Find the actual document for the last listing in our result
+        final lastListingId = listings.last.id;
+        lastDoc = snapshot.docs.firstWhere(
+          (doc) => doc.id == lastListingId,
+          orElse: () => snapshot.docs.last,
+        );
+      }
+
+      return PaginatedListingsResult(
+        listings: listings,
+        lastDocument: lastDoc,
+        hasMore: hasMore,
+      );
+    } catch (e) {
+      debugPrint('Firestore getPaginatedListings error: $e');
+      return PaginatedListingsResult(
+        listings: [],
+        lastDocument: null,
+        hasMore: false,
+      );
+    }
+  }
+
+  /// Fetches the next page of listings using the provided cursor
+  ///
+  /// [lastDocument] - Document snapshot cursor from previous page
+  /// [limit] - Number of listings to fetch (default: 20)
+  /// [category] - Optional category filter
+  /// [searchQuery] - Optional search query (client-side filtering)
+  Future<PaginatedListingsResult> getNextPage({
+    required DocumentSnapshot lastDocument,
+    int limit = 20,
+    String? category,
+    String? searchQuery,
+  }) async {
+    return getPaginatedListings(
+      limit: limit,
+      startAfter: lastDocument,
+      category: category,
+      searchQuery: searchQuery,
+    );
+  }
+}
+
+/// Result object for paginated listings queries
+class PaginatedListingsResult {
+  final List<Listing> listings;
+  final DocumentSnapshot? lastDocument;
+  final bool hasMore;
+
+  PaginatedListingsResult({
+    required this.listings,
+    required this.lastDocument,
+    required this.hasMore,
+  });
 }
 
 final listingServiceProvider = Provider<ListingService>((ref) => ListingService(FirebaseFirestore.instance));
