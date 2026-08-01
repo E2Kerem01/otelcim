@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../shared/constants/categories.dart';
+import '../../../shared/services/analytics_service.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
@@ -42,7 +43,7 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     }
   }
 
-  void _shareListing(Listing listing) {
+  Future<void> _shareListing(Listing listing) async {
     final text = '''
 ${listing.title}
 
@@ -54,8 +55,23 @@ ${listing.description}
 
 İletişim: ${listing.posterName}
 ${listing.contactInfo}
+
+🔗 Otelcim Uygulamasını İndir: https://otelcim.app
 ''';
-    Share.share(text, subject: listing.title);
+
+    try {
+      await Share.share(text, subject: listing.title);
+
+      // Log analytics event
+      await ref.read(analyticsServiceProvider).logShareListing(
+        listingId: listing.id,
+        listingTitle: listing.title,
+        category: listing.category,
+        location: listing.location,
+      );
+    } catch (e) {
+      debugPrint('Error sharing listing: $e');
+    }
   }
 
   @override
