@@ -9,10 +9,12 @@ import '../features/chat/presentation/chat_detail_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/listings/presentation/create_listing_screen.dart';
+import '../features/listings/presentation/edit_listing_screen.dart';
 import '../features/listings/presentation/listing_detail_screen.dart';
 import '../features/listings/presentation/my_listings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/role_selection_screen.dart';
+import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import '../shared/services/auth_service.dart';
@@ -111,6 +113,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/listing/:id/edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return EditListingScreen(listingId: id);
+        },
+      ),
+      GoRoute(
         path: '/chat/:conversationId',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
@@ -122,6 +132,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/my-listings',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const MyListingsScreen(),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const EditProfileScreen(),
       ),
     ],
   );

@@ -137,11 +137,16 @@ class ListingService {
   }
 
   Future<void> updateListing(Listing listing) {
-    return _db.collection('listings').doc(listing.id).update(listing.toMap());
+    final data = listing.toMap()..remove('createdAt');
+    return _db.collection('listings').doc(listing.id).update(data);
   }
 
   Future<void> closeListing(String listingId) {
     return _db.collection('listings').doc(listingId).update({'status': 'closed'});
+  }
+
+  Future<void> reactivateListing(String listingId) {
+    return _db.collection('listings').doc(listingId).update({'status': 'active'});
   }
 
   Future<Listing?> getListing(String listingId) async {
