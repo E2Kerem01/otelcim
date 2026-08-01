@@ -75,5 +75,25 @@
   "continueButton": "Devam Et",
   "@continueButton": {
     "description": "Continue button text"
+  },
+  "navHome": "Ana Sayfa",
+  "@navHome": {
+    "description": "Bottom navigation bar home tab label"
+  },
+  "navCategories": "Kategoriler",
+  "@navCategories": {
+    "description": "Bottom navigation bar categories tab label"
+  },
+  "navCreateListing": "İlan Ver",
+  "@navCreateListing": {
+    "description": "Bottom navigation bar create listing tab label"
+  },
+  "navMessages": "Mesajlar",
+  "@navMessages": {
+    "description": "Bottom navigation bar messages tab label"
+  },
+  "navProfile": "Hesabım",
+  "@navProfile": {
+    "description": "Bottom navigation bar profile tab label"
   }
 }

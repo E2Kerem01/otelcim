@@ -18,5 +18,10 @@
   "roleEmployer": "Looking for Staff",
   "roleEmployerDescription": "I'm looking for employees for my hotel or business. I want to post job listings.",
   "roleSelectionError": "Please select a role",
-  "continueButton": "Continue"
+  "continueButton": "Continue",
+  "navHome": "Home",
+  "navCategories": "Categories",
+  "navCreateListing": "Post Listing",
+  "navMessages": "Messages",
+  "navProfile": "My Account"
 }
