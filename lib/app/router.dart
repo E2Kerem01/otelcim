@@ -16,6 +16,7 @@ import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/role_selection_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
+import '../features/profile/presentation/verification_request_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import '../shared/services/auth_service.dart';
 
@@ -141,6 +142,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile/edit',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/profile/verification',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const VerificationRequestScreen(),
       ),
     ],
   );
