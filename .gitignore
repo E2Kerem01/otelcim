@@ -26,12 +26,19 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/ephemeral/
 .dart_tool/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
+!/build/web/
 /coverage/
+
+# Android related
+android/local.properties
 
 # Symbolication related
 app.*.symbols
@@ -46,3 +53,15 @@ app.*.map.json
 
 # Auto Claude data directory
 .auto-claude/
+
+# Auto Claude generated files
+.auto-claude-security.json
+.auto-claude-status
+.claude_settings.json
+.worktrees/
+.security-key
+logs/security/
+
+# Environment files
+.env
+.env*.local
