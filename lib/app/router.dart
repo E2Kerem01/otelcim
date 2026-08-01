@@ -1,180 +1,130 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/listings/screens/edit_listing_screen.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/register_screen.dart';
+import '../features/categories/presentation/categories_screen.dart';
+import '../features/chat/presentation/chat_detail_screen.dart';
+import '../features/chat/presentation/chat_list_screen.dart';
+import '../features/home/presentation/home_screen.dart';
+import '../features/listings/presentation/create_listing_screen.dart';
+import '../features/listings/presentation/edit_listing_screen.dart';
+import '../features/listings/presentation/listing_detail_screen.dart';
+import '../features/listings/presentation/my_listings_screen.dart';
+import '../features/profile/presentation/profile_screen.dart';
+import '../features/splash/presentation/splash_screen.dart';
+import '../shared/services/auth_service.dart';
 
-/// GoRouter configuration for the Otelcim app.
-///
-/// This router handles all navigation and route management throughout the app.
-/// It includes authentication-aware routing and redirects.
-///
-/// Routes:
-/// - `/` - Home screen (placeholder)
-/// - `/listings/:id/edit` - Edit listing screen (requires authentication)
-final GoRouter router = GoRouter(
-  debugLogDiagnostics: true,
-  initialLocation: '/',
-  redirect: (BuildContext context, GoRouterState state) {
-    // Get current user authentication state
-    final user = FirebaseAuth.instance.currentUser;
-    final isAuthenticated = user != null;
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-    // Define protected routes that require authentication
-    final isEditListingRoute = state.matchedLocation.startsWith('/listings/') &&
-        state.matchedLocation.endsWith('/edit');
+final routerProvider = Provider<GoRouter>((ref) {
+  final authService = ref.watch(authServiceProvider);
 
-    // Redirect to home if trying to access protected route without authentication
-    if (!isAuthenticated && isEditListingRoute) {
-      return '/';
-    }
+  return GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: '/splash',
+    refreshListenable: authService,
+    redirect: (context, state) {
+      final isLoggedIn = authService.currentUser != null;
+      final loggingInPath = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+      final onSplash = state.matchedLocation == '/splash';
 
-    // No redirect needed
-    return null;
-  },
-  routes: [
-    GoRoute(
-      path: '/',
-      name: 'home',
-      builder: (context, state) => const HomeScreen(),
-    ),
-    GoRoute(
-      path: '/listings/:id/edit',
-      name: 'edit-listing',
-      builder: (context, state) {
-        final listingId = state.pathParameters['id'];
-
-        // Validate that listingId is provided
-        if (listingId == null || listingId.isEmpty) {
-          return const ErrorScreen(
-            message: 'İlan ID\'si bulunamadı',
+      if (!isLoggedIn) {
+        return loggingInPath ? null : '/login';
+      }
+      if (isLoggedIn && (loggingInPath || onSplash)) {
+        return '/';
+      }
+      return null;
+    },
+    routes: [
+      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return Scaffold(
+            body: navigationShell,
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: navigationShell.currentIndex,
+              onTap: (index) {
+                navigationShell.goBranch(
+                  index,
+                  initialLocation: index == navigationShell.currentIndex,
+                );
+              },
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  activeIcon: Icon(Icons.home_rounded),
+                  label: 'Ana Sayfa',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.grid_view_outlined),
+                  activeIcon: Icon(Icons.grid_view_rounded),
+                  label: 'Kategoriler',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.add_circle_outline_rounded),
+                  activeIcon: Icon(Icons.add_circle_rounded),
+                  label: 'İlan Ver',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.chat_bubble_outline_rounded),
+                  activeIcon: Icon(Icons.chat_bubble_rounded),
+                  label: 'Mesajlar',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person_outline_rounded),
+                  activeIcon: Icon(Icons.person_rounded),
+                  label: 'Hesabım',
+                ),
+              ],
+            ),
           );
-        }
-
-        return EditListingScreen(listingId: listingId);
-      },
-    ),
-  ],
-  errorBuilder: (context, state) => ErrorScreen(
-    message: state.error?.toString() ?? 'Sayfa bulunamadı',
-  ),
-);
-
-/// Placeholder home screen for the app.
-///
-/// This is a temporary screen that will be replaced with the actual
-/// home/feed screen in future implementations.
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Otelcim'),
-        elevation: 0,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.work_outline,
-              size: 80,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Hoş Geldiniz',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              user != null
-                  ? 'Oturum açık: ${user.email ?? user.uid}'
-                  : 'Oturum açılmadı',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 32),
-            const Text(
-              'Ana sayfa yakında eklenecek',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Error screen displayed when routing errors occur.
-///
-/// Shows a user-friendly error message and provides a button to return home.
-class ErrorScreen extends StatelessWidget {
-  /// The error message to display
-  final String message;
-
-  const ErrorScreen({
-    super.key,
-    required this.message,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hata'),
-        elevation: 0,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                size: 80,
-                color: Colors.red,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Bir hata oluştu',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton.icon(
-                onPressed: () => context.go('/'),
-                icon: const Icon(Icons.home),
-                label: const Text('Ana Sayfaya Dön'),
-              ),
-            ],
+        },
+        branches: [
+          StatefulShellBranch(routes: [GoRoute(path: '/', builder: (context, state) => const HomeScreen())]),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/categories', builder: (context, state) => const CategoriesScreen())],
           ),
-        ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/create-listing', builder: (context, state) => const CreateListingScreen())],
+          ),
+          StatefulShellBranch(routes: [GoRoute(path: '/chat', builder: (context, state) => const ChatListScreen())]),
+          StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen())]),
+        ],
       ),
-    );
-  }
-}
+      GoRoute(
+        path: '/listing/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return ListingDetailScreen(listingId: id);
+        },
+      ),
+      GoRoute(
+        path: '/listing/:id/edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return EditListingScreen(listingId: id);
+        },
+      ),
+      GoRoute(
+        path: '/chat/:conversationId',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final conversationId = state.pathParameters['conversationId']!;
+          return ChatDetailScreen(conversationId: conversationId);
+        },
+      ),
+      GoRoute(
+        path: '/my-listings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const MyListingsScreen(),
+      ),
+    ],
+  );
+});
