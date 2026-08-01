@@ -1,0 +1,7 @@
+{
+  "@@locale": "tr",
+  "appName": "Otelcim",
+  "@appName": {
+    "description": "Application name"
+  }
+}
