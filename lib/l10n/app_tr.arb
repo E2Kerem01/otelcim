@@ -95,5 +95,21 @@
   "navProfile": "Hesabım",
   "@navProfile": {
     "description": "Bottom navigation bar profile tab label"
+  },
+  "profileTitle": "Hesabım",
+  "@profileTitle": {
+    "description": "Profile screen title"
+  },
+  "editProfile": "Profili Düzenle",
+  "@editProfile": {
+    "description": "Edit profile button text"
+  },
+  "myListings": "İlanlarım",
+  "@myListings": {
+    "description": "My listings button text"
+  },
+  "signOut": "Çıkış Yap",
+  "@signOut": {
+    "description": "Sign out button text"
   }
 }

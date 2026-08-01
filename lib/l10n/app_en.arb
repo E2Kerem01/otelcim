@@ -23,5 +23,9 @@
   "navCategories": "Categories",
   "navCreateListing": "Post Listing",
   "navMessages": "Messages",
-  "navProfile": "My Account"
+  "navProfile": "My Account",
+  "profileTitle": "My Account",
+  "editProfile": "Edit Profile",
+  "myListings": "My Listings",
+  "signOut": "Sign Out"
 }
