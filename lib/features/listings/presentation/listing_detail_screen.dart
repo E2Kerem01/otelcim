@@ -102,7 +102,7 @@ ${listing.contactInfo}
     showDialog(
       context: context,
       builder: (context) => ReportDialog(
-        targetType: TargetType.listing,
+        targetType: ReportTargetType.listing,
         targetId: listing.id,
         targetName: listing.title,
       ),

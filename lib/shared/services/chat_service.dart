@@ -79,12 +79,6 @@ class ChatService {
     return conversationId;
   }
 
-  Future<Conversation?> getConversation(String conversationId) async {
-    final doc = await _db.collection('conversations').doc(conversationId).get();
-    if (!doc.exists) return null;
-    return Conversation.fromDoc(doc as DocumentSnapshot<Map<String, dynamic>>);
-  }
-
   Future<void> sendMessage({
     required String conversationId,
     required String senderId,

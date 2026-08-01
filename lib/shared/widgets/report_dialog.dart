@@ -15,7 +15,7 @@ class ReportDialog extends ConsumerStatefulWidget {
     required this.targetName,
   });
 
-  final TargetType targetType;
+  final ReportTargetType targetType;
   final String targetId;
   final String targetName;
 
@@ -24,7 +24,7 @@ class ReportDialog extends ConsumerStatefulWidget {
 }
 
 class _ReportDialogState extends ConsumerState<ReportDialog> {
-  ReportReason _selectedReason = ReportReason.scamFraud;
+  ReportReason _selectedReason = ReportReason.scam;
   final _descriptionController = TextEditingController();
   bool _submitting = false;
 
@@ -32,21 +32,6 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
-  }
-
-  String _getReasonLabel(ReportReason reason) {
-    switch (reason) {
-      case ReportReason.scamFraud:
-        return 'Dolandırıcılık/Sahtecilik';
-      case ReportReason.spam:
-        return 'Spam';
-      case ReportReason.inappropriateContent:
-        return 'Uygunsuz İçerik';
-      case ReportReason.misleadingInformation:
-        return 'Yanıltıcı Bilgi';
-      case ReportReason.other:
-        return 'Diğer';
-    }
   }
 
   Future<void> _submitReport() async {
@@ -113,7 +98,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final targetTypeLabel = widget.targetType == TargetType.listing ? 'İlanı' : 'Kullanıcıyı';
+    final targetTypeLabel = widget.targetType == ReportTargetType.listing ? 'İlanı' : 'Kullanıcıyı';
 
     return AlertDialog(
       title: Text('$targetTypeLabel Bildir'),
@@ -141,7 +126,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
               items: ReportReason.values
                   .map((reason) => DropdownMenuItem(
                         value: reason,
-                        child: Text(_getReasonLabel(reason)),
+                        child: Text(reason.label),
                       ))
                   .toList(),
               onChanged: (value) {
