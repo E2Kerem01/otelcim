@@ -15,12 +15,28 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
   String _searchQuery = '';
 
   @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.9) {
+      // Trigger loading more data when scrolled to 90% of the list
+      // This will be connected to pagination logic in subsequent subtasks
+    }
   }
 
   @override
@@ -35,6 +51,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: const Text('Otelcim'),
       ),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
