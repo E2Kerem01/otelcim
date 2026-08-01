@@ -87,4 +87,70 @@ class StorageService {
       throw Exception('Unexpected error during photo deletion: $e');
     }
   }
+
+  /// Uploads a verification document to Firebase Storage.
+  ///
+  /// The document is stored at `verification_documents/{userId}/{timestamp}_{documentType}.{ext}` in Firebase Storage.
+  /// This path structure ensures documents are organized by user and easily identifiable by type.
+  ///
+  /// Parameters:
+  /// - [userId]: The unique identifier for the user
+  /// - [documentFile]: The document file to upload (e.g., PDF, image)
+  /// - [documentType]: The type of document (e.g., 'tax_id', 'tourism_license', 'hotel_registration')
+  ///
+  /// Returns:
+  /// A [Future<String>] containing the download URL of the uploaded document.
+  ///
+  /// Throws:
+  /// - [FirebaseException] if the upload fails
+  /// - [Exception] for other errors during upload
+  Future<String> uploadVerificationDocument(
+    String userId,
+    File documentFile,
+    String documentType,
+  ) async {
+    try {
+      // Get file extension from the file path
+      final String filePath = documentFile.path;
+      final String extension = filePath.substring(filePath.lastIndexOf('.'));
+
+      // Create timestamp for unique file naming
+      final int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+      // Define the storage path for the verification document
+      final String path = 'verification_documents/$userId/${timestamp}_$documentType$extension';
+      final Reference ref = _storage.ref().child(path);
+
+      // Determine content type based on file extension
+      String contentType = 'application/octet-stream';
+      if (extension.toLowerCase() == '.pdf') {
+        contentType = 'application/pdf';
+      } else if (['.jpg', '.jpeg'].contains(extension.toLowerCase())) {
+        contentType = 'image/jpeg';
+      } else if (extension.toLowerCase() == '.png') {
+        contentType = 'image/png';
+      }
+
+      // Set metadata for the file
+      final SettableMetadata metadata = SettableMetadata(
+        contentType: contentType,
+        customMetadata: {
+          'userId': userId,
+          'documentType': documentType,
+          'uploadedAt': DateTime.now().toIso8601String(),
+        },
+      );
+
+      // Upload the file
+      final TaskSnapshot uploadTask = await ref.putFile(documentFile, metadata);
+
+      // Get and return the download URL
+      final String downloadUrl = await uploadTask.ref.getDownloadURL();
+      return downloadUrl;
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to upload verification document: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error during document upload: $e');
+    }
+  }
 }
