@@ -24,6 +24,16 @@ class AuthService extends ChangeNotifier {
   StreamSubscription<User?>? _authSub;
 
   AppUser? _currentUser;
+  bool _justRegistered = false;
+
+  /// Returns whether the current user just registered (vs. logged in to an
+  /// existing account), and resets the flag. Used to route first-time
+  /// registrants through onboarding exactly once.
+  bool consumeJustRegistered() {
+    final value = _justRegistered;
+    _justRegistered = false;
+    return value;
+  }
 
   AppUser? get currentUser {
     final fbUser = _auth.currentUser;
@@ -59,6 +69,7 @@ class AuthService extends ChangeNotifier {
       debugPrint('Firestore user creation warning: $e');
     }
     _currentUser = user;
+    _justRegistered = true;
     notifyListeners();
     return user;
   }

@@ -12,6 +12,8 @@ import '../features/listings/presentation/create_listing_screen.dart';
 import '../features/listings/presentation/edit_listing_screen.dart';
 import '../features/listings/presentation/listing_detail_screen.dart';
 import '../features/listings/presentation/my_listings_screen.dart';
+import '../features/onboarding/presentation/onboarding_screen.dart';
+import '../features/onboarding/presentation/role_selection_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
@@ -34,7 +36,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (!isLoggedIn) {
         return loggingInPath ? null : '/login';
       }
-      if (isLoggedIn && (loggingInPath || onSplash)) {
+      if (isLoggedIn && loggingInPath) {
+        return authService.consumeJustRegistered() ? '/onboarding' : '/';
+      }
+      if (isLoggedIn && onSplash) {
         return '/';
       }
       return null;
@@ -43,6 +48,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+      GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingScreen()),
+      GoRoute(path: '/onboarding/role', builder: (context, state) => const RoleSelectionScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return Scaffold(
