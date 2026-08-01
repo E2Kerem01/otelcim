@@ -3,5 +3,45 @@
   "appName": "Otelcim",
   "@appName": {
     "description": "Application name"
+  },
+  "emailLabel": "E-posta",
+  "@emailLabel": {
+    "description": "Email input field label"
+  },
+  "emailHint": "ornek@eposta.com",
+  "@emailHint": {
+    "description": "Email input field hint"
+  },
+  "emailValidation": "Geçerli bir e-posta girin",
+  "@emailValidation": {
+    "description": "Email validation error message"
+  },
+  "passwordLabel": "Şifre",
+  "@passwordLabel": {
+    "description": "Password input field label"
+  },
+  "passwordValidation": "Şifre en az 6 karakter olmalı",
+  "@passwordValidation": {
+    "description": "Password validation error message"
+  },
+  "loginButton": "Giriş Yap",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "registerButton": "Kayıt Ol",
+  "@registerButton": {
+    "description": "Register button text"
+  },
+  "registerTitle": "Kayıt Ol",
+  "@registerTitle": {
+    "description": "Register screen title"
+  },
+  "noAccountPrompt": "Hesabın yok mu? Kayıt ol",
+  "@noAccountPrompt": {
+    "description": "Prompt to register when no account exists"
+  },
+  "hasAccountPrompt": "Zaten hesabın var mı? Giriş yap",
+  "@hasAccountPrompt": {
+    "description": "Prompt to login when account exists"
   }
 }

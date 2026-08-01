@@ -1,4 +1,14 @@
 {
   "@@locale": "en",
-  "appName": "Otelcim"
+  "appName": "Otelcim",
+  "emailLabel": "Email",
+  "emailHint": "example@email.com",
+  "emailValidation": "Enter a valid email",
+  "passwordLabel": "Password",
+  "passwordValidation": "Password must be at least 6 characters",
+  "loginButton": "Sign In",
+  "registerButton": "Register",
+  "registerTitle": "Register",
+  "noAccountPrompt": "Don't have an account? Register",
+  "hasAccountPrompt": "Already have an account? Sign in"
 }
