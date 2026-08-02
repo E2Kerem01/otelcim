@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'app_user.dart';
 
 /// Represents a user's profile information in the application.
 ///
@@ -31,6 +32,12 @@ class UserProfile {
   /// Type of user: 'employer' or 'jobseeker'
   final String userType;
 
+  /// Whether this user has admin privileges
+  final bool isAdmin;
+
+  /// Admin role (only set if isAdmin is true)
+  final AdminRole? adminRole;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -47,6 +54,8 @@ class UserProfile {
     this.hotelName,
     this.position,
     required this.userType,
+    this.isAdmin = false,
+    this.adminRole,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -54,6 +63,7 @@ class UserProfile {
   /// Creates a UserProfile from a Firestore DocumentSnapshot
   factory UserProfile.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
+    final adminRoleString = data['adminRole'] as String?;
     return UserProfile(
       id: doc.id,
       email: data['email'] as String,
@@ -64,6 +74,10 @@ class UserProfile {
       hotelName: data['hotelName'] as String?,
       position: data['position'] as String?,
       userType: data['userType'] as String,
+      isAdmin: data['isAdmin'] as bool? ?? false,
+      adminRole: adminRoleString != null
+          ? AdminRoleExtension.fromFirestore(adminRoleString)
+          : null,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -80,6 +94,8 @@ class UserProfile {
       'hotelName': hotelName,
       'position': position,
       'userType': userType,
+      'isAdmin': isAdmin,
+      'adminRole': adminRole?.toFirestore(),
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -96,6 +112,8 @@ class UserProfile {
     String? hotelName,
     String? position,
     String? userType,
+    bool? isAdmin,
+    AdminRole? adminRole,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -109,6 +127,8 @@ class UserProfile {
       hotelName: hotelName ?? this.hotelName,
       position: position ?? this.position,
       userType: userType ?? this.userType,
+      isAdmin: isAdmin ?? this.isAdmin,
+      adminRole: adminRole ?? this.adminRole,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -128,6 +148,8 @@ class UserProfile {
         other.hotelName == hotelName &&
         other.position == position &&
         other.userType == userType &&
+        other.isAdmin == isAdmin &&
+        other.adminRole == adminRole &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -144,6 +166,8 @@ class UserProfile {
       hotelName,
       position,
       userType,
+      isAdmin,
+      adminRole,
       createdAt,
       updatedAt,
     );
@@ -154,6 +178,7 @@ class UserProfile {
     return 'UserProfile(id: $id, email: $email, displayName: $displayName, '
         'phoneNumber: $phoneNumber, bio: $bio, photoUrl: $photoUrl, '
         'hotelName: $hotelName, position: $position, userType: $userType, '
+        'isAdmin: $isAdmin, adminRole: $adminRole, '
         'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
