@@ -1,0 +1,151 @@
+{
+  "@@locale": "tr",
+  "appName": "Otelcim",
+  "@appName": {
+    "description": "Application name"
+  },
+  "emailLabel": "E-posta",
+  "@emailLabel": {
+    "description": "Email input field label"
+  },
+  "emailHint": "ornek@eposta.com",
+  "@emailHint": {
+    "description": "Email input field hint"
+  },
+  "emailValidation": "Geçerli bir e-posta girin",
+  "@emailValidation": {
+    "description": "Email validation error message"
+  },
+  "passwordLabel": "Şifre",
+  "@passwordLabel": {
+    "description": "Password input field label"
+  },
+  "passwordValidation": "Şifre en az 6 karakter olmalı",
+  "@passwordValidation": {
+    "description": "Password validation error message"
+  },
+  "loginButton": "Giriş Yap",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "registerButton": "Kayıt Ol",
+  "@registerButton": {
+    "description": "Register button text"
+  },
+  "registerTitle": "Kayıt Ol",
+  "@registerTitle": {
+    "description": "Register screen title"
+  },
+  "noAccountPrompt": "Hesabın yok mu? Kayıt ol",
+  "@noAccountPrompt": {
+    "description": "Prompt to register when no account exists"
+  },
+  "hasAccountPrompt": "Zaten hesabın var mı? Giriş yap",
+  "@hasAccountPrompt": {
+    "description": "Prompt to login when account exists"
+  },
+  "onboardingWelcome": "Otelcim'e Hoş Geldiniz!",
+  "@onboardingWelcome": {
+    "description": "Welcome message on role selection screen"
+  },
+  "onboardingRolePrompt": "Size en uygun deneyimi sunabilmemiz için lütfen rolünüzü seçin:",
+  "@onboardingRolePrompt": {
+    "description": "Prompt to select user role"
+  },
+  "roleJobSeeker": "İş Arıyorum",
+  "@roleJobSeeker": {
+    "description": "Job seeker role title"
+  },
+  "roleJobSeekerDescription": "Otel ve turizm sektöründe iş arıyorum. İlanları görmek ve başvurmak istiyorum.",
+  "@roleJobSeekerDescription": {
+    "description": "Job seeker role description"
+  },
+  "roleEmployer": "Personel Arıyorum",
+  "@roleEmployer": {
+    "description": "Employer role title"
+  },
+  "roleEmployerDescription": "Otelim veya işletmem için çalışan arıyorum. İlan vermek istiyorum.",
+  "@roleEmployerDescription": {
+    "description": "Employer role description"
+  },
+  "roleSelectionError": "Lütfen bir rol seçin",
+  "@roleSelectionError": {
+    "description": "Error message when no role is selected"
+  },
+  "continueButton": "Devam Et",
+  "@continueButton": {
+    "description": "Continue button text"
+  },
+  "navHome": "Ana Sayfa",
+  "@navHome": {
+    "description": "Bottom navigation bar home tab label"
+  },
+  "navCategories": "Kategoriler",
+  "@navCategories": {
+    "description": "Bottom navigation bar categories tab label"
+  },
+  "navCreateListing": "İlan Ver",
+  "@navCreateListing": {
+    "description": "Bottom navigation bar create listing tab label"
+  },
+  "navMessages": "Mesajlar",
+  "@navMessages": {
+    "description": "Bottom navigation bar messages tab label"
+  },
+  "navProfile": "Hesabım",
+  "@navProfile": {
+    "description": "Bottom navigation bar profile tab label"
+  },
+  "profileTitle": "Hesabım",
+  "@profileTitle": {
+    "description": "Profile screen title"
+  },
+  "editProfile": "Profili Düzenle",
+  "@editProfile": {
+    "description": "Edit profile button text"
+  },
+  "myListings": "İlanlarım",
+  "@myListings": {
+    "description": "My listings button text"
+  },
+  "signOut": "Çıkış Yap",
+  "@signOut": {
+    "description": "Sign out button text"
+  },
+  "categoryReception": "Resepsiyon",
+  "@categoryReception": {
+    "description": "Reception category label"
+  },
+  "categoryHousekeeping": "Kat Hizmetleri",
+  "@categoryHousekeeping": {
+    "description": "Housekeeping category label"
+  },
+  "categoryKitchenChef": "Mutfak / Aşçı",
+  "@categoryKitchenChef": {
+    "description": "Kitchen/Chef category label"
+  },
+  "categoryServiceWaiter": "Servis / Garson",
+  "@categoryServiceWaiter": {
+    "description": "Service/Waiter category label"
+  },
+  "categorySecurity": "Güvenlik",
+  "@categorySecurity": {
+    "description": "Security category label"
+  },
+  "categoryAnimation": "Animasyon",
+  "@categoryAnimation": {
+    "description": "Animation category label"
+  },
+  "categoryManagement": "Yönetim",
+  "@categoryManagement": {
+    "description": "Management category label"
+  },
+  "categoryTechnicalService": "Teknik Servis",
+  "@categoryTechnicalService": {
+    "description": "Technical Service category label"
+  },
+  "categoryOther": "Diğer",
+  "@categoryOther": {
+    "description": "Other category label"
+  }
+}
