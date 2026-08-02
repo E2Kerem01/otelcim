@@ -15,6 +15,12 @@ class Listing {
   final ListingStatus status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final bool isBoosted;
+  final DateTime? boostExpiresAt;
+  final String? boostType;
+  final String? boostPurchaseId;
+  final int viewCount;
+  final int messageCount;
 
   const Listing({
     required this.id,
@@ -29,6 +35,12 @@ class Listing {
     this.status = ListingStatus.active,
     this.createdAt,
     this.updatedAt,
+    this.isBoosted = false,
+    this.boostExpiresAt,
+    this.boostType,
+    this.boostPurchaseId,
+    this.viewCount = 0,
+    this.messageCount = 0,
   });
 
   factory Listing.fromDoc(DocumentSnapshot doc) {
@@ -46,6 +58,12 @@ class Listing {
       status: (data['status'] as String? ?? 'active') == 'closed' ? ListingStatus.closed : ListingStatus.active,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      isBoosted: data['isBoosted'] as bool? ?? false,
+      boostExpiresAt: (data['boostExpiresAt'] as Timestamp?)?.toDate(),
+      boostType: data['boostType'] as String?,
+      boostPurchaseId: data['boostPurchaseId'] as String?,
+      viewCount: data['viewCount'] as int? ?? 0,
+      messageCount: data['messageCount'] as int? ?? 0,
     );
   }
 
@@ -61,5 +79,11 @@ class Listing {
         'status': status == ListingStatus.closed ? 'closed' : 'active',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
+        'isBoosted': isBoosted,
+        'boostExpiresAt': boostExpiresAt != null ? Timestamp.fromDate(boostExpiresAt!) : null,
+        'boostType': boostType,
+        'boostPurchaseId': boostPurchaseId,
+        'viewCount': viewCount,
+        'messageCount': messageCount,
       };
 }
