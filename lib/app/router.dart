@@ -169,7 +169,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final conversationId = state.pathParameters['conversationId']!;
-          return ChatDetailScreen(conversationId: conversationId);
+          return ChatDetailScreen(conversationId: conversationId, initialText: state.extra as String?);
         },
       ),
       GoRoute(

@@ -75,7 +75,7 @@ class ChatService {
     });
   }
 
-  Future<String> getOrCreateConversation({
+  Future<({String conversationId, bool isNew})> getOrCreateConversation({
     required String listingId,
     required String listingTitle,
     required String posterId,
@@ -84,7 +84,8 @@ class ChatService {
     final conversationId = '${listingId}_$seekerId';
     final ref = _db.collection('conversations').doc(conversationId);
     final existing = await ref.get();
-    if (!existing.exists) {
+    final isNew = !existing.exists;
+    if (isNew) {
       await ref.set(
         Conversation(
           id: conversationId,
@@ -95,7 +96,7 @@ class ChatService {
         ).toMap(),
       );
     }
-    return conversationId;
+    return (conversationId: conversationId, isNew: isNew);
   }
 
   Future<void> sendMessage({

@@ -151,7 +151,9 @@ void main() {
 
     test('chat creates once, sends, watches and fetches conversations/messages', () async {
       final service = ChatService(db);
-      final id = await service.getOrCreateConversation(listingId: 'l', listingTitle: 'İş', posterId: 'p', seekerId: 's');
+      final result = await service.getOrCreateConversation(listingId: 'l', listingTitle: 'İş', posterId: 'p', seekerId: 's');
+      final id = result.conversationId;
+      expect(result.isNew, isTrue);
       expect(await service.getConversation(id), isA<Conversation>());
       expect(await service.watchConversations('p').first, hasLength(1));
       await service.sendMessage(conversationId: id, senderId: 's', text: 'Merhaba');
