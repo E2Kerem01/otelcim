@@ -8,9 +8,13 @@ import '../../../shared/services/chat_service.dart';
 import '../../../shared/widgets/report_dialog.dart';
 
 class ChatDetailScreen extends ConsumerStatefulWidget {
-  const ChatDetailScreen({super.key, required this.conversationId});
+  const ChatDetailScreen({super.key, required this.conversationId, this.initialText});
 
   final String conversationId;
+
+  /// Pre-fills the message field, e.g. when the seeker picked a quick-apply
+  /// template before entering the chat for the first time.
+  final String? initialText;
 
   @override
   ConsumerState<ChatDetailScreen> createState() => _ChatDetailScreenState();
@@ -23,6 +27,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialText != null && widget.initialText!.isNotEmpty) {
+      _messageController.text = widget.initialText!;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(currentChatIdProvider.notifier).state = widget.conversationId;
     });

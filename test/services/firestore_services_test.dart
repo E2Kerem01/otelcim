@@ -149,7 +149,8 @@ void main() {
 
     test('chat creates once, sends, watches and fetches conversations/messages', () async {
       final service = ChatService(db);
-      final id = await service.getOrCreateConversation(listingId: 'l', listingTitle: 'İş', posterId: 'p', seekerId: 's');
+      final (id, isNew) = await service.getOrCreateConversation(listingId: 'l', listingTitle: 'İş', posterId: 'p', seekerId: 's');
+      expect(isNew, isTrue);
       expect(await service.getConversation(id), isA<Conversation>());
       expect(await service.watchConversations('p').first, hasLength(1));
       await service.sendMessage(conversationId: id, senderId: 's', text: 'Merhaba');
@@ -157,6 +158,10 @@ void main() {
       expect(messages.single.text, 'Merhaba');
       expect((await service.getConversation(id))!.lastMessage, 'Merhaba');
       expect(await service.getConversation('missing'), isNull);
+
+      final (idAgain, isNewAgain) = await service.getOrCreateConversation(listingId: 'l', listingTitle: 'İş', posterId: 'p', seekerId: 's');
+      expect(idAgain, id);
+      expect(isNewAgain, isFalse);
     });
   });
 
