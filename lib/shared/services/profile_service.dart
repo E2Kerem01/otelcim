@@ -18,6 +18,22 @@ class ProfileService {
   /// The Firestore collection name for user profiles
   static const String _collectionName = 'user_profiles';
 
+  /// Cihazın güncel FCM token'ını kullanıcının profiline kaydeder.
+  Future<void> updateFcmToken(String uid, String token) async {
+    await _firestore.collection(_collectionName).doc(uid).set({
+      'fcmToken': token,
+      'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  /// Çıkış yapan kullanıcının eski cihaz token'ını profilden kaldırır.
+  Future<void> clearFcmToken(String uid) async {
+    await _firestore.collection(_collectionName).doc(uid).set({
+      'fcmToken': FieldValue.delete(),
+      'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
   /// Retrieves a user's profile from Firestore.
   ///
   /// Parameters:
