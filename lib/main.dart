@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/router.dart';
 import 'app/theme.dart';
 import 'firebase_options.dart';
+import 'shared/providers/theme_provider.dart';
 import 'shared/services/auth_service.dart';
 import 'shared/services/notification_service.dart';
 
@@ -49,10 +50,13 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp.router(
       title: 'Otelcim',
       debugShowCheckedModeBanner: false,
       theme: otelcimTheme,
+      darkTheme: otelcimDarkTheme,
+      themeMode: themeMode,
       routerConfig: router,
     );
   }
