@@ -9,6 +9,24 @@ class ReportService {
 
   final FirebaseFirestore _db;
 
+  Stream<List<Report>> watchPendingReports() {
+    return _db
+        .collection('reports')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .where((doc) {
+              final status = doc.data()['status'] as String?;
+              return status == null || status == 'pending';
+            })
+            .map(Report.fromDoc)
+            .toList())
+        .handleError((Object error) {
+      debugPrint('Error watching pending reports: $error');
+      return <Report>[];
+    });
+  }
+
   Future<void> submitReport(Report report) async {
     try {
       await _db.collection('reports').add(report.toMap());

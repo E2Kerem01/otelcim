@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'app_user.dart';
 
 /// Represents a user's profile information in the application.
 ///
@@ -31,6 +32,12 @@ class UserProfile {
   /// Type of user: 'employer' or 'jobseeker'
   final String userType;
 
+  /// Whether this user has admin privileges
+  final bool isAdmin;
+
+  /// Admin role (only set if isAdmin is true)
+  final AdminRole? adminRole;
+
   /// Whether the employer has been verified (only for employer users)
   final bool isVerified;
 
@@ -56,6 +63,8 @@ class UserProfile {
     this.hotelName,
     this.position,
     required this.userType,
+    this.isAdmin = false,
+    this.adminRole,
     this.isVerified = false,
     this.verificationStatus,
     this.verifiedAt,
@@ -66,6 +75,7 @@ class UserProfile {
   /// Creates a UserProfile from a Firestore DocumentSnapshot
   factory UserProfile.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
+    final adminRoleString = data['adminRole'] as String?;
     return UserProfile(
       id: doc.id,
       email: data['email'] as String,
@@ -76,6 +86,10 @@ class UserProfile {
       hotelName: data['hotelName'] as String?,
       position: data['position'] as String?,
       userType: data['userType'] as String,
+      isAdmin: data['isAdmin'] as bool? ?? false,
+      adminRole: adminRoleString != null
+          ? AdminRoleExtension.fromFirestore(adminRoleString)
+          : null,
       isVerified: data['isVerified'] as bool? ?? false,
       verificationStatus: data['verificationStatus'] as String?,
       verifiedAt: data['verifiedAt'] != null
@@ -97,6 +111,8 @@ class UserProfile {
       'hotelName': hotelName,
       'position': position,
       'userType': userType,
+      'isAdmin': isAdmin,
+      'adminRole': adminRole?.toFirestore(),
       'isVerified': isVerified,
       'verificationStatus': verificationStatus,
       'verifiedAt': verifiedAt != null ? Timestamp.fromDate(verifiedAt!) : null,
@@ -116,6 +132,8 @@ class UserProfile {
     String? hotelName,
     String? position,
     String? userType,
+    bool? isAdmin,
+    AdminRole? adminRole,
     bool? isVerified,
     String? verificationStatus,
     DateTime? verifiedAt,
@@ -132,6 +150,8 @@ class UserProfile {
       hotelName: hotelName ?? this.hotelName,
       position: position ?? this.position,
       userType: userType ?? this.userType,
+      isAdmin: isAdmin ?? this.isAdmin,
+      adminRole: adminRole ?? this.adminRole,
       isVerified: isVerified ?? this.isVerified,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       verifiedAt: verifiedAt ?? this.verifiedAt,
@@ -154,6 +174,8 @@ class UserProfile {
         other.hotelName == hotelName &&
         other.position == position &&
         other.userType == userType &&
+        other.isAdmin == isAdmin &&
+        other.adminRole == adminRole &&
         other.isVerified == isVerified &&
         other.verificationStatus == verificationStatus &&
         other.verifiedAt == verifiedAt &&
@@ -173,6 +195,8 @@ class UserProfile {
       hotelName,
       position,
       userType,
+      isAdmin,
+      adminRole,
       isVerified,
       verificationStatus,
       verifiedAt,
@@ -186,6 +210,7 @@ class UserProfile {
     return 'UserProfile(id: $id, email: $email, displayName: $displayName, '
         'phoneNumber: $phoneNumber, bio: $bio, photoUrl: $photoUrl, '
         'hotelName: $hotelName, position: $position, userType: $userType, '
+        'isAdmin: $isAdmin, adminRole: $adminRole, '
         'isVerified: $isVerified, verificationStatus: $verificationStatus, '
         'verifiedAt: $verifiedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
