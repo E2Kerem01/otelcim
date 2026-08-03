@@ -153,4 +153,31 @@ class StorageService {
       throw Exception('Unexpected error during document upload: $e');
     }
   }
+
+  /// Uploads a banner ad image to Firebase Storage.
+  ///
+  /// The image is stored at `banner_images/{timestamp}.jpg`.
+  /// Returns the download URL string.
+  Future<String> uploadBannerImage(File imageFile) async {
+    try {
+      final int timestamp = DateTime.now().millisecondsSinceEpoch;
+      final String path = 'banner_images/$timestamp.jpg';
+      final Reference ref = _storage.ref().child(path);
+
+      final SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {
+          'uploadedAt': DateTime.now().toIso8601String(),
+        },
+      );
+
+      final TaskSnapshot uploadTask = await ref.putFile(imageFile, metadata);
+      final String downloadUrl = await uploadTask.ref.getDownloadURL();
+      return downloadUrl;
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to upload banner image: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error during banner image upload: $e');
+    }
+  }
 }

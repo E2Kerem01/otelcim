@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
+import '../features/ads/presentation/admin_banner_ads_screen.dart';
 import '../features/admin/presentation/admin_dashboard_screen.dart';
 import '../features/admin/presentation/audit_log_screen.dart';
 import '../features/admin/presentation/reports_moderation_screen.dart';
@@ -196,6 +197,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/admin/audit-log',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AuditLogScreen(),
+      ),
+      GoRoute(
+        path: '/admin/banners',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AdminBannerAdsScreen(),
       ),
     ],
   );

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/providers/paginated_listings_provider.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../ads/presentation/widgets/banner_ad_carousel.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../listings/domain/listing_model.dart';
 
@@ -95,6 +96,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onChanged: (value) => setState(() => _searchQuery = value),
                 ),
               ),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: BannerAdCarousel(),
             ),
           ),
           SliverToBoxAdapter(
