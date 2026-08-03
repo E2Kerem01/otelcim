@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/services/auth_service.dart';
+import '../../ratings/services/rating_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -18,6 +19,7 @@ class ProfileScreen extends ConsumerWidget {
     final displayName = profile?.displayName;
     final photoUrl = profile?.photoUrl;
     final themeMode = ref.watch(themeModeProvider);
+    final ratings = user == null ? null : ref.watch(userRatingsProvider(user.uid));
     final initial = (displayName?.isNotEmpty ?? false)
         ? displayName![0].toUpperCase()
         : (email.isNotEmpty ? email[0].toUpperCase() : '?');
@@ -63,6 +65,32 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
+          if (ratings != null)
+            ratings.when(
+              data: (items) {
+                if (items.isEmpty) return const SizedBox.shrink();
+                final average = items.fold<int>(
+                      0,
+                      (total, rating) => total + rating.stars,
+                    ) /
+                    items.length;
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Card(
+                    child: ListTile(
+                      leading: Icon(Icons.star_rounded, color: Colors.amber.shade700),
+                      title: Text(
+                        '${average.toStringAsFixed(1)} / 5',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text('${items.length} değerlendirme'),
+                    ),
+                  ),
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
           const SizedBox(height: 20),
           Card(
             child: ListTile(

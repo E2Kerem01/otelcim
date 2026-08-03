@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../shared/models/conversation.dart';
 import '../../../shared/models/message.dart';
 import '../../../shared/models/report.dart';
 import '../../../shared/services/auth_service.dart';
@@ -19,6 +23,9 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
 class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   final _messageController = TextEditingController();
   String? _otherParticipantId;
+  Conversation? _conversation;
+  bool _markingHired = false;
+  StreamSubscription<Conversation?>? _conversationSubscription;
 
   @override
   void initState() {
@@ -26,21 +33,76 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(currentChatIdProvider.notifier).state = widget.conversationId;
     });
-    _loadOtherParticipant();
+    _listenToConversation();
   }
 
-  Future<void> _loadOtherParticipant() async {
-    final myUid = ref.read(authStateProvider).value?.uid;
-    if (myUid == null) return;
-    final conversation = await ref.read(chatServiceProvider).getConversation(widget.conversationId);
-    if (conversation != null && mounted) {
-      setState(() => _otherParticipantId = conversation.otherParticipant(myUid));
+  void _listenToConversation() {
+    _conversationSubscription = ref
+        .read(chatServiceProvider)
+        .watchConversation(widget.conversationId)
+        .listen((conversation) {
+      final myUid = ref.read(authStateProvider).value?.uid;
+      if (conversation != null && myUid != null && mounted) {
+        if (myUid != conversation.posterId && myUid != conversation.seekerId) {
+          context.go('/');
+          return;
+        }
+        setState(() {
+          _conversation = conversation;
+          _otherParticipantId = conversation.otherParticipant(myUid);
+        });
+      }
+    });
+  }
+
+  Future<void> _markAsHired() async {
+    if (_conversation?.hired == true || _markingHired) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('İşe alındı olarak işaretle'),
+        content: const Text(
+          'Bu görüşmede işe alımın gerçekleştiğini onaylıyor musunuz?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Vazgeç'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Onayla'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _markingHired = true);
+    try {
+      await ref
+          .read(chatServiceProvider)
+          .markConversationHired(widget.conversationId);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Görüşme işe alındı olarak işaretlendi.')),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('İşlem tamamlanamadı. Tekrar deneyin.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _markingHired = false);
     }
   }
 
   @override
   void dispose() {
     ref.read(currentChatIdProvider.notifier).state = null;
+    _conversationSubscription?.cancel();
     _messageController.dispose();
     super.dispose();
   }
@@ -84,10 +146,23 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               onSelected: (value) {
                 if (value == 'report') {
                   _showReportDialog();
+                } else if (value == 'hired') {
+                  _markAsHired();
                 }
               },
-              itemBuilder: (context) => const [
-                PopupMenuItem(
+              itemBuilder: (context) => [
+                if (_conversation?.hired != true)
+                  const PopupMenuItem(
+                    value: 'hired',
+                    child: Row(
+                      children: [
+                        Icon(Icons.handshake_outlined),
+                        SizedBox(width: 12),
+                        Text('İşe Alındı Olarak İşaretle'),
+                      ],
+                    ),
+                  ),
+                const PopupMenuItem(
                   value: 'report',
                   child: Row(
                     children: [
@@ -103,6 +178,39 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
       ),
       body: Column(
         children: [
+          if (_conversation?.hired == true && _otherParticipantId != null)
+            Material(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.verified_outlined,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text('Bu görüşmede işe alım gerçekleşti.'),
+                        ),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () async {
+                          await context.push('/chat/${widget.conversationId}/rate');
+                        },
+                        child: const Text('Deneyimini Değerlendir'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           Expanded(
             child: StreamBuilder<List<Message>>(
               stream: messagesStream,

@@ -36,6 +36,25 @@ class ChatService {
     return Conversation.fromDoc(doc);
   }
 
+  Stream<Conversation?> watchConversation(String conversationId) {
+    return _db.collection('conversations').doc(conversationId).snapshots().map(
+          (doc) => doc.exists ? Conversation.fromDoc(doc) : null,
+        );
+  }
+
+  Future<void> markConversationHired(String conversationId) async {
+    final reference = _db.collection('conversations').doc(conversationId);
+    await _db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(reference);
+      if (!snapshot.exists || snapshot.data()?['hired'] == true) return;
+      transaction.update(reference, {
+        'hired': true,
+        'hiredAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
   Stream<List<Message>> watchMessages(String conversationId) {
     return _db
         .collection('conversations')

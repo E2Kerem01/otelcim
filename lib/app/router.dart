@@ -27,6 +27,7 @@ import '../features/profile/presentation/privacy_policy_screen.dart';
 import '../features/profile/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/verification_request_screen.dart';
+import '../features/ratings/presentation/submit_rating_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import '../shared/services/auth_service.dart';
 
@@ -150,6 +151,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return BoostPurchaseScreen(listingId: id);
+        },
+      ),
+      GoRoute(
+        path: '/chat/:conversationId/rate',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final conversationId = state.pathParameters['conversationId']!;
+          return SubmitRatingScreen(conversationId: conversationId);
         },
       ),
       GoRoute(
