@@ -4,6 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
+import '../features/admin/presentation/admin_dashboard_screen.dart';
+import '../features/admin/presentation/audit_log_screen.dart';
+import '../features/admin/presentation/reports_moderation_screen.dart';
+import '../features/admin/presentation/verification_review_screen.dart';
+import '../features/admin/services/admin_service.dart';
 import '../features/categories/presentation/categories_screen.dart';
 import '../features/chat/presentation/chat_detail_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
@@ -23,12 +28,13 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authService = ref.watch(authServiceProvider);
+  final adminService = ref.watch(adminServiceProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     refreshListenable: authService,
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final isLoggedIn = authService.currentUser != null;
       final location = state.matchedLocation;
 
@@ -36,10 +42,16 @@ final routerProvider = Provider<GoRouter>((ref) {
           location.startsWith('/chat') ||
           location.startsWith('/profile') ||
           location == '/my-listings' ||
-          location == '/onboarding';
+          location == '/onboarding' ||
+          location.startsWith('/admin');
 
       if (!isLoggedIn && isProtected) {
         return '/login';
+      }
+
+      if (isLoggedIn && location.startsWith('/admin')) {
+        final profile = await adminService.getUserProfile(authService.currentUser!.uid);
+        if (!adminService.isAdminProfile(profile)) return '/';
       }
 
       if (isLoggedIn && (location == '/login' || location == '/register')) {
@@ -141,6 +153,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile/edit',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/admin',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin/reports',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ReportsModerationScreen(),
+      ),
+      GoRoute(
+        path: '/admin/verifications',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const VerificationReviewScreen(),
+      ),
+      GoRoute(
+        path: '/admin/audit-log',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AuditLogScreen(),
       ),
     ],
   );
