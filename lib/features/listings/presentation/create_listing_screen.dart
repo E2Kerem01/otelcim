@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../../shared/services/storage_service.dart';
 import '../domain/listing_model.dart';
 
 class CreateListingScreen extends ConsumerStatefulWidget {
@@ -24,6 +28,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   final _maxSalaryController = TextEditingController();
   final _locationController = TextEditingController();
   final _contactController = TextEditingController();
+  final List<File> _selectedImageFiles = [];
   bool _submitting = false;
   String? _selectedCity;
   EmploymentType _employmentType = EmploymentType.fullTime;
@@ -40,6 +45,29 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImages() async {
+    if (_selectedImageFiles.length >= 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('En fazla 5 fotoğraf ekleyebilirsiniz.')),
+      );
+      return;
+    }
+
+    final picker = ImagePicker();
+    final pickedFiles = await picker.pickMultiImage(imageQuality: 80);
+    if (pickedFiles.isNotEmpty) {
+      final availableSlots = 5 - _selectedImageFiles.length;
+      final filesToAdd = pickedFiles
+          .take(availableSlots)
+          .map((xFile) => File(xFile.path))
+          .toList();
+
+      setState(() {
+        _selectedImageFiles.addAll(filesToAdd);
+      });
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final user = ref.read(authServiceProvider).currentUser;
@@ -54,7 +82,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
 
     setState(() => _submitting = true);
     try {
-      await ref.read(listingServiceProvider).createListing(
+      final listingId = await ref.read(listingServiceProvider).createListing(
             Listing(
               id: '',
               posterId: user.uid,
@@ -71,6 +99,36 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               contactInfo: _contactController.text.trim(),
             ),
           );
+
+      if (_selectedImageFiles.isNotEmpty) {
+        final storageService = ref.read(storageServiceProvider);
+        final imageUrls = await storageService.uploadListingImages(listingId, _selectedImageFiles);
+
+        final existingListing = await ref.read(listingServiceProvider).getListing(listingId);
+        if (existingListing != null) {
+          await ref.read(listingServiceProvider).updateListing(
+                Listing(
+                  id: existingListing.id,
+                  posterId: existingListing.posterId,
+                  posterName: existingListing.posterName,
+                  title: existingListing.title,
+                  description: existingListing.description,
+                  category: existingListing.category,
+                  location: existingListing.location,
+                  salary: existingListing.salary,
+                  city: existingListing.city,
+                  minSalaryTl: existingListing.minSalaryTl,
+                  maxSalaryTl: existingListing.maxSalaryTl,
+                  employmentType: existingListing.employmentType,
+                  contactInfo: existingListing.contactInfo,
+                  images: imageUrls,
+                  status: existingListing.status,
+                  createdAt: existingListing.createdAt,
+                ),
+              );
+        }
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('İlanınız başarıyla yayınlandı!')),
@@ -117,6 +175,87 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Başlık gerekli' : null,
               ),
               const SizedBox(height: 16),
+
+              // Image Picker Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('İlan Fotoğrafları', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    '${_selectedImageFiles.length}/5',
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 90,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _selectedImageFiles.length + (_selectedImageFiles.length < 5 ? 1 : 0),
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    if (index == _selectedImageFiles.length) {
+                      return InkWell(
+                        onTap: _pickImages,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: 90,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_a_photo_outlined, color: Colors.grey),
+                              SizedBox(height: 4),
+                              Text('Fotoğraf Ekle', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    final file = _selectedImageFiles[index];
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            file,
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _selectedImageFiles.removeAt(index);
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Colors.black60,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.close, size: 16, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 16),
               const Text('Konum (İl / İlçe)', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               TextFormField(
@@ -145,19 +284,23 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: TextFormField(
-                    controller: _minSalaryController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'En düşük maaş (TL)'),
-                    validator: _salaryValidator,
-                  )),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _minSalaryController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'En düşük maaş (TL)'),
+                      validator: _salaryValidator,
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: TextFormField(
-                    controller: _maxSalaryController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'En yüksek maaş (TL)'),
-                    validator: _salaryValidator,
-                  )),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _maxSalaryController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'En yüksek maaş (TL)'),
+                      validator: _salaryValidator,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -166,7 +309,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               DropdownButtonFormField<EmploymentType>(
                 initialValue: _employmentType,
                 items: EmploymentType.values.map((type) => DropdownMenuItem(value: type, child: Text(type.label))).toList(),
-                onChanged: (value) { if (value != null) setState(() => _employmentType = value); },
+                onChanged: (value) {
+                  if (value != null) setState(() => _employmentType = value);
+                },
               ),
               const SizedBox(height: 16),
               const Text('İletişim', style: TextStyle(fontWeight: FontWeight.bold)),

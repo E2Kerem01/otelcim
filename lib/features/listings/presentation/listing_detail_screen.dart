@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -169,6 +170,7 @@ ${listing.contactInfo}
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _ListingImageGallery(listing: listing),
                 Row(
                   children: [
                     Chip(
@@ -335,6 +337,105 @@ ${listing.contactInfo}
           );
         },
         orElse: () => null,
+      ),
+    );
+  }
+}
+
+class _ListingImageGallery extends StatefulWidget {
+  final Listing listing;
+
+  const _ListingImageGallery({required this.listing});
+
+  @override
+  State<_ListingImageGallery> createState() => _ListingImageGalleryState();
+}
+
+class _ListingImageGalleryState extends State<_ListingImageGallery> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.listing.images.isEmpty) {
+      final categoryEnum = ListingCategory.values.firstWhere(
+        (c) => c.name == widget.listing.category,
+        orElse: () => ListingCategory.diger,
+      );
+      final categoryIcon = listingCategoryIcons[categoryEnum] ?? Icons.hotel;
+
+      return Container(
+        width: double.infinity,
+        height: 180,
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(categoryIcon, size: 56, color: Theme.of(context).primaryColor.withValues(alpha: 0.5)),
+              const SizedBox(height: 8),
+              Text(
+                listingCategoryLabels[categoryEnum] ?? 'Otelcim İlanı',
+                style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      height: 220,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: PageView.builder(
+              itemCount: widget.listing.images.length,
+              onPageChanged: (idx) => setState(() => _currentIndex = idx),
+              itemBuilder: (context, idx) {
+                return CachedNetworkImage(
+                  imageUrl: widget.listing.images[idx],
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey.shade200,
+                    child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (widget.listing.images.length > 1)
+            Positioned(
+              bottom: 10,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  widget.listing.images.length,
+                  (index) => Container(
+                    width: _currentIndex == index ? 10 : 6,
+                    height: 6,
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: _currentIndex == index ? Colors.white : Colors.white54,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

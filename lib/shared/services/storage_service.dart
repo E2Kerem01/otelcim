@@ -180,4 +180,39 @@ class StorageService {
       throw Exception('Unexpected error during banner image upload: $e');
     }
   }
+
+  /// Uploads multiple images for a listing to Firebase Storage.
+  ///
+  /// The images are stored at `listing_images/{listingId}/{index}_{timestamp}.jpg`.
+  /// Returns a list of download URL strings.
+  Future<List<String>> uploadListingImages(String listingId, List<File> imageFiles) async {
+    try {
+      final List<String> downloadUrls = [];
+      final int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+      for (int i = 0; i < imageFiles.length; i++) {
+        final String path = 'listing_images/$listingId/${i}_$timestamp.jpg';
+        final Reference ref = _storage.ref().child(path);
+
+        final SettableMetadata metadata = SettableMetadata(
+          contentType: 'image/jpeg',
+          customMetadata: {
+            'listingId': listingId,
+            'imageIndex': i.toString(),
+            'uploadedAt': DateTime.now().toIso8601String(),
+          },
+        );
+
+        final TaskSnapshot uploadTask = await ref.putFile(imageFiles[i], metadata);
+        final String url = await uploadTask.ref.getDownloadURL();
+        downloadUrls.add(url);
+      }
+
+      return downloadUrls;
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to upload listing images: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error during listing image upload: $e');
+    }
+  }
 }
