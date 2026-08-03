@@ -19,6 +19,7 @@ class Listing {
   final int? maxSalaryTl;
   final EmploymentType? employmentType;
   final String contactInfo;
+  final List<String> images;
   final ListingStatus status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -44,6 +45,7 @@ class Listing {
     this.maxSalaryTl,
     this.employmentType,
     required this.contactInfo,
+    this.images = const [],
     this.status = ListingStatus.active,
     this.createdAt,
     this.updatedAt,
@@ -72,6 +74,9 @@ class Listing {
       maxSalaryTl: (data['maxSalaryTl'] as num?)?.toInt(),
       employmentType: _employmentTypeFromString(data['employmentType'] as String?),
       contactInfo: data['contactInfo'] as String? ?? '',
+      images: (data['images'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+          (data['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+          const [],
       status: (data['status'] as String? ?? 'active') == 'closed' ? ListingStatus.closed : ListingStatus.active,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
@@ -98,6 +103,7 @@ class Listing {
         'maxSalaryTl': maxSalaryTl,
         'employmentType': employmentType?.name,
         'contactInfo': contactInfo,
+        'images': images,
         'status': status == ListingStatus.closed ? 'closed' : 'active',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),

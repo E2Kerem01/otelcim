@@ -1,11 +1,16 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../../shared/services/storage_service.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../domain/listing_model.dart';
 
@@ -36,6 +41,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   bool _submitting = false;
   String? _selectedCity;
   EmploymentType? _employmentType;
+  List<String> _existingImageUrls = [];
+  final List<File> _newImageFiles = [];
 
   @override
   void dispose() {
@@ -61,10 +68,35 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     _employmentType = listing.employmentType;
     _locationController.text = listing.location;
     _contactController.text = listing.contactInfo;
+    _existingImageUrls = List<String>.from(listing.images);
     _selectedCategory = ListingCategory.values.firstWhere(
       (c) => c.name == listing.category,
       orElse: () => ListingCategory.diger,
     );
+  }
+
+  Future<void> _pickNewImages() async {
+    final totalCount = _existingImageUrls.length + _newImageFiles.length;
+    if (totalCount >= 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('En fazla 5 fotoğraf ekleyebilirsiniz.')),
+      );
+      return;
+    }
+
+    final picker = ImagePicker();
+    final pickedFiles = await picker.pickMultiImage(imageQuality: 80);
+    if (pickedFiles.isNotEmpty) {
+      final availableSlots = 5 - totalCount;
+      final filesToAdd = pickedFiles
+          .take(availableSlots)
+          .map((xFile) => File(xFile.path))
+          .toList();
+
+      setState(() {
+        _newImageFiles.addAll(filesToAdd);
+      });
+    }
   }
 
   Future<void> _submit(Listing original) async {
@@ -72,6 +104,14 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
 
     setState(() => _submitting = true);
     try {
+      List<String> finalImages = List<String>.from(_existingImageUrls);
+
+      if (_newImageFiles.isNotEmpty) {
+        final storageService = ref.read(storageServiceProvider);
+        final uploadedUrls = await storageService.uploadListingImages(original.id, _newImageFiles);
+        finalImages.addAll(uploadedUrls);
+      }
+
       await ref.read(listingServiceProvider).updateListing(
             Listing(
               id: original.id,
@@ -88,6 +128,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               maxSalaryTl: int.tryParse(_maxSalaryController.text.trim()),
               employmentType: _employmentType,
               contactInfo: _contactController.text.trim(),
+              images: finalImages,
               status: original.status,
               createdAt: original.createdAt,
               updatedAt: original.updatedAt,
@@ -153,6 +194,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
 
           _initializeForm(listing);
           final isBoostedActive = BoostBadge.isBoostActive(listing);
+          final totalImageCount = _existingImageUrls.length + _newImageFiles.length;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -203,7 +245,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                   isBoostedActive
                                       ? 'Bitiş Tarihi: ${listing.boostExpiresAt!.day}.${listing.boostExpiresAt!.month}.${listing.boostExpiresAt!.year}'
                                       : 'İlanınızı en üste taşıyarak daha fazla adaya ulaşın.',
-                                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                                  style: const TextStyle(fontSize: 12, color: Colors.black87),
                                 ),
                               ],
                             ),
@@ -256,6 +298,128 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     validator: (v) => (v == null || v.trim().isEmpty) ? 'Başlık gerekli' : null,
                   ),
                   const SizedBox(height: 16),
+
+                  // Image Picker & Management Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('İlan Fotoğrafları', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        '$totalImageCount/5',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 90,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: totalImageCount + (totalImageCount < 5 ? 1 : 0),
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        if (index == totalImageCount) {
+                          return InkWell(
+                            onTap: _pickNewImages,
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              width: 90,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_a_photo_outlined, color: Colors.grey),
+                                  SizedBox(height: 4),
+                                  Text('Fotoğraf Ekle', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        // Existing images first
+                        if (index < _existingImageUrls.length) {
+                          final url = _existingImageUrls[index];
+                          return Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: CachedNetworkImage(
+                                  imageUrl: url,
+                                  width: 90,
+                                  height: 90,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Container(color: Colors.grey.shade200),
+                                  errorWidget: (_, __, ___) => const Icon(Icons.broken_image),
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _existingImageUrls.removeAt(index);
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black60,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.close, size: 16, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+
+                        // New picked local files
+                        final localIndex = index - _existingImageUrls.length;
+                        final file = _newImageFiles[localIndex];
+                        return Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.file(
+                                file,
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _newImageFiles.removeAt(localIndex);
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black60,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.close, size: 16, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
                   const Text('Konum (İl / İlçe)', style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   TextFormField(
@@ -280,19 +444,23 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                   ),
                   const SizedBox(height: 12),
                   Row(children: [
-                    Expanded(child: TextFormField(
-                      controller: _minSalaryController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'En düşük maaş (TL)'),
-                      validator: _salaryValidator,
-                    )),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _minSalaryController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'En düşük maaş (TL)'),
+                        validator: _salaryValidator,
+                      ),
+                    ),
                     const SizedBox(width: 12),
-                    Expanded(child: TextFormField(
-                      controller: _maxSalaryController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'En yüksek maaş (TL)'),
-                      validator: _salaryValidator,
-                    )),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _maxSalaryController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'En yüksek maaş (TL)'),
+                        validator: _salaryValidator,
+                      ),
+                    ),
                   ]),
                   const SizedBox(height: 16),
                   const Text('Çalışma tipi', style: TextStyle(fontWeight: FontWeight.bold)),
