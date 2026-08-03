@@ -10,6 +10,8 @@ class Conversation {
   final String lastSenderId;
   final DateTime? updatedAt;
   final DateTime? createdAt;
+  final bool hired;
+  final DateTime? hiredAt;
 
   const Conversation({
     required this.id,
@@ -21,6 +23,8 @@ class Conversation {
     this.lastSenderId = '',
     this.updatedAt,
     this.createdAt,
+    this.hired = false,
+    this.hiredAt,
   });
 
   String otherParticipant(String myUid) => myUid == posterId ? seekerId : posterId;
@@ -37,6 +41,8 @@ class Conversation {
       lastSenderId: data['lastSenderId'] as String? ?? '',
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
+      hired: data['hired'] as bool? ?? false,
+      hiredAt: (data['hiredAt'] as Timestamp?)?.toDate(),
     );
   }
 
@@ -50,5 +56,7 @@ class Conversation {
         'lastSenderId': lastSenderId,
         'updatedAt': FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
+        'hired': hired,
+        'hiredAt': hiredAt == null ? null : Timestamp.fromDate(hiredAt!),
       };
 }
