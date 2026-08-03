@@ -467,7 +467,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                                 right: 8,
                                 top: 8,
                                 child: CircleAvatar(
-                                  backgroundColor: Colors.black50,
+                                  backgroundColor: Colors.black.withValues(alpha: 0.5),
                                   child: IconButton(
                                     icon: const Icon(Icons.edit, color: Colors.white, size: 18),
                                     onPressed: _pickAndUploadImage,
