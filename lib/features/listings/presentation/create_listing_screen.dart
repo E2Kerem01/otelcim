@@ -242,7 +242,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(2),
                               decoration: const BoxDecoration(
-                                color: Colors.black60,
+                                color: Colors.black54,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.close, size: 16, color: Colors.white),
