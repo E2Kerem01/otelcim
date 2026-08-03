@@ -6,6 +6,7 @@ import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/providers/paginated_listings_provider.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../ads/presentation/widgets/banner_ad_carousel.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../listings/domain/listing_model.dart';
 
@@ -157,6 +158,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: BannerAdCarousel(),
+            ),
+          ),
           SliverToBoxAdapter(
             child: SizedBox(
               height: 48,
