@@ -10,6 +10,7 @@ import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/widgets/report_dialog.dart';
+import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../domain/listing_model.dart';
 
 final _listingProvider = FutureProvider.family<Listing?, String>((ref, listingId) {
@@ -160,6 +161,8 @@ ${listing.contactInfo}
           if (listing == null) {
             return const Center(child: Text('İlan bulunamadı.'));
           }
+          final isBoostedActive = BoostBadge.isBoostActive(listing);
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -172,6 +175,10 @@ ${listing.contactInfo}
                       backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                       side: BorderSide.none,
                     ),
+                    if (isBoostedActive) ...[
+                      const SizedBox(width: 8),
+                      const BoostBadge(isCompact: false),
+                    ],
                     const Spacer(),
                     if (listing.createdAt != null)
                       Text(
@@ -257,7 +264,28 @@ ${listing.contactInfo}
         data: (listing) {
           if (listing == null) return null;
           final isOwner = myUid == listing.posterId;
-          if (isOwner) return null;
+          if (isOwner) {
+            final isBoostedActive = BoostBadge.isBoostActive(listing);
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.push('/listing/${listing.id}/boost'),
+                  icon: const Icon(Icons.rocket_launch_rounded),
+                  label: Text(isBoostedActive ? 'Öne Çıkarma Yönetimi' : 'İlanı Öne Çıkar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber.shade700,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ),
+            );
+          }
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(

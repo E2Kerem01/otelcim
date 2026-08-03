@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
+import '../features/boosts/presentation/boost_purchase_screen.dart';
+import '../features/boosts/presentation/my_boosts_screen.dart';
 import '../features/categories/presentation/categories_screen.dart';
 import '../features/chat/presentation/chat_detail_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
@@ -37,6 +39,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           location.startsWith('/chat') ||
           location.startsWith('/profile') ||
           location == '/my-listings' ||
+          location == '/my-boosts' ||
+          location.endsWith('/boost') ||
           location == '/onboarding';
 
       if (!isLoggedIn && isProtected) {
@@ -126,6 +130,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/listing/:id/boost',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return BoostPurchaseScreen(listingId: id);
+        },
+      ),
+      GoRoute(
         path: '/chat/:conversationId',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
@@ -137,6 +149,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/my-listings',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const MyListingsScreen(),
+      ),
+      GoRoute(
+        path: '/my-boosts',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const MyBoostsScreen(),
       ),
       GoRoute(
         path: '/profile/edit',

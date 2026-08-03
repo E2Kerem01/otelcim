@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/constants/categories.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../domain/listing_model.dart';
 
 final _editListingProvider = FutureProvider.family<Listing?, String>((ref, id) {
@@ -72,6 +74,10 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               contactInfo: _contactController.text.trim(),
               status: original.status,
               createdAt: original.createdAt,
+              isBoosted: original.isBoosted,
+              boostExpiresAt: original.boostExpiresAt,
+              boostType: original.boostType,
+              boostPurchaseId: original.boostPurchaseId,
             ),
           );
       if (mounted) {
@@ -127,6 +133,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
           }
 
           _initializeForm(listing);
+          final isBoostedActive = BoostBadge.isBoostActive(listing);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -135,6 +142,68 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Boost Promotion Card
+                  Card(
+                    color: isBoostedActive ? Colors.amber.shade50 : Colors.orange.shade50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isBoostedActive ? Colors.amber.shade300 : Colors.orange.shade200),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.rocket_launch_rounded,
+                            size: 32,
+                            color: isBoostedActive ? Colors.amber.shade900 : Colors.orange.shade800,
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      isBoostedActive ? 'İlan Öne Çıkarıldı' : 'İlanınızı Öne Çıkarın',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: isBoostedActive ? Colors.amber.shade900 : Colors.orange.shade900,
+                                      ),
+                                    ),
+                                    if (isBoostedActive) ...[
+                                      const SizedBox(width: 6),
+                                      const BoostBadge(isCompact: true),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  isBoostedActive
+                                      ? 'Bitiş Tarihi: ${listing.boostExpiresAt!.day}.${listing.boostExpiresAt!.month}.${listing.boostExpiresAt!.year}'
+                                      : 'İlanınızı en üste taşıyarak daha fazla adaya ulaşın.',
+                                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => context.push('/listing/${listing.id}/boost'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber.shade700,
+                              foregroundColor: Colors.white,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            child: Text(isBoostedActive ? 'Uzat' : 'Öne Çıkar'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

@@ -1,0 +1,80 @@
+{
+  "identifier" : "3D8B45A5",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "199",
+      "familyShareable" : false,
+      "internalID" : "6670805101",
+      "localizations" : [
+        {
+          "description" : "İlanınızı 7 gün boyunca ana sayfada en üstte gösterir",
+          "displayName" : "7 Günlük Öne Çıkarma",
+          "locale" : "tr"
+        },
+        {
+          "description" : "Boost your listing to the top for 7 days",
+          "displayName" : "7-Day Visibility Boost",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "boost_7_days",
+      "referenceName" : "7 Day Boost",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "349",
+      "familyShareable" : false,
+      "internalID" : "6670805102",
+      "localizations" : [
+        {
+          "description" : "İlanınızı 14 gün boyunca ana sayfada en üstte gösterir",
+          "displayName" : "14 Günlük Öne Çıkarma",
+          "locale" : "tr"
+        },
+        {
+          "description" : "Boost your listing to the top for 14 days",
+          "displayName" : "14-Day Visibility Boost",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "boost_14_days",
+      "referenceName" : "14 Day Boost",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "599",
+      "familyShareable" : false,
+      "internalID" : "6670805103",
+      "localizations" : [
+        {
+          "description" : "İlanınızı 30 gün boyunca ana sayfada en üstte gösterir",
+          "displayName" : "30 Günlük Öne Çıkarma",
+          "locale" : "tr"
+        },
+        {
+          "description" : "Boost your listing to the top for 30 days",
+          "displayName" : "30-Day Visibility Boost",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "boost_30_days",
+      "referenceName" : "30 Day Boost",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6670805100",
+    "_developerTeamID" : "YOUR_TEAM_ID",
+    "_lastSynchronizedDate" : 733706400.0
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}
