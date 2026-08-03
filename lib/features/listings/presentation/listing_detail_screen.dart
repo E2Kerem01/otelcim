@@ -12,6 +12,7 @@ import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/widgets/report_dialog.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
+import '../../chat/presentation/widgets/message_template_sheet.dart';
 import '../../favorites/services/favorite_service.dart';
 import '../domain/listing_model.dart';
 
@@ -55,13 +56,19 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
 
     setState(() => _startingChat = true);
     try {
-      final conversationId = await ref.read(chatServiceProvider).getOrCreateConversation(
+      final result = await ref.read(chatServiceProvider).getOrCreateConversation(
             listingId: listing.id,
             listingTitle: listing.title,
             posterId: listing.posterId,
             seekerId: user.uid,
           );
-      if (mounted) context.push('/chat/$conversationId');
+      if (!mounted) return;
+
+      String? prefillText;
+      if (result.isNew) {
+        prefillText = await MessageTemplateSheet.show(context, listingTitle: listing.title);
+      }
+      if (mounted) context.push('/chat/${result.conversationId}', extra: prefillText);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
