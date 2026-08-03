@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/constants/categories.dart';
+import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
@@ -26,17 +27,23 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
   final _salaryController = TextEditingController();
+  final _minSalaryController = TextEditingController();
+  final _maxSalaryController = TextEditingController();
   final _locationController = TextEditingController();
   final _contactController = TextEditingController();
   ListingCategory? _selectedCategory;
   bool _initialized = false;
   bool _submitting = false;
+  String? _selectedCity;
+  EmploymentType? _employmentType;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descController.dispose();
     _salaryController.dispose();
+    _minSalaryController.dispose();
+    _maxSalaryController.dispose();
     _locationController.dispose();
     _contactController.dispose();
     super.dispose();
@@ -48,6 +55,10 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     _titleController.text = listing.title;
     _descController.text = listing.description;
     _salaryController.text = listing.salary;
+    _minSalaryController.text = listing.minSalaryTl?.toString() ?? '';
+    _maxSalaryController.text = listing.maxSalaryTl?.toString() ?? '';
+    _selectedCity = listing.city;
+    _employmentType = listing.employmentType;
     _locationController.text = listing.location;
     _contactController.text = listing.contactInfo;
     _selectedCategory = ListingCategory.values.firstWhere(
@@ -66,18 +77,26 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               id: original.id,
               posterId: original.posterId,
               posterName: original.posterName,
+              posterVerified: original.posterVerified,
               title: _titleController.text.trim(),
               description: _descController.text.trim(),
               category: _selectedCategory!.name,
               location: _locationController.text.trim(),
               salary: _salaryController.text.trim(),
+              city: _selectedCity,
+              minSalaryTl: int.tryParse(_minSalaryController.text.trim()),
+              maxSalaryTl: int.tryParse(_maxSalaryController.text.trim()),
+              employmentType: _employmentType,
               contactInfo: _contactController.text.trim(),
               status: original.status,
               createdAt: original.createdAt,
+              updatedAt: original.updatedAt,
               isBoosted: original.isBoosted,
               boostExpiresAt: original.boostExpiresAt,
               boostType: original.boostType,
               boostPurchaseId: original.boostPurchaseId,
+              viewCount: original.viewCount,
+              messageCount: original.messageCount,
             ),
           );
       if (mounted) {
@@ -244,11 +263,45 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     validator: (v) => (v == null || v.trim().isEmpty) ? 'Konum gerekli' : null,
                   ),
                   const SizedBox(height: 16),
+                  const Text('Şehir', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedCity,
+                    hint: const Text('Şehir seçin'),
+                    items: turkishTourismCities.map((city) => DropdownMenuItem(value: city, child: Text(city))).toList(),
+                    onChanged: (value) => setState(() => _selectedCity = value),
+                  ),
+                  const SizedBox(height: 16),
                   const Text('Maaş', style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _salaryController,
                     validator: (v) => (v == null || v.trim().isEmpty) ? 'Maaş bilgisi gerekli' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    Expanded(child: TextFormField(
+                      controller: _minSalaryController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'En düşük maaş (TL)'),
+                      validator: _salaryValidator,
+                    )),
+                    const SizedBox(width: 12),
+                    Expanded(child: TextFormField(
+                      controller: _maxSalaryController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'En yüksek maaş (TL)'),
+                      validator: _salaryValidator,
+                    )),
+                  ]),
+                  const SizedBox(height: 16),
+                  const Text('Çalışma tipi', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<EmploymentType>(
+                    initialValue: _employmentType,
+                    hint: const Text('Çalışma tipi seçin'),
+                    items: EmploymentType.values.map((type) => DropdownMenuItem(value: type, child: Text(type.label))).toList(),
+                    onChanged: (value) => setState(() => _employmentType = value),
                   ),
                   const SizedBox(height: 16),
                   const Text('İletişim', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -286,5 +339,15 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         },
       ),
     );
+  }
+
+  String? _salaryValidator(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    final parsed = int.tryParse(value.trim());
+    if (parsed == null || parsed < 0) return 'Geçerli tutar girin';
+    final min = int.tryParse(_minSalaryController.text.trim());
+    final max = int.tryParse(_maxSalaryController.text.trim());
+    if (min != null && max != null && min > max) return 'Aralığı kontrol edin';
+    return null;
   }
 }

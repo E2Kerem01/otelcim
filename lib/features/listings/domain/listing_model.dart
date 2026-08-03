@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../shared/constants/listing_filters.dart';
+
 enum ListingStatus { active, closed }
 
 class Listing {
@@ -12,6 +14,10 @@ class Listing {
   final String category;
   final String location;
   final String salary;
+  final String? city;
+  final int? minSalaryTl;
+  final int? maxSalaryTl;
+  final EmploymentType? employmentType;
   final String contactInfo;
   final ListingStatus status;
   final DateTime? createdAt;
@@ -33,6 +39,10 @@ class Listing {
     required this.category,
     required this.location,
     required this.salary,
+    this.city,
+    this.minSalaryTl,
+    this.maxSalaryTl,
+    this.employmentType,
     required this.contactInfo,
     this.status = ListingStatus.active,
     this.createdAt,
@@ -57,6 +67,10 @@ class Listing {
       category: data['category'] as String? ?? 'diger',
       location: data['location'] as String? ?? '',
       salary: data['salary'] as String? ?? '',
+      city: data['city'] as String?,
+      minSalaryTl: (data['minSalaryTl'] as num?)?.toInt(),
+      maxSalaryTl: (data['maxSalaryTl'] as num?)?.toInt(),
+      employmentType: _employmentTypeFromString(data['employmentType'] as String?),
       contactInfo: data['contactInfo'] as String? ?? '',
       status: (data['status'] as String? ?? 'active') == 'closed' ? ListingStatus.closed : ListingStatus.active,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
@@ -79,6 +93,10 @@ class Listing {
         'category': category,
         'location': location,
         'salary': salary,
+        'city': city,
+        'minSalaryTl': minSalaryTl,
+        'maxSalaryTl': maxSalaryTl,
+        'employmentType': employmentType?.name,
         'contactInfo': contactInfo,
         'status': status == ListingStatus.closed ? 'closed' : 'active',
         'createdAt': FieldValue.serverTimestamp(),
@@ -90,4 +108,11 @@ class Listing {
         'viewCount': viewCount,
         'messageCount': messageCount,
       };
+
+  static EmploymentType? _employmentTypeFromString(String? value) {
+    for (final type in EmploymentType.values) {
+      if (type.name == value) return type;
+    }
+    return null;
+  }
 }

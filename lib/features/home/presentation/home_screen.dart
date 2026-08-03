@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/constants/categories.dart';
+import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/providers/paginated_listings_provider.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
@@ -19,7 +20,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   String _searchQuery = '';
-  ({String? category, String? searchQuery}) _currentParams = (category: null, searchQuery: '');
+  _AdvancedFilters _filters = const _AdvancedFilters();
+  PaginationParams _currentParams = (
+    category: null,
+    searchQuery: '',
+    city: null,
+    minSalaryTl: null,
+    maxSalaryTl: null,
+    dateFilter: ListingDateFilter.all,
+    employmentType: null,
+    sortOrder: ListingSortOrder.newest,
+  );
 
   @override
   void initState() {
@@ -53,10 +64,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  Future<void> _openFilters() async {
+    final result = await showModalBottomSheet<_AdvancedFilters>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => _FilterSheet(initial: _filters),
+    );
+    if (result != null && mounted) setState(() => _filters = result);
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedCategory = ref.watch(selectedCategoryFilterProvider);
-    _currentParams = (category: selectedCategory?.name, searchQuery: _searchQuery);
+    _currentParams = (
+      category: selectedCategory?.name,
+      searchQuery: _searchQuery,
+      city: _filters.city,
+      minSalaryTl: _filters.minSalaryTl,
+      maxSalaryTl: _filters.maxSalaryTl,
+      dateFilter: _filters.dateFilter,
+      employmentType: _filters.employmentType,
+      sortOrder: _filters.sortOrder,
+    );
     final paginationState = ref.watch(paginatedListingsProvider(_currentParams));
 
     if (paginationState.listings.isEmpty && !paginationState.isLoading && paginationState.hasMore) {
@@ -76,13 +106,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-                ),
-                child: TextField(
+              child: Row(children: [
+                Expanded(child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+                  ),
+                  child: TextField(
                   controller: _searchController,
                   decoration: const InputDecoration(
                     hintText: 'İş ilanı ara...',
@@ -92,11 +123,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     focusedBorder: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
-                  onChanged: (value) => setState(() => _searchQuery = value),
+                    onChanged: (value) => setState(() => _searchQuery = value.trim()),
+                  ),
+                )),
+                const SizedBox(width: 10),
+                Badge(
+                  isLabelVisible: _filters.activeCount > 0,
+                  label: Text('${_filters.activeCount}'),
+                  child: IconButton.filledTonal(
+                    onPressed: _openFilters,
+                    tooltip: 'Filtreler',
+                    icon: const Icon(Icons.tune_rounded),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+          if (_filters.activeCount > 0)
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 44,
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    if (_filters.city != null) _filterChip(_filters.city!, () => setState(() => _filters = _filters.copyWith(clearCity: true))),
+                    if (_filters.minSalaryTl != null || _filters.maxSalaryTl != null) _filterChip(_filters.salaryLabel, () => setState(() => _filters = _filters.copyWith(clearSalary: true))),
+                    if (_filters.dateFilter != ListingDateFilter.all) _filterChip(_filters.dateFilter.label, () => setState(() => _filters = _filters.copyWith(dateFilter: ListingDateFilter.all))),
+                    if (_filters.employmentType != null) _filterChip(_filters.employmentType!.label, () => setState(() => _filters = _filters.copyWith(clearEmploymentType: true))),
+                    if (_filters.sortOrder != ListingSortOrder.newest) _filterChip(_filters.sortOrder.label, () => setState(() => _filters = _filters.copyWith(sortOrder: ListingSortOrder.newest))),
+                    TextButton(onPressed: () => setState(() => _filters = const _AdvancedFilters()), child: const Text('Temizle')),
+                  ],
                 ),
               ),
             ),
-          ),
           SliverToBoxAdapter(
             child: SizedBox(
               height: 48,
@@ -130,6 +190,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+              child: Text('${paginationState.listings.length} sonuç', style: const TextStyle(fontWeight: FontWeight.w600)),
+            ),
+          ),
           if (paginationState.isLoading && paginationState.listings.isEmpty)
             const _ListingsSkeletonSliver()
           else if (paginationState.listings.isEmpty)
@@ -212,6 +278,136 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
+
+  Widget _filterChip(String label, VoidCallback onDeleted) => Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: InputChip(label: Text(label), onDeleted: onDeleted),
+      );
+}
+
+class _AdvancedFilters {
+  const _AdvancedFilters({
+    this.city,
+    this.minSalaryTl,
+    this.maxSalaryTl,
+    this.dateFilter = ListingDateFilter.all,
+    this.employmentType,
+    this.sortOrder = ListingSortOrder.newest,
+  });
+
+  final String? city;
+  final int? minSalaryTl;
+  final int? maxSalaryTl;
+  final ListingDateFilter dateFilter;
+  final EmploymentType? employmentType;
+  final ListingSortOrder sortOrder;
+
+  int get activeCount => [
+        city != null,
+        minSalaryTl != null || maxSalaryTl != null,
+        dateFilter != ListingDateFilter.all,
+        employmentType != null,
+        sortOrder != ListingSortOrder.newest,
+      ].where((active) => active).length;
+
+  String get salaryLabel {
+    if (minSalaryTl != null && maxSalaryTl != null) return '$minSalaryTl - $maxSalaryTl TL';
+    if (minSalaryTl != null) return '$minSalaryTl TL ve üzeri';
+    return '$maxSalaryTl TL ve altı';
+  }
+
+  _AdvancedFilters copyWith({
+    String? city,
+    int? minSalaryTl,
+    int? maxSalaryTl,
+    ListingDateFilter? dateFilter,
+    EmploymentType? employmentType,
+    ListingSortOrder? sortOrder,
+    bool clearCity = false,
+    bool clearSalary = false,
+    bool clearEmploymentType = false,
+  }) => _AdvancedFilters(
+        city: clearCity ? null : city ?? this.city,
+        minSalaryTl: clearSalary ? null : minSalaryTl ?? this.minSalaryTl,
+        maxSalaryTl: clearSalary ? null : maxSalaryTl ?? this.maxSalaryTl,
+        dateFilter: dateFilter ?? this.dateFilter,
+        employmentType: clearEmploymentType ? null : employmentType ?? this.employmentType,
+        sortOrder: sortOrder ?? this.sortOrder,
+      );
+}
+
+class _FilterSheet extends StatefulWidget {
+  const _FilterSheet({required this.initial});
+  final _AdvancedFilters initial;
+  @override
+  State<_FilterSheet> createState() => _FilterSheetState();
+}
+
+class _FilterSheetState extends State<_FilterSheet> {
+  String? _city;
+  late final TextEditingController _minController;
+  late final TextEditingController _maxController;
+  late ListingDateFilter _date;
+  EmploymentType? _employmentType;
+  late ListingSortOrder _sort;
+
+  @override
+  void initState() {
+    super.initState();
+    _city = widget.initial.city;
+    _minController = TextEditingController(text: widget.initial.minSalaryTl?.toString() ?? '');
+    _maxController = TextEditingController(text: widget.initial.maxSalaryTl?.toString() ?? '');
+    _date = widget.initial.dateFilter;
+    _employmentType = widget.initial.employmentType;
+    _sort = widget.initial.sortOrder;
+  }
+
+  @override
+  void dispose() {
+    _minController.dispose();
+    _maxController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.fromLTRB(20, 12, 20, MediaQuery.viewInsetsOf(context).bottom + 20),
+        child: SingleChildScrollView(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [const Expanded(child: Text('Gelişmiş filtreler', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))), IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close))]),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String?>(
+              initialValue: _city,
+              decoration: const InputDecoration(labelText: 'Şehir / bölge'),
+              items: [const DropdownMenuItem<String?>(value: null, child: Text('Tüm şehirler')), ...turkishTourismCities.map((city) => DropdownMenuItem(value: city, child: Text(city)))],
+              onChanged: (value) => setState(() => _city = value),
+            ),
+            const SizedBox(height: 14),
+            Row(children: [
+              Expanded(child: TextField(controller: _minController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'En düşük maaş'))),
+              const SizedBox(width: 12),
+              Expanded(child: TextField(controller: _maxController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'En yüksek maaş'))),
+            ]),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<ListingDateFilter>(initialValue: _date, decoration: const InputDecoration(labelText: 'İlan tarihi'), items: ListingDateFilter.values.map((value) => DropdownMenuItem(value: value, child: Text(value.label))).toList(), onChanged: (value) { if (value != null) setState(() => _date = value); }),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<EmploymentType?>(initialValue: _employmentType, decoration: const InputDecoration(labelText: 'Çalışma tipi'), items: [const DropdownMenuItem<EmploymentType?>(value: null, child: Text('Tüm çalışma tipleri')), ...EmploymentType.values.map((value) => DropdownMenuItem(value: value, child: Text(value.label)))], onChanged: (value) => setState(() => _employmentType = value)),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<ListingSortOrder>(initialValue: _sort, decoration: const InputDecoration(labelText: 'Sıralama'), items: ListingSortOrder.values.map((value) => DropdownMenuItem(value: value, child: Text(value.label))).toList(), onChanged: (value) { if (value != null) setState(() => _sort = value); }),
+            const SizedBox(height: 22),
+            Row(children: [
+              Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(context, const _AdvancedFilters()), child: const Text('Temizle'))),
+              const SizedBox(width: 12),
+              Expanded(child: FilledButton(onPressed: () {
+                final min = int.tryParse(_minController.text.trim());
+                final max = int.tryParse(_maxController.text.trim());
+                if (min != null && max != null && min > max) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Maaş aralığını kontrol edin.'))); return; }
+                Navigator.pop(context, _AdvancedFilters(city: _city, minSalaryTl: min, maxSalaryTl: max, dateFilter: _date, employmentType: _employmentType, sortOrder: _sort));
+              }, child: const Text('Filtreleri uygula'))),
+            ]),
+          ]),
+        ),
+      );
 }
 
 /// Skeleton placeholder cards shown while the initial page of listings loads.
