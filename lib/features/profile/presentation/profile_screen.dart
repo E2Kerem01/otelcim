@@ -88,6 +88,16 @@ class ProfileScreen extends ConsumerWidget {
               onTap: () => context.push('/my-boosts'),
             ),
           ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.security_rounded),
+              title: const Text('Gizlilik ve Veri Ayarları'),
+              subtitle: const Text('KVKK, veri indirme ve hesap silme'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => context.push('/profile/privacy'),
+            ),
+          ),
           const SizedBox(height: 20),
           OutlinedButton.icon(
             onPressed: () => ref.read(authServiceProvider).signOut(),

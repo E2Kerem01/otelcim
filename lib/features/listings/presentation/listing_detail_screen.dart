@@ -28,6 +28,7 @@ class ListingDetailScreen extends ConsumerStatefulWidget {
 
 class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
   bool _startingChat = false;
+  bool _revealContactInfo = false;
 
   Future<void> _messageOwner(Listing listing) async {
     final user = ref.read(authServiceProvider).currentUser;
@@ -244,7 +245,38 @@ ${listing.contactInfo}
                               const SizedBox(height: 2),
                               Text('İlan Sahibi', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
                               const SizedBox(height: 4),
-                              Text(listing.contactInfo, style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+                              if (myUid == null)
+                                InkWell(
+                                  onTap: () => context.push('/login'),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.lock_outline, size: 14, color: Colors.orange.shade800),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          'İletişim bilgisini görmek için giriş yapın',
+                                          style: TextStyle(color: Colors.orange.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              else if (myUid == listing.posterId || _revealContactInfo)
+                                Text(listing.contactInfo, style: TextStyle(color: Colors.grey.shade700, fontSize: 13))
+                              else
+                                InkWell(
+                                  onTap: () => setState(() => _revealContactInfo = true),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.visibility_outlined, size: 14, color: Theme.of(context).primaryColor),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'İletişim Bilgisini Göster',
+                                        style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                             ],
                           ),
                         ),
