@@ -23,7 +23,10 @@ const params = (
 Listing listing(String id) => Listing(id: id, posterId: 'u', posterName: 'Otel', title: id, description: 'D', category: 'diger', location: 'Antalya', salary: '1 TL', contactInfo: 'x');
 
 void main() {
-  setUpAll(() => registerFallbackValue(ListingDateFilter.all));
+  setUpAll(() {
+    registerFallbackValue(ListingDateFilter.all);
+    registerFallbackValue(ListingSortOrder.newest);
+  });
 
   late MockListingService service;
   setUp(() => service = MockListingService());

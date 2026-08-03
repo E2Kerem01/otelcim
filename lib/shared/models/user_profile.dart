@@ -251,7 +251,7 @@ class UserProfile {
       isVerified,
       verificationStatus,
       verifiedAt,
-      Object.hashAll(notificationPreferences.entries),
+      notificationPreferences.entries.fold<int>(0, (acc, e) => acc ^ Object.hash(e.key, e.value)),
       quietHoursStart,
       quietHoursEnd,
       createdAt,
