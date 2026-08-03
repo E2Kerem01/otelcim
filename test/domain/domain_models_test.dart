@@ -122,17 +122,34 @@ void main() {
         userType: 'employer',
         isAdmin: true,
         adminRole: AdminRole.contentModerator,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
         createdAt: now,
         updatedAt: now,
       );
       expect(profile.copyWith(displayName: 'Veli').displayName, 'Veli');
+      expect(profile.copyWith(), profile);
+      expect(profile.notificationPreferences['messages'], isTrue);
+      expect(profile.notificationPreferences['marketing'], isFalse);
 
       final db = FakeFirebaseFirestore();
       await db.collection('profiles').doc('u').set(profile.toFirestore());
       final parsed = UserProfile.fromFirestore(await db.collection('profiles').doc('u').get());
-      expect(parsed.id, profile.id);
-      expect(parsed.email, profile.email);
-      expect(parsed.displayName, profile.displayName);
+      expect(parsed, profile);
+      expect(parsed.hashCode, profile.hashCode);
+
+      // Test fallback for legacy profiles without notificationPreferences
+      await db.collection('profiles').doc('legacy').set({
+        'email': 'legacy@test.com',
+        'userType': 'jobseeker',
+        'createdAt': now,
+        'updatedAt': now,
+      });
+      final legacyParsed = UserProfile.fromFirestore(await db.collection('profiles').doc('legacy').get());
+      expect(legacyParsed.notificationPreferences['messages'], isTrue);
+      expect(legacyParsed.notificationPreferences['listingAlerts'], isTrue);
+      expect(legacyParsed.notificationPreferences['seasonalReminders'], isFalse);
+      expect(legacyParsed.notificationPreferences['marketing'], isFalse);
     });
 
     test('shared VerificationRequest copyWith, equality and round-trip', () async {

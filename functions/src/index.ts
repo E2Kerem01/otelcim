@@ -51,7 +51,14 @@ export const sendChatMessageNotification = onDocumentCreated(
         db.collection("user_profiles").doc(senderId).get(),
       ]);
 
-      const token = recipientSnapshot.data()?.fcmToken as string | undefined;
+      const recipientData = recipientSnapshot.data();
+      const notificationPreferences = recipientData?.notificationPreferences;
+      if (notificationPreferences && notificationPreferences.messages === false) {
+        logger.info("Alıcı mesaj bildirimlerini kapatmış; bildirim atlandı.", {conversationId, recipientId});
+        return;
+      }
+
+      const token = recipientData?.fcmToken as string | undefined;
       if (!token) {
         logger.info("Alıcının FCM token'ı yok; bildirim atlandı.", {conversationId, recipientId});
         return;

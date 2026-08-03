@@ -1,10 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'app_user.dart';
+
+const Object _undefined = Object();
 
 /// Represents a user's profile information in the application.
 ///
 /// Contains personal details and role-specific fields (hotel name and position for employers).
 class UserProfile {
+  /// Default notification preferences map
+  static const Map<String, bool> defaultNotificationPreferences = {
+    'messages': true,
+    'listingAlerts': true,
+    'seasonalReminders': false,
+    'marketing': false,
+  };
+
   /// Unique identifier for the user (matches Firebase Auth UID)
   final String id;
 
@@ -47,6 +58,15 @@ class UserProfile {
   /// Timestamp when the employer was verified (only for verified employers)
   final DateTime? verifiedAt;
 
+  /// Notification preferences map ('messages', 'listingAlerts', 'seasonalReminders', 'marketing')
+  final Map<String, bool> notificationPreferences;
+
+  /// Quiet hours start time in "HH:mm" format
+  final String? quietHoursStart;
+
+  /// Quiet hours end time in "HH:mm" format
+  final String? quietHoursEnd;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -68,6 +88,9 @@ class UserProfile {
     this.isVerified = false,
     this.verificationStatus,
     this.verifiedAt,
+    this.notificationPreferences = defaultNotificationPreferences,
+    this.quietHoursStart,
+    this.quietHoursEnd,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -76,6 +99,15 @@ class UserProfile {
   factory UserProfile.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
     final adminRoleString = data['adminRole'] as String?;
+
+    final rawPrefs = data['notificationPreferences'] as Map<String, dynamic>?;
+    final preferences = <String, bool>{
+      'messages': rawPrefs?['messages'] as bool? ?? defaultNotificationPreferences['messages']!,
+      'listingAlerts': rawPrefs?['listingAlerts'] as bool? ?? defaultNotificationPreferences['listingAlerts']!,
+      'seasonalReminders': rawPrefs?['seasonalReminders'] as bool? ?? defaultNotificationPreferences['seasonalReminders']!,
+      'marketing': rawPrefs?['marketing'] as bool? ?? defaultNotificationPreferences['marketing']!,
+    };
+
     return UserProfile(
       id: doc.id,
       email: data['email'] as String,
@@ -95,6 +127,9 @@ class UserProfile {
       verifiedAt: data['verifiedAt'] != null
           ? (data['verifiedAt'] as Timestamp).toDate()
           : null,
+      notificationPreferences: preferences,
+      quietHoursStart: data['quietHoursStart'] as String?,
+      quietHoursEnd: data['quietHoursEnd'] as String?,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -116,6 +151,9 @@ class UserProfile {
       'isVerified': isVerified,
       'verificationStatus': verificationStatus,
       'verifiedAt': verifiedAt != null ? Timestamp.fromDate(verifiedAt!) : null,
+      'notificationPreferences': notificationPreferences,
+      'quietHoursStart': quietHoursStart,
+      'quietHoursEnd': quietHoursEnd,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -137,6 +175,9 @@ class UserProfile {
     bool? isVerified,
     String? verificationStatus,
     DateTime? verifiedAt,
+    Map<String, bool>? notificationPreferences,
+    Object? quietHoursStart = _undefined,
+    Object? quietHoursEnd = _undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -155,6 +196,13 @@ class UserProfile {
       isVerified: isVerified ?? this.isVerified,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       verifiedAt: verifiedAt ?? this.verifiedAt,
+      notificationPreferences: notificationPreferences ?? this.notificationPreferences,
+      quietHoursStart: quietHoursStart == _undefined
+          ? this.quietHoursStart
+          : quietHoursStart as String?,
+      quietHoursEnd: quietHoursEnd == _undefined
+          ? this.quietHoursEnd
+          : quietHoursEnd as String?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -179,13 +227,16 @@ class UserProfile {
         other.isVerified == isVerified &&
         other.verificationStatus == verificationStatus &&
         other.verifiedAt == verifiedAt &&
+        mapEquals(other.notificationPreferences, notificationPreferences) &&
+        other.quietHoursStart == quietHoursStart &&
+        other.quietHoursEnd == quietHoursEnd &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
 
   @override
   int get hashCode {
-    return Object.hash(
+    return Object.hashAll([
       id,
       email,
       displayName,
@@ -200,9 +251,12 @@ class UserProfile {
       isVerified,
       verificationStatus,
       verifiedAt,
+      Object.hashAll(notificationPreferences.entries),
+      quietHoursStart,
+      quietHoursEnd,
       createdAt,
       updatedAt,
-    );
+    ]);
   }
 
   @override
@@ -212,6 +266,8 @@ class UserProfile {
         'hotelName: $hotelName, position: $position, userType: $userType, '
         'isAdmin: $isAdmin, adminRole: $adminRole, '
         'isVerified: $isVerified, verificationStatus: $verificationStatus, '
-        'verifiedAt: $verifiedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
+        'verifiedAt: $verifiedAt, notificationPreferences: $notificationPreferences, '
+        'quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, '
+        'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
