@@ -45,6 +45,13 @@ class AdminDashboardScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             _AdminCard(
+              icon: Icons.campaign_outlined,
+              title: 'Banner Reklamlar',
+              subtitle: 'Anasayfa sponsorlu reklam banner\'larını yönetin.',
+              onTap: () => context.push('/admin/banners'),
+            ),
+            const SizedBox(height: 12),
+            _AdminCard(
               icon: Icons.history_rounded,
               title: 'İşlem Geçmişi',
               subtitle: 'Yönetici aksiyonlarını ve gerekçelerini görüntüleyin.',
