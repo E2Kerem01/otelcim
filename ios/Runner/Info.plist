@@ -60,5 +60,13 @@
 		<string>tel</string>
 		<string>mailto</string>
 	</array>
+	<!-- In-App Purchase Configuration -->
+	<!-- StoreKit functionality requires In-App Purchase capability to be enabled in Xcode -->
+	<!-- For local testing, use Configuration.storekit file with StoreKit Testing -->
+	<!-- No additional Info.plist keys required for basic IAP functionality -->
+	<key>SKAdNetworkItems</key>
+	<array>
+		<!-- Reserved for future ad network attribution if needed -->
+	</array>
 </dict>
 </plist>

@@ -6,6 +6,7 @@ class Listing {
   final String id;
   final String posterId;
   final String posterName;
+  final bool posterVerified;
   final String title;
   final String description;
   final String category;
@@ -15,11 +16,18 @@ class Listing {
   final ListingStatus status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final bool isBoosted;
+  final DateTime? boostExpiresAt;
+  final String? boostType;
+  final String? boostPurchaseId;
+  final int viewCount;
+  final int messageCount;
 
   const Listing({
     required this.id,
     required this.posterId,
     required this.posterName,
+    this.posterVerified = false,
     required this.title,
     required this.description,
     required this.category,
@@ -29,6 +37,12 @@ class Listing {
     this.status = ListingStatus.active,
     this.createdAt,
     this.updatedAt,
+    this.isBoosted = false,
+    this.boostExpiresAt,
+    this.boostType,
+    this.boostPurchaseId,
+    this.viewCount = 0,
+    this.messageCount = 0,
   });
 
   factory Listing.fromDoc(DocumentSnapshot doc) {
@@ -37,6 +51,7 @@ class Listing {
       id: doc.id,
       posterId: data['posterId'] as String? ?? '',
       posterName: data['posterName'] as String? ?? '',
+      posterVerified: data['posterVerified'] as bool? ?? false,
       title: data['title'] as String? ?? '',
       description: data['description'] as String? ?? '',
       category: data['category'] as String? ?? 'diger',
@@ -46,12 +61,19 @@ class Listing {
       status: (data['status'] as String? ?? 'active') == 'closed' ? ListingStatus.closed : ListingStatus.active,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      isBoosted: data['isBoosted'] as bool? ?? false,
+      boostExpiresAt: (data['boostExpiresAt'] as Timestamp?)?.toDate(),
+      boostType: data['boostType'] as String?,
+      boostPurchaseId: data['boostPurchaseId'] as String?,
+      viewCount: data['viewCount'] as int? ?? 0,
+      messageCount: data['messageCount'] as int? ?? 0,
     );
   }
 
   Map<String, dynamic> toMap() => {
         'posterId': posterId,
         'posterName': posterName,
+        'posterVerified': posterVerified,
         'title': title,
         'description': description,
         'category': category,
@@ -61,5 +83,11 @@ class Listing {
         'status': status == ListingStatus.closed ? 'closed' : 'active',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
+        'isBoosted': isBoosted,
+        'boostExpiresAt': boostExpiresAt != null ? Timestamp.fromDate(boostExpiresAt!) : null,
+        'boostType': boostType,
+        'boostPurchaseId': boostPurchaseId,
+        'viewCount': viewCount,
+        'messageCount': messageCount,
       };
 }

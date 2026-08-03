@@ -38,6 +38,15 @@ class UserProfile {
   /// Admin role (only set if isAdmin is true)
   final AdminRole? adminRole;
 
+  /// Whether the employer has been verified (only for employer users)
+  final bool isVerified;
+
+  /// Verification status: 'pending', 'approved', or 'rejected' (only for employer users)
+  final String? verificationStatus;
+
+  /// Timestamp when the employer was verified (only for verified employers)
+  final DateTime? verifiedAt;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -56,6 +65,9 @@ class UserProfile {
     required this.userType,
     this.isAdmin = false,
     this.adminRole,
+    this.isVerified = false,
+    this.verificationStatus,
+    this.verifiedAt,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -78,6 +90,11 @@ class UserProfile {
       adminRole: adminRoleString != null
           ? AdminRoleExtension.fromFirestore(adminRoleString)
           : null,
+      isVerified: data['isVerified'] as bool? ?? false,
+      verificationStatus: data['verificationStatus'] as String?,
+      verifiedAt: data['verifiedAt'] != null
+          ? (data['verifiedAt'] as Timestamp).toDate()
+          : null,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -96,6 +113,9 @@ class UserProfile {
       'userType': userType,
       'isAdmin': isAdmin,
       'adminRole': adminRole?.toFirestore(),
+      'isVerified': isVerified,
+      'verificationStatus': verificationStatus,
+      'verifiedAt': verifiedAt != null ? Timestamp.fromDate(verifiedAt!) : null,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -114,6 +134,9 @@ class UserProfile {
     String? userType,
     bool? isAdmin,
     AdminRole? adminRole,
+    bool? isVerified,
+    String? verificationStatus,
+    DateTime? verifiedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -129,6 +152,9 @@ class UserProfile {
       userType: userType ?? this.userType,
       isAdmin: isAdmin ?? this.isAdmin,
       adminRole: adminRole ?? this.adminRole,
+      isVerified: isVerified ?? this.isVerified,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
+      verifiedAt: verifiedAt ?? this.verifiedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -150,6 +176,9 @@ class UserProfile {
         other.userType == userType &&
         other.isAdmin == isAdmin &&
         other.adminRole == adminRole &&
+        other.isVerified == isVerified &&
+        other.verificationStatus == verificationStatus &&
+        other.verifiedAt == verifiedAt &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -168,6 +197,9 @@ class UserProfile {
       userType,
       isAdmin,
       adminRole,
+      isVerified,
+      verificationStatus,
+      verifiedAt,
       createdAt,
       updatedAt,
     );
@@ -179,6 +211,7 @@ class UserProfile {
         'phoneNumber: $phoneNumber, bio: $bio, photoUrl: $photoUrl, '
         'hotelName: $hotelName, position: $position, userType: $userType, '
         'isAdmin: $isAdmin, adminRole: $adminRole, '
-        'createdAt: $createdAt, updatedAt: $updatedAt)';
+        'isVerified: $isVerified, verificationStatus: $verificationStatus, '
+        'verifiedAt: $verifiedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

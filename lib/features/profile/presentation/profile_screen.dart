@@ -79,6 +79,15 @@ class ProfileScreen extends ConsumerWidget {
               onTap: () => context.push('/my-listings'),
             ),
           ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: Icon(Icons.rocket_launch_rounded, color: Colors.amber.shade800),
+              title: const Text('Öne Çıkarılan İlanlarım'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => context.push('/my-boosts'),
+            ),
+          ),
           const SizedBox(height: 20),
           OutlinedButton.icon(
             onPressed: () => ref.read(authServiceProvider).signOut(),

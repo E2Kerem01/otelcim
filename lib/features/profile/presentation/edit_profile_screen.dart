@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
+import 'verification_request_screen.dart';
 import 'widgets/profile_form.dart';
 import 'widgets/profile_photo_picker.dart';
 
@@ -215,6 +216,30 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
+
+                // Verification button for employer users
+                if (profile?.userType == 'employer')
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const VerificationRequestScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.verified),
+                        label: const Text('Otelinizi Doğrulayın'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
 
                 // Save Button (also available in AppBar)
                 ElevatedButton(
