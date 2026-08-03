@@ -15,6 +15,7 @@ import '../features/boosts/presentation/my_boosts_screen.dart';
 import '../features/categories/presentation/categories_screen.dart';
 import '../features/chat/presentation/chat_detail_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
+import '../features/favorites/presentation/favorites_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/listings/presentation/create_listing_screen.dart';
 import '../features/listings/presentation/edit_listing_screen.dart';
@@ -49,6 +50,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           location.startsWith('/profile') ||
           location == '/my-listings' ||
           location == '/my-boosts' ||
+          location == '/favorites' ||
           location.endsWith('/boost') ||
           location == '/onboarding' ||
           location.startsWith('/admin');
@@ -159,6 +161,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           final conversationId = state.pathParameters['conversationId']!;
           return ChatDetailScreen(conversationId: conversationId);
         },
+      ),
+      GoRoute(
+        path: '/favorites',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const FavoritesScreen(),
       ),
       GoRoute(
         path: '/my-listings',
