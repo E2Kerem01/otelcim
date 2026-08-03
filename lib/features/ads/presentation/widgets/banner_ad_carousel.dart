@@ -213,7 +213,7 @@ class _BannerItemCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withValues(alpha: 0.5),
+                            color: Colors.black54,
                             blurRadius: 4,
                             offset: Offset(0, 1),
                           ),
