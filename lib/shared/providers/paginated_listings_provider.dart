@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/listings/domain/listing_model.dart';
+import '../constants/listing_filters.dart';
 import '../services/listing_service.dart';
 
 /// State class for paginated listings
@@ -35,7 +36,7 @@ class PaginatedListingsState {
 
 /// StateNotifier for managing paginated listings
 class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
-  PaginatedListingsNotifier(this._listingService, {this.category, this.searchQuery})
+  PaginatedListingsNotifier(this._listingService, this.params)
       : super(const PaginatedListingsState(
           listings: [],
           hasMore: true,
@@ -43,8 +44,7 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
         ));
 
   final ListingService _listingService;
-  final String? category;
-  final String? searchQuery;
+  final PaginationParams params;
 
   /// Load initial batch of listings
   Future<void> loadInitial() async {
@@ -54,8 +54,14 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
 
     try {
       final result = await _listingService.getPaginatedListings(
-        category: category,
-        searchQuery: searchQuery,
+        category: params.category,
+        searchQuery: params.searchQuery,
+        city: params.city,
+        minSalaryTl: params.minSalaryTl,
+        maxSalaryTl: params.maxSalaryTl,
+        dateFilter: params.dateFilter,
+        employmentType: params.employmentType,
+        sortOrder: params.sortOrder,
       );
 
       state = PaginatedListingsState(
@@ -78,8 +84,14 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
     try {
       final result = await _listingService.getNextPage(
         lastDocument: state.lastDocument!,
-        category: category,
-        searchQuery: searchQuery,
+        category: params.category,
+        searchQuery: params.searchQuery,
+        city: params.city,
+        minSalaryTl: params.minSalaryTl,
+        maxSalaryTl: params.maxSalaryTl,
+        dateFilter: params.dateFilter,
+        employmentType: params.employmentType,
+        sortOrder: params.sortOrder,
       );
 
       state = PaginatedListingsState(
@@ -105,14 +117,19 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
 }
 
 /// Provider for paginated listings with category and search parameters
-typedef _PaginationParams = ({String? category, String? searchQuery});
+typedef PaginationParams = ({
+  String? category,
+  String? searchQuery,
+  String? city,
+  int? minSalaryTl,
+  int? maxSalaryTl,
+  ListingDateFilter dateFilter,
+  EmploymentType? employmentType,
+  ListingSortOrder sortOrder,
+});
 
-final paginatedListingsProvider = StateNotifierProvider.family<PaginatedListingsNotifier, PaginatedListingsState, _PaginationParams>(
+final paginatedListingsProvider = StateNotifierProvider.family<PaginatedListingsNotifier, PaginatedListingsState, PaginationParams>(
   (ref, params) {
-    return PaginatedListingsNotifier(
-      ref.watch(listingServiceProvider),
-      category: params.category,
-      searchQuery: params.searchQuery,
-    );
+    return PaginatedListingsNotifier(ref.watch(listingServiceProvider), params);
   },
 );

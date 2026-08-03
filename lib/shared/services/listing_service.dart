@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/listings/domain/listing_model.dart';
+import '../constants/listing_filters.dart';
 
 class ListingService {
   ListingService(this._db);
@@ -81,6 +82,10 @@ class ListingService {
           'category': 'resepsiyon',
           'location': 'Antalya, Belek',
           'salary': '35.000 TL / Ay',
+          'city': 'Antalya',
+          'minSalaryTl': 35000,
+          'maxSalaryTl': 35000,
+          'employmentType': EmploymentType.fullTime.name,
           'contactInfo': 'ik@belekluxuryresort.com - 0242 555 01 02',
           'status': 'active',
           'createdAt': FieldValue.serverTimestamp(),
@@ -94,6 +99,10 @@ class ListingService {
           'category': 'mutfak',
           'location': 'İstanbul, Şişli',
           'salary': '45.000 TL / Ay',
+          'city': 'İstanbul',
+          'minSalaryTl': 45000,
+          'maxSalaryTl': 45000,
+          'employmentType': EmploymentType.fullTime.name,
           'contactInfo': 'kariyer@grandpalace.com',
           'status': 'active',
           'createdAt': FieldValue.serverTimestamp(),
@@ -107,6 +116,10 @@ class ListingService {
           'category': 'servis',
           'location': 'Muğla, Bodrum',
           'salary': '30.000 TL / Ay + Tip',
+          'city': 'Muğla',
+          'minSalaryTl': 30000,
+          'maxSalaryTl': 30000,
+          'employmentType': EmploymentType.seasonal.name,
           'contactInfo': '0532 100 20 30',
           'status': 'active',
           'createdAt': FieldValue.serverTimestamp(),
@@ -120,6 +133,10 @@ class ListingService {
           'category': 'kat_hizmetleri',
           'location': 'Nevşehir, Ürgüp',
           'salary': '28.000 TL / Ay',
+          'city': 'Nevşehir',
+          'minSalaryTl': 28000,
+          'maxSalaryTl': 28000,
+          'employmentType': EmploymentType.fullTime.name,
           'contactInfo': 'info@cappadociacavesuites.com',
           'status': 'active',
           'createdAt': FieldValue.serverTimestamp(),
@@ -175,6 +192,12 @@ class ListingService {
     DocumentSnapshot? startAfter,
     String? category,
     String? searchQuery,
+    String? city,
+    int? minSalaryTl,
+    int? maxSalaryTl,
+    ListingDateFilter dateFilter = ListingDateFilter.all,
+    EmploymentType? employmentType,
+    ListingSortOrder sortOrder = ListingSortOrder.newest,
   }) async {
     try {
       Query query = _db.collection('listings');
@@ -184,11 +207,35 @@ class ListingService {
         query = query.where('category', isEqualTo: category);
       }
 
+      if (city != null && city.isNotEmpty) {
+        query = query.where('city', isEqualTo: city);
+      }
+
+      if (employmentType != null) {
+        query = query.where('employmentType', isEqualTo: employmentType.name);
+      }
+
       // Filter by active status
       query = query.where('status', isEqualTo: 'active');
 
-      // Order by createdAt descending for most recent first
-      query = query.orderBy('createdAt', descending: true);
+      final cutoff = dateFilter.cutoff;
+      if (cutoff != null) {
+        query = query.where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoff));
+      }
+
+      // Salary sorting can run at query level unless a createdAt range filter
+      // requires createdAt to be the first ordered field.
+      if (cutoff == null && sortOrder == ListingSortOrder.salaryHighToLow) {
+        query = query
+            .orderBy('maxSalaryTl', descending: true)
+            .orderBy('createdAt', descending: true);
+      } else if (cutoff == null && sortOrder == ListingSortOrder.salaryLowToHigh) {
+        query = query
+            .orderBy('minSalaryTl')
+            .orderBy('createdAt', descending: true);
+      } else {
+        query = query.orderBy('createdAt', descending: true);
+      }
 
       // Apply cursor for pagination
       if (startAfter != null) {
@@ -200,9 +247,8 @@ class ListingService {
 
       final snapshot = await query.get();
 
-      var listings = snapshot.docs
-          .map(Listing.fromDoc)
-          .toList();
+      final pageDocs = snapshot.docs.take(limit).toList();
+      var listings = pageDocs.map(Listing.fromDoc).toList();
 
       listings.sort((a, b) {
         final aBoosted = a.isBoosted && (a.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
@@ -223,23 +269,36 @@ class ListingService {
             .toList();
       }
 
-      // Check if there are more results
-      final hasMore = listings.length > limit;
 
-      // Trim to requested limit
-      if (hasMore) {
-        listings = listings.sublist(0, limit);
+      if (minSalaryTl != null) {
+        listings = listings.where((listing) =>
+          listing.maxSalaryTl != null && listing.maxSalaryTl! >= minSalaryTl
+        ).toList();
       }
+
+      if (maxSalaryTl != null) {
+        listings = listings.where((listing) =>
+          listing.minSalaryTl != null && listing.minSalaryTl! <= maxSalaryTl
+        ).toList();
+      }
+
+      if (sortOrder != ListingSortOrder.newest) {
+        listings.sort((a, b) {
+          final aSalary = a.maxSalaryTl ?? a.minSalaryTl ?? 0;
+          final bSalary = b.maxSalaryTl ?? b.minSalaryTl ?? 0;
+          return sortOrder == ListingSortOrder.salaryHighToLow
+              ? bSalary.compareTo(aSalary)
+              : aSalary.compareTo(bSalary);
+        });
+      }
+
+      // Check if there are more results
+      final hasMore = snapshot.docs.length > limit;
 
       // Get last document for next cursor
       DocumentSnapshot? lastDoc;
-      if (listings.isNotEmpty && snapshot.docs.isNotEmpty) {
-        // Find the actual document for the last listing in our result
-        final lastListingId = listings.last.id;
-        lastDoc = snapshot.docs.firstWhere(
-          (doc) => doc.id == lastListingId,
-          orElse: () => snapshot.docs.last,
-        );
+      if (pageDocs.isNotEmpty) {
+        lastDoc = pageDocs.last;
       }
 
       return PaginatedListingsResult(
@@ -268,12 +327,24 @@ class ListingService {
     int limit = 20,
     String? category,
     String? searchQuery,
+    String? city,
+    int? minSalaryTl,
+    int? maxSalaryTl,
+    ListingDateFilter dateFilter = ListingDateFilter.all,
+    EmploymentType? employmentType,
+    ListingSortOrder sortOrder = ListingSortOrder.newest,
   }) async {
     return getPaginatedListings(
       limit: limit,
       startAfter: lastDocument,
       category: category,
       searchQuery: searchQuery,
+      city: city,
+      minSalaryTl: minSalaryTl,
+      maxSalaryTl: maxSalaryTl,
+      dateFilter: dateFilter,
+      employmentType: employmentType,
+      sortOrder: sortOrder,
     );
   }
 }
