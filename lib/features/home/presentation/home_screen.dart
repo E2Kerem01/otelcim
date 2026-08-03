@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/providers/paginated_listings_provider.dart';
+import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../ads/presentation/widgets/banner_ad_carousel.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
+import '../../favorites/services/favorite_service.dart';
 import '../../listings/domain/listing_model.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -486,14 +488,18 @@ class _SkeletonCardState extends State<_SkeletonCard> with SingleTickerProviderS
   }
 }
 
-class _ListingCard extends StatelessWidget {
+class _ListingCard extends ConsumerWidget {
   const _ListingCard({required this.listing});
 
   final Listing listing;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isBoostedActive = BoostBadge.isBoostActive(listing);
+    final uid = ref.watch(authStateProvider).value?.uid;
+    final isFavorite = uid == null
+        ? false
+        : ref.watch(favoriteIdsProvider(uid)).valueOrNull?.contains(listing.id) ?? false;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -546,6 +552,25 @@ class _ListingCard extends StatelessWidget {
                       const BoostBadge(isCompact: true),
                     ],
                     const Spacer(),
+                    AnimatedScale(
+                      scale: isFavorite ? 1.15 : 1,
+                      duration: const Duration(milliseconds: 180),
+                      child: IconButton(
+                        visualDensity: VisualDensity.compact,
+                        tooltip: isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle',
+                        onPressed: () {
+                          if (uid == null) {
+                            context.push('/login');
+                            return;
+                          }
+                          ref.read(favoriteServiceProvider).toggleFavorite(uid, listing.id);
+                        },
+                        icon: Icon(
+                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: isFavorite ? Colors.red : Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
                     if (listing.createdAt != null)
                       Text(
                         '${listing.createdAt!.day}.${listing.createdAt!.month}.${listing.createdAt!.year}',
