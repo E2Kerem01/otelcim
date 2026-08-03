@@ -23,6 +23,8 @@ import '../features/listings/presentation/my_listings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/role_selection_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
+import '../features/profile/presentation/privacy_policy_screen.dart';
+import '../features/profile/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/verification_request_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
@@ -177,6 +179,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile/verification',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const VerificationRequestScreen(),
+      ),
+      GoRoute(
+        path: '/profile/privacy',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const PrivacySettingsScreen(),
+      ),
+      GoRoute(
+        path: '/profile/privacy/policy',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const PrivacyPolicyScreen(),
       ),
       GoRoute(
         path: '/admin',
