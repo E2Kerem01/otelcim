@@ -31,6 +31,15 @@ class UserProfile {
   /// Type of user: 'employer' or 'jobseeker'
   final String userType;
 
+  /// Whether the employer has been verified (only for employer users)
+  final bool isVerified;
+
+  /// Verification status: 'pending', 'approved', or 'rejected' (only for employer users)
+  final String? verificationStatus;
+
+  /// Timestamp when the employer was verified (only for verified employers)
+  final DateTime? verifiedAt;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -47,6 +56,9 @@ class UserProfile {
     this.hotelName,
     this.position,
     required this.userType,
+    this.isVerified = false,
+    this.verificationStatus,
+    this.verifiedAt,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -64,6 +76,11 @@ class UserProfile {
       hotelName: data['hotelName'] as String?,
       position: data['position'] as String?,
       userType: data['userType'] as String,
+      isVerified: data['isVerified'] as bool? ?? false,
+      verificationStatus: data['verificationStatus'] as String?,
+      verifiedAt: data['verifiedAt'] != null
+          ? (data['verifiedAt'] as Timestamp).toDate()
+          : null,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -80,6 +97,9 @@ class UserProfile {
       'hotelName': hotelName,
       'position': position,
       'userType': userType,
+      'isVerified': isVerified,
+      'verificationStatus': verificationStatus,
+      'verifiedAt': verifiedAt != null ? Timestamp.fromDate(verifiedAt!) : null,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -96,6 +116,9 @@ class UserProfile {
     String? hotelName,
     String? position,
     String? userType,
+    bool? isVerified,
+    String? verificationStatus,
+    DateTime? verifiedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -109,6 +132,9 @@ class UserProfile {
       hotelName: hotelName ?? this.hotelName,
       position: position ?? this.position,
       userType: userType ?? this.userType,
+      isVerified: isVerified ?? this.isVerified,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
+      verifiedAt: verifiedAt ?? this.verifiedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -128,6 +154,9 @@ class UserProfile {
         other.hotelName == hotelName &&
         other.position == position &&
         other.userType == userType &&
+        other.isVerified == isVerified &&
+        other.verificationStatus == verificationStatus &&
+        other.verifiedAt == verifiedAt &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -144,6 +173,9 @@ class UserProfile {
       hotelName,
       position,
       userType,
+      isVerified,
+      verificationStatus,
+      verifiedAt,
       createdAt,
       updatedAt,
     );
@@ -154,6 +186,7 @@ class UserProfile {
     return 'UserProfile(id: $id, email: $email, displayName: $displayName, '
         'phoneNumber: $phoneNumber, bio: $bio, photoUrl: $photoUrl, '
         'hotelName: $hotelName, position: $position, userType: $userType, '
-        'createdAt: $createdAt, updatedAt: $updatedAt)';
+        'isVerified: $isVerified, verificationStatus: $verificationStatus, '
+        'verifiedAt: $verifiedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

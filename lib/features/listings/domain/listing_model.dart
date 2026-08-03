@@ -6,6 +6,7 @@ class Listing {
   final String id;
   final String posterId;
   final String posterName;
+  final bool posterVerified;
   final String title;
   final String description;
   final String category;
@@ -26,6 +27,7 @@ class Listing {
     required this.id,
     required this.posterId,
     required this.posterName,
+    this.posterVerified = false,
     required this.title,
     required this.description,
     required this.category,
@@ -49,6 +51,7 @@ class Listing {
       id: doc.id,
       posterId: data['posterId'] as String? ?? '',
       posterName: data['posterName'] as String? ?? '',
+      posterVerified: data['posterVerified'] as bool? ?? false,
       title: data['title'] as String? ?? '',
       description: data['description'] as String? ?? '',
       category: data['category'] as String? ?? 'diger',
@@ -70,6 +73,7 @@ class Listing {
   Map<String, dynamic> toMap() => {
         'posterId': posterId,
         'posterName': posterName,
+        'posterVerified': posterVerified,
         'title': title,
         'description': description,
         'category': category,
