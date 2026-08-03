@@ -202,19 +202,6 @@ class ListingService {
     try {
       Query query = _db.collection('listings');
 
-      // Apply category filter at query level if provided
-      if (category != null && category.isNotEmpty) {
-        query = query.where('category', isEqualTo: category);
-      }
-
-      if (city != null && city.isNotEmpty) {
-        query = query.where('city', isEqualTo: city);
-      }
-
-      if (employmentType != null) {
-        query = query.where('employmentType', isEqualTo: employmentType.name);
-      }
-
       // Filter by active status
       query = query.where('status', isEqualTo: 'active');
 
@@ -223,19 +210,14 @@ class ListingService {
         query = query.where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoff));
       }
 
-      // Salary sorting can run at query level unless a createdAt range filter
-      // requires createdAt to be the first ordered field.
-      if (cutoff == null && sortOrder == ListingSortOrder.salaryHighToLow) {
-        query = query
-            .orderBy('maxSalaryTl', descending: true)
-            .orderBy('createdAt', descending: true);
-      } else if (cutoff == null && sortOrder == ListingSortOrder.salaryLowToHigh) {
-        query = query
-            .orderBy('minSalaryTl')
-            .orderBy('createdAt', descending: true);
-      } else {
-        query = query.orderBy('createdAt', descending: true);
-      }
+      // Only (status, createdAt) is filtered/sorted server-side, which needs a
+      // single Firestore composite index. category/city/employmentType and
+      // salary-based sorting are applied client-side below instead of adding
+      // a `.where()`/`.orderBy()` per combination - each such combination
+      // would require its own composite index, and a missing one fails the
+      // whole query (silently, from the UI's point of view) until someone
+      // notices and creates it in the Firebase console.
+      query = query.orderBy('createdAt', descending: true);
 
       // Apply cursor for pagination
       if (startAfter != null) {
@@ -257,6 +239,18 @@ class ListingService {
         if (!aBoosted && bBoosted) return 1;
         return 0;
       });
+
+      if (category != null && category.isNotEmpty) {
+        listings = listings.where((l) => l.category == category).toList();
+      }
+
+      if (city != null && city.isNotEmpty) {
+        listings = listings.where((l) => l.city == city).toList();
+      }
+
+      if (employmentType != null) {
+        listings = listings.where((l) => l.employmentType == employmentType).toList();
+      }
 
       // Apply search query filter client-side if provided
       if (searchQuery != null && searchQuery.isNotEmpty) {
