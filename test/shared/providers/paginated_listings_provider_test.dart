@@ -26,6 +26,7 @@ void main() {
   setUpAll(() {
     registerFallbackValue(ListingDateFilter.all);
     registerFallbackValue(ListingSortOrder.newest);
+    registerFallbackValue(MockDocumentSnapshot());
   });
 
   late MockListingService service;
