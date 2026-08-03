@@ -91,6 +91,16 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Card(
             child: ListTile(
+              leading: const Icon(Icons.notifications_outlined),
+              title: const Text('Bildirim Ayarları'),
+              subtitle: const Text('Mesaj, ilan ve duyuru bildirimleri'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => context.push('/profile/notifications'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.security_rounded),
               title: const Text('Gizlilik ve Veri Ayarları'),
               subtitle: const Text('KVKK, veri indirme ve hesap silme'),
