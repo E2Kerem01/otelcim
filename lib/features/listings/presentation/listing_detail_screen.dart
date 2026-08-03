@@ -12,6 +12,7 @@ import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/widgets/report_dialog.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
+import '../../favorites/services/favorite_service.dart';
 import '../domain/listing_model.dart';
 
 final _listingProvider = FutureProvider.family<Listing?, String>((ref, listingId) {
@@ -116,11 +117,32 @@ ${listing.contactInfo}
   Widget build(BuildContext context) {
     final listingAsync = ref.watch(_listingProvider(widget.listingId));
     final myUid = ref.watch(authStateProvider).value?.uid;
+    final isFavorite = myUid == null
+        ? false
+        : ref.watch(favoriteIdsProvider(myUid)).valueOrNull?.contains(widget.listingId) ?? false;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('İlan Detayı'),
         actions: [
+          AnimatedScale(
+            scale: isFavorite ? 1.15 : 1,
+            duration: const Duration(milliseconds: 180),
+            child: IconButton(
+              tooltip: isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle',
+              onPressed: () {
+                if (myUid == null) {
+                  context.push('/login');
+                  return;
+                }
+                ref.read(favoriteServiceProvider).toggleFavorite(myUid, widget.listingId);
+              },
+              icon: Icon(
+                isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                color: isFavorite ? Colors.red : null,
+              ),
+            ),
+          ),
           listingAsync.maybeWhen(
             data: (listing) {
               if (listing == null) return const SizedBox.shrink();

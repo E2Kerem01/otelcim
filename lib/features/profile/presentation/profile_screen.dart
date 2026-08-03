@@ -103,6 +103,15 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Card(
             child: ListTile(
+              leading: const Icon(Icons.favorite_outline_rounded),
+              title: const Text('Favorilerim'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => context.push('/favorites'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.list_alt_rounded),
               title: const Text('İlanlarım'),
               trailing: const Icon(Icons.chevron_right_rounded),
