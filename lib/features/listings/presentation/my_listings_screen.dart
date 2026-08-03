@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../domain/listing_model.dart';
 
 final _myListingsProvider = StreamProvider.family<List<Listing>, String>((ref, uid) {
@@ -23,7 +24,16 @@ class MyListingsScreen extends ConsumerWidget {
     final listingsAsync = ref.watch(_myListingsProvider(uid));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('İlanlarım')),
+      appBar: AppBar(
+        title: const Text('İlanlarım'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.rocket_launch_outlined),
+            tooltip: 'Öne Çıkarılanlarım',
+            onPressed: () => context.push('/my-boosts'),
+          ),
+        ],
+      ),
       body: listingsAsync.when(
         data: (listings) {
           if (listings.isEmpty) {
@@ -35,15 +45,45 @@ class MyListingsScreen extends ConsumerWidget {
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final listing = listings[index];
+              final isBoostedActive = BoostBadge.isBoostActive(listing);
+
               return Card(
                 child: ListTile(
-                  title: Text(listing.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(
-                    '${listingCategoryLabel(listing.category)} · ${listing.status == ListingStatus.active ? 'Aktif' : 'Kapalı'}',
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  title: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          listing.title,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isBoostedActive) ...[
+                        const SizedBox(width: 8),
+                        const BoostBadge(isCompact: true),
+                      ],
+                    ],
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      '${listingCategoryLabel(listing.category)} · ${listing.status == ListingStatus.active ? 'Aktif' : 'Kapalı'}',
+                    ),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (listing.status == ListingStatus.active)
+                        IconButton(
+                          icon: Icon(
+                            Icons.rocket_launch_rounded,
+                            color: isBoostedActive ? Colors.amber.shade800 : Theme.of(context).primaryColor,
+                          ),
+                          tooltip: isBoostedActive ? 'Öne Çıkarıldı (Yönet)' : 'Öne Çıkar',
+                          onPressed: () => context.push('/listing/${listing.id}/boost'),
+                        ),
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         tooltip: 'Düzenle',

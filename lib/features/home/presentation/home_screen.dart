@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/providers/paginated_listings_provider.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../listings/domain/listing_model.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -288,68 +289,95 @@ class _ListingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isBoostedActive = BoostBadge.isBoostActive(listing);
+
     return Card(
       clipBehavior: Clip.antiAlias,
+      elevation: isBoostedActive ? 3 : 1,
+      shape: isBoostedActive
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.amber.shade400, width: 1.5),
+            )
+          : null,
       child: InkWell(
         onTap: () => context.push('/listing/${listing.id}'),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      listingCategoryLabel(listing.category),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+        child: Container(
+          decoration: isBoostedActive
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.amber.shade50.withValues(alpha: 0.35),
+                      Colors.white,
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                )
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        listingCategoryLabel(listing.category),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
                     ),
-                  ),
-                  const Spacer(),
-                  if (listing.createdAt != null)
-                    Text(
-                      '${listing.createdAt!.day}.${listing.createdAt!.month}.${listing.createdAt!.year}',
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                    if (isBoostedActive) ...[
+                      const SizedBox(width: 8),
+                      const BoostBadge(isCompact: true),
+                    ],
+                    const Spacer(),
+                    if (listing.createdAt != null)
+                      Text(
+                        '${listing.createdAt!.day}.${listing.createdAt!.month}.${listing.createdAt!.year}',
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  listing.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        listing.location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      ),
                     ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                listing.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      listing.location,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                listing.salary,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-              ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  listing.salary,
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                ),
+              ],
+            ),
           ),
         ),
       ),

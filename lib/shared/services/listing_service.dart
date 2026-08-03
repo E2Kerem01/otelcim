@@ -17,6 +17,10 @@ class ListingService {
           .toList();
 
       listings.sort((a, b) {
+        final aBoosted = a.isBoosted && (a.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+        final bBoosted = b.isBoosted && (b.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+        if (aBoosted && !bBoosted) return -1;
+        if (!aBoosted && bBoosted) return 1;
         final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         final tB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         return tB.compareTo(tA);
@@ -199,6 +203,14 @@ class ListingService {
       var listings = snapshot.docs
           .map(Listing.fromDoc)
           .toList();
+
+      listings.sort((a, b) {
+        final aBoosted = a.isBoosted && (a.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+        final bBoosted = b.isBoosted && (b.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+        if (aBoosted && !bBoosted) return -1;
+        if (!aBoosted && bBoosted) return 1;
+        return 0;
+      });
 
       // Apply search query filter client-side if provided
       if (searchQuery != null && searchQuery.isNotEmpty) {
