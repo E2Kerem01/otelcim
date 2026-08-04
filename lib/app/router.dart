@@ -17,6 +17,7 @@ import '../features/chat/presentation/chat_detail_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/favorites/presentation/favorites_screen.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../features/listings/presentation/batch_create_listing_screen.dart';
 import '../features/listings/presentation/create_listing_screen.dart';
 import '../features/listings/presentation/edit_listing_screen.dart';
 import '../features/listings/presentation/listing_detail_screen.dart';
@@ -48,6 +49,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
 
       final isProtected = location == '/create-listing' ||
+          location == '/batch-create-listing' ||
           location.startsWith('/chat') ||
           location.startsWith('/profile') ||
           location == '/my-listings' ||
@@ -181,6 +183,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/my-listings',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const MyListingsScreen(),
+      ),
+      GoRoute(
+        path: '/batch-create-listing',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const BatchCreateListingScreen(),
       ),
       GoRoute(
         path: '/my-boosts',

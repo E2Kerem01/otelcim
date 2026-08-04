@@ -68,6 +68,54 @@
   "@roleEmployerDescription": {
     "description": "Employer role description"
   },
+  "incompletePositionsError": "Lütfen tüm pozisyon bilgilerini eksiksiz doldurun.",
+  "@incompletePositionsError": {
+    "description": "Error when positions not filled"
+  },
+  "batchCreateButton": "Toplu İlan Ver",
+  "@batchCreateButton": {
+    "description": "Batch create button text"
+  },
+  "seasonalCalendarTitle": "Sezonluk İşe Alım Takvimi",
+  "@seasonalCalendarTitle": {
+    "description": "Seasonal calendar title"
+  },
+  "seasonalRemindersTitle": "Sezonluk Hatırlatıcılarım",
+  "@seasonalRemindersTitle": {
+    "description": "Seasonal reminders title"
+  },
+  "seasonalRemindersDesc": "Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.",
+  "@seasonalRemindersDesc": {
+    "description": "Seasonal reminders description"
+  },
+  "seasonLabel": "Sezon",
+  "@seasonLabel": {
+    "description": "Season label"
+  },
+  "seasonSummer2025": "Yaz 2025",
+  "@seasonSummer2025": {
+    "description": "Summer 2025 season"
+  },
+  "seasonWinter202526": "Kış 2025-26",
+  "@seasonWinter202526": {
+    "description": "Winter 2025-26 season"
+  },
+  "seasonYearRound": "Tüm Yıl",
+  "@seasonYearRound": {
+    "description": "Year round season"
+  },
+  "seasonAny": "Farketmez / Tüm Sezonlar",
+  "@seasonAny": {
+    "description": "Any season"
+  },
+  "addSeasonalAlert": "Hatırlatıcı Ekle",
+  "@addSeasonalAlert": {
+    "description": "Add seasonal alert button text"
+  },
+  "createAlertSuccess": "Sezonluk hatırlatıcı başarıyla oluşturuldu.",
+  "@createAlertSuccess": {
+    "description": "Success message for alert creation"
+  },
   "roleSelectionError": "Lütfen bir rol seçin",
   "@roleSelectionError": {
     "description": "Error message when no role is selected"

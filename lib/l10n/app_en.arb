@@ -36,5 +36,15 @@
   "categoryAnimation": "Animation",
   "categoryManagement": "Management",
   "categoryTechnicalService": "Technical Service",
-  "categoryOther": "Other"
+  "categoryOther": "Other",
+  "seasonalCalendarTitle": "Seasonal Hiring Calendar",
+  "seasonalRemindersTitle": "My Seasonal Reminders",
+  "seasonalRemindersDesc": "Get notified about listings in your selected region & category before the season starts.",
+  "seasonLabel": "Season",
+  "seasonSummer2025": "Summer 2025",
+  "seasonWinter202526": "Winter 2025-26",
+  "seasonYearRound": "Year-Round",
+  "seasonAny": "Any / All Seasons",
+  "addSeasonalAlert": "Add Alert",
+  "createAlertSuccess": "Seasonal reminder created successfully."
 }

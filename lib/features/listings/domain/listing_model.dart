@@ -15,9 +15,13 @@ class Listing {
   final String location;
   final String salary;
   final String? city;
+  final String? region;
   final int? minSalaryTl;
   final int? maxSalaryTl;
   final EmploymentType? employmentType;
+  final String? season;
+  final DateTime? contractStartDate;
+  final DateTime? contractEndDate;
   final String contactInfo;
   final List<String> images;
   final ListingStatus status;
@@ -38,9 +42,13 @@ class Listing {
     required this.title,
     required this.description,
     required this.category,
+    this.season,
+    this.contractStartDate,
+    this.contractEndDate,
     required this.location,
     required this.salary,
     this.city,
+    this.region,
     this.minSalaryTl,
     this.maxSalaryTl,
     this.employmentType,
@@ -64,12 +72,16 @@ class Listing {
       posterId: data['posterId'] as String? ?? '',
       posterName: data['posterName'] as String? ?? '',
       posterVerified: data['posterVerified'] as bool? ?? false,
+      season: data['season'] as String?,
+      contractStartDate: (data['contractStartDate'] as Timestamp?)?.toDate(),
+      contractEndDate: (data['contractEndDate'] as Timestamp?)?.toDate(),
       title: data['title'] as String? ?? '',
       description: data['description'] as String? ?? '',
       category: data['category'] as String? ?? 'diger',
       location: data['location'] as String? ?? '',
       salary: data['salary'] as String? ?? '',
       city: data['city'] as String?,
+      region: data['region'] as String?,
       minSalaryTl: (data['minSalaryTl'] as num?)?.toInt(),
       maxSalaryTl: (data['maxSalaryTl'] as num?)?.toInt(),
       employmentType: _employmentTypeFromString(data['employmentType'] as String?),
@@ -95,10 +107,14 @@ class Listing {
         'posterVerified': posterVerified,
         'title': title,
         'description': description,
+        'season': season,
+        'contractStartDate': contractStartDate != null ? Timestamp.fromDate(contractStartDate!) : null,
+        'contractEndDate': contractEndDate != null ? Timestamp.fromDate(contractEndDate!) : null,
         'category': category,
         'location': location,
         'salary': salary,
         'city': city,
+        'region': region,
         'minSalaryTl': minSalaryTl,
         'maxSalaryTl': maxSalaryTl,
         'employmentType': employmentType?.name,
@@ -113,6 +129,9 @@ class Listing {
         'boostPurchaseId': boostPurchaseId,
         'viewCount': viewCount,
         'messageCount': messageCount,
+        'season': season,
+        'contractStartDate': contractStartDate != null ? Timestamp.fromDate(contractStartDate!) : null,
+        'contractEndDate': contractEndDate != null ? Timestamp.fromDate(contractEndDate!) : null,
       };
 
   static EmploymentType? _employmentTypeFromString(String? value) {

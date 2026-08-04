@@ -157,6 +157,19 @@ class ListingService {
     return ref.id;
   }
 
+  Future<List<String>> createBatchListings(List<Listing> listings) async {
+    if (listings.isEmpty) return [];
+    final batch = _db.batch();
+    final ids = <String>[];
+    for (final listing in listings) {
+      final docRef = _db.collection('listings').doc();
+      ids.add(docRef.id);
+      batch.set(docRef, listing.toMap());
+    }
+    await batch.commit();
+    return ids;
+  }
+
   Future<void> updateListing(Listing listing) {
     final data = listing.toMap()..remove('createdAt');
     return _db.collection('listings').doc(listing.id).update(data);
@@ -193,6 +206,7 @@ class ListingService {
     String? category,
     String? searchQuery,
     String? city,
+    String? region,
     int? minSalaryTl,
     int? maxSalaryTl,
     ListingDateFilter dateFilter = ListingDateFilter.all,
@@ -246,6 +260,10 @@ class ListingService {
 
       if (city != null && city.isNotEmpty) {
         listings = listings.where((l) => l.city == city).toList();
+      }
+
+      if (region != null && region.isNotEmpty) {
+        listings = listings.where((l) => l.region == region).toList();
       }
 
       if (employmentType != null) {
@@ -322,6 +340,7 @@ class ListingService {
     String? category,
     String? searchQuery,
     String? city,
+    String? region,
     int? minSalaryTl,
     int? maxSalaryTl,
     ListingDateFilter dateFilter = ListingDateFilter.all,
@@ -334,6 +353,7 @@ class ListingService {
       category: category,
       searchQuery: searchQuery,
       city: city,
+      region: region,
       minSalaryTl: minSalaryTl,
       maxSalaryTl: maxSalaryTl,
       dateFilter: dateFilter,

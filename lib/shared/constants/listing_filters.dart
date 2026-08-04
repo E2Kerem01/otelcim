@@ -10,6 +10,32 @@ enum EmploymentType {
       };
 }
 
+enum ListingSeason {
+  yaz2025,
+  kis202526,
+  tumYil;
+
+  String get code => switch (this) {
+        ListingSeason.yaz2025 => 'yaz_2025',
+        ListingSeason.kis202526 => 'kis_2025_26',
+        ListingSeason.tumYil => 'tum_yil',
+      };
+
+  String get label => switch (this) {
+        ListingSeason.yaz2025 => 'Yaz 2025',
+        ListingSeason.kis202526 => 'Kış 2025-26',
+        ListingSeason.tumYil => 'Tüm Yıl',
+      };
+
+  static ListingSeason? fromCode(String? code) {
+    if (code == null) return null;
+    for (final s in ListingSeason.values) {
+      if (s.code == code) return s;
+    }
+    return null;
+  }
+}
+
 enum ListingDateFilter {
   all,
   last24Hours,
