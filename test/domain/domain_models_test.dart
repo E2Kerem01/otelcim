@@ -67,14 +67,23 @@ void main() {
     });
 
     test('Listing preserves legacy and structured fields', () async {
-      final listing = Listing(id: 'l', posterId: 'u', posterName: 'User', title: 'İş', description: 'Açıklama', category: 'servisGarson', location: 'Muğla / Bodrum', salary: '40.000 TL', city: 'Muğla', minSalaryTl: 40000, maxSalaryTl: 45000, employmentType: EmploymentType.seasonal, contactInfo: 'mail');
+      final contractStart = DateTime(2025, 4, 1);
+      final contractEnd = DateTime(2025, 10, 31);
+      final listing = Listing(id: 'l', posterId: 'u', posterName: 'User', title: 'İş', description: 'Açıklama', category: 'servisGarson', location: 'Muğla / Bodrum', salary: '40.000 TL', city: 'Muğla', minSalaryTl: 40000, maxSalaryTl: 45000, employmentType: EmploymentType.seasonal, season: 'yaz_2025', contractStartDate: contractStart, contractEndDate: contractEnd, contactInfo: 'mail');
       final ref = await db.collection('listings').add(listing.toMap());
       final parsed = Listing.fromDoc(await ref.get());
       expect(parsed.salary, '40.000 TL');
       expect(parsed.city, 'Muğla');
       expect(parsed.employmentType, EmploymentType.seasonal);
+      expect(parsed.season, 'yaz_2025');
+      expect(parsed.contractStartDate, contractStart);
+      expect(parsed.contractEndDate, contractEnd);
       await db.collection('listings').doc('legacy').set({'title': 'Eski'});
-      expect(Listing.fromDoc(await db.collection('listings').doc('legacy').get()).minSalaryTl, isNull);
+      final legacy = Listing.fromDoc(await db.collection('listings').doc('legacy').get());
+      expect(legacy.minSalaryTl, isNull);
+      expect(legacy.season, isNull);
+      expect(legacy.contractStartDate, isNull);
+      expect(legacy.contractEndDate, isNull);
     });
 
     test('Conversation and Message round-trip and defaults work', () async {

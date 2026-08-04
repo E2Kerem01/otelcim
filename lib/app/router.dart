@@ -16,12 +16,15 @@ import '../features/categories/presentation/categories_screen.dart';
 import '../features/chat/presentation/chat_detail_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/favorites/presentation/favorites_screen.dart';
+import '../features/discovery/presentation/regions_screen.dart';
+import '../features/discovery/presentation/region_map_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/listings/presentation/batch_create_listing_screen.dart';
 import '../features/listings/presentation/create_listing_screen.dart';
 import '../features/listings/presentation/edit_listing_screen.dart';
 import '../features/listings/presentation/listing_detail_screen.dart';
 import '../features/listings/presentation/my_listings_screen.dart';
+import '../features/nearby/presentation/nearby_listings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/role_selection_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
@@ -31,6 +34,7 @@ import '../features/profile/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/verification_request_screen.dart';
 import '../features/ratings/presentation/submit_rating_screen.dart';
+import '../features/seasonal/presentation/seasonal_calendar_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import '../shared/services/auth_service.dart';
 
@@ -48,7 +52,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = authService.currentUser != null;
       final location = state.matchedLocation;
 
-      final isProtected = location == '/create-listing' ||
+      final isProtected =
+          location == '/create-listing' ||
           location == '/batch-create-listing' ||
           location.startsWith('/chat') ||
           location.startsWith('/profile') ||
@@ -64,7 +69,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLoggedIn && location.startsWith('/admin')) {
-        final profile = await adminService.getUserProfile(authService.currentUser!.uid);
+        final profile = await adminService.getUserProfile(
+          authService.currentUser!.uid,
+        );
         if (!adminService.isAdminProfile(profile)) return '/';
       }
 
@@ -75,11 +82,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
-      GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingScreen()),
-      GoRoute(path: '/onboarding/role', builder: (context, state) => const RoleSelectionScreen()),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/role',
+        builder: (context, state) => const RoleSelectionScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return Scaffold(
@@ -123,16 +142,68 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
         branches: [
-          StatefulShellBranch(routes: [GoRoute(path: '/', builder: (context, state) => const HomeScreen())]),
           StatefulShellBranch(
-            routes: [GoRoute(path: '/categories', builder: (context, state) => const CategoriesScreen())],
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: '/create-listing', builder: (context, state) => const CreateListingScreen())],
+            routes: [
+              GoRoute(
+                path: '/categories',
+                builder: (context, state) => const CategoriesScreen(),
+              ),
+            ],
           ),
-          StatefulShellBranch(routes: [GoRoute(path: '/chat', builder: (context, state) => const ChatListScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen())]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/create-listing',
+                builder: (context, state) => const CreateListingScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/chat',
+                builder: (context, state) => const ChatListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
         ],
+      ),
+      GoRoute(
+        path: '/regions',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const RegionsScreen(),
+      ),
+      GoRoute(
+        path: '/regions/map',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const RegionMapScreen(),
+      ),
+      GoRoute(
+        path: '/regions/:regionId',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) =>
+            HomeScreen(initialRegion: state.pathParameters['regionId']),
+      ),
+      GoRoute(
+        path: '/nearby',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const NearbyListingsScreen(),
       ),
       GoRoute(
         path: '/listing/:id',
@@ -171,7 +242,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final conversationId = state.pathParameters['conversationId']!;
-          return ChatDetailScreen(conversationId: conversationId, initialText: state.extra as String?);
+          return ChatDetailScreen(
+            conversationId: conversationId,
+            initialText: state.extra as String?,
+          );
         },
       ),
       GoRoute(
@@ -193,6 +267,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/my-boosts',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const MyBoostsScreen(),
+      ),
+      GoRoute(
+        path: '/seasonal-calendar',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SeasonalCalendarScreen(),
       ),
       GoRoute(
         path: '/profile/edit',

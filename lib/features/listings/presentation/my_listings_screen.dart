@@ -29,6 +29,11 @@ class MyListingsScreen extends ConsumerWidget {
         title: const Text('İlanlarım'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.library_add_outlined),
+            tooltip: 'Toplu İlan Ver',
+            onPressed: () => context.push('/batch-create-listing'),
+          ),
+          IconButton(
             icon: const Icon(Icons.rocket_launch_outlined),
             tooltip: 'Öne Çıkarılanlarım',
             onPressed: () => context.push('/my-boosts'),

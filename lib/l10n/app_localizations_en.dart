@@ -63,6 +63,44 @@ class AppLocalizationsEn extends AppLocalizations {
       'I\'m looking for employees for my hotel or business. I want to post job listings.';
 
   @override
+  String get incompletePositionsError =>
+      'Lütfen tüm pozisyon bilgilerini eksiksiz doldurun.';
+
+  @override
+  String get batchCreateButton => 'Toplu İlan Ver';
+
+  @override
+  String get seasonalCalendarTitle => 'Seasonal Hiring Calendar';
+
+  @override
+  String get seasonalRemindersTitle => 'My Seasonal Reminders';
+
+  @override
+  String get seasonalRemindersDesc =>
+      'Get notified about listings in your selected region & category before the season starts.';
+
+  @override
+  String get seasonLabel => 'Season';
+
+  @override
+  String get seasonSummer2025 => 'Summer 2025';
+
+  @override
+  String get seasonWinter202526 => 'Winter 2025-26';
+
+  @override
+  String get seasonYearRound => 'Year-Round';
+
+  @override
+  String get seasonAny => 'Any / All Seasons';
+
+  @override
+  String get addSeasonalAlert => 'Add Alert';
+
+  @override
+  String get createAlertSuccess => 'Seasonal reminder created successfully.';
+
+  @override
   String get roleSelectionError => 'Please select a role';
 
   @override
@@ -121,4 +159,108 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryOther => 'Other';
+
+  @override
+  String get regionLabel => 'Tourism region';
+
+  @override
+  String get regionSelectHint => 'Select a region';
+
+  @override
+  String get regionRequired => 'Please select a region';
+
+  @override
+  String get regionsTitle => 'Regions';
+
+  @override
+  String get regionsLoadError => 'Regions could not be loaded.';
+
+  @override
+  String activeListingCount(int count) {
+    return '$count active listings';
+  }
+
+  @override
+  String get nearMe => 'Near Me';
+
+  @override
+  String get nearbyTitle => 'Nearby Listings';
+
+  @override
+  String get nearbyPermissionTitle => 'Location permission';
+
+  @override
+  String get nearbyPermissionExplanation =>
+      'To show nearby jobs sorted by distance, we need your current location only when you use this feature.';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get radiusLabel => 'Search radius';
+
+  @override
+  String get nearbyEmpty =>
+      'No listings with location data were found within this radius.';
+
+  @override
+  String get nearbyLocationDenied =>
+      'Location permission was denied. Near Me remains disabled.';
+
+  @override
+  String get nearbyLocationDeniedForever =>
+      'Location permission is permanently disabled. You can enable it in device settings.';
+
+  @override
+  String get nearbyServicesDisabled =>
+      'Location services are disabled on your device.';
+
+  @override
+  String get nearbyLocationUnavailable =>
+      'Your location is currently unavailable. Please try again.';
+
+  @override
+  String get retryButton => 'Try again';
+
+  @override
+  String distanceKm(String distance) {
+    return '$distance km away';
+  }
+
+  @override
+  String get addListingLocation =>
+      'Add my current location to this listing (optional)';
+
+  @override
+  String get listingLocationAdded => 'Location will be added to the listing.';
+
+  @override
+  String get listingLocationOptionalHint =>
+      'Coordinates are used only for nearby listing searches.';
+
+  @override
+  String get seasonNone => 'No season selected';
+
+  @override
+  String get contractStartDateLabel => 'Contract start';
+
+  @override
+  String get contractEndDateLabel => 'Contract end';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get contractDatesRequired =>
+      'Select contract start and end dates for seasonal listings.';
+
+  @override
+  String get contractDateRangeInvalid =>
+      'Contract end date cannot be before the start date.';
+
+  @override
+  String get regionMapTitle => 'Region map';
+
+  @override
+  String get regionMapAttribution => 'OpenStreetMap contributors';
 }

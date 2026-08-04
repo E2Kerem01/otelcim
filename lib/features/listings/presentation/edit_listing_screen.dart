@@ -6,13 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
+import '../../discovery/domain/tourism_region.dart';
 import '../domain/listing_model.dart';
+import 'season_utils.dart';
 
 final _editListingProvider = FutureProvider.family<Listing?, String>((ref, id) {
   return ref.watch(listingServiceProvider).getListing(id);
@@ -40,7 +43,11 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   bool _initialized = false;
   bool _submitting = false;
   String? _selectedCity;
+  String? _selectedRegion;
   EmploymentType? _employmentType;
+  String? _season;
+  DateTime? _contractStartDate;
+  DateTime? _contractEndDate;
   List<String> _existingImageUrls = [];
   final List<File> _newImageFiles = [];
 
@@ -65,7 +72,11 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     _minSalaryController.text = listing.minSalaryTl?.toString() ?? '';
     _maxSalaryController.text = listing.maxSalaryTl?.toString() ?? '';
     _selectedCity = listing.city;
+    _selectedRegion = listing.region;
     _employmentType = listing.employmentType;
+    _season = listing.season;
+    _contractStartDate = listing.contractStartDate;
+    _contractEndDate = listing.contractEndDate;
     _locationController.text = listing.location;
     _contactController.text = listing.contactInfo;
     _existingImageUrls = List<String>.from(listing.images);
@@ -101,6 +112,22 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
 
   Future<void> _submit(Listing original) async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
+    if (isSeasonalContract(_season) &&
+        (_contractStartDate == null || _contractEndDate == null)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.contractDatesRequired)));
+      return;
+    }
+    if (_contractStartDate != null &&
+        _contractEndDate != null &&
+        _contractEndDate!.isBefore(_contractStartDate!)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.contractDateRangeInvalid)));
+      return;
+    }
 
     setState(() => _submitting = true);
     try {
@@ -108,11 +135,16 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
 
       if (_newImageFiles.isNotEmpty) {
         final storageService = ref.read(storageServiceProvider);
-        final uploadedUrls = await storageService.uploadListingImages(original.id, _newImageFiles);
+        final uploadedUrls = await storageService.uploadListingImages(
+          original.id,
+          _newImageFiles,
+        );
         finalImages.addAll(uploadedUrls);
       }
 
-      await ref.read(listingServiceProvider).updateListing(
+      await ref
+          .read(listingServiceProvider)
+          .updateListing(
             Listing(
               id: original.id,
               posterId: original.posterId,
@@ -124,9 +156,13 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               location: _locationController.text.trim(),
               salary: _salaryController.text.trim(),
               city: _selectedCity,
+              region: _selectedRegion,
               minSalaryTl: int.tryParse(_minSalaryController.text.trim()),
               maxSalaryTl: int.tryParse(_maxSalaryController.text.trim()),
               employmentType: _employmentType,
+              season: _season,
+              contractStartDate: _contractStartDate,
+              contractEndDate: _contractEndDate,
               contactInfo: _contactController.text.trim(),
               images: finalImages,
               status: original.status,
@@ -141,14 +177,16 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
             ),
           );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İlan güncellendi.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('İlan güncellendi.')));
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -167,7 +205,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
       ref.invalidate(_editListingProvider(widget.listingId));
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -176,6 +216,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final listingAsync = ref.watch(_editListingProvider(widget.listingId));
     final currentUid = ref.watch(authStateProvider).value?.uid;
 
@@ -189,12 +230,15 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
             return const Center(child: Text('İlan bulunamadı.'));
           }
           if (currentUid == null || listing.posterId != currentUid) {
-            return const Center(child: Text('Bu ilanı düzenleme yetkiniz yok.'));
+            return const Center(
+              child: Text('Bu ilanı düzenleme yetkiniz yok.'),
+            );
           }
 
           _initializeForm(listing);
           final isBoostedActive = BoostBadge.isBoostActive(listing);
-          final totalImageCount = _existingImageUrls.length + _newImageFiles.length;
+          final totalImageCount =
+              _existingImageUrls.length + _newImageFiles.length;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -205,10 +249,16 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                 children: [
                   // Boost Promotion Card
                   Card(
-                    color: isBoostedActive ? Colors.amber.shade50 : Colors.orange.shade50,
+                    color: isBoostedActive
+                        ? Colors.amber.shade50
+                        : Colors.orange.shade50,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: isBoostedActive ? Colors.amber.shade300 : Colors.orange.shade200),
+                      side: BorderSide(
+                        color: isBoostedActive
+                            ? Colors.amber.shade300
+                            : Colors.orange.shade200,
+                      ),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -217,7 +267,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                           Icon(
                             Icons.rocket_launch_rounded,
                             size: 32,
-                            color: isBoostedActive ? Colors.amber.shade900 : Colors.orange.shade800,
+                            color: isBoostedActive
+                                ? Colors.amber.shade900
+                                : Colors.orange.shade800,
                           ),
                           const SizedBox(width: 14),
                           Expanded(
@@ -227,11 +279,15 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                 Row(
                                   children: [
                                     Text(
-                                      isBoostedActive ? 'İlan Öne Çıkarıldı' : 'İlanınızı Öne Çıkarın',
+                                      isBoostedActive
+                                          ? 'İlan Öne Çıkarıldı'
+                                          : 'İlanınızı Öne Çıkarın',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15,
-                                        color: isBoostedActive ? Colors.amber.shade900 : Colors.orange.shade900,
+                                        color: isBoostedActive
+                                            ? Colors.amber.shade900
+                                            : Colors.orange.shade900,
                                       ),
                                     ),
                                     if (isBoostedActive) ...[
@@ -245,14 +301,18 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                   isBoostedActive
                                       ? 'Bitiş Tarihi: ${listing.boostExpiresAt!.day}.${listing.boostExpiresAt!.month}.${listing.boostExpiresAt!.year}'
                                       : 'İlanınızı en üste taşıyarak daha fazla adaya ulaşın.',
-                                  style: const TextStyle(fontSize: 12, color: Colors.black87),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black87,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: () => context.push('/listing/${listing.id}/boost'),
+                            onPressed: () =>
+                                context.push('/listing/${listing.id}/boost'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.amber.shade700,
                               foregroundColor: Colors.white,
@@ -273,29 +333,48 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextButton(
-                        onPressed: _submitting ? null : () => _toggleStatus(listing),
-                        child: Text(listing.status == ListingStatus.active ? 'Kapat' : 'Tekrar Aktifleştir'),
+                        onPressed: _submitting
+                            ? null
+                            : () => _toggleStatus(listing),
+                        child: Text(
+                          listing.status == ListingStatus.active
+                              ? 'Kapat'
+                              : 'Tekrar Aktifleştir',
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text('Kategori', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Kategori',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<ListingCategory>(
                     initialValue: _selectedCategory,
                     items: ListingCategory.values
-                        .map((c) => DropdownMenuItem(value: c, child: Text(listingCategoryLabels[c]!)))
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c,
+                            child: Text(listingCategoryLabels[c]!),
+                          ),
+                        )
                         .toList(),
                     onChanged: (val) {
                       if (val != null) setState(() => _selectedCategory = val);
                     },
                   ),
                   const SizedBox(height: 16),
-                  const Text('İlan Başlığı', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'İlan Başlığı',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _titleController,
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Başlık gerekli' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Başlık gerekli'
+                        : null,
                   ),
                   const SizedBox(height: 16),
 
@@ -303,10 +382,16 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('İlan Fotoğrafları', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text(
+                        'İlan Fotoğrafları',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       Text(
                         '$totalImageCount/5',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ],
                   ),
@@ -315,7 +400,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     height: 90,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: totalImageCount + (totalImageCount < 5 ? 1 : 0),
+                      itemCount:
+                          totalImageCount + (totalImageCount < 5 ? 1 : 0),
                       separatorBuilder: (_, __) => const SizedBox(width: 8),
                       itemBuilder: (context, index) {
                         if (index == totalImageCount) {
@@ -332,9 +418,18 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                               child: const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.add_a_photo_outlined, color: Colors.grey),
+                                  Icon(
+                                    Icons.add_a_photo_outlined,
+                                    color: Colors.grey,
+                                  ),
                                   SizedBox(height: 4),
-                                  Text('Fotoğraf Ekle', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                  Text(
+                                    'Fotoğraf Ekle',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -353,8 +448,10 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                   width: 90,
                                   height: 90,
                                   fit: BoxFit.cover,
-                                  placeholder: (_, __) => Container(color: Colors.grey.shade200),
-                                  errorWidget: (_, __, ___) => const Icon(Icons.broken_image),
+                                  placeholder: (_, __) =>
+                                      Container(color: Colors.grey.shade200),
+                                  errorWidget: (_, __, ___) =>
+                                      const Icon(Icons.broken_image),
                                 ),
                               ),
                               Positioned(
@@ -372,7 +469,11 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                       color: Colors.black54,
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(Icons.close, size: 16, color: Colors.white),
+                                    child: const Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -409,7 +510,11 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                     color: Colors.black54,
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Icons.close, size: 16, color: Colors.white),
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -420,71 +525,195 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                   ),
 
                   const SizedBox(height: 16),
-                  const Text('Konum (İl / İlçe)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Konum (İl / İlçe)',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _locationController,
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Konum gerekli' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Konum gerekli'
+                        : null,
                   ),
                   const SizedBox(height: 16),
-                  const Text('Şehir', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    AppLocalizations.of(context)!.regionLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedRegion,
+                    hint: Text(AppLocalizations.of(context)!.regionSelectHint),
+                    items: tourismRegions
+                        .map(
+                          (region) => DropdownMenuItem(
+                            value: region.id,
+                            child: Text(
+                              Localizations.localeOf(context).languageCode ==
+                                      'en'
+                                  ? region.nameEn
+                                  : region.nameTr,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) =>
+                        setState(() => _selectedRegion = value),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Şehir',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
                     initialValue: _selectedCity,
                     hint: const Text('Şehir seçin'),
-                    items: turkishTourismCities.map((city) => DropdownMenuItem(value: city, child: Text(city))).toList(),
+                    items: turkishTourismCities
+                        .map(
+                          (city) =>
+                              DropdownMenuItem(value: city, child: Text(city)),
+                        )
+                        .toList(),
                     onChanged: (value) => setState(() => _selectedCity = value),
                   ),
                   const SizedBox(height: 16),
-                  const Text('Maaş', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Maaş',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _salaryController,
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Maaş bilgisi gerekli' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Maaş bilgisi gerekli'
+                        : null,
                   ),
                   const SizedBox(height: 12),
-                  Row(children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _minSalaryController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'En düşük maaş (TL)'),
-                        validator: _salaryValidator,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _minSalaryController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'En düşük maaş (TL)',
+                          ),
+                          validator: _salaryValidator,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _maxSalaryController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'En yüksek maaş (TL)'),
-                        validator: _salaryValidator,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _maxSalaryController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'En yüksek maaş (TL)',
+                          ),
+                          validator: _salaryValidator,
+                        ),
                       ),
-                    ),
-                  ]),
+                    ],
+                  ),
                   const SizedBox(height: 16),
-                  const Text('Çalışma tipi', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Çalışma tipi',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<EmploymentType>(
                     initialValue: _employmentType,
                     hint: const Text('Çalışma tipi seçin'),
-                    items: EmploymentType.values.map((type) => DropdownMenuItem(value: type, child: Text(type.label))).toList(),
-                    onChanged: (value) => setState(() => _employmentType = value),
+                    items: EmploymentType.values
+                        .map(
+                          (type) => DropdownMenuItem(
+                            value: type,
+                            child: Text(type.label),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) =>
+                        setState(() => _employmentType = value),
                   ),
                   const SizedBox(height: 16),
-                  const Text('İletişim', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    l10n.seasonLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String?>(
+                    initialValue: _season,
+                    items: [
+                      DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text(l10n.seasonNone),
+                      ),
+                      ...listingSeasonValues.map(
+                        (season) => DropdownMenuItem<String?>(
+                          value: season,
+                          child: Text(listingSeasonLabel(l10n, season)),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) => setState(() {
+                      _season = value;
+                      if (!isSeasonalContract(value)) {
+                        _contractStartDate = null;
+                        _contractEndDate = null;
+                      }
+                    }),
+                  ),
+                  if (isSeasonalContract(_season)) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => _pickContractDate(isStart: true),
+                            icon: const Icon(Icons.calendar_today_outlined),
+                            label: Text(
+                              '${l10n.contractStartDateLabel}: ${formatContractDate(_contractStartDate, l10n)}',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => _pickContractDate(isStart: false),
+                            icon: const Icon(Icons.event_available_outlined),
+                            label: Text(
+                              '${l10n.contractEndDateLabel}: ${formatContractDate(_contractEndDate, l10n)}',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  const Text(
+                    'İletişim',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _contactController,
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'İletişim bilgisi gerekli' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'İletişim bilgisi gerekli'
+                        : null,
                   ),
                   const SizedBox(height: 16),
-                  const Text('İlan Açıklaması', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'İlan Açıklaması',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _descController,
                     maxLines: 4,
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Açıklama gerekli' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Açıklama gerekli'
+                        : null,
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -495,7 +724,10 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : const Text('Değişiklikleri Kaydet'),
                     ),
@@ -517,5 +749,25 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     final max = int.tryParse(_maxSalaryController.text.trim());
     if (min != null && max != null && min > max) return 'Aralığı kontrol edin';
     return null;
+  }
+
+  Future<void> _pickContractDate({required bool isStart}) async {
+    final initialDate = isStart
+        ? (_contractStartDate ?? DateTime.now())
+        : (_contractEndDate ?? _contractStartDate ?? DateTime.now());
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2024),
+      lastDate: DateTime(2035),
+    );
+    if (date == null || !mounted) return;
+    setState(() {
+      if (isStart) {
+        _contractStartDate = date;
+      } else {
+        _contractEndDate = date;
+      }
+    });
   }
 }

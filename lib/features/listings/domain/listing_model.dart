@@ -16,6 +16,8 @@ class Listing {
   final String salary;
   final String? city;
   final String? region;
+  final double? lat;
+  final double? lng;
   final int? minSalaryTl;
   final int? maxSalaryTl;
   final EmploymentType? employmentType;
@@ -49,6 +51,8 @@ class Listing {
     required this.salary,
     this.city,
     this.region,
+    this.lat,
+    this.lng,
     this.minSalaryTl,
     this.maxSalaryTl,
     this.employmentType,
@@ -82,14 +86,25 @@ class Listing {
       salary: data['salary'] as String? ?? '',
       city: data['city'] as String?,
       region: data['region'] as String?,
+      lat: (data['lat'] as num?)?.toDouble(),
+      lng: (data['lng'] as num?)?.toDouble(),
       minSalaryTl: (data['minSalaryTl'] as num?)?.toInt(),
       maxSalaryTl: (data['maxSalaryTl'] as num?)?.toInt(),
-      employmentType: _employmentTypeFromString(data['employmentType'] as String?),
+      employmentType: _employmentTypeFromString(
+        data['employmentType'] as String?,
+      ),
       contactInfo: data['contactInfo'] as String? ?? '',
-      images: (data['images'] as List<dynamic>?)?.map((e) => e as String).toList() ??
-          (data['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      images:
+          (data['images'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          (data['imageUrls'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
           const [],
-      status: (data['status'] as String? ?? 'active') == 'closed' ? ListingStatus.closed : ListingStatus.active,
+      status: (data['status'] as String? ?? 'active') == 'closed'
+          ? ListingStatus.closed
+          : ListingStatus.active,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
       isBoosted: data['isBoosted'] as bool? ?? false,
@@ -102,37 +117,42 @@ class Listing {
   }
 
   Map<String, dynamic> toMap() => {
-        'posterId': posterId,
-        'posterName': posterName,
-        'posterVerified': posterVerified,
-        'title': title,
-        'description': description,
-        'season': season,
-        'contractStartDate': contractStartDate != null ? Timestamp.fromDate(contractStartDate!) : null,
-        'contractEndDate': contractEndDate != null ? Timestamp.fromDate(contractEndDate!) : null,
-        'category': category,
-        'location': location,
-        'salary': salary,
-        'city': city,
-        'region': region,
-        'minSalaryTl': minSalaryTl,
-        'maxSalaryTl': maxSalaryTl,
-        'employmentType': employmentType?.name,
-        'contactInfo': contactInfo,
-        'images': images,
-        'status': status == ListingStatus.closed ? 'closed' : 'active',
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-        'isBoosted': isBoosted,
-        'boostExpiresAt': boostExpiresAt != null ? Timestamp.fromDate(boostExpiresAt!) : null,
-        'boostType': boostType,
-        'boostPurchaseId': boostPurchaseId,
-        'viewCount': viewCount,
-        'messageCount': messageCount,
-        'season': season,
-        'contractStartDate': contractStartDate != null ? Timestamp.fromDate(contractStartDate!) : null,
-        'contractEndDate': contractEndDate != null ? Timestamp.fromDate(contractEndDate!) : null,
-      };
+    'posterId': posterId,
+    'posterName': posterName,
+    'posterVerified': posterVerified,
+    'title': title,
+    'description': description,
+    'season': season,
+    'contractStartDate': contractStartDate != null
+        ? Timestamp.fromDate(contractStartDate!)
+        : null,
+    'contractEndDate': contractEndDate != null
+        ? Timestamp.fromDate(contractEndDate!)
+        : null,
+    'category': category,
+    'location': location,
+    'salary': salary,
+    'city': city,
+    'region': region,
+    'lat': lat,
+    'lng': lng,
+    'minSalaryTl': minSalaryTl,
+    'maxSalaryTl': maxSalaryTl,
+    'employmentType': employmentType?.name,
+    'contactInfo': contactInfo,
+    'images': images,
+    'status': status == ListingStatus.closed ? 'closed' : 'active',
+    'createdAt': FieldValue.serverTimestamp(),
+    'updatedAt': FieldValue.serverTimestamp(),
+    'isBoosted': isBoosted,
+    'boostExpiresAt': boostExpiresAt != null
+        ? Timestamp.fromDate(boostExpiresAt!)
+        : null,
+    'boostType': boostType,
+    'boostPurchaseId': boostPurchaseId,
+    'viewCount': viewCount,
+    'messageCount': messageCount,
+  };
 
   static EmploymentType? _employmentTypeFromString(String? value) {
     for (final type in EmploymentType.values) {

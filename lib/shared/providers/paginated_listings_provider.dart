@@ -37,11 +37,13 @@ class PaginatedListingsState {
 /// StateNotifier for managing paginated listings
 class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
   PaginatedListingsNotifier(this._listingService, this.params)
-      : super(const PaginatedListingsState(
+    : super(
+        const PaginatedListingsState(
           listings: [],
           hasMore: true,
           isLoading: false,
-        ));
+        ),
+      );
 
   final ListingService _listingService;
   final PaginationParams params;
@@ -63,6 +65,7 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
         dateFilter: params.dateFilter,
         employmentType: params.employmentType,
         sortOrder: params.sortOrder,
+        season: params.season,
       );
 
       state = PaginatedListingsState(
@@ -94,6 +97,7 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
         dateFilter: params.dateFilter,
         employmentType: params.employmentType,
         sortOrder: params.sortOrder,
+        season: params.season,
       );
 
       state = PaginatedListingsState(
@@ -129,10 +133,17 @@ typedef PaginationParams = ({
   ListingDateFilter dateFilter,
   EmploymentType? employmentType,
   ListingSortOrder sortOrder,
+  String? season,
 });
 
-final paginatedListingsProvider = StateNotifierProvider.family<PaginatedListingsNotifier, PaginatedListingsState, PaginationParams>(
-  (ref, params) {
-    return PaginatedListingsNotifier(ref.watch(listingServiceProvider), params);
-  },
-);
+final paginatedListingsProvider =
+    StateNotifierProvider.family<
+      PaginatedListingsNotifier,
+      PaginatedListingsState,
+      PaginationParams
+    >((ref, params) {
+      return PaginatedListingsNotifier(
+        ref.watch(listingServiceProvider),
+        params,
+      );
+    });

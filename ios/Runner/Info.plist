@@ -56,6 +56,8 @@
 	<string>Otelcim galerinize erişerek fotoğraf seçmenize izin verir.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Otelcim video çekimi esnasında ses kaydı almak için mikrofona erişim istiyor.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Otelcim yakındaki iş ilanlarını göstermek ve ilanınıza isteğe bağlı konum eklemek için konumunuza erişir.</string>
 	<!-- External URL Launcher Schemes -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>

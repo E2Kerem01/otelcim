@@ -5,6 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'l10n/app_localizations.dart';
+
 import 'app/router.dart';
 import 'app/theme.dart';
 import 'firebase_options.dart';
@@ -38,9 +40,11 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
     super.initState();
     final notificationService = ref.read(notificationServiceProvider);
     final router = ref.read(routerProvider);
-    unawaited(notificationService.init(
-      onOpenChat: (conversationId) => router.go('/chat/$conversationId'),
-    ));
+    unawaited(
+      notificationService.init(
+        onOpenChat: (conversationId) => router.go('/chat/$conversationId'),
+      ),
+    );
     ref.listenManual(authStateProvider, (previous, next) {
       final uid = next.value?.uid;
       unawaited(notificationService.setCurrentUser(uid));
@@ -57,6 +61,8 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
       theme: otelcimTheme,
       darkTheme: otelcimDarkTheme,
       themeMode: themeMode,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
     );
   }

@@ -196,4 +196,41 @@
   "@categoryOther": {
     "description": "Other category label"
   }
+,
+  "regionLabel": "Turizm bölgesi",
+  "regionSelectHint": "Bölge seçin",
+  "regionRequired": "Bölge seçmeniz gerekiyor",
+  "regionsTitle": "Bölgeler",
+  "regionsLoadError": "Bölgeler yüklenemedi.",
+  "activeListingCount": "{count} aktif ilan",
+  "@activeListingCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "nearMe": "Yakınımda",
+  "nearbyTitle": "Yakındaki İlanlar",
+  "nearbyPermissionTitle": "Konum izni",
+  "nearbyPermissionExplanation": "Yakınınızdaki iş ilanlarını mesafeye göre göstermek için yalnızca siz bu özelliği kullandığınızda anlık konumunuza erişmemiz gerekiyor.",
+  "cancelButton": "Vazgeç",
+  "radiusLabel": "Arama yarıçapı",
+  "nearbyEmpty": "Seçilen yarıçapta konum bilgili ilan bulunamadı.",
+  "nearbyLocationDenied": "Konum izni verilmedi. Yakınımda özelliği kapalı kaldı.",
+  "nearbyLocationDeniedForever": "Konum izni kalıcı olarak kapalı. İzni cihaz ayarlarından açabilirsiniz.",
+  "nearbyServicesDisabled": "Cihazınızın konum hizmetleri kapalı.",
+  "nearbyLocationUnavailable": "Konum şu anda alınamıyor. Lütfen tekrar deneyin.",
+  "retryButton": "Tekrar dene",
+  "distanceKm": "{distance} km uzakta",
+  "@distanceKm": {"placeholders": {"distance": {"type": "String"}}},
+  "addListingLocation": "Anlık konumumu ilana ekle (isteğe bağlı)",
+  "listingLocationAdded": "Konum ilana eklenecek.",
+  "listingLocationOptionalHint": "Koordinatlar yalnızca yakın ilan aramalarında kullanılır.",
+  "seasonNone": "Sezon seçilmedi",
+  "contractStartDateLabel": "Sözleşme başlangıcı",
+  "contractEndDateLabel": "Sözleşme bitişi",
+  "selectDate": "Tarih seçin",
+  "contractDatesRequired": "Sezonluk ilanlar için başlangıç ve bitiş tarihlerini seçin.",
+  "contractDateRangeInvalid": "Sözleşme bitiş tarihi başlangıç tarihinden önce olamaz.",
+  "regionMapTitle": "Bölge haritası",
+  "regionMapAttribution": "OpenStreetMap katkıda bulunanları"
 }

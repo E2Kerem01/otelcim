@@ -10,62 +10,79 @@ class ListingService {
 
   final FirebaseFirestore _db;
 
-  Stream<List<Listing>> watchActiveListings({String? category, String? searchQuery}) {
-    return _db.collection('listings').snapshots().map((snap) {
-      var listings = snap.docs
-          .map(Listing.fromDoc)
-          .where((l) => l.status == ListingStatus.active)
-          .toList();
+  Stream<List<Listing>> watchActiveListings({
+    String? category,
+    String? searchQuery,
+  }) {
+    return _db
+        .collection('listings')
+        .snapshots()
+        .map((snap) {
+          var listings = snap.docs
+              .map(Listing.fromDoc)
+              .where((l) => l.status == ListingStatus.active)
+              .toList();
 
-      listings.sort((a, b) {
-        final aBoosted = a.isBoosted && (a.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
-        final bBoosted = b.isBoosted && (b.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
-        if (aBoosted && !bBoosted) return -1;
-        if (!aBoosted && bBoosted) return 1;
-        final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final tB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return tB.compareTo(tA);
-      });
+          listings.sort((a, b) {
+            final aBoosted =
+                a.isBoosted &&
+                (a.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+            final bBoosted =
+                b.isBoosted &&
+                (b.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+            if (aBoosted && !bBoosted) return -1;
+            if (!aBoosted && bBoosted) return 1;
+            final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            final tB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            return tB.compareTo(tA);
+          });
 
-      if (category != null && category.isNotEmpty) {
-        listings = listings.where((l) => l.category == category).toList();
-      }
+          if (category != null && category.isNotEmpty) {
+            listings = listings.where((l) => l.category == category).toList();
+          }
 
-      if (searchQuery != null && searchQuery.isNotEmpty) {
-        final q = searchQuery.toLowerCase();
-        listings = listings
-            .where((l) =>
-                l.title.toLowerCase().contains(q) ||
-                l.location.toLowerCase().contains(q) ||
-                l.description.toLowerCase().contains(q))
-            .toList();
-      }
+          if (searchQuery != null && searchQuery.isNotEmpty) {
+            final q = searchQuery.toLowerCase();
+            listings = listings
+                .where(
+                  (l) =>
+                      l.title.toLowerCase().contains(q) ||
+                      l.location.toLowerCase().contains(q) ||
+                      l.description.toLowerCase().contains(q),
+                )
+                .toList();
+          }
 
-      return listings;
-    }).handleError((error) {
-      debugPrint('Firestore watchActiveListings warning: $error');
-      return <Listing>[];
-    });
+          return listings;
+        })
+        .handleError((error) {
+          debugPrint('Firestore watchActiveListings warning: $error');
+          return <Listing>[];
+        });
   }
 
   Stream<List<Listing>> watchMyListings(String uid) {
-    return _db.collection('listings').snapshots().map((snap) {
-      var listings = snap.docs
-          .map(Listing.fromDoc)
-          .where((l) => l.posterId == uid)
-          .toList();
+    return _db
+        .collection('listings')
+        .snapshots()
+        .map((snap) {
+          var listings = snap.docs
+              .map(Listing.fromDoc)
+              .where((l) => l.posterId == uid)
+              .toList();
 
-      listings.sort((a, b) {
-        final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final tB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return tB.compareTo(tA);
-      });
+          listings.sort((a, b) {
+            final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            final tB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            return tB.compareTo(tA);
+          });
 
-      return listings;
-    }).handleError((error) {
-      debugPrint('Firestore watchMyListings warning: $error');
-      return <Listing>[];
-    });
+          return listings;
+        })
+        .handleError((error) {
+          debugPrint('Firestore watchMyListings warning: $error');
+          return <Listing>[];
+        });
   }
 
   Future<void> seedSampleListings() async {
@@ -78,7 +95,8 @@ class ListingService {
           'posterId': 'system_demo',
           'posterName': 'Belek Luxury Resort',
           'title': 'Ön Büro Resepsiyonisti (İngilizce & Rusça Bilen)',
-          'description': 'Belek 5 Yıldızlı Otelimizde görevlendirilmek üzere diksiyonu düzgün, vardiyalı çalışabilecek resepsiyonist aranıyor. Lojman ve yemek mevcuttur.',
+          'description':
+              'Belek 5 Yıldızlı Otelimizde görevlendirilmek üzere diksiyonu düzgün, vardiyalı çalışabilecek resepsiyonist aranıyor. Lojman ve yemek mevcuttur.',
           'category': 'resepsiyon',
           'location': 'Antalya, Belek',
           'salary': '35.000 TL / Ay',
@@ -95,7 +113,8 @@ class ListingService {
           'posterId': 'system_demo',
           'posterName': 'Grand Palace Bosphorus',
           'title': 'Chef de Partie / Aşçıbaşı Yardımcısı',
-          'description': 'İstanbul Şişli lokasyonundaki otel mutfağımız için soğuk ve sıcak büfe tecrübeli aşçı ekibi aranmaktadır. SGK + Yemek + Prim.',
+          'description':
+              'İstanbul Şişli lokasyonundaki otel mutfağımız için soğuk ve sıcak büfe tecrübeli aşçı ekibi aranmaktadır. SGK + Yemek + Prim.',
           'category': 'mutfak',
           'location': 'İstanbul, Şişli',
           'salary': '45.000 TL / Ay',
@@ -112,7 +131,8 @@ class ListingService {
           'posterId': 'system_demo',
           'posterName': 'Bodrum Sunset Beach Hotel',
           'title': 'Servis Elemanı & Garson (Sezonluk)',
-          'description': 'Bodrum Yalıkavak otelimizde beach ve alakart restoranda çalışacak enerjik servis elemanları aranıyor. Lojman ve dolgun bahşiş imkanı.',
+          'description':
+              'Bodrum Yalıkavak otelimizde beach ve alakart restoranda çalışacak enerjik servis elemanları aranıyor. Lojman ve dolgun bahşiş imkanı.',
           'category': 'servis',
           'location': 'Muğla, Bodrum',
           'salary': '30.000 TL / Ay + Tip',
@@ -129,7 +149,8 @@ class ListingService {
           'posterId': 'system_demo',
           'posterName': 'Cappadocia Cave Suites',
           'title': 'Kat Hizmetleri Görevlisi (Housekeeping)',
-          'description': 'Nevşehir Ürgüp bölgesindeki butik otelimizde oda temizliği ve düzeninden sorumlu deneyimli kat görevlileri alınacaktır.',
+          'description':
+              'Nevşehir Ürgüp bölgesindeki butik otelimizde oda temizliği ve düzeninden sorumlu deneyimli kat görevlileri alınacaktır.',
           'category': 'kat_hizmetleri',
           'location': 'Nevşehir, Ürgüp',
           'salary': '28.000 TL / Ay',
@@ -176,11 +197,15 @@ class ListingService {
   }
 
   Future<void> closeListing(String listingId) {
-    return _db.collection('listings').doc(listingId).update({'status': 'closed'});
+    return _db.collection('listings').doc(listingId).update({
+      'status': 'closed',
+    });
   }
 
   Future<void> reactivateListing(String listingId) {
-    return _db.collection('listings').doc(listingId).update({'status': 'active'});
+    return _db.collection('listings').doc(listingId).update({
+      'status': 'active',
+    });
   }
 
   Future<Listing?> getListing(String listingId) async {
@@ -212,6 +237,7 @@ class ListingService {
     ListingDateFilter dateFilter = ListingDateFilter.all,
     EmploymentType? employmentType,
     ListingSortOrder sortOrder = ListingSortOrder.newest,
+    String? season,
   }) async {
     try {
       Query query = _db.collection('listings');
@@ -219,9 +245,16 @@ class ListingService {
       // Filter by active status
       query = query.where('status', isEqualTo: 'active');
 
+      if (season != null && season.isNotEmpty) {
+        query = query.where('season', isEqualTo: season);
+      }
+
       final cutoff = dateFilter.cutoff;
       if (cutoff != null) {
-        query = query.where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoff));
+        query = query.where(
+          'createdAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(cutoff),
+        );
       }
 
       // Only (status, createdAt) is filtered/sorted server-side, which needs a
@@ -247,8 +280,10 @@ class ListingService {
       var listings = pageDocs.map(Listing.fromDoc).toList();
 
       listings.sort((a, b) {
-        final aBoosted = a.isBoosted && (a.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
-        final bBoosted = b.isBoosted && (b.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+        final aBoosted =
+            a.isBoosted && (a.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
+        final bBoosted =
+            b.isBoosted && (b.boostExpiresAt?.isAfter(DateTime.now()) ?? false);
         if (aBoosted && !bBoosted) return -1;
         if (!aBoosted && bBoosted) return 1;
         return 0;
@@ -267,31 +302,42 @@ class ListingService {
       }
 
       if (employmentType != null) {
-        listings = listings.where((l) => l.employmentType == employmentType).toList();
+        listings = listings
+            .where((l) => l.employmentType == employmentType)
+            .toList();
       }
 
       // Apply search query filter client-side if provided
       if (searchQuery != null && searchQuery.isNotEmpty) {
         final q = searchQuery.toLowerCase();
         listings = listings
-            .where((l) =>
-                l.title.toLowerCase().contains(q) ||
-                l.location.toLowerCase().contains(q) ||
-                l.description.toLowerCase().contains(q))
+            .where(
+              (l) =>
+                  l.title.toLowerCase().contains(q) ||
+                  l.location.toLowerCase().contains(q) ||
+                  l.description.toLowerCase().contains(q),
+            )
             .toList();
       }
 
-
       if (minSalaryTl != null) {
-        listings = listings.where((listing) =>
-          listing.maxSalaryTl != null && listing.maxSalaryTl! >= minSalaryTl
-        ).toList();
+        listings = listings
+            .where(
+              (listing) =>
+                  listing.maxSalaryTl != null &&
+                  listing.maxSalaryTl! >= minSalaryTl,
+            )
+            .toList();
       }
 
       if (maxSalaryTl != null) {
-        listings = listings.where((listing) =>
-          listing.minSalaryTl != null && listing.minSalaryTl! <= maxSalaryTl
-        ).toList();
+        listings = listings
+            .where(
+              (listing) =>
+                  listing.minSalaryTl != null &&
+                  listing.minSalaryTl! <= maxSalaryTl,
+            )
+            .toList();
       }
 
       if (sortOrder != ListingSortOrder.newest) {
@@ -346,6 +392,7 @@ class ListingService {
     ListingDateFilter dateFilter = ListingDateFilter.all,
     EmploymentType? employmentType,
     ListingSortOrder sortOrder = ListingSortOrder.newest,
+    String? season,
   }) async {
     return getPaginatedListings(
       limit: limit,
@@ -359,6 +406,7 @@ class ListingService {
       dateFilter: dateFilter,
       employmentType: employmentType,
       sortOrder: sortOrder,
+      season: season,
     );
   }
 }
@@ -376,4 +424,6 @@ class PaginatedListingsResult {
   });
 }
 
-final listingServiceProvider = Provider<ListingService>((ref) => ListingService(FirebaseFirestore.instance));
+final listingServiceProvider = Provider<ListingService>(
+  (ref) => ListingService(FirebaseFirestore.instance),
+);

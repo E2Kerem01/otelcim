@@ -12,9 +12,14 @@ import '../../ads/presentation/widgets/banner_ad_carousel.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../favorites/services/favorite_service.dart';
 import '../../listings/domain/listing_model.dart';
+import '../../listings/presentation/season_utils.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../discovery/domain/tourism_region.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.initialRegion});
+
+  final String? initialRegion;
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -29,16 +34,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     category: null,
     searchQuery: '',
     city: null,
+    region: null,
     minSalaryTl: null,
     maxSalaryTl: null,
     dateFilter: ListingDateFilter.all,
     employmentType: null,
     sortOrder: ListingSortOrder.newest,
+    season: null,
   );
 
   @override
   void initState() {
     super.initState();
+    _filters = _AdvancedFilters(region: widget.initialRegion);
     _scrollController.addListener(_onScroll);
   }
 
@@ -51,13 +59,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.9) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
       ref.read(paginatedListingsProvider(_currentParams).notifier).loadMore();
     }
   }
 
   Future<void> _onRefresh() async {
-    await ref.read(paginatedListingsProvider(_currentParams).notifier).refresh();
+    await ref
+        .read(paginatedListingsProvider(_currentParams).notifier)
+        .refresh();
 
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -85,153 +96,288 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       category: selectedCategory?.name,
       searchQuery: _searchQuery,
       city: _filters.city,
+      region: _filters.region,
       minSalaryTl: _filters.minSalaryTl,
       maxSalaryTl: _filters.maxSalaryTl,
       dateFilter: _filters.dateFilter,
       employmentType: _filters.employmentType,
       sortOrder: _filters.sortOrder,
+      season: _filters.season?.code,
     );
-    final paginationState = ref.watch(paginatedListingsProvider(_currentParams));
+    final paginationState = ref.watch(
+      paginatedListingsProvider(_currentParams),
+    );
 
-    if (paginationState.listings.isEmpty && !paginationState.isLoading && paginationState.hasMore) {
-      final notifier = ref.read(paginatedListingsProvider(_currentParams).notifier);
+    if (paginationState.listings.isEmpty &&
+        !paginationState.isLoading &&
+        paginationState.hasMore) {
+      final notifier = ref.read(
+        paginatedListingsProvider(_currentParams).notifier,
+      );
       Future.microtask(notifier.loadInitial);
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Otelcim'),
+        title: Text(
+          widget.initialRegion == null
+              ? 'Otelcim'
+              : (Localizations.localeOf(context).languageCode == 'en'
+                        ? tourismRegionById(widget.initialRegion)?.nameEn
+                        : tourismRegionById(widget.initialRegion)?.nameTr) ??
+                    AppLocalizations.of(context)!.regionsTitle,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/seasonal-calendar'),
+            tooltip: 'Sezon Takvimi',
+            icon: const Icon(Icons.calendar_month_rounded),
+          ),
+          IconButton(
+            onPressed: () => context.push('/regions'),
+            tooltip: AppLocalizations.of(context)!.regionsTitle,
+            icon: const Icon(Icons.travel_explore),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: CustomScrollView(
           controller: _scrollController,
           slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(children: [
-                Expanded(child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-                  ),
-                  child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: 'İş ilanı ara...',
-                    prefixIcon: Icon(Icons.search_rounded, color: Colors.grey),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 14),
-                  ),
-                    onChanged: (value) => setState(() => _searchQuery = value.trim()),
-                  ),
-                )),
-                const SizedBox(width: 10),
-                Badge(
-                  isLabelVisible: _filters.activeCount > 0,
-                  label: Text('${_filters.activeCount}'),
-                  child: IconButton.filledTonal(
-                    onPressed: _openFilters,
-                    tooltip: 'Filtreler',
-                    icon: const Icon(Icons.tune_rounded),
-                  ),
-                ),
-              ]),
-            ),
-          ),
-          if (_filters.activeCount > 0)
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: 44,
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  scrollDirection: Axis.horizontal,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
                   children: [
-                    if (_filters.city != null) _filterChip(_filters.city!, () => setState(() => _filters = _filters.copyWith(clearCity: true))),
-                    if (_filters.minSalaryTl != null || _filters.maxSalaryTl != null) _filterChip(_filters.salaryLabel, () => setState(() => _filters = _filters.copyWith(clearSalary: true))),
-                    if (_filters.dateFilter != ListingDateFilter.all) _filterChip(_filters.dateFilter.label, () => setState(() => _filters = _filters.copyWith(dateFilter: ListingDateFilter.all))),
-                    if (_filters.employmentType != null) _filterChip(_filters.employmentType!.label, () => setState(() => _filters = _filters.copyWith(clearEmploymentType: true))),
-                    if (_filters.sortOrder != ListingSortOrder.newest) _filterChip(_filters.sortOrder.label, () => setState(() => _filters = _filters.copyWith(sortOrder: ListingSortOrder.newest))),
-                    TextButton(onPressed: () => setState(() => _filters = const _AdvancedFilters()), child: const Text('Temizle')),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'İş ilanı ara...',
+                            prefixIcon: Icon(
+                              Icons.search_rounded,
+                              color: Colors.grey,
+                            ),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onChanged: (value) =>
+                              setState(() => _searchQuery = value.trim()),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Badge(
+                      isLabelVisible: _filters.activeCount > 0,
+                      label: Text('${_filters.activeCount}'),
+                      child: IconButton.filledTonal(
+                        onPressed: _openFilters,
+                        tooltip: 'Filtreler',
+                        icon: const Icon(Icons.tune_rounded),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 12),
-              child: BannerAdCarousel(),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 48,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                itemCount: ListingCategory.values.length + 1,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    final isSelected = selectedCategory == null;
-                    return ChoiceChip(
-                      label: const Text('Tümü'),
-                      selected: isSelected,
-                      onSelected: (_) => ref.read(selectedCategoryFilterProvider.notifier).state = null,
-                      selectedColor: Theme.of(context).primaryColor,
-                      labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
-                    );
-                  }
-                  final category = ListingCategory.values[index - 1];
-                  final isSelected = category == selectedCategory;
-                  return ChoiceChip(
-                    label: Text(listingCategoryLabels[category]!),
-                    selected: isSelected,
-                    onSelected: (_) => ref.read(selectedCategoryFilterProvider.notifier).state = category,
-                    selectedColor: Theme.of(context).primaryColor,
-                    labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
-                  );
-                },
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: FilledButton.tonalIcon(
+                  onPressed: () => context.push('/nearby'),
+                  icon: const Icon(Icons.near_me_outlined),
+                  label: Text(AppLocalizations.of(context)!.nearMe),
+                ),
               ),
             ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-              child: Text('${paginationState.listings.length} sonuç', style: const TextStyle(fontWeight: FontWeight.w600)),
-            ),
-          ),
-          if (paginationState.isLoading && paginationState.listings.isEmpty)
-            const _ListingsSkeletonSliver()
-          else if (paginationState.listings.isEmpty)
-            _buildEmptyState(context)
-          else ...[
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _ListingCard(listing: paginationState.listings[index]),
+            if (_filters.activeCount > 0)
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 44,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      if (_filters.city != null)
+                        _filterChip(
+                          _filters.city!,
+                          () => setState(
+                            () => _filters = _filters.copyWith(clearCity: true),
+                          ),
+                        ),
+                      if (_filters.region != null)
+                        _filterChip(
+                          (Localizations.localeOf(context).languageCode == 'en'
+                                  ? tourismRegionById(_filters.region)?.nameEn
+                                  : tourismRegionById(
+                                      _filters.region,
+                                    )?.nameTr) ??
+                              _filters.region!,
+                          () => setState(
+                            () =>
+                                _filters = _filters.copyWith(clearRegion: true),
+                          ),
+                        ),
+                      if (_filters.minSalaryTl != null ||
+                          _filters.maxSalaryTl != null)
+                        _filterChip(
+                          _filters.salaryLabel,
+                          () => setState(
+                            () =>
+                                _filters = _filters.copyWith(clearSalary: true),
+                          ),
+                        ),
+                      if (_filters.dateFilter != ListingDateFilter.all)
+                        _filterChip(
+                          _filters.dateFilter.label,
+                          () => setState(
+                            () => _filters = _filters.copyWith(
+                              dateFilter: ListingDateFilter.all,
+                            ),
+                          ),
+                        ),
+                      if (_filters.employmentType != null)
+                        _filterChip(
+                          _filters.employmentType!.label,
+                          () => setState(
+                            () => _filters = _filters.copyWith(
+                              clearEmploymentType: true,
+                            ),
+                          ),
+                        ),
+                      if (_filters.season != null)
+                        _filterChip(
+                          _filters.season!.label,
+                          () => setState(
+                            () => _filters = _filters.copyWith(
+                              clearSeason: true,
+                            ),
+                          ),
+                        ),
+                      if (_filters.sortOrder != ListingSortOrder.newest)
+                        _filterChip(
+                          _filters.sortOrder.label,
+                          () => setState(
+                            () => _filters = _filters.copyWith(
+                              sortOrder: ListingSortOrder.newest,
+                            ),
+                          ),
+                        ),
+                      TextButton(
+                        onPressed: () =>
+                            setState(() => _filters = const _AdvancedFilters()),
+                        child: const Text('Temizle'),
+                      ),
+                    ],
                   ),
-                  childCount: paginationState.listings.length,
+                ),
+              ),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: BannerAdCarousel(),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 48,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: ListingCategory.values.length + 1,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      final isSelected = selectedCategory == null;
+                      return ChoiceChip(
+                        label: const Text('Tümü'),
+                        selected: isSelected,
+                        onSelected: (_) =>
+                            ref
+                                    .read(
+                                      selectedCategoryFilterProvider.notifier,
+                                    )
+                                    .state =
+                                null,
+                        selectedColor: Theme.of(context).primaryColor,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black87,
+                        ),
+                      );
+                    }
+                    final category = ListingCategory.values[index - 1];
+                    final isSelected = category == selectedCategory;
+                    return ChoiceChip(
+                      label: Text(listingCategoryLabels[category]!),
+                      selected: isSelected,
+                      onSelected: (_) =>
+                          ref
+                                  .read(selectedCategoryFilterProvider.notifier)
+                                  .state =
+                              category,
+                      selectedColor: Theme.of(context).primaryColor,
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black87,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
-            if (paginationState.isLoading)
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: CircularProgressIndicator()),
+            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                child: Text(
+                  '${paginationState.listings.length} sonuç',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
+            ),
+            if (paginationState.isLoading && paginationState.listings.isEmpty)
+              const _ListingsSkeletonSliver()
+            else if (paginationState.listings.isEmpty)
+              _buildEmptyState(context)
+            else ...[
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _ListingCard(
+                        listing: paginationState.listings[index],
+                      ),
+                    ),
+                    childCount: paginationState.listings.length,
+                  ),
+                ),
+              ),
+              if (paginationState.isLoading)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+            ],
           ],
-        ],
         ),
       ),
     );
@@ -239,7 +385,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildEmptyState(BuildContext context) {
     // Auto seed sample listings into Firestore if database is empty
-    Future.microtask(() => ref.read(listingServiceProvider).seedSampleListings());
+    Future.microtask(
+      () => ref.read(listingServiceProvider).seedSampleListings(),
+    );
     return SliverFillRemaining(
       hasScrollBody: false,
       child: Center(
@@ -270,7 +418,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -279,7 +430,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('İlk İlanı Sen Oluştur'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                 ),
               ),
             ],
@@ -290,60 +444,75 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _filterChip(String label, VoidCallback onDeleted) => Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: InputChip(label: Text(label), onDeleted: onDeleted),
-      );
+    padding: const EdgeInsets.only(right: 8),
+    child: InputChip(label: Text(label), onDeleted: onDeleted),
+  );
 }
 
 class _AdvancedFilters {
   const _AdvancedFilters({
     this.city,
+    this.region,
     this.minSalaryTl,
     this.maxSalaryTl,
     this.dateFilter = ListingDateFilter.all,
     this.employmentType,
     this.sortOrder = ListingSortOrder.newest,
+    this.season,
   });
 
   final String? city;
+  final String? region;
   final int? minSalaryTl;
   final int? maxSalaryTl;
   final ListingDateFilter dateFilter;
   final EmploymentType? employmentType;
   final ListingSortOrder sortOrder;
+  final ListingSeason? season;
 
   int get activeCount => [
-        city != null,
-        minSalaryTl != null || maxSalaryTl != null,
-        dateFilter != ListingDateFilter.all,
-        employmentType != null,
-        sortOrder != ListingSortOrder.newest,
-      ].where((active) => active).length;
+    city != null,
+    region != null,
+    minSalaryTl != null || maxSalaryTl != null,
+    dateFilter != ListingDateFilter.all,
+    employmentType != null,
+    sortOrder != ListingSortOrder.newest,
+    season != null,
+  ].where((active) => active).length;
 
   String get salaryLabel {
-    if (minSalaryTl != null && maxSalaryTl != null) return '$minSalaryTl - $maxSalaryTl TL';
+    if (minSalaryTl != null && maxSalaryTl != null)
+      return '$minSalaryTl - $maxSalaryTl TL';
     if (minSalaryTl != null) return '$minSalaryTl TL ve üzeri';
     return '$maxSalaryTl TL ve altı';
   }
 
   _AdvancedFilters copyWith({
     String? city,
+    String? region,
     int? minSalaryTl,
     int? maxSalaryTl,
     ListingDateFilter? dateFilter,
     EmploymentType? employmentType,
     ListingSortOrder? sortOrder,
+    ListingSeason? season,
     bool clearCity = false,
+    bool clearRegion = false,
     bool clearSalary = false,
     bool clearEmploymentType = false,
+    bool clearSeason = false,
   }) => _AdvancedFilters(
-        city: clearCity ? null : city ?? this.city,
-        minSalaryTl: clearSalary ? null : minSalaryTl ?? this.minSalaryTl,
-        maxSalaryTl: clearSalary ? null : maxSalaryTl ?? this.maxSalaryTl,
-        dateFilter: dateFilter ?? this.dateFilter,
-        employmentType: clearEmploymentType ? null : employmentType ?? this.employmentType,
-        sortOrder: sortOrder ?? this.sortOrder,
-      );
+    city: clearCity ? null : city ?? this.city,
+    region: clearRegion ? null : region ?? this.region,
+    minSalaryTl: clearSalary ? null : minSalaryTl ?? this.minSalaryTl,
+    maxSalaryTl: clearSalary ? null : maxSalaryTl ?? this.maxSalaryTl,
+    dateFilter: dateFilter ?? this.dateFilter,
+    employmentType: clearEmploymentType
+        ? null
+        : employmentType ?? this.employmentType,
+    sortOrder: sortOrder ?? this.sortOrder,
+    season: clearSeason ? null : season ?? this.season,
+  );
 }
 
 class _FilterSheet extends StatefulWidget {
@@ -355,21 +524,29 @@ class _FilterSheet extends StatefulWidget {
 
 class _FilterSheetState extends State<_FilterSheet> {
   String? _city;
+  String? _region;
   late final TextEditingController _minController;
   late final TextEditingController _maxController;
   late ListingDateFilter _date;
   EmploymentType? _employmentType;
   late ListingSortOrder _sort;
+  ListingSeason? _season;
 
   @override
   void initState() {
     super.initState();
     _city = widget.initial.city;
-    _minController = TextEditingController(text: widget.initial.minSalaryTl?.toString() ?? '');
-    _maxController = TextEditingController(text: widget.initial.maxSalaryTl?.toString() ?? '');
+    _region = widget.initial.region;
+    _minController = TextEditingController(
+      text: widget.initial.minSalaryTl?.toString() ?? '',
+    );
+    _maxController = TextEditingController(
+      text: widget.initial.maxSalaryTl?.toString() ?? '',
+    );
     _date = widget.initial.dateFilter;
     _employmentType = widget.initial.employmentType;
     _sort = widget.initial.sortOrder;
+    _season = widget.initial.season;
   }
 
   @override
@@ -381,43 +558,197 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 12, 20, MediaQuery.viewInsetsOf(context).bottom + 20),
-        child: SingleChildScrollView(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [const Expanded(child: Text('Gelişmiş filtreler', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))), IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close))]),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String?>(
-              initialValue: _city,
-              decoration: const InputDecoration(labelText: 'Şehir / bölge'),
-              items: [const DropdownMenuItem<String?>(value: null, child: Text('Tüm şehirler')), ...turkishTourismCities.map((city) => DropdownMenuItem(value: city, child: Text(city)))],
-              onChanged: (value) => setState(() => _city = value),
+    padding: EdgeInsets.fromLTRB(
+      20,
+      12,
+      20,
+      MediaQuery.viewInsetsOf(context).bottom + 20,
+    ),
+    child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Gelişmiş filtreler',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String?>(
+            initialValue: _city,
+            decoration: const InputDecoration(labelText: 'Şehir / bölge'),
+            items: [
+              const DropdownMenuItem<String?>(
+                value: null,
+                child: Text('Tüm şehirler'),
+              ),
+              ...turkishTourismCities.map(
+                (city) => DropdownMenuItem(value: city, child: Text(city)),
+              ),
+            ],
+            onChanged: (value) => setState(() => _city = value),
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<String?>(
+            initialValue: _region,
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context)!.regionLabel,
             ),
-            const SizedBox(height: 14),
-            Row(children: [
-              Expanded(child: TextField(controller: _minController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'En düşük maaş'))),
+            items: [
+              DropdownMenuItem<String?>(
+                value: null,
+                child: Text(AppLocalizations.of(context)!.regionsTitle),
+              ),
+              ...tourismRegions.map(
+                (region) => DropdownMenuItem(
+                  value: region.id,
+                  child: Text(
+                    Localizations.localeOf(context).languageCode == 'en'
+                        ? region.nameEn
+                        : region.nameTr,
+                  ),
+                ),
+              ),
+            ],
+            onChanged: (value) => setState(() => _region = value),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _minController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'En düşük maaş'),
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: TextField(controller: _maxController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'En yüksek maaş'))),
-            ]),
-            const SizedBox(height: 14),
-            DropdownButtonFormField<ListingDateFilter>(initialValue: _date, decoration: const InputDecoration(labelText: 'İlan tarihi'), items: ListingDateFilter.values.map((value) => DropdownMenuItem(value: value, child: Text(value.label))).toList(), onChanged: (value) { if (value != null) setState(() => _date = value); }),
-            const SizedBox(height: 14),
-            DropdownButtonFormField<EmploymentType?>(initialValue: _employmentType, decoration: const InputDecoration(labelText: 'Çalışma tipi'), items: [const DropdownMenuItem<EmploymentType?>(value: null, child: Text('Tüm çalışma tipleri')), ...EmploymentType.values.map((value) => DropdownMenuItem(value: value, child: Text(value.label)))], onChanged: (value) => setState(() => _employmentType = value)),
-            const SizedBox(height: 14),
-            DropdownButtonFormField<ListingSortOrder>(initialValue: _sort, decoration: const InputDecoration(labelText: 'Sıralama'), items: ListingSortOrder.values.map((value) => DropdownMenuItem(value: value, child: Text(value.label))).toList(), onChanged: (value) { if (value != null) setState(() => _sort = value); }),
-            const SizedBox(height: 22),
-            Row(children: [
-              Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(context, const _AdvancedFilters()), child: const Text('Temizle'))),
+              Expanded(
+                child: TextField(
+                  controller: _maxController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'En yüksek maaş',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<ListingDateFilter>(
+            initialValue: _date,
+            decoration: const InputDecoration(labelText: 'İlan tarihi'),
+            items: ListingDateFilter.values
+                .map(
+                  (value) =>
+                      DropdownMenuItem(value: value, child: Text(value.label)),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value != null) setState(() => _date = value);
+            },
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<EmploymentType?>(
+            initialValue: _employmentType,
+            decoration: const InputDecoration(labelText: 'Çalışma tipi'),
+            items: [
+              const DropdownMenuItem<EmploymentType?>(
+                value: null,
+                child: Text('Tüm çalışma tipleri'),
+              ),
+              ...EmploymentType.values.map(
+                (value) =>
+                    DropdownMenuItem(value: value, child: Text(value.label)),
+              ),
+            ],
+            onChanged: (value) => setState(() => _employmentType = value),
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<ListingSeason?>(
+            initialValue: _season,
+            decoration: const InputDecoration(labelText: 'Sezon'),
+            items: [
+              const DropdownMenuItem<ListingSeason?>(
+                value: null,
+                child: Text('Farketmez / Tüm Sezonlar'),
+              ),
+              ...ListingSeason.values.map(
+                (s) => DropdownMenuItem(value: s, child: Text(s.label)),
+              ),
+            ],
+            onChanged: (value) => setState(() => _season = value),
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<ListingSortOrder>(
+            initialValue: _sort,
+            decoration: const InputDecoration(labelText: 'Sıralama'),
+            items: ListingSortOrder.values
+                .map(
+                  (value) =>
+                      DropdownMenuItem(value: value, child: Text(value.label)),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value != null) setState(() => _sort = value);
+            },
+          ),
+          const SizedBox(height: 22),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () =>
+                      Navigator.pop(context, const _AdvancedFilters()),
+                  child: const Text('Temizle'),
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: FilledButton(onPressed: () {
-                final min = int.tryParse(_minController.text.trim());
-                final max = int.tryParse(_maxController.text.trim());
-                if (min != null && max != null && min > max) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Maaş aralığını kontrol edin.'))); return; }
-                Navigator.pop(context, _AdvancedFilters(city: _city, minSalaryTl: min, maxSalaryTl: max, dateFilter: _date, employmentType: _employmentType, sortOrder: _sort));
-              }, child: const Text('Filtreleri uygula'))),
-            ]),
-          ]),
-        ),
-      );
+              Expanded(
+                child: FilledButton(
+                  onPressed: () {
+                    final min = int.tryParse(_minController.text.trim());
+                    final max = int.tryParse(_maxController.text.trim());
+                    if (min != null && max != null && min > max) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Maaş aralığını kontrol edin.'),
+                        ),
+                      );
+                      return;
+                    }
+                    Navigator.pop(
+                      context,
+                      _AdvancedFilters(
+                        city: _city,
+                        region: _region,
+                        minSalaryTl: min,
+                        maxSalaryTl: max,
+                        dateFilter: _date,
+                        employmentType: _employmentType,
+                        sortOrder: _sort,
+                        season: _season,
+                      ),
+                    );
+                  },
+                  child: const Text('Filtreleri uygula'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 /// Skeleton placeholder cards shown while the initial page of listings loads.
@@ -446,7 +777,8 @@ class _SkeletonCard extends StatefulWidget {
   State<_SkeletonCard> createState() => _SkeletonCardState();
 }
 
-class _SkeletonCardState extends State<_SkeletonCard> with SingleTickerProviderStateMixin {
+class _SkeletonCardState extends State<_SkeletonCard>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 900),
@@ -475,7 +807,11 @@ class _SkeletonCardState extends State<_SkeletonCard> with SingleTickerProviderS
             children: [
               Container(width: 80, height: 16, color: Colors.grey.shade300),
               const SizedBox(height: 10),
-              Container(width: double.infinity, height: 14, color: Colors.grey.shade300),
+              Container(
+                width: double.infinity,
+                height: 14,
+                color: Colors.grey.shade300,
+              ),
               const SizedBox(height: 8),
               Container(width: 160, height: 12, color: Colors.grey.shade300),
               const SizedBox(height: 8),
@@ -499,7 +835,11 @@ class _ListingCard extends ConsumerWidget {
     final uid = ref.watch(authStateProvider).value?.uid;
     final isFavorite = uid == null
         ? false
-        : ref.watch(favoriteIdsProvider(uid)).valueOrNull?.contains(listing.id) ?? false;
+        : ref
+                  .watch(favoriteIdsProvider(uid))
+                  .valueOrNull
+                  ?.contains(listing.id) ??
+              false;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -533,9 +873,14 @@ class _ListingCard extends ConsumerWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -551,22 +896,32 @@ class _ListingCard extends ConsumerWidget {
                       const SizedBox(width: 8),
                       const BoostBadge(isCompact: true),
                     ],
+                    if (isSeasonalContract(listing.season)) ...[
+                      const SizedBox(width: 8),
+                      SeasonBadge(season: listing.season!),
+                    ],
                     const Spacer(),
                     AnimatedScale(
                       scale: isFavorite ? 1.15 : 1,
                       duration: const Duration(milliseconds: 180),
                       child: IconButton(
                         visualDensity: VisualDensity.compact,
-                        tooltip: isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle',
+                        tooltip: isFavorite
+                            ? 'Favorilerden çıkar'
+                            : 'Favorilere ekle',
                         onPressed: () {
                           if (uid == null) {
                             context.push('/login');
                             return;
                           }
-                          ref.read(favoriteServiceProvider).toggleFavorite(uid, listing.id);
+                          ref
+                              .read(favoriteServiceProvider)
+                              .toggleFavorite(uid, listing.id);
                         },
                         icon: Icon(
-                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          isFavorite
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
                           color: isFavorite ? Colors.red : Colors.grey.shade600,
                         ),
                       ),
@@ -574,7 +929,10 @@ class _ListingCard extends ConsumerWidget {
                     if (listing.createdAt != null)
                       Text(
                         '${listing.createdAt!.day}.${listing.createdAt!.month}.${listing.createdAt!.year}',
-                        style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                   ],
                 ),
@@ -590,8 +948,16 @@ class _ListingCard extends ConsumerWidget {
                           width: 60,
                           height: 60,
                           fit: BoxFit.cover,
-                          placeholder: (_, __) => Container(color: Colors.grey.shade200, width: 60, height: 60),
-                          errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 24, color: Colors.grey),
+                          placeholder: (_, __) => Container(
+                            color: Colors.grey.shade200,
+                            width: 60,
+                            height: 60,
+                          ),
+                          errorWidget: (_, __, ___) => const Icon(
+                            Icons.broken_image,
+                            size: 24,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -604,19 +970,29 @@ class _ListingCard extends ConsumerWidget {
                             listing.title,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 14,
+                                color: Colors.grey.shade600,
+                              ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   listing.location,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
+                                  ),
                                 ),
                               ),
                             ],
@@ -629,7 +1005,11 @@ class _ListingCard extends ConsumerWidget {
                 const SizedBox(height: 6),
                 Text(
                   listing.salary,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ],
             ),
