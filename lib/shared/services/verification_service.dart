@@ -61,13 +61,23 @@ class VerificationService {
   Future<VerificationRequest?> getUserVerificationRequest(
       String userId) async {
     try {
-      final QuerySnapshot<Map<String, dynamic>> querySnapshot =
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await _firestore
               .collection(_collectionName)
-              .where('userId', isEqualTo: userId)
-              .orderBy('requestedAt', descending: true)
+              .where('employerId', isEqualTo: userId)
+              .orderBy('submittedAt', descending: true)
               .limit(1)
               .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        // Fallback for legacy records using 'userId'
+        querySnapshot = await _firestore
+            .collection(_collectionName)
+            .where('userId', isEqualTo: userId)
+            .orderBy('requestedAt', descending: true)
+            .limit(1)
+            .get();
+      }
 
       if (querySnapshot.docs.isEmpty) {
         return null;
@@ -98,8 +108,8 @@ class VerificationService {
   Stream<VerificationRequest?> watchVerificationRequest(String userId) {
     return _firestore
         .collection(_collectionName)
-        .where('userId', isEqualTo: userId)
-        .orderBy('requestedAt', descending: true)
+        .where('employerId', isEqualTo: userId)
+        .orderBy('submittedAt', descending: true)
         .limit(1)
         .snapshots()
         .map((querySnapshot) {

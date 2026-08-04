@@ -59,15 +59,6 @@ class AuthService extends ChangeNotifier {
   Future<AppUser> register({required String email, required String password}) async {
     final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     final user = AppUser(uid: credential.user!.uid, email: credential.user!.email ?? email);
-    try {
-      await _firestore.collection('users').doc(user.uid).set({
-        'uid': user.uid,
-        'email': user.email,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      debugPrint('Firestore user creation warning: $e');
-    }
     _currentUser = user;
     _justRegistered = true;
     notifyListeners();
