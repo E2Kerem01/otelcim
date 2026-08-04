@@ -188,6 +188,28 @@
 
 ---
 
+### 10. `certificates` (İş Arayan Sertifika & Belge Cüzdanı)
+* **Açıklama**: İş arayanların hijyen belgesi, cankurtaran sertifikası, ehliyet, dil belgesi gibi belgeleri ve admin onay durumları.
+* **Doküman ID**: Otomatik üretilen Firestore ID.
+* **Kullanan Servisler**: `CertificateService`.
+* **Alanlar**:
+  - `userId` (String): Belge sahibi iş arayanın UID'si.
+  - `userName` (String?): Kullanıcının adı soyadı.
+  - `userEmail` (String?): Kullanıcının e-posta adresi.
+  - `type` (String): Belge türü (`hijyen`, `cankurtaran`, `ehliyet`, `dil`, `diger`).
+  - `title` (String?): Belge / sertifika başlığı veya açıklaması.
+  - `fileUrl` (String): Storage üzerindeki dosya bağlantısı (`certificates/{userId}/{certId}`).
+  - `status` (String): Doğrulama durumu (`pending`, `approved`, `rejected`).
+  - `createdAt` (Timestamp): Yüklenme tarihi.
+  - `reviewedBy` (String?): İnceleyen admin UID'si.
+  - `reviewedAt` (Timestamp?): Karar tarihi.
+  - `rejectionReason` (String?): Reddedilme gerekçesi.
+* **Bileşik İndeksler (`firestore.indexes.json`)**:
+  - `userId` (ASC) + `createdAt` (DESC)
+  - `status` (ASC) + `createdAt` (DESC)
+
+---
+
 ## Composite Index Kuralları (`firestore.indexes.json`)
 
 Firestore üzerinde birden fazla alan içeren karmaşık sorgularda (`where` + `orderBy` veya birden fazla `where` filtresi) dizin hatası (`FirebaseException: The query requires an index`) almamak için ilgili dizin `firestore.indexes.json` dosyasına eklenmelidir.
@@ -198,3 +220,5 @@ Mevcut Aktif Dizinler:
 3. `admin_audit_log`: `actionType` (ASC) + `timestamp` (DESC)
 4. `verification_requests`: `status` (ASC) + `submittedAt` (DESC)
 5. `verification_requests`: `employerId` (ASC) + `submittedAt` (DESC)
+6. `certificates`: `userId` (ASC) + `createdAt` (DESC)
+7. `certificates`: `status` (ASC) + `createdAt` (DESC)

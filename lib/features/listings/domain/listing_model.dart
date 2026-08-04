@@ -9,6 +9,7 @@ class Listing {
   final String posterId;
   final String posterName;
   final bool posterVerified;
+  final bool isUrgent;
   final String title;
   final String description;
   final String category;
@@ -28,6 +29,11 @@ class Listing {
   final DateTime? contractEndDate;
   final String contactInfo;
   final List<String> images;
+  final String? housingRoomType;
+  final bool? housingHasAc;
+  final bool? housingHasWifi;
+  final int? housingMealsIncluded;
+  final List<String> housingImages;
   final ListingStatus status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -43,6 +49,7 @@ class Listing {
     required this.posterId,
     required this.posterName,
     this.posterVerified = false,
+    this.isUrgent = false,
     required this.title,
     required this.description,
     required this.category,
@@ -62,6 +69,11 @@ class Listing {
     this.educationLevel,
     required this.contactInfo,
     this.images = const [],
+    this.housingRoomType,
+    this.housingHasAc,
+    this.housingHasWifi,
+    this.housingMealsIncluded,
+    this.housingImages = const [],
     this.status = ListingStatus.active,
     this.createdAt,
     this.updatedAt,
@@ -80,6 +92,7 @@ class Listing {
       posterId: data['posterId'] as String? ?? '',
       posterName: data['posterName'] as String? ?? '',
       posterVerified: data['posterVerified'] as bool? ?? false,
+      isUrgent: data['isUrgent'] as bool? ?? false,
       season: data['season'] as String?,
       contractStartDate: (data['contractStartDate'] as Timestamp?)?.toDate(),
       contractEndDate: (data['contractEndDate'] as Timestamp?)?.toDate(),
@@ -108,6 +121,15 @@ class Listing {
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      housingRoomType: data['housingRoomType'] as String?,
+      housingHasAc: data['housingHasAc'] as bool?,
+      housingHasWifi: data['housingHasWifi'] as bool?,
+      housingMealsIncluded: (data['housingMealsIncluded'] as num?)?.toInt(),
+      housingImages:
+          (data['housingImages'] as List<dynamic>?)
+              ?.whereType<String>()
+              .toList() ??
+          const [],
       status: (data['status'] as String? ?? 'active') == 'closed'
           ? ListingStatus.closed
           : ListingStatus.active,
@@ -126,6 +148,7 @@ class Listing {
     'posterId': posterId,
     'posterName': posterName,
     'posterVerified': posterVerified,
+    'isUrgent': isUrgent,
     'title': title,
     'description': description,
     'season': season,
@@ -149,6 +172,11 @@ class Listing {
     'educationLevel': educationLevel,
     'contactInfo': contactInfo,
     'images': images,
+    'housingRoomType': housingRoomType,
+    'housingHasAc': housingHasAc,
+    'housingHasWifi': housingHasWifi,
+    'housingMealsIncluded': housingMealsIncluded,
+    'housingImages': housingImages,
     'status': status == ListingStatus.closed ? 'closed' : 'active',
     'createdAt': FieldValue.serverTimestamp(),
     'updatedAt': FieldValue.serverTimestamp(),

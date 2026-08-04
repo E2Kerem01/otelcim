@@ -2,7 +2,7 @@ import {initializeApp} from "firebase-admin/app";
 import {getFirestore} from "firebase-admin/firestore";
 import {getMessaging} from "firebase-admin/messaging";
 import {logger} from "firebase-functions";
-import {onDocumentCreated} from "firebase-functions/v2/firestore";
+import {onDocumentCreated, onDocumentUpdated} from "firebase-functions/v2/firestore";
 
 initializeApp();
 
@@ -175,6 +175,121 @@ export const sendSeasonalReminders = onDocumentCreated(
       logger.info("Sezonluk hatırlatma bildirimi başarıyla gönderildi.", {userId, subscriptionId});
     } catch (error) {
       logger.error("Sezonluk hatırlatma bildirimi gönderilemedi.", {subscriptionId, error});
+    }
+  },
+);
+
+export const sendUrgentListingNotification = onDocumentCreated(
+  {
+    document: "listings/{listingId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const listing = event.data?.data();
+    const listingId = event.params.listingId;
+    if (!listing || listing.isUrgent !== true) {
+      return;
+    }
+
+    const region = listing.region as string | undefined;
+    if (!region) {
+      logger.info("Acil ilanın bölgesi yok; bildirim atlandı.", {listingId});
+      return;
+    }
+
+    const safeRegion = region.trim().toLowerCase().replace(/[^a-z0-9-_.~%]/g, "_");
+    const topic = `region_${safeRegion}`;
+    try {
+      await getMessaging().send({
+        topic,
+        notification: {
+          title: "Acil Personel İhtiyacı",
+          body: `${(listing.title as string | undefined) ?? "Yeni ilan"} için hemen başvurun.`,
+        },
+        data: {
+          type: "urgent_listing",
+          listingId,
+          region,
+        },
+        android: {
+          priority: "high",
+          notification: {channelId: "urgent_listings"},
+        },
+        apns: {payload: {aps: {sound: "default"}}},
+      });
+      logger.info("Acil ilan bildirimi gönderildi.", {listingId, topic});
+    } catch (error) {
+      logger.error("Acil ilan bildirimi gönderilemedi.", {listingId, topic, error});
+    }
+  },
+);
+
+export const sendInterviewConfirmedNotification = onDocumentUpdated(
+  {
+    document: "conversations/{conversationId}/interview_slots/{slotId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const beforeData = event.data?.before.data();
+    const afterData = event.data?.after.data();
+    const conversationId = event.params.conversationId;
+    const slotId = event.params.slotId;
+
+    if (!afterData || afterData.status !== "confirmed" || beforeData?.status === "confirmed") {
+      return;
+    }
+
+    try {
+      const conversationDoc = await db.collection("conversations").doc(conversationId).get();
+      if (!conversationDoc.exists) {
+        logger.info("Konuşma bulunamadı.", {conversationId});
+        return;
+      }
+
+      const conversationData = conversationDoc.data() ?? {};
+      const posterId = conversationData.posterId as string | undefined;
+      const seekerId = conversationData.seekerId as string | undefined;
+
+      const participantIds = [posterId, seekerId].filter((id): id is string => Boolean(id));
+
+      for (const participantId of participantIds) {
+        const userDoc = await db.collection("user_profiles").doc(participantId).get();
+        if (!userDoc.exists) continue;
+
+        const userData = userDoc.data() ?? {};
+        const token = userData.fcmToken as string | undefined;
+        if (!token) continue;
+
+        await getMessaging().send({
+          token,
+          notification: {
+            title: "Mülakat Onaylandı",
+            body: "Mülakat zamanı tarafınıza ve karşı tarafa onaylandı.",
+          },
+          data: {
+            type: "interview_confirmed",
+            conversationId,
+            slotId,
+          },
+          android: {
+            priority: "high",
+            notification: {
+              channelId: "messages",
+            },
+          },
+          apns: {
+            payload: {
+              aps: {
+                sound: "default",
+              },
+            },
+          },
+        });
+      }
+
+      logger.info("Mülakat onay bildirimi gönderildi.", {conversationId, slotId});
+    } catch (error) {
+      logger.error("Mülakat onay bildirimi gönderilemedi.", {conversationId, slotId, error});
     }
   },
 );

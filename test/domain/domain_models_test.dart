@@ -130,17 +130,23 @@ void main() {
         displayName: 'Ali',
         userType: 'jobseeker',
         availableImmediately: true,
+        introVideoUrl: 'https://example.com/intro.mp4',
         isAdmin: true,
         adminRole: AdminRole.contentModerator,
         quietHoursStart: '22:00',
         quietHoursEnd: '08:00',
+        preferredExperienceLevel: ExperienceLevel.oneToThreeYears.name,
+        preferredEducationLevel: EducationLevel.highSchool.name,
+        preferredRegion: 'antalya',
         createdAt: now,
         updatedAt: now,
       );
       expect(profile.copyWith(displayName: 'Veli').displayName, 'Veli');
       expect(profile.copyWith(availableImmediately: false).availableImmediately, isFalse);
+      expect(profile.copyWith(introVideoUrl: null).introVideoUrl, isNull);
       expect(profile.copyWith(), profile);
       expect(profile.availableImmediately, isTrue);
+      expect(profile.introVideoUrl, 'https://example.com/intro.mp4');
       expect(profile.notificationPreferences['messages'], isTrue);
       expect(profile.notificationPreferences['marketing'], isFalse);
 
@@ -149,9 +155,10 @@ void main() {
       final parsed = UserProfile.fromFirestore(await db.collection('profiles').doc('u').get());
       expect(parsed, profile);
       expect(parsed.availableImmediately, isTrue);
+      expect(parsed.introVideoUrl, 'https://example.com/intro.mp4');
       expect(parsed.hashCode, profile.hashCode);
 
-      // Test fallback for legacy profiles without availableImmediately & notificationPreferences
+      // Test fallback for legacy profiles without availableImmediately, introVideoUrl & notificationPreferences
       await db.collection('profiles').doc('legacy').set({
         'email': 'legacy@test.com',
         'userType': 'jobseeker',
@@ -160,6 +167,7 @@ void main() {
       });
       final legacyParsed = UserProfile.fromFirestore(await db.collection('profiles').doc('legacy').get());
       expect(legacyParsed.availableImmediately, isFalse);
+      expect(legacyParsed.introVideoUrl, isNull);
       expect(legacyParsed.notificationPreferences['messages'], isTrue);
       expect(legacyParsed.notificationPreferences['listingAlerts'], isTrue);
       expect(legacyParsed.notificationPreferences['seasonalReminders'], isFalse);

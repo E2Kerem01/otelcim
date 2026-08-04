@@ -97,5 +97,7 @@ class _ActionCard extends StatelessWidget {
     AdminActionType.banUser => Icons.block,
     AdminActionType.approveVerification => Icons.verified_outlined,
     AdminActionType.rejectVerification => Icons.gpp_bad_outlined,
+    AdminActionType.approveCertificate => Icons.workspace_premium_outlined,
+    AdminActionType.rejectCertificate => Icons.remove_moderator_outlined,
   };
 }

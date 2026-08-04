@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/chat/domain/interview_slot_model.dart';
 import '../models/conversation.dart';
 import '../models/message.dart';
 
@@ -118,6 +119,66 @@ class ChatService {
       'lastMessage': text,
       'lastSenderId': senderId,
       'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<String> proposeInterviewSlots({
+    required String conversationId,
+    required String proposedBy,
+    required List<DateTime> slots,
+  }) async {
+    final docRef = _db
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('interview_slots')
+        .doc();
+
+    final item = InterviewSlot(
+      id: docRef.id,
+      proposedBy: proposedBy,
+      slots: slots,
+      status: 'pending',
+      createdAt: DateTime.now(),
+    );
+
+    await docRef.set(item.toMap());
+    return docRef.id;
+  }
+
+  Future<void> confirmInterviewSlot({
+    required String conversationId,
+    required String slotId,
+    required DateTime selectedSlot,
+  }) async {
+    await _db
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('interview_slots')
+        .doc(slotId)
+        .update({
+      'selectedSlot': Timestamp.fromDate(selectedSlot),
+      'status': 'confirmed',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Stream<List<InterviewSlot>> watchInterviewSlots(String conversationId) {
+    return _db
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('interview_slots')
+        .snapshots()
+        .map((snap) {
+      final items = snap.docs.map(InterviewSlot.fromDoc).toList();
+      items.sort((a, b) {
+        final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final tB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return tB.compareTo(tA);
+      });
+      return items;
+    }).handleError((error) {
+      debugPrint('Firestore watchInterviewSlots error: $error');
+      return <InterviewSlot>[];
     });
   }
 }

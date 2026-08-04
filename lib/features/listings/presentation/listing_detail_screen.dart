@@ -16,8 +16,10 @@ import '../../../shared/widgets/report_dialog.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../chat/presentation/widgets/message_template_sheet.dart';
 import '../../favorites/services/favorite_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../domain/listing_model.dart';
 import 'listing_requirement_labels.dart';
+import 'whatsapp_utils.dart';
 
 final _listingProvider = FutureProvider.family<Listing?, String>((
   ref,
@@ -94,6 +96,38 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
       }
     } finally {
       if (mounted) setState(() => _startingChat = false);
+    }
+  }
+
+  Future<void> _openWhatsApp(Listing listing) async {
+    final phone = parsePhoneNumber(listing.contactInfo);
+    if (phone == null) return;
+    final localeCode = Localizations.localeOf(context).languageCode;
+    final url = buildWhatsAppUrl(
+      phone: phone,
+      listingTitle: listing.title,
+      posterName: listing.posterName,
+      languageCode: localeCode,
+    );
+    final uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.whatsappNotInstalled),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('WhatsApp açılamadı: $e')));
+      }
     }
   }
 
@@ -348,6 +382,108 @@ ${listing.contactInfo}
                   listing.description,
                   style: const TextStyle(fontSize: 14, height: 1.5),
                 ),
+                if (listing.housingRoomType != null ||
+                    listing.housingHasAc != null ||
+                    listing.housingHasWifi != null ||
+                    listing.housingMealsIncluded != null ||
+                    listing.housingImages.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.home_work_outlined),
+                              const SizedBox(width: 8),
+                              Text(
+                                AppLocalizations.of(context)!.housingTitle,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              if (listing.housingRoomType != null)
+                                Chip(
+                                  avatar: const Icon(
+                                    Icons.bed_outlined,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    listing.housingRoomType == 'single'
+                                        ? AppLocalizations.of(
+                                            context,
+                                          )!.housingSingleRoom
+                                        : AppLocalizations.of(
+                                            context,
+                                          )!.housingSharedRoom,
+                                  ),
+                                ),
+                              if (listing.housingHasAc == true)
+                                Chip(
+                                  avatar: const Icon(
+                                    Icons.ac_unit_outlined,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    AppLocalizations.of(context)!.housingHasAc,
+                                  ),
+                                ),
+                              if (listing.housingHasWifi == true)
+                                Chip(
+                                  avatar: const Icon(Icons.wifi, size: 18),
+                                  label: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.housingHasWifi,
+                                  ),
+                                ),
+                              if (listing.housingMealsIncluded != null)
+                                Chip(
+                                  avatar: const Icon(
+                                    Icons.restaurant_outlined,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    '${AppLocalizations.of(context)!.housingMealsIncluded}: '
+                                    '${listing.housingMealsIncluded}',
+                                  ),
+                                ),
+                            ],
+                          ),
+                          if (listing.housingImages.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: 120,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: listing.housingImages.length,
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(width: 8),
+                                itemBuilder: (context, index) => ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CachedNetworkImage(
+                                    imageUrl: listing.housingImages[index],
+                                    width: 160,
+                                    fit: BoxFit.cover,
+                                    errorWidget: (_, _, _) =>
+                                        const Icon(Icons.broken_image),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 Card(
                   child: Padding(
@@ -524,6 +660,8 @@ ${listing.contactInfo}
         data: (listing) {
           if (listing == null) return null;
           final isOwner = myUid == listing.posterId;
+          final l10n = AppLocalizations.of(context)!;
+
           if (isOwner) {
             final isBoostedActive = BoostBadge.isBoostActive(listing);
             return Container(
@@ -538,24 +676,39 @@ ${listing.contactInfo}
                   ),
                 ],
               ),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => context.push('/listing/${listing.id}/boost'),
-                  icon: const Icon(Icons.rocket_launch_rounded),
-                  label: Text(
-                    isBoostedActive
-                        ? 'Öne Çıkarma Yönetimi'
-                        : 'İlanı Öne Çıkar',
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () =>
+                          context.push('/listing/${listing.id}/boost'),
+                      icon: const Icon(Icons.rocket_launch_rounded),
+                      label: Text(
+                        isBoostedActive ? 'Öne Çıkarma' : 'İlanı Öne Çıkar',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber.shade700,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber.shade700,
-                    foregroundColor: Colors.white,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          context.push('/listing/${listing.id}/qr-poster'),
+                      icon: const Icon(Icons.qr_code_2_rounded),
+                      label: Text(l10n.createQrPosterAction),
+                    ),
                   ),
-                ),
+                ],
               ),
             );
           }
+
+          final phone = parsePhoneNumber(listing.contactInfo);
+          final hasWhatsApp = phone != null;
+
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
@@ -568,13 +721,32 @@ ${listing.contactInfo}
                 ),
               ],
             ),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _startingChat ? null : () => _messageOwner(listing),
-                icon: const Icon(Icons.message_outlined),
-                label: const Text('Mesaj Gönder'),
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _startingChat
+                        ? null
+                        : () => _messageOwner(listing),
+                    icon: const Icon(Icons.message_outlined),
+                    label: const Text('Mesaj Gönder'),
+                  ),
+                ),
+                if (hasWhatsApp) ...[
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _openWhatsApp(listing),
+                      icon: const Icon(Icons.chat_rounded),
+                      label: Text(l10n.sendWhatsAppAction),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF25D366),
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           );
         },

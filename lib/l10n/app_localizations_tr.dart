@@ -317,4 +317,198 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get educationUniversity => 'En Az Üniversite';
+
+  @override
+  String get proposeInterview => 'Mülakat Saati Öner';
+
+  @override
+  String get interviewProposalTitle => 'Mülakat Zamanı Önerisi';
+
+  @override
+  String get interviewConfirmedTitle => 'Mülakat Onaylandı';
+
+  @override
+  String get waitingCandidateSelection =>
+      'Adayın mülakat saati seçimi bekleniyor...';
+
+  @override
+  String get confirmSlotPrompt => 'Bu mülakat saatini onaylıyor musunuz?';
+
+  @override
+  String get selectSlot => 'Seç';
+
+  @override
+  String get interviewSlotsProposedSuccess =>
+      'Mülakat saatleri başarıyla önerildi.';
+
+  @override
+  String get introVideoTitle => 'Tanıtım Videosu';
+
+  @override
+  String get introVideoLabel => '15-30 Saniyelik Tanıtım Videosu';
+
+  @override
+  String get introVideoHint =>
+      'Kendinizi işverenlere tanıtan kısa bir video yükleyin.';
+
+  @override
+  String get uploadVideoAction => 'Video Yükle';
+
+  @override
+  String get changeVideoAction => 'Videoyu Değiştir';
+
+  @override
+  String get removeVideoAction => 'Videoyu Kaldır';
+
+  @override
+  String get watchIntroVideo => 'Tanıtım Videosunu İzle';
+
+  @override
+  String get videoDurationWarning => 'Video en fazla 30 saniye olmalıdır.';
+
+  @override
+  String get videoUploadSuccess => 'Tanıtım videosu başarıyla yüklendi!';
+
+  @override
+  String get videoRemoveSuccess => 'Tanıtım videosu kaldırıldı.';
+
+  @override
+  String get sendWhatsAppAction => 'WhatsApp ile Mesaj Gönder';
+
+  @override
+  String get certificateTypeCankurtaran => 'Cankurtaran Sertifikası';
+
+  @override
+  String get certificateTypeEhliyet => 'Sürücü Belgesi (Ehliyet)';
+
+  @override
+  String get certificateTypeDil => 'Yabancı Dil Belgesi';
+
+  @override
+  String get certificateTypeDiger => 'Diğer Sertifika';
+
+  @override
+  String get certificateStatusPending => 'Beklemede';
+
+  @override
+  String get certificateStatusApproved => 'Onaylandı';
+
+  @override
+  String get certificateStatusRejected => 'Reddedildi';
+
+  @override
+  String get adminCertificateReviewTitle => 'Belge Onay Kuyruğu';
+
+  @override
+  String get talentPoolTitle => 'Yetenek Havuzu';
+
+  @override
+  String get talentPoolMyPool => 'Yetenek Havuzum';
+
+  @override
+  String get talentPoolSubtitle => 'Gelecek sezon adayları ve notlar';
+
+  @override
+  String get addToTalentPool => 'Yetenek Havuzuna Ekle';
+
+  @override
+  String get addedToTalentPool => 'Aday yetenek havuzunuza eklendi.';
+
+  @override
+  String get removedFromTalentPool => 'Aday yetenek havuzundan çıkarıldı.';
+
+  @override
+  String get emptyTalentPool => 'Henüz Yetenek Havuzunuzda Aday Yok';
+
+  @override
+  String get emptyTalentPoolSubtitle =>
+      'İş arayanlarla yaptığınız sohbetlerde detay menüsünden \"Yetenek Havuzuna Ekle\" seçeneği ile adayları buraya kaydedebilirsiniz.';
+
+  @override
+  String get backToChat => 'Sohbete Dön';
+
+  @override
+  String get removeFromPoolConfirmTitle => 'Adayı Havuzdan Çıkar';
+
+  @override
+  String get housingAddTitle => 'Lojman Bilgileri Ekle';
+
+  @override
+  String get housingTitle => 'Lojman & Sosyal İmkanlar';
+
+  @override
+  String get housingRoomType => 'Oda tipi';
+
+  @override
+  String get housingSingleRoom => 'Tek kişilik oda';
+
+  @override
+  String get housingSharedRoom => 'Çok kişilik oda';
+
+  @override
+  String get housingHasAc => 'Klima';
+
+  @override
+  String get housingHasWifi => 'Wi-Fi';
+
+  @override
+  String get housingMealsIncluded => 'Günlük dahil öğün';
+
+  @override
+  String get housingPhotos => 'Lojman fotoğrafları';
+
+  @override
+  String get housingAddPhoto => 'Fotoğraf ekle';
+
+  @override
+  String get urgentListingLabel => 'Acil İhtiyaç';
+
+  @override
+  String get urgentListingHint =>
+      'Bölgedeki kullanıcılara anlık bildirim gönderilir.';
+
+  @override
+  String get urgentBadge => 'ACİL';
+
+  @override
+  String get urgentNotificationsTitle => 'Acil İlan Bildirimleri';
+
+  @override
+  String get urgentNotificationsDescription =>
+      'Seçtiğiniz turizm bölgesindeki acil personel ilanlarını anında alın.';
+
+  @override
+  String get qrPosterTitle => 'QR İlan Posteri';
+
+  @override
+  String get createQrPosterAction => 'QR Poster Oluştur';
+
+  @override
+  String get sharePosterAction => 'Posteri Paylaş';
+
+  @override
+  String get qrPosterScanInstruction =>
+      'İlanı görüntülemek ve hızlı başvuru yapmak için QR kodu taratın.';
+
+  @override
+  String get qrPosterFooter =>
+      'www.otelcim.app • Otel & Turizm İş İlanları Platformu';
+
+  @override
+  String get whatsappNotInstalled => 'WhatsApp cihazınızda açılamadı.';
+
+  @override
+  String get preferredRegionLabel => 'Tercih Edilen Turizm Bölgesi';
+
+  @override
+  String get optionalSelection => 'Seçim Yapılmadı (isteğe bağlı)';
+
+  @override
+  String get myExperienceLevelLabel => 'Deneyim Seviyem';
+
+  @override
+  String get myEducationLevelLabel => 'Eğitim Durumum';
+
+  @override
+  String get matchLabel => 'Uyum';
 }
