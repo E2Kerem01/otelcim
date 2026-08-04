@@ -68,6 +68,54 @@
   "@roleEmployerDescription": {
     "description": "Employer role description"
   },
+  "incompletePositionsError": "Lütfen tüm pozisyon bilgilerini eksiksiz doldurun.",
+  "@incompletePositionsError": {
+    "description": "Error when positions not filled"
+  },
+  "batchCreateButton": "Toplu İlan Ver",
+  "@batchCreateButton": {
+    "description": "Batch create button text"
+  },
+  "seasonalCalendarTitle": "Sezonluk İşe Alım Takvimi",
+  "@seasonalCalendarTitle": {
+    "description": "Seasonal calendar title"
+  },
+  "seasonalRemindersTitle": "Sezonluk Hatırlatıcılarım",
+  "@seasonalRemindersTitle": {
+    "description": "Seasonal reminders title"
+  },
+  "seasonalRemindersDesc": "Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.",
+  "@seasonalRemindersDesc": {
+    "description": "Seasonal reminders description"
+  },
+  "seasonLabel": "Sezon",
+  "@seasonLabel": {
+    "description": "Season label"
+  },
+  "seasonSummer2025": "Yaz 2025",
+  "@seasonSummer2025": {
+    "description": "Summer 2025 season"
+  },
+  "seasonWinter202526": "Kış 2025-26",
+  "@seasonWinter202526": {
+    "description": "Winter 2025-26 season"
+  },
+  "seasonYearRound": "Tüm Yıl",
+  "@seasonYearRound": {
+    "description": "Year round season"
+  },
+  "seasonAny": "Farketmez / Tüm Sezonlar",
+  "@seasonAny": {
+    "description": "Any season"
+  },
+  "addSeasonalAlert": "Hatırlatıcı Ekle",
+  "@addSeasonalAlert": {
+    "description": "Add seasonal alert button text"
+  },
+  "createAlertSuccess": "Sezonluk hatırlatıcı başarıyla oluşturuldu.",
+  "@createAlertSuccess": {
+    "description": "Success message for alert creation"
+  },
   "roleSelectionError": "Lütfen bir rol seçin",
   "@roleSelectionError": {
     "description": "Error message when no role is selected"
@@ -148,4 +196,41 @@
   "@categoryOther": {
     "description": "Other category label"
   }
+,
+  "regionLabel": "Turizm bölgesi",
+  "regionSelectHint": "Bölge seçin",
+  "regionRequired": "Bölge seçmeniz gerekiyor",
+  "regionsTitle": "Bölgeler",
+  "regionsLoadError": "Bölgeler yüklenemedi.",
+  "activeListingCount": "{count} aktif ilan",
+  "@activeListingCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "nearMe": "Yakınımda",
+  "nearbyTitle": "Yakındaki İlanlar",
+  "nearbyPermissionTitle": "Konum izni",
+  "nearbyPermissionExplanation": "Yakınınızdaki iş ilanlarını mesafeye göre göstermek için yalnızca siz bu özelliği kullandığınızda anlık konumunuza erişmemiz gerekiyor.",
+  "cancelButton": "Vazgeç",
+  "radiusLabel": "Arama yarıçapı",
+  "nearbyEmpty": "Seçilen yarıçapta konum bilgili ilan bulunamadı.",
+  "nearbyLocationDenied": "Konum izni verilmedi. Yakınımda özelliği kapalı kaldı.",
+  "nearbyLocationDeniedForever": "Konum izni kalıcı olarak kapalı. İzni cihaz ayarlarından açabilirsiniz.",
+  "nearbyServicesDisabled": "Cihazınızın konum hizmetleri kapalı.",
+  "nearbyLocationUnavailable": "Konum şu anda alınamıyor. Lütfen tekrar deneyin.",
+  "retryButton": "Tekrar dene",
+  "distanceKm": "{distance} km uzakta",
+  "@distanceKm": {"placeholders": {"distance": {"type": "String"}}},
+  "addListingLocation": "Anlık konumumu ilana ekle (isteğe bağlı)",
+  "listingLocationAdded": "Konum ilana eklenecek.",
+  "listingLocationOptionalHint": "Koordinatlar yalnızca yakın ilan aramalarında kullanılır.",
+  "seasonNone": "Sezon seçilmedi",
+  "contractStartDateLabel": "Sözleşme başlangıcı",
+  "contractEndDateLabel": "Sözleşme bitişi",
+  "selectDate": "Tarih seçin",
+  "contractDatesRequired": "Sezonluk ilanlar için başlangıç ve bitiş tarihlerini seçin.",
+  "contractDateRangeInvalid": "Sözleşme bitiş tarihi başlangıç tarihinden önce olamaz.",
+  "regionMapTitle": "Bölge haritası",
+  "regionMapAttribution": "OpenStreetMap katkıda bulunanları"
 }

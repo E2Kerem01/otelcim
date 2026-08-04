@@ -200,6 +200,78 @@ abstract class AppLocalizations {
   /// **'Otelim veya işletmem için çalışan arıyorum. İlan vermek istiyorum.'**
   String get roleEmployerDescription;
 
+  /// Error when positions not filled
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen tüm pozisyon bilgilerini eksiksiz doldurun.'**
+  String get incompletePositionsError;
+
+  /// Batch create button text
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplu İlan Ver'**
+  String get batchCreateButton;
+
+  /// Seasonal calendar title
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezonluk İşe Alım Takvimi'**
+  String get seasonalCalendarTitle;
+
+  /// Seasonal reminders title
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezonluk Hatırlatıcılarım'**
+  String get seasonalRemindersTitle;
+
+  /// Seasonal reminders description
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.'**
+  String get seasonalRemindersDesc;
+
+  /// Season label
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezon'**
+  String get seasonLabel;
+
+  /// Summer 2025 season
+  ///
+  /// In tr, this message translates to:
+  /// **'Yaz 2025'**
+  String get seasonSummer2025;
+
+  /// Winter 2025-26 season
+  ///
+  /// In tr, this message translates to:
+  /// **'Kış 2025-26'**
+  String get seasonWinter202526;
+
+  /// Year round season
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm Yıl'**
+  String get seasonYearRound;
+
+  /// Any season
+  ///
+  /// In tr, this message translates to:
+  /// **'Farketmez / Tüm Sezonlar'**
+  String get seasonAny;
+
+  /// Add seasonal alert button text
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatıcı Ekle'**
+  String get addSeasonalAlert;
+
+  /// Success message for alert creation
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezonluk hatırlatıcı başarıyla oluşturuldu.'**
+  String get createAlertSuccess;
+
   /// Error message when no role is selected
   ///
   /// In tr, this message translates to:
@@ -319,6 +391,186 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Diğer'**
   String get categoryOther;
+
+  /// No description provided for @regionLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Turizm bölgesi'**
+  String get regionLabel;
+
+  /// No description provided for @regionSelectHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölge seçin'**
+  String get regionSelectHint;
+
+  /// No description provided for @regionRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölge seçmeniz gerekiyor'**
+  String get regionRequired;
+
+  /// No description provided for @regionsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölgeler'**
+  String get regionsTitle;
+
+  /// No description provided for @regionsLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölgeler yüklenemedi.'**
+  String get regionsLoadError;
+
+  /// No description provided for @activeListingCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} aktif ilan'**
+  String activeListingCount(int count);
+
+  /// No description provided for @nearMe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakınımda'**
+  String get nearMe;
+
+  /// No description provided for @nearbyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakındaki İlanlar'**
+  String get nearbyTitle;
+
+  /// No description provided for @nearbyPermissionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum izni'**
+  String get nearbyPermissionTitle;
+
+  /// No description provided for @nearbyPermissionExplanation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakınınızdaki iş ilanlarını mesafeye göre göstermek için yalnızca siz bu özelliği kullandığınızda anlık konumunuza erişmemiz gerekiyor.'**
+  String get nearbyPermissionExplanation;
+
+  /// No description provided for @cancelButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get cancelButton;
+
+  /// No description provided for @radiusLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arama yarıçapı'**
+  String get radiusLabel;
+
+  /// No description provided for @nearbyEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçilen yarıçapta konum bilgili ilan bulunamadı.'**
+  String get nearbyEmpty;
+
+  /// No description provided for @nearbyLocationDenied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum izni verilmedi. Yakınımda özelliği kapalı kaldı.'**
+  String get nearbyLocationDenied;
+
+  /// No description provided for @nearbyLocationDeniedForever.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum izni kalıcı olarak kapalı. İzni cihaz ayarlarından açabilirsiniz.'**
+  String get nearbyLocationDeniedForever;
+
+  /// No description provided for @nearbyServicesDisabled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihazınızın konum hizmetleri kapalı.'**
+  String get nearbyServicesDisabled;
+
+  /// No description provided for @nearbyLocationUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum şu anda alınamıyor. Lütfen tekrar deneyin.'**
+  String get nearbyLocationUnavailable;
+
+  /// No description provided for @retryButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get retryButton;
+
+  /// No description provided for @distanceKm.
+  ///
+  /// In tr, this message translates to:
+  /// **'{distance} km uzakta'**
+  String distanceKm(String distance);
+
+  /// No description provided for @addListingLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Anlık konumumu ilana ekle (isteğe bağlı)'**
+  String get addListingLocation;
+
+  /// No description provided for @listingLocationAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum ilana eklenecek.'**
+  String get listingLocationAdded;
+
+  /// No description provided for @listingLocationOptionalHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Koordinatlar yalnızca yakın ilan aramalarında kullanılır.'**
+  String get listingLocationOptionalHint;
+
+  /// No description provided for @seasonNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezon seçilmedi'**
+  String get seasonNone;
+
+  /// No description provided for @contractStartDateLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sözleşme başlangıcı'**
+  String get contractStartDateLabel;
+
+  /// No description provided for @contractEndDateLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sözleşme bitişi'**
+  String get contractEndDateLabel;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih seçin'**
+  String get selectDate;
+
+  /// No description provided for @contractDatesRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezonluk ilanlar için başlangıç ve bitiş tarihlerini seçin.'**
+  String get contractDatesRequired;
+
+  /// No description provided for @contractDateRangeInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sözleşme bitiş tarihi başlangıç tarihinden önce olamaz.'**
+  String get contractDateRangeInvalid;
+
+  /// No description provided for @regionMapTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölge haritası'**
+  String get regionMapTitle;
+
+  /// No description provided for @regionMapAttribution.
+  ///
+  /// In tr, this message translates to:
+  /// **'OpenStreetMap katkıda bulunanları'**
+  String get regionMapAttribution;
 }
 
 class _AppLocalizationsDelegate

@@ -101,3 +101,80 @@ export const sendChatMessageNotification = onDocumentCreated(
     }
   },
 );
+
+export const sendSeasonalReminders = onDocumentCreated(
+  {
+    document: "seasonal_subscriptions/{subscriptionId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const sub = event.data?.data();
+    const subscriptionId = event.params.subscriptionId;
+
+    if (!sub || sub.enabled === false) {
+      logger.info("Sezonluk abonelik aktif değil veya veri yok.", {subscriptionId});
+      return;
+    }
+
+    const userId = sub.userId as string | undefined;
+    if (!userId) {
+      logger.info("Abonelikte userId bulunamadı.", {subscriptionId});
+      return;
+    }
+
+    try {
+      const userSnapshot = await db.collection("user_profiles").doc(userId).get();
+      if (!userSnapshot.exists) {
+        logger.info("Kullanıcı profili bulunamadı.", {userId});
+        return;
+      }
+
+      const userData = userSnapshot.data() ?? {};
+      const prefs = userData.notificationPreferences;
+      if (prefs && prefs.seasonalReminders === false) {
+        logger.info("Kullanıcı sezonluk hatırlatıcı bildirimlerini kapatmış; bildirim atlandı.", {userId});
+        return;
+      }
+
+      const token = userData.fcmToken as string | undefined;
+      if (!token) {
+        logger.info("Kullanıcının FCM token'ı yok; bildirim atlandı.", {userId});
+        return;
+      }
+
+      const city = (sub.city as string) || "Tüm Bölgeler";
+      const season = (sub.season as string) || "Yaklaşan Sezon";
+
+      await getMessaging().send({
+        token,
+        notification: {
+          title: "Sezonluk İşe Alım Hatırlatması",
+          body: `${season} için ${city} bölgesinde işe alım dönemi yaklaşıyor. Yeni ilanlara hemen göz atın!`,
+        },
+        data: {
+          type: "seasonal_reminder",
+          subscriptionId,
+          city,
+          season,
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "reminders",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+            },
+          },
+        },
+      });
+
+      logger.info("Sezonluk hatırlatma bildirimi başarıyla gönderildi.", {userId, subscriptionId});
+    } catch (error) {
+      logger.error("Sezonluk hatırlatma bildirimi gönderilemedi.", {subscriptionId, error});
+    }
+  },
+);

@@ -7,20 +7,33 @@ import 'package:otelcim/shared/providers/paginated_listings_provider.dart';
 import 'package:otelcim/shared/services/listing_service.dart';
 
 class MockListingService extends Mock implements ListingService {}
+
 class MockDocumentSnapshot extends Mock implements DocumentSnapshot<Object?> {}
 
 const params = (
   category: null,
   searchQuery: null,
   city: null,
+  region: null,
   minSalaryTl: null,
   maxSalaryTl: null,
   dateFilter: ListingDateFilter.all,
   employmentType: null,
   sortOrder: ListingSortOrder.newest,
+  season: null,
 );
 
-Listing listing(String id) => Listing(id: id, posterId: 'u', posterName: 'Otel', title: id, description: 'D', category: 'diger', location: 'Antalya', salary: '1 TL', contactInfo: 'x');
+Listing listing(String id) => Listing(
+  id: id,
+  posterId: 'u',
+  posterName: 'Otel',
+  title: id,
+  description: 'D',
+  category: 'diger',
+  location: 'Antalya',
+  salary: '1 TL',
+  contactInfo: 'x',
+);
 
 void main() {
   setUpAll(() {
@@ -34,9 +47,25 @@ void main() {
 
   test('loadInitial publishes listings and cursor', () async {
     final cursor = MockDocumentSnapshot();
-    when(() => service.getPaginatedListings(
-      category: any(named: 'category'), searchQuery: any(named: 'searchQuery'), city: any(named: 'city'), minSalaryTl: any(named: 'minSalaryTl'), maxSalaryTl: any(named: 'maxSalaryTl'), dateFilter: any(named: 'dateFilter'), employmentType: any(named: 'employmentType'), sortOrder: any(named: 'sortOrder'),
-    )).thenAnswer((_) async => PaginatedListingsResult(listings: [listing('1')], lastDocument: cursor, hasMore: true));
+    when(
+      () => service.getPaginatedListings(
+        category: any(named: 'category'),
+        searchQuery: any(named: 'searchQuery'),
+        city: any(named: 'city'),
+        region: any(named: 'region'),
+        minSalaryTl: any(named: 'minSalaryTl'),
+        maxSalaryTl: any(named: 'maxSalaryTl'),
+        dateFilter: any(named: 'dateFilter'),
+        employmentType: any(named: 'employmentType'),
+        sortOrder: any(named: 'sortOrder'),
+      ),
+    ).thenAnswer(
+      (_) async => PaginatedListingsResult(
+        listings: [listing('1')],
+        lastDocument: cursor,
+        hasMore: true,
+      ),
+    );
     final notifier = PaginatedListingsNotifier(service, params);
     await notifier.loadInitial();
     expect(notifier.state.listings.single.id, '1');
@@ -47,15 +76,46 @@ void main() {
   test('loadMore appends and refresh resets then reloads', () async {
     final cursor = MockDocumentSnapshot();
     var initialCalls = 0;
-    when(() => service.getPaginatedListings(
-      category: any(named: 'category'), searchQuery: any(named: 'searchQuery'), city: any(named: 'city'), minSalaryTl: any(named: 'minSalaryTl'), maxSalaryTl: any(named: 'maxSalaryTl'), dateFilter: any(named: 'dateFilter'), employmentType: any(named: 'employmentType'), sortOrder: any(named: 'sortOrder'),
-    )).thenAnswer((_) async {
+    when(
+      () => service.getPaginatedListings(
+        category: any(named: 'category'),
+        searchQuery: any(named: 'searchQuery'),
+        city: any(named: 'city'),
+        region: any(named: 'region'),
+        minSalaryTl: any(named: 'minSalaryTl'),
+        maxSalaryTl: any(named: 'maxSalaryTl'),
+        dateFilter: any(named: 'dateFilter'),
+        employmentType: any(named: 'employmentType'),
+        sortOrder: any(named: 'sortOrder'),
+      ),
+    ).thenAnswer((_) async {
       initialCalls++;
-      return PaginatedListingsResult(listings: [listing('1')], lastDocument: cursor, hasMore: true);
+      return PaginatedListingsResult(
+        listings: [listing('1')],
+        lastDocument: cursor,
+        hasMore: true,
+      );
     });
-    when(() => service.getNextPage(
-      lastDocument: any(named: 'lastDocument'), category: any(named: 'category'), searchQuery: any(named: 'searchQuery'), city: any(named: 'city'), minSalaryTl: any(named: 'minSalaryTl'), maxSalaryTl: any(named: 'maxSalaryTl'), dateFilter: any(named: 'dateFilter'), employmentType: any(named: 'employmentType'), sortOrder: any(named: 'sortOrder'),
-    )).thenAnswer((_) async => PaginatedListingsResult(listings: [listing('2')], lastDocument: cursor, hasMore: false));
+    when(
+      () => service.getNextPage(
+        lastDocument: any(named: 'lastDocument'),
+        category: any(named: 'category'),
+        searchQuery: any(named: 'searchQuery'),
+        city: any(named: 'city'),
+        region: any(named: 'region'),
+        minSalaryTl: any(named: 'minSalaryTl'),
+        maxSalaryTl: any(named: 'maxSalaryTl'),
+        dateFilter: any(named: 'dateFilter'),
+        employmentType: any(named: 'employmentType'),
+        sortOrder: any(named: 'sortOrder'),
+      ),
+    ).thenAnswer(
+      (_) async => PaginatedListingsResult(
+        listings: [listing('2')],
+        lastDocument: cursor,
+        hasMore: false,
+      ),
+    );
     final notifier = PaginatedListingsNotifier(service, params);
     await notifier.loadInitial();
     await notifier.loadMore();

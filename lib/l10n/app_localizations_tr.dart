@@ -63,6 +63,45 @@ class AppLocalizationsTr extends AppLocalizations {
       'Otelim veya işletmem için çalışan arıyorum. İlan vermek istiyorum.';
 
   @override
+  String get incompletePositionsError =>
+      'Lütfen tüm pozisyon bilgilerini eksiksiz doldurun.';
+
+  @override
+  String get batchCreateButton => 'Toplu İlan Ver';
+
+  @override
+  String get seasonalCalendarTitle => 'Sezonluk İşe Alım Takvimi';
+
+  @override
+  String get seasonalRemindersTitle => 'Sezonluk Hatırlatıcılarım';
+
+  @override
+  String get seasonalRemindersDesc =>
+      'Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.';
+
+  @override
+  String get seasonLabel => 'Sezon';
+
+  @override
+  String get seasonSummer2025 => 'Yaz 2025';
+
+  @override
+  String get seasonWinter202526 => 'Kış 2025-26';
+
+  @override
+  String get seasonYearRound => 'Tüm Yıl';
+
+  @override
+  String get seasonAny => 'Farketmez / Tüm Sezonlar';
+
+  @override
+  String get addSeasonalAlert => 'Hatırlatıcı Ekle';
+
+  @override
+  String get createAlertSuccess =>
+      'Sezonluk hatırlatıcı başarıyla oluşturuldu.';
+
+  @override
   String get roleSelectionError => 'Lütfen bir rol seçin';
 
   @override
@@ -121,4 +160,105 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get categoryOther => 'Diğer';
+
+  @override
+  String get regionLabel => 'Turizm bölgesi';
+
+  @override
+  String get regionSelectHint => 'Bölge seçin';
+
+  @override
+  String get regionRequired => 'Bölge seçmeniz gerekiyor';
+
+  @override
+  String get regionsTitle => 'Bölgeler';
+
+  @override
+  String get regionsLoadError => 'Bölgeler yüklenemedi.';
+
+  @override
+  String activeListingCount(int count) {
+    return '$count aktif ilan';
+  }
+
+  @override
+  String get nearMe => 'Yakınımda';
+
+  @override
+  String get nearbyTitle => 'Yakındaki İlanlar';
+
+  @override
+  String get nearbyPermissionTitle => 'Konum izni';
+
+  @override
+  String get nearbyPermissionExplanation =>
+      'Yakınınızdaki iş ilanlarını mesafeye göre göstermek için yalnızca siz bu özelliği kullandığınızda anlık konumunuza erişmemiz gerekiyor.';
+
+  @override
+  String get cancelButton => 'Vazgeç';
+
+  @override
+  String get radiusLabel => 'Arama yarıçapı';
+
+  @override
+  String get nearbyEmpty => 'Seçilen yarıçapta konum bilgili ilan bulunamadı.';
+
+  @override
+  String get nearbyLocationDenied =>
+      'Konum izni verilmedi. Yakınımda özelliği kapalı kaldı.';
+
+  @override
+  String get nearbyLocationDeniedForever =>
+      'Konum izni kalıcı olarak kapalı. İzni cihaz ayarlarından açabilirsiniz.';
+
+  @override
+  String get nearbyServicesDisabled => 'Cihazınızın konum hizmetleri kapalı.';
+
+  @override
+  String get nearbyLocationUnavailable =>
+      'Konum şu anda alınamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get retryButton => 'Tekrar dene';
+
+  @override
+  String distanceKm(String distance) {
+    return '$distance km uzakta';
+  }
+
+  @override
+  String get addListingLocation => 'Anlık konumumu ilana ekle (isteğe bağlı)';
+
+  @override
+  String get listingLocationAdded => 'Konum ilana eklenecek.';
+
+  @override
+  String get listingLocationOptionalHint =>
+      'Koordinatlar yalnızca yakın ilan aramalarında kullanılır.';
+
+  @override
+  String get seasonNone => 'Sezon seçilmedi';
+
+  @override
+  String get contractStartDateLabel => 'Sözleşme başlangıcı';
+
+  @override
+  String get contractEndDateLabel => 'Sözleşme bitişi';
+
+  @override
+  String get selectDate => 'Tarih seçin';
+
+  @override
+  String get contractDatesRequired =>
+      'Sezonluk ilanlar için başlangıç ve bitiş tarihlerini seçin.';
+
+  @override
+  String get contractDateRangeInvalid =>
+      'Sözleşme bitiş tarihi başlangıç tarihinden önce olamaz.';
+
+  @override
+  String get regionMapTitle => 'Bölge haritası';
+
+  @override
+  String get regionMapAttribution => 'OpenStreetMap katkıda bulunanları';
 }
