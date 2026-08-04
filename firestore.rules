@@ -1,0 +1,139 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/user_profiles/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Public job marketplace listings. Read is public so anonymous users can
+    // browse (home feed, regions, map, nearby). Writes require ownership;
+    // moderation (update/delete) is also allowed for admins.
+    match /listings/{listingId} {
+      allow read: if true;
+      allow create: if isSignedIn() &&
+        request.resource.data.posterId == request.auth.uid;
+      allow update, delete: if isOwner(resource.data.posterId) || isAdmin();
+    }
+
+    // Public profile data (hotel name, verified badge, bio) shown on
+    // listings and chat. Only the owner can write their own profile.
+    match /user_profiles/{userId} {
+      allow read: if true;
+      allow create, update: if isOwner(userId);
+      allow delete: if isOwner(userId) || isAdmin();
+
+      match /favorites/{listingId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /seasonal_subscriptions/{subscriptionId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Legacy collection, only touched during account-deletion cleanup.
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId);
+    }
+
+    // Chat. watchConversations()/messages currently run unfiltered
+    // collection queries and filter client-side, so read is scoped to any
+    // signed-in user rather than per-participant (see TECH-002 follow-up to
+    // add proper where() filters and tighten this further). Writes require
+    // being a participant.
+    match /conversations/{conversationId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() &&
+        (request.resource.data.posterId == request.auth.uid ||
+         request.resource.data.seekerId == request.auth.uid);
+      allow update: if isSignedIn() &&
+        (resource.data.posterId == request.auth.uid ||
+         resource.data.seekerId == request.auth.uid);
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() &&
+          (get(/databases/$(database)/documents/conversations/$(conversationId)).data.posterId == request.auth.uid ||
+           get(/databases/$(database)/documents/conversations/$(conversationId)).data.seekerId == request.auth.uid);
+      }
+    }
+
+    // Reports are write-only for regular users (their own report), only
+    // admins can list/review them.
+    match /reports/{reportId} {
+      allow create: if isSignedIn() &&
+        request.resource.data.reporterId == request.auth.uid;
+      allow read, update: if isAdmin();
+    }
+
+    // Employer verification requests.
+    match /verification_requests/{requestId} {
+      allow create: if isSignedIn() &&
+        request.resource.data.employerId == request.auth.uid;
+      allow read: if isSignedIn() &&
+        (resource.data.employerId == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+    }
+
+    // Boosts / purchases. watchUserBoosts()/watchUserBoostPurchases() run
+    // unfiltered collection queries (see TECH-002 follow-up) so read is
+    // scoped to any signed-in user; writes require ownership.
+    match /boosts/{boostId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+    }
+    match /boost_purchases/{purchaseId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+    }
+
+    // Ratings are publicly visible (shown on profiles), only the rater can
+    // create their own rating document.
+    match /ratings/{ratingId} {
+      allow read: if true;
+      allow create: if isSignedIn() &&
+        request.resource.data.raterId == request.auth.uid;
+    }
+
+    // Sponsor banners: public read, admin-managed.
+    match /banner_ads/{adId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Flat mirror of seasonal subscriptions used only as a Cloud Function
+    // trigger source (read via Admin SDK, bypasses these rules). Client
+    // only ever creates/updates/deletes its own entry here.
+    match /seasonal_subscriptions/{subscriptionId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() &&
+        resource.data.userId == request.auth.uid;
+    }
+
+    // Admin-only collections.
+    match /admin_audit_log/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny for anything not explicitly covered above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
