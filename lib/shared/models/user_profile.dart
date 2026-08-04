@@ -67,6 +67,9 @@ class UserProfile {
   /// Quiet hours end time in "HH:mm" format
   final String? quietHoursEnd;
 
+  /// Whether the user is immediately available for work (only for jobseekers)
+  final bool availableImmediately;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -91,6 +94,7 @@ class UserProfile {
     this.notificationPreferences = defaultNotificationPreferences,
     this.quietHoursStart,
     this.quietHoursEnd,
+    this.availableImmediately = false,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -130,6 +134,7 @@ class UserProfile {
       notificationPreferences: preferences,
       quietHoursStart: data['quietHoursStart'] as String?,
       quietHoursEnd: data['quietHoursEnd'] as String?,
+      availableImmediately: data['availableImmediately'] as bool? ?? false,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -154,6 +159,7 @@ class UserProfile {
       'notificationPreferences': notificationPreferences,
       'quietHoursStart': quietHoursStart,
       'quietHoursEnd': quietHoursEnd,
+      'availableImmediately': availableImmediately,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -178,6 +184,7 @@ class UserProfile {
     Map<String, bool>? notificationPreferences,
     Object? quietHoursStart = _undefined,
     Object? quietHoursEnd = _undefined,
+    bool? availableImmediately,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -203,6 +210,7 @@ class UserProfile {
       quietHoursEnd: quietHoursEnd == _undefined
           ? this.quietHoursEnd
           : quietHoursEnd as String?,
+      availableImmediately: availableImmediately ?? this.availableImmediately,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -230,6 +238,7 @@ class UserProfile {
         mapEquals(other.notificationPreferences, notificationPreferences) &&
         other.quietHoursStart == quietHoursStart &&
         other.quietHoursEnd == quietHoursEnd &&
+        other.availableImmediately == availableImmediately &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -254,6 +263,7 @@ class UserProfile {
       notificationPreferences.entries.fold<int>(0, (acc, e) => acc ^ Object.hash(e.key, e.value)),
       quietHoursStart,
       quietHoursEnd,
+      availableImmediately,
       createdAt,
       updatedAt,
     ]);
@@ -268,6 +278,7 @@ class UserProfile {
         'isVerified: $isVerified, verificationStatus: $verificationStatus, '
         'verifiedAt: $verifiedAt, notificationPreferences: $notificationPreferences, '
         'quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, '
+        'availableImmediately: $availableImmediately, '
         'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

@@ -261,4 +261,60 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get regionMapAttribution => 'OpenStreetMap katkıda bulunanları';
+
+  @override
+  String get listingSafetyTipsTitle => 'Güvenlik İpuçları';
+
+  @override
+  String get listingSafetyTipsBody =>
+      'İşverenle görüşmeden ve iş yerini ziyaret etmeden ödeme yapmayın. Kimlik, kredi kartı, banka veya diğer hassas kişisel bilgilerinizi paylaşmayın. Şüpheli durumları bize bildirin.';
+
+  @override
+  String get listingSafetyReportAction => 'İlanı Şikâyet Et';
+
+  @override
+  String get availableImmediatelyLabel => 'Şu An Boşta / Hemen Başlayabilir';
+
+  @override
+  String get availableImmediatelyHint =>
+      'İşverenlerin sohbet ekranında yeşil rozet ile görünürsünüz.';
+
+  @override
+  String get availableImmediatelyBadge => 'Hemen Başlayabilir';
+
+  @override
+  String get notAvailableBadge => 'Müsait Değil';
+
+  @override
+  String get experienceLevelLabel => 'Deneyim';
+
+  @override
+  String get educationLevelLabel => 'Eğitim Durumu';
+
+  @override
+  String get optionalNotSpecified => 'Belirtilmedi (isteğe bağlı)';
+
+  @override
+  String get experienceNone => 'Deneyim Aranmıyor';
+
+  @override
+  String get experienceUnderOneYear => '1 Yıldan Az';
+
+  @override
+  String get experienceOneToThreeYears => '1-3 Yıl';
+
+  @override
+  String get experienceThreePlusYears => '3+ Yıl';
+
+  @override
+  String get educationNone => 'Eğitim Şartı Yok';
+
+  @override
+  String get educationPrimary => 'En Az İlköğretim';
+
+  @override
+  String get educationHighSchool => 'En Az Lise';
+
+  @override
+  String get educationUniversity => 'En Az Üniversite';
 }

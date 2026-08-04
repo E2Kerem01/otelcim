@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/models/conversation.dart';
 import '../../../shared/models/message.dart';
 import '../../../shared/models/report.dart';
+import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/widgets/report_dialog.dart';
@@ -140,10 +141,46 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   Widget build(BuildContext context) {
     final myUid = ref.watch(authStateProvider).value?.uid;
     final messagesStream = ref.watch(chatServiceProvider).watchMessages(widget.conversationId);
+    final otherProfile = _otherParticipantId != null
+        ? ref.watch(userProfileProvider(_otherParticipantId!)).value
+        : null;
+    final isOtherAvailableImmediately = otherProfile != null &&
+        otherProfile.userType != 'employer' &&
+        otherProfile.availableImmediately;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sohbet'),
+        title: Row(
+          children: [
+            const Text('Sohbet'),
+            if (isOtherAvailableImmediately) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green.shade300),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.bolt_rounded, size: 14, color: Colors.green.shade700),
+                    const SizedBox(width: 2),
+                    Text(
+                      'Hemen Başlayabilir',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
         actions: [
           if (_otherParticipantId != null)
             PopupMenuButton<String>(

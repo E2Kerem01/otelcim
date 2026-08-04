@@ -88,7 +88,15 @@ class SeasonalService {
     String? category,
     String? season,
   }) async {
-    final subData = {
+    final subDocRef = _db
+        .collection('user_profiles')
+        .doc(userId)
+        .collection('seasonal_subscriptions')
+        .doc();
+
+    final mirrorDocRef = _db.collection('seasonal_subscriptions').doc(subDocRef.id);
+
+    final userSubData = {
       'userId': userId,
       'city': city,
       'category': category,
@@ -97,16 +105,20 @@ class SeasonalService {
       'createdAt': FieldValue.serverTimestamp(),
     };
 
-    final docRef = await _db
-        .collection('user_profiles')
-        .doc(userId)
-        .collection('seasonal_subscriptions')
-        .add(subData);
+    final mirrorSubData = {
+      'userId': userId,
+      'city': city,
+      'category': category,
+      'season': season ?? 'yaz_2025',
+      'enabled': true,
+      'createdAt': FieldValue.serverTimestamp(),
+      'subscriptionId': subDocRef.id,
+    };
 
-    await _db.collection('seasonal_subscriptions').doc(docRef.id).set({
-      ...subData,
-      'subscriptionId': docRef.id,
-    });
+    final batch = _db.batch();
+    batch.set(subDocRef, userSubData);
+    batch.set(mirrorDocRef, mirrorSubData);
+    await batch.commit();
   }
 
   Future<void> toggleSubscription({
@@ -114,28 +126,36 @@ class SeasonalService {
     required String subscriptionId,
     required bool enabled,
   }) async {
-    await _db
+    final subDocRef = _db
         .collection('user_profiles')
         .doc(userId)
         .collection('seasonal_subscriptions')
-        .doc(subscriptionId)
-        .update({'enabled': enabled});
+        .doc(subscriptionId);
 
-    await _db.collection('seasonal_subscriptions').doc(subscriptionId).update({'enabled': enabled});
+    final mirrorDocRef = _db.collection('seasonal_subscriptions').doc(subscriptionId);
+
+    final batch = _db.batch();
+    batch.update(subDocRef, {'enabled': enabled});
+    batch.update(mirrorDocRef, {'enabled': enabled});
+    await batch.commit();
   }
 
   Future<void> deleteSubscription({
     required String userId,
     required String subscriptionId,
   }) async {
-    await _db
+    final subDocRef = _db
         .collection('user_profiles')
         .doc(userId)
         .collection('seasonal_subscriptions')
-        .doc(subscriptionId)
-        .delete();
+        .doc(subscriptionId);
 
-    await _db.collection('seasonal_subscriptions').doc(subscriptionId).delete();
+    final mirrorDocRef = _db.collection('seasonal_subscriptions').doc(subscriptionId);
+
+    final batch = _db.batch();
+    batch.delete(subDocRef);
+    batch.delete(mirrorDocRef);
+    await batch.commit();
   }
 }
 

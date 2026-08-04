@@ -35,6 +35,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   String? _hotelName;
   String? _position;
   String? _photoUrl;
+  bool _availableImmediately = false;
 
   /// Handles the save button press
   Future<void> _handleSave() async {
@@ -70,6 +71,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         hotelName: _hotelName,
         position: _position,
         userType: currentProfile?.userType ?? 'jobseeker',
+        availableImmediately: _availableImmediately,
         createdAt: currentProfile?.createdAt ?? now,
         updatedAt: now,
       );
@@ -169,6 +171,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _hotelName = profile.hotelName;
             _position = profile.position;
             _photoUrl = profile.photoUrl;
+            _availableImmediately = profile.availableImmediately;
           }
 
           final currentUser = authState.value;
@@ -205,6 +208,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     String? bio,
                     String? hotelName,
                     String? position,
+                    bool? availableImmediately,
                   }) {
                     setState(() {
                       _displayName = displayName;
@@ -212,6 +216,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       _bio = bio;
                       _hotelName = hotelName;
                       _position = position;
+                      if (availableImmediately != null) {
+                        _availableImmediately = availableImmediately;
+                      }
                     });
                   },
                 ),

@@ -128,7 +128,8 @@ void main() {
         id: 'u',
         email: 'u@test.com',
         displayName: 'Ali',
-        userType: 'employer',
+        userType: 'jobseeker',
+        availableImmediately: true,
         isAdmin: true,
         adminRole: AdminRole.contentModerator,
         quietHoursStart: '22:00',
@@ -137,7 +138,9 @@ void main() {
         updatedAt: now,
       );
       expect(profile.copyWith(displayName: 'Veli').displayName, 'Veli');
+      expect(profile.copyWith(availableImmediately: false).availableImmediately, isFalse);
       expect(profile.copyWith(), profile);
+      expect(profile.availableImmediately, isTrue);
       expect(profile.notificationPreferences['messages'], isTrue);
       expect(profile.notificationPreferences['marketing'], isFalse);
 
@@ -145,9 +148,10 @@ void main() {
       await db.collection('profiles').doc('u').set(profile.toFirestore());
       final parsed = UserProfile.fromFirestore(await db.collection('profiles').doc('u').get());
       expect(parsed, profile);
+      expect(parsed.availableImmediately, isTrue);
       expect(parsed.hashCode, profile.hashCode);
 
-      // Test fallback for legacy profiles without notificationPreferences
+      // Test fallback for legacy profiles without availableImmediately & notificationPreferences
       await db.collection('profiles').doc('legacy').set({
         'email': 'legacy@test.com',
         'userType': 'jobseeker',
@@ -155,6 +159,7 @@ void main() {
         'updatedAt': now,
       });
       final legacyParsed = UserProfile.fromFirestore(await db.collection('profiles').doc('legacy').get());
+      expect(legacyParsed.availableImmediately, isFalse);
       expect(legacyParsed.notificationPreferences['messages'], isTrue);
       expect(legacyParsed.notificationPreferences['listingAlerts'], isTrue);
       expect(legacyParsed.notificationPreferences['seasonalReminders'], isFalse);

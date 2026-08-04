@@ -11,11 +11,17 @@ class ChatService {
   final FirebaseFirestore _db;
 
   Stream<List<Conversation>> watchConversations(String uid) {
-    return _db.collection('conversations').snapshots().map((snap) {
-      var conversations = snap.docs
-          .map(Conversation.fromDoc)
-          .where((c) => c.posterId == uid || c.seekerId == uid)
-          .toList();
+    return _db
+        .collection('conversations')
+        .where(
+          Filter.or(
+            Filter('posterId', isEqualTo: uid),
+            Filter('seekerId', isEqualTo: uid),
+          ),
+        )
+        .snapshots()
+        .map((snap) {
+      final conversations = snap.docs.map(Conversation.fromDoc).toList();
 
       conversations.sort((a, b) {
         final tA = a.updatedAt ?? a.createdAt ?? DateTime.now();

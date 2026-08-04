@@ -263,4 +263,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regionMapAttribution => 'OpenStreetMap contributors';
+
+  @override
+  String get listingSafetyTipsTitle => 'Safety tips';
+
+  @override
+  String get listingSafetyTipsBody =>
+      'Never pay money before meeting the employer and visiting the workplace. Do not share identity, credit card, banking, or other sensitive personal information. Report anything suspicious.';
+
+  @override
+  String get listingSafetyReportAction => 'Report listing';
+
+  @override
+  String get availableImmediatelyLabel =>
+      'Currently Available / Immediate Start';
+
+  @override
+  String get availableImmediatelyHint =>
+      'Employers will see a green badge on the chat screen.';
+
+  @override
+  String get availableImmediatelyBadge => 'Available Immediately';
+
+  @override
+  String get notAvailableBadge => 'Not Available';
+
+  @override
+  String get experienceLevelLabel => 'Experience';
+
+  @override
+  String get educationLevelLabel => 'Education Level';
+
+  @override
+  String get optionalNotSpecified => 'Not specified (optional)';
+
+  @override
+  String get experienceNone => 'No Experience Required';
+
+  @override
+  String get experienceUnderOneYear => 'Less Than 1 Year';
+
+  @override
+  String get experienceOneToThreeYears => '1-3 Years';
+
+  @override
+  String get experienceThreePlusYears => '3+ Years';
+
+  @override
+  String get educationNone => 'No Education Requirement';
+
+  @override
+  String get educationPrimary => 'At Least Primary School';
+
+  @override
+  String get educationHighSchool => 'At Least High School';
+
+  @override
+  String get educationUniversity => 'At Least University';
 }

@@ -10,6 +10,21 @@ class ListingService {
 
   final FirebaseFirestore _db;
 
+  /// Counts active listings on Firestore without downloading documents.
+  Future<int> countActiveListings({String? region, String? season}) async {
+    Query<Map<String, dynamic>> query = _db
+        .collection('listings')
+        .where('status', isEqualTo: 'active');
+    if (region != null && region.isNotEmpty) {
+      query = query.where('region', isEqualTo: region);
+    }
+    if (season != null && season.isNotEmpty) {
+      query = query.where('season', isEqualTo: season);
+    }
+    final snapshot = await query.count().get();
+    return snapshot.count ?? 0;
+  }
+
   Stream<List<Listing>> watchActiveListings({
     String? category,
     String? searchQuery,

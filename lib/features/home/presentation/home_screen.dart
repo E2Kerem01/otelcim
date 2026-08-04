@@ -84,7 +84,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => _FilterSheet(initial: _filters),
+      builder: (_) => _FilterSheet(
+        initial: _filters,
+        listingService: ref.read(listingServiceProvider),
+      ),
     );
     if (result != null && mounted) setState(() => _filters = result);
   }
@@ -516,8 +519,9 @@ class _AdvancedFilters {
 }
 
 class _FilterSheet extends StatefulWidget {
-  const _FilterSheet({required this.initial});
+  const _FilterSheet({required this.initial, required this.listingService});
   final _AdvancedFilters initial;
+  final ListingService listingService;
   @override
   State<_FilterSheet> createState() => _FilterSheetState();
 }
@@ -531,6 +535,8 @@ class _FilterSheetState extends State<_FilterSheet> {
   EmploymentType? _employmentType;
   late ListingSortOrder _sort;
   ListingSeason? _season;
+  Map<String, int> _regionCounts = const {};
+  Map<String, int> _seasonCounts = const {};
 
   @override
   void initState() {
@@ -547,6 +553,41 @@ class _FilterSheetState extends State<_FilterSheet> {
     _employmentType = widget.initial.employmentType;
     _sort = widget.initial.sortOrder;
     _season = widget.initial.season;
+    _loadLiveCounts();
+  }
+
+  Future<void> _loadLiveCounts() async {
+    try {
+      final results = await Future.wait([
+        ...tourismRegions.map(
+          (region) => widget.listingService
+              .countActiveListings(region: region.id)
+              .then((count) => (key: region.id, count: count, isRegion: true)),
+        ),
+        ...ListingSeason.values.map(
+          (season) => widget.listingService
+              .countActiveListings(season: season.code)
+              .then((count) => (key: season.code, count: count, isRegion: false)),
+        ),
+      ]);
+      if (!mounted) return;
+      setState(() {
+        _regionCounts = {
+          for (final result in results)
+            if (result.isRegion) result.key: result.count,
+        };
+        _seasonCounts = {
+          for (final result in results)
+            if (!result.isRegion) result.key: result.count,
+        };
+      });
+    } catch (_) {
+      // Keep labels usable without counts when an aggregate request fails.
+    }
+  }
+
+  String _withCount(String label, int? count) {
+    return count == null ? label : '$label ($count)';
   }
 
   @override
@@ -612,9 +653,12 @@ class _FilterSheetState extends State<_FilterSheet> {
                 (region) => DropdownMenuItem(
                   value: region.id,
                   child: Text(
-                    Localizations.localeOf(context).languageCode == 'en'
-                        ? region.nameEn
-                        : region.nameTr,
+                    _withCount(
+                      Localizations.localeOf(context).languageCode == 'en'
+                          ? region.nameEn
+                          : region.nameTr,
+                      _regionCounts[region.id],
+                    ),
                   ),
                 ),
               ),
@@ -683,7 +727,10 @@ class _FilterSheetState extends State<_FilterSheet> {
                 child: Text('Farketmez / Tüm Sezonlar'),
               ),
               ...ListingSeason.values.map(
-                (s) => DropdownMenuItem(value: s, child: Text(s.label)),
+                (s) => DropdownMenuItem(
+                  value: s,
+                  child: Text(_withCount(s.label, _seasonCounts[s.code])),
+                ),
               ),
             ],
             onChanged: (value) => setState(() => _season = value),

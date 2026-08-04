@@ -4,10 +4,52 @@ enum EmploymentType {
   seasonal;
 
   String get label => switch (this) {
-        EmploymentType.fullTime => 'Tam zamanlı',
-        EmploymentType.partTime => 'Yarı zamanlı',
-        EmploymentType.seasonal => 'Mevsimlik',
-      };
+    EmploymentType.fullTime => 'Tam zamanlı',
+    EmploymentType.partTime => 'Yarı zamanlı',
+    EmploymentType.seasonal => 'Mevsimlik',
+  };
+}
+
+enum ExperienceLevel {
+  none,
+  underOneYear,
+  oneToThreeYears,
+  threePlusYears;
+
+  String get label => switch (this) {
+    ExperienceLevel.none => 'Deneyim Aranmıyor',
+    ExperienceLevel.underOneYear => '1 Yıldan Az',
+    ExperienceLevel.oneToThreeYears => '1-3 Yıl',
+    ExperienceLevel.threePlusYears => '3+ Yıl',
+  };
+
+  static ExperienceLevel? fromName(String? value) {
+    for (final level in values) {
+      if (level.name == value) return level;
+    }
+    return null;
+  }
+}
+
+enum EducationLevel {
+  none,
+  primary,
+  highSchool,
+  university;
+
+  String get label => switch (this) {
+    EducationLevel.none => 'Eğitim Şartı Yok',
+    EducationLevel.primary => 'En Az İlköğretim',
+    EducationLevel.highSchool => 'En Az Lise',
+    EducationLevel.university => 'En Az Üniversite',
+  };
+
+  static EducationLevel? fromName(String? value) {
+    for (final level in values) {
+      if (level.name == value) return level;
+    }
+    return null;
+  }
 }
 
 enum ListingSeason {
@@ -16,16 +58,16 @@ enum ListingSeason {
   tumYil;
 
   String get code => switch (this) {
-        ListingSeason.yaz2025 => 'yaz_2025',
-        ListingSeason.kis202526 => 'kis_2025_26',
-        ListingSeason.tumYil => 'tum_yil',
-      };
+    ListingSeason.yaz2025 => 'yaz_2025',
+    ListingSeason.kis202526 => 'kis_2025_26',
+    ListingSeason.tumYil => 'tum_yil',
+  };
 
   String get label => switch (this) {
-        ListingSeason.yaz2025 => 'Yaz 2025',
-        ListingSeason.kis202526 => 'Kış 2025-26',
-        ListingSeason.tumYil => 'Tüm Yıl',
-      };
+    ListingSeason.yaz2025 => 'Yaz 2025',
+    ListingSeason.kis202526 => 'Kış 2025-26',
+    ListingSeason.tumYil => 'Tüm Yıl',
+  };
 
   static ListingSeason? fromCode(String? code) {
     if (code == null) return null;
@@ -43,18 +85,24 @@ enum ListingDateFilter {
   lastMonth;
 
   String get label => switch (this) {
-        ListingDateFilter.all => 'Tümü',
-        ListingDateFilter.last24Hours => 'Son 24 saat',
-        ListingDateFilter.lastWeek => 'Son hafta',
-        ListingDateFilter.lastMonth => 'Son ay',
-      };
+    ListingDateFilter.all => 'Tümü',
+    ListingDateFilter.last24Hours => 'Son 24 saat',
+    ListingDateFilter.lastWeek => 'Son hafta',
+    ListingDateFilter.lastMonth => 'Son ay',
+  };
 
   DateTime? get cutoff => switch (this) {
-        ListingDateFilter.all => null,
-        ListingDateFilter.last24Hours => DateTime.now().subtract(const Duration(hours: 24)),
-        ListingDateFilter.lastWeek => DateTime.now().subtract(const Duration(days: 7)),
-        ListingDateFilter.lastMonth => DateTime.now().subtract(const Duration(days: 30)),
-      };
+    ListingDateFilter.all => null,
+    ListingDateFilter.last24Hours => DateTime.now().subtract(
+      const Duration(hours: 24),
+    ),
+    ListingDateFilter.lastWeek => DateTime.now().subtract(
+      const Duration(days: 7),
+    ),
+    ListingDateFilter.lastMonth => DateTime.now().subtract(
+      const Duration(days: 30),
+    ),
+  };
 }
 
 enum ListingSortOrder {
@@ -63,10 +111,10 @@ enum ListingSortOrder {
   salaryLowToHigh;
 
   String get label => switch (this) {
-        ListingSortOrder.newest => 'En yeni',
-        ListingSortOrder.salaryHighToLow => 'Maaş yüksekten düşüğe',
-        ListingSortOrder.salaryLowToHigh => 'Maaş düşükten yükseğe',
-      };
+    ListingSortOrder.newest => 'En yeni',
+    ListingSortOrder.salaryHighToLow => 'Maaş yüksekten düşüğe',
+    ListingSortOrder.salaryLowToHigh => 'Maaş düşükten yükseğe',
+  };
 }
 
 const turkishTourismCities = <String>[

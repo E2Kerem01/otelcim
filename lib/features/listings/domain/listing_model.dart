@@ -21,6 +21,8 @@ class Listing {
   final int? minSalaryTl;
   final int? maxSalaryTl;
   final EmploymentType? employmentType;
+  final String? experienceLevel;
+  final String? educationLevel;
   final String? season;
   final DateTime? contractStartDate;
   final DateTime? contractEndDate;
@@ -56,6 +58,8 @@ class Listing {
     this.minSalaryTl,
     this.maxSalaryTl,
     this.employmentType,
+    this.experienceLevel,
+    this.educationLevel,
     required this.contactInfo,
     this.images = const [],
     this.status = ListingStatus.active,
@@ -93,6 +97,8 @@ class Listing {
       employmentType: _employmentTypeFromString(
         data['employmentType'] as String?,
       ),
+      experienceLevel: data['experienceLevel'] as String?,
+      educationLevel: data['educationLevel'] as String?,
       contactInfo: data['contactInfo'] as String? ?? '',
       images:
           (data['images'] as List<dynamic>?)
@@ -139,6 +145,8 @@ class Listing {
     'minSalaryTl': minSalaryTl,
     'maxSalaryTl': maxSalaryTl,
     'employmentType': employmentType?.name,
+    'experienceLevel': experienceLevel,
+    'educationLevel': educationLevel,
     'contactInfo': contactInfo,
     'images': images,
     'status': status == ListingStatus.closed ? 'closed' : 'active',

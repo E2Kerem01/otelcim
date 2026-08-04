@@ -19,6 +19,7 @@ class ProfileForm extends StatefulWidget {
     String? bio,
     String? hotelName,
     String? position,
+    bool? availableImmediately,
   }) onChanged;
 
   /// The GlobalKey for the form (for validation from parent)
@@ -41,6 +42,7 @@ class _ProfileFormState extends State<ProfileForm> {
   late final TextEditingController _bioController;
   late final TextEditingController _hotelNameController;
   late final TextEditingController _positionController;
+  late bool _availableImmediately;
 
   bool get _isEmployer => widget.profile?.userType == 'employer';
 
@@ -62,6 +64,7 @@ class _ProfileFormState extends State<ProfileForm> {
     _positionController = TextEditingController(
       text: widget.profile?.position ?? '',
     );
+    _availableImmediately = widget.profile?.availableImmediately ?? false;
 
     // Add listeners to notify parent of changes
     _displayNameController.addListener(_notifyChange);
@@ -89,6 +92,7 @@ class _ProfileFormState extends State<ProfileForm> {
       bio: _bioController.text,
       hotelName: _hotelNameController.text,
       position: _positionController.text,
+      availableImmediately: _availableImmediately,
     );
   }
 
@@ -171,6 +175,54 @@ class _ProfileFormState extends State<ProfileForm> {
             textCapitalization: TextCapitalization.sentences,
           ),
           const SizedBox(height: 16),
+
+          // Immediate Availability Toggle (SADECE iş arayanlar için)
+          if (!_isEmployer) ...[
+            Card(
+              elevation: 0,
+              color: _availableImmediately ? Colors.green.shade50 : Colors.grey.shade50,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: _availableImmediately ? Colors.green.shade300 : Colors.grey.shade300,
+                ),
+              ),
+              child: SwitchListTile(
+                value: _availableImmediately,
+                onChanged: (val) {
+                  setState(() {
+                    _availableImmediately = val;
+                  });
+                  _notifyChange();
+                },
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.bolt_rounded,
+                      color: _availableImmediately ? Colors.green.shade700 : Colors.grey.shade600,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Şu An Boşta / Hemen Başlayabilir',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+                subtitle: const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(
+                    'Açık olduğunda işverenlerin sohbet ekranında yeşil "Hemen Başlayabilir" rozeti gösterilir.',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+                activeColor: Colors.green.shade700,
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
 
           // Employer-specific fields
           if (_isEmployer) ...[

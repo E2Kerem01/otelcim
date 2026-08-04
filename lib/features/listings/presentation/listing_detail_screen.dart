@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
+import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/models/report.dart';
 import '../../../shared/services/analytics_service.dart';
 import '../../../shared/services/auth_service.dart';
@@ -15,8 +17,12 @@ import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../chat/presentation/widgets/message_template_sheet.dart';
 import '../../favorites/services/favorite_service.dart';
 import '../domain/listing_model.dart';
+import 'listing_requirement_labels.dart';
 
-final _listingProvider = FutureProvider.family<Listing?, String>((ref, listingId) {
+final _listingProvider = FutureProvider.family<Listing?, String>((
+  ref,
+  listingId,
+) {
   return ref.watch(listingServiceProvider).getListing(listingId);
 });
 
@@ -26,7 +32,8 @@ class ListingDetailScreen extends ConsumerStatefulWidget {
   final String listingId;
 
   @override
-  ConsumerState<ListingDetailScreen> createState() => _ListingDetailScreenState();
+  ConsumerState<ListingDetailScreen> createState() =>
+      _ListingDetailScreenState();
 }
 
 class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
@@ -38,7 +45,9 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mesaj göndermek için lütfen giriş yapın.')),
+          const SnackBar(
+            content: Text('Mesaj göndermek için lütfen giriş yapın.'),
+          ),
         );
         context.push('/login');
       }
@@ -48,7 +57,9 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     if (listing.posterId == user.uid) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kendi ilanınıza mesaj gönderemezsiniz.')),
+          const SnackBar(
+            content: Text('Kendi ilanınıza mesaj gönderemezsiniz.'),
+          ),
         );
       }
       return;
@@ -56,7 +67,9 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
 
     setState(() => _startingChat = true);
     try {
-      final result = await ref.read(chatServiceProvider).getOrCreateConversation(
+      final result = await ref
+          .read(chatServiceProvider)
+          .getOrCreateConversation(
             listingId: listing.id,
             listingTitle: listing.title,
             posterId: listing.posterId,
@@ -66,14 +79,18 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
 
       String? prefillText;
       if (result.isNew) {
-        prefillText = await MessageTemplateSheet.show(context, listingTitle: listing.title);
+        prefillText = await MessageTemplateSheet.show(
+          context,
+          listingTitle: listing.title,
+        );
       }
-      if (mounted) context.push('/chat/${result.conversationId}', extra: prefillText);
+      if (mounted)
+        context.push('/chat/${result.conversationId}', extra: prefillText);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sohbet başlatılamadı: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Sohbet başlatılamadı: $e')));
       }
     } finally {
       if (mounted) setState(() => _startingChat = false);
@@ -81,7 +98,8 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
   }
 
   Future<void> _shareListing(Listing listing) async {
-    final text = '''
+    final text =
+        '''
 ${listing.title}
 
 📍 ${listing.location}
@@ -97,8 +115,12 @@ ${listing.contactInfo}
 ''';
 
     try {
-      await SharePlus.instance.share(ShareParams(text: text, subject: listing.title));
-      await ref.read(analyticsServiceProvider).logShareListing(
+      await SharePlus.instance.share(
+        ShareParams(text: text, subject: listing.title),
+      );
+      await ref
+          .read(analyticsServiceProvider)
+          .logShareListing(
             listingId: listing.id,
             listingTitle: listing.title,
             category: listing.category,
@@ -126,7 +148,11 @@ ${listing.contactInfo}
     final myUid = ref.watch(authStateProvider).value?.uid;
     final isFavorite = myUid == null
         ? false
-        : ref.watch(favoriteIdsProvider(myUid)).valueOrNull?.contains(widget.listingId) ?? false;
+        : ref
+                  .watch(favoriteIdsProvider(myUid))
+                  .valueOrNull
+                  ?.contains(widget.listingId) ??
+              false;
 
     return Scaffold(
       appBar: AppBar(
@@ -142,10 +168,14 @@ ${listing.contactInfo}
                   context.push('/login');
                   return;
                 }
-                ref.read(favoriteServiceProvider).toggleFavorite(myUid, widget.listingId);
+                ref
+                    .read(favoriteServiceProvider)
+                    .toggleFavorite(myUid, widget.listingId);
               },
               icon: Icon(
-                isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                isFavorite
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
                 color: isFavorite ? Colors.red : null,
               ),
             ),
@@ -162,7 +192,8 @@ ${listing.contactInfo}
           ),
           listingAsync.maybeWhen(
             data: (listing) {
-              if (listing == null || listing.posterId == myUid) return const SizedBox.shrink();
+              if (listing == null || listing.posterId == myUid)
+                return const SizedBox.shrink();
               return PopupMenuButton<String>(
                 onSelected: (value) {
                   if (value == 'report') {
@@ -193,6 +224,9 @@ ${listing.contactInfo}
             return const Center(child: Text('İlan bulunamadı.'));
           }
           final isBoostedActive = BoostBadge.isBoostActive(listing);
+          final experience = ExperienceLevel.fromName(listing.experienceLevel);
+          final education = EducationLevel.fromName(listing.educationLevel);
+          final l10n = AppLocalizations.of(context)!;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -204,7 +238,9 @@ ${listing.contactInfo}
                   children: [
                     Chip(
                       label: Text(listingCategoryLabel(listing.category)),
-                      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.1),
                       side: BorderSide.none,
                     ),
                     if (isBoostedActive) ...[
@@ -215,18 +251,36 @@ ${listing.contactInfo}
                     if (listing.createdAt != null)
                       Text(
                         '${listing.createdAt!.day}.${listing.createdAt!.month}.${listing.createdAt!.year}',
-                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13,
+                        ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(listing.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  listing.title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.location_on_outlined, color: Colors.grey.shade600),
+                    Icon(
+                      Icons.location_on_outlined,
+                      color: Colors.grey.shade600,
+                    ),
                     const SizedBox(width: 4),
-                    Text(listing.location, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                    Text(
+                      listing.location,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -234,25 +288,66 @@ ${listing.contactInfo}
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+                    color: Theme.of(
+                      context,
+                    ).primaryColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Maaş', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      const Text(
+                        'Maaş',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         listing.salary,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
                     ],
                   ),
                 ),
+                if (experience != null || education != null) ...[
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          if (experience != null)
+                            _RequirementRow(
+                              icon: Icons.work_history_outlined,
+                              label: l10n.experienceLevelLabel,
+                              value: experienceLevelLabel(l10n, experience),
+                            ),
+                          if (experience != null && education != null)
+                            const Divider(height: 24),
+                          if (education != null)
+                            _RequirementRow(
+                              icon: Icons.school_outlined,
+                              label: l10n.educationLevelLabel,
+                              value: educationLevelLabel(l10n, education),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
-                const Text('İlan Açıklaması', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text(
+                  'İlan Açıklaması',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
-                Text(listing.description, style: const TextStyle(fontSize: 14, height: 1.5)),
+                Text(
+                  listing.description,
+                  style: const TextStyle(fontSize: 14, height: 1.5),
+                ),
                 const SizedBox(height: 24),
                 Card(
                   child: Padding(
@@ -263,8 +358,13 @@ ${listing.contactInfo}
                           radius: 24,
                           backgroundColor: Theme.of(context).primaryColor,
                           child: Text(
-                            listing.posterName.isNotEmpty ? listing.posterName[0].toUpperCase() : '?',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            listing.posterName.isNotEmpty
+                                ? listing.posterName[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -272,42 +372,139 @@ ${listing.contactInfo}
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(listing.posterName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                              Text(
+                                listing.posterName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
                               const SizedBox(height: 2),
-                              Text('İlan Sahibi', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                              Text(
+                                'İlan Sahibi',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 12,
+                                ),
+                              ),
                               const SizedBox(height: 4),
                               if (myUid == null)
                                 InkWell(
                                   onTap: () => context.push('/login'),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.lock_outline, size: 14, color: Colors.orange.shade800),
+                                      Icon(
+                                        Icons.lock_outline,
+                                        size: 14,
+                                        color: Colors.orange.shade800,
+                                      ),
                                       const SizedBox(width: 4),
                                       Expanded(
                                         child: Text(
                                           'İletişim bilgisini görmek için giriş yapın',
-                                          style: TextStyle(color: Colors.orange.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                                          style: TextStyle(
+                                            color: Colors.orange.shade800,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 )
-                              else if (myUid == listing.posterId || _revealContactInfo)
-                                Text(listing.contactInfo, style: TextStyle(color: Colors.grey.shade700, fontSize: 13))
+                              else if (myUid == listing.posterId ||
+                                  _revealContactInfo)
+                                Text(
+                                  listing.contactInfo,
+                                  style: TextStyle(
+                                    color: Colors.grey.shade700,
+                                    fontSize: 13,
+                                  ),
+                                )
                               else
                                 InkWell(
-                                  onTap: () => setState(() => _revealContactInfo = true),
+                                  onTap: () =>
+                                      setState(() => _revealContactInfo = true),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.visibility_outlined, size: 14, color: Theme.of(context).primaryColor),
+                                      Icon(
+                                        Icons.visibility_outlined,
+                                        size: 14,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
                                       const SizedBox(width: 4),
                                       Text(
                                         'İletişim Bilgisini Göster',
-                                        style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.shield_outlined,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onTertiaryContainer,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.listingSafetyTipsTitle,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onTertiaryContainer,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.listingSafetyTipsBody,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onTertiaryContainer,
+                                      height: 1.4,
+                                    ),
+                              ),
+                              const SizedBox(height: 4),
+                              TextButton.icon(
+                                onPressed: () => _showReportDialog(listing),
+                                icon: const Icon(Icons.flag_outlined),
+                                label: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.listingSafetyReportAction,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -333,14 +530,24 @@ ${listing.contactInfo}
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, -2),
+                  ),
+                ],
               ),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () => context.push('/listing/${listing.id}/boost'),
                   icon: const Icon(Icons.rocket_launch_rounded),
-                  label: Text(isBoostedActive ? 'Öne Çıkarma Yönetimi' : 'İlanı Öne Çıkar'),
+                  label: Text(
+                    isBoostedActive
+                        ? 'Öne Çıkarma Yönetimi'
+                        : 'İlanı Öne Çıkar',
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber.shade700,
                     foregroundColor: Colors.white,
@@ -353,7 +560,13 @@ ${listing.contactInfo}
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, -2),
+                ),
+              ],
             ),
             child: SizedBox(
               width: double.infinity,
@@ -367,6 +580,38 @@ ${listing.contactInfo}
         },
         orElse: () => null,
       ),
+    );
+  }
+}
+
+class _RequirementRow extends StatelessWidget {
+  const _RequirementRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: Theme.of(context).textTheme.labelMedium),
+              const SizedBox(height: 2),
+              Text(value, style: Theme.of(context).textTheme.bodyLarge),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -404,11 +649,19 @@ class _ListingImageGalleryState extends State<_ListingImageGallery> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(categoryIcon, size: 56, color: Theme.of(context).primaryColor.withValues(alpha: 0.5)),
+              Icon(
+                categoryIcon,
+                size: 56,
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+              ),
               const SizedBox(height: 8),
               Text(
                 listingCategoryLabels[categoryEnum] ?? 'Otelcim İlanı',
-                style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.bold, fontSize: 13),
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -433,11 +686,17 @@ class _ListingImageGalleryState extends State<_ListingImageGallery> {
                   width: double.infinity,
                   placeholder: (context, url) => Container(
                     color: Colors.grey.shade200,
-                    child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    child: const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                   ),
                   errorWidget: (context, url, error) => Container(
                     color: Colors.grey.shade200,
-                    child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                    child: const Icon(
+                      Icons.broken_image,
+                      size: 40,
+                      color: Colors.grey,
+                    ),
                   ),
                 );
               },
@@ -458,7 +717,9 @@ class _ListingImageGalleryState extends State<_ListingImageGallery> {
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(3),
-                      color: _currentIndex == index ? Colors.white : Colors.white54,
+                      color: _currentIndex == index
+                          ? Colors.white
+                          : Colors.white54,
                     ),
                   ),
                 ),
