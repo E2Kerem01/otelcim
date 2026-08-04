@@ -45,6 +45,13 @@ class AdminDashboardScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             _AdminCard(
+              icon: Icons.card_membership_outlined,
+              title: 'Belge Onay Kuyruğu',
+              subtitle: 'İş arayanların hijyen, cankurtaran, ehliyet vb. belgelerini onaylayın.',
+              onTap: () => context.push('/admin/certificates'),
+            ),
+            const SizedBox(height: 12),
+            _AdminCard(
               icon: Icons.campaign_outlined,
               title: 'Banner Reklamlar',
               subtitle: 'Anasayfa sponsorlu reklam banner\'larını yönetin.',

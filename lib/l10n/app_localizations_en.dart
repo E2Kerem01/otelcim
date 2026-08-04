@@ -320,4 +320,197 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get educationUniversity => 'At Least University';
+
+  @override
+  String get proposeInterview => 'Propose Interview Time';
+
+  @override
+  String get interviewProposalTitle => 'Interview Time Proposal';
+
+  @override
+  String get interviewConfirmedTitle => 'Interview Confirmed';
+
+  @override
+  String get waitingCandidateSelection => 'Waiting for candidate selection...';
+
+  @override
+  String get confirmSlotPrompt => 'Do you confirm this interview time?';
+
+  @override
+  String get selectSlot => 'Select';
+
+  @override
+  String get interviewSlotsProposedSuccess =>
+      'Interview time slots successfully proposed.';
+
+  @override
+  String get introVideoTitle => 'Video Intro';
+
+  @override
+  String get introVideoLabel => '15-30 Second Video Intro';
+
+  @override
+  String get introVideoHint =>
+      'Upload a short video introducing yourself to employers.';
+
+  @override
+  String get uploadVideoAction => 'Upload Video';
+
+  @override
+  String get changeVideoAction => 'Change Video';
+
+  @override
+  String get removeVideoAction => 'Remove Video';
+
+  @override
+  String get watchIntroVideo => 'Watch Video Intro';
+
+  @override
+  String get videoDurationWarning => 'Video must be at most 30 seconds.';
+
+  @override
+  String get videoUploadSuccess => 'Video intro uploaded successfully!';
+
+  @override
+  String get videoRemoveSuccess => 'Video intro removed.';
+
+  @override
+  String get sendWhatsAppAction => 'Send Message via WhatsApp';
+
+  @override
+  String get certificateTypeCankurtaran => 'Lifeguard Certificate';
+
+  @override
+  String get certificateTypeEhliyet => 'Driver\'s License';
+
+  @override
+  String get certificateTypeDil => 'Foreign Language Certificate';
+
+  @override
+  String get certificateTypeDiger => 'Other Certificate';
+
+  @override
+  String get certificateStatusPending => 'Pending';
+
+  @override
+  String get certificateStatusApproved => 'Approved';
+
+  @override
+  String get certificateStatusRejected => 'Rejected';
+
+  @override
+  String get adminCertificateReviewTitle => 'Document Review Queue';
+
+  @override
+  String get talentPoolTitle => 'Talent Pool';
+
+  @override
+  String get talentPoolMyPool => 'My Talent Pool';
+
+  @override
+  String get talentPoolSubtitle => 'Next season candidates and notes';
+
+  @override
+  String get addToTalentPool => 'Add to Talent Pool';
+
+  @override
+  String get addedToTalentPool => 'Candidate added to your talent pool.';
+
+  @override
+  String get removedFromTalentPool => 'Candidate removed from talent pool.';
+
+  @override
+  String get emptyTalentPool => 'No Candidates in Your Talent Pool Yet';
+
+  @override
+  String get emptyTalentPoolSubtitle =>
+      'You can add candidates here using \'Add to Talent Pool\' from the details menu in your chats with job seekers.';
+
+  @override
+  String get backToChat => 'Back to Chat';
+
+  @override
+  String get removeFromPoolConfirmTitle => 'Remove Candidate from Pool';
+
+  @override
+  String get housingAddTitle => 'Add accommodation details';
+
+  @override
+  String get housingTitle => 'Accommodation & amenities';
+
+  @override
+  String get housingRoomType => 'Room type';
+
+  @override
+  String get housingSingleRoom => 'Single room';
+
+  @override
+  String get housingSharedRoom => 'Shared room';
+
+  @override
+  String get housingHasAc => 'Air conditioning';
+
+  @override
+  String get housingHasWifi => 'Wi-Fi';
+
+  @override
+  String get housingMealsIncluded => 'Meals included per day';
+
+  @override
+  String get housingPhotos => 'Accommodation photos';
+
+  @override
+  String get housingAddPhoto => 'Add photo';
+
+  @override
+  String get urgentListingLabel => 'Urgent Hiring';
+
+  @override
+  String get urgentListingHint =>
+      'Users in the region receive an instant notification.';
+
+  @override
+  String get urgentBadge => 'URGENT';
+
+  @override
+  String get urgentNotificationsTitle => 'Urgent Listing Notifications';
+
+  @override
+  String get urgentNotificationsDescription =>
+      'Get immediate alerts for urgent staff listings in your selected tourism region.';
+
+  @override
+  String get qrPosterTitle => 'QR Job Poster';
+
+  @override
+  String get createQrPosterAction => 'Generate QR Poster';
+
+  @override
+  String get sharePosterAction => 'Share Poster';
+
+  @override
+  String get qrPosterScanInstruction =>
+      'Scan the QR code to view the listing and apply quickly.';
+
+  @override
+  String get qrPosterFooter => 'www.otelcim.app • Hotel & Tourism Job Platform';
+
+  @override
+  String get whatsappNotInstalled =>
+      'WhatsApp could not be opened on your device.';
+
+  @override
+  String get preferredRegionLabel => 'Preferred Tourism Region';
+
+  @override
+  String get optionalSelection => 'Not Selected (optional)';
+
+  @override
+  String get myExperienceLevelLabel => 'My Experience Level';
+
+  @override
+  String get myEducationLevelLabel => 'My Education Level';
+
+  @override
+  String get matchLabel => 'Match';
 }

@@ -53,6 +53,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   DateTime? _contractEndDate;
   List<String> _existingImageUrls = [];
   final List<File> _newImageFiles = [];
+  List<String> _existingHousingImageUrls = [];
+  final List<File> _newHousingImageFiles = [];
+  String? _housingRoomType;
+  bool _housingHasAc = false;
+  bool _housingHasWifi = false;
+  int? _housingMealsIncluded;
 
   @override
   void dispose() {
@@ -85,6 +91,11 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     _locationController.text = listing.location;
     _contactController.text = listing.contactInfo;
     _existingImageUrls = List<String>.from(listing.images);
+    _existingHousingImageUrls = List<String>.from(listing.housingImages);
+    _housingRoomType = listing.housingRoomType;
+    _housingHasAc = listing.housingHasAc ?? false;
+    _housingHasWifi = listing.housingHasWifi ?? false;
+    _housingMealsIncluded = listing.housingMealsIncluded;
     _selectedCategory = ListingCategory.values.firstWhere(
       (c) => c.name == listing.category,
       orElse: () => ListingCategory.diger,
@@ -115,6 +126,18 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     }
   }
 
+  Future<void> _pickHousingImages() async {
+    final total =
+        _existingHousingImageUrls.length + _newHousingImageFiles.length;
+    final picked = await ImagePicker().pickMultiImage(imageQuality: 80);
+    if (!mounted || picked.isEmpty) return;
+    setState(
+      () => _newHousingImageFiles.addAll(
+        picked.take(5 - total).map((x) => File(x.path)),
+      ),
+    );
+  }
+
   Future<void> _submit(Listing original) async {
     if (!_formKey.currentState!.validate()) return;
     final l10n = AppLocalizations.of(context)!;
@@ -137,6 +160,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     setState(() => _submitting = true);
     try {
       List<String> finalImages = List<String>.from(_existingImageUrls);
+      final housingImages = List<String>.from(_existingHousingImageUrls);
 
       if (_newImageFiles.isNotEmpty) {
         final storageService = ref.read(storageServiceProvider);
@@ -145,6 +169,13 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
           _newImageFiles,
         );
         finalImages.addAll(uploadedUrls);
+      }
+      if (_newHousingImageFiles.isNotEmpty) {
+        housingImages.addAll(
+          await ref
+              .read(storageServiceProvider)
+              .uploadHousingImages(original.id, _newHousingImageFiles),
+        );
       }
 
       await ref
@@ -172,6 +203,11 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               contractEndDate: _contractEndDate,
               contactInfo: _contactController.text.trim(),
               images: finalImages,
+              housingRoomType: _housingRoomType,
+              housingHasAc: _housingRoomType == null ? null : _housingHasAc,
+              housingHasWifi: _housingRoomType == null ? null : _housingHasWifi,
+              housingMealsIncluded: _housingMealsIncluded,
+              housingImages: housingImages,
               status: original.status,
               createdAt: original.createdAt,
               updatedAt: original.updatedAt,
@@ -743,6 +779,73 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                       ],
                     ),
                   ],
+                  const SizedBox(height: 16),
+                  ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
+                    title: Text(l10n.housingAddTitle),
+                    leading: const Icon(Icons.home_work_outlined),
+                    children: [
+                      DropdownButtonFormField<String?>(
+                        initialValue: _housingRoomType,
+                        decoration: InputDecoration(
+                          labelText: l10n.housingRoomType,
+                        ),
+                        items: [
+                          DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text(l10n.optionalNotSpecified),
+                          ),
+                          DropdownMenuItem(
+                            value: 'single',
+                            child: Text(l10n.housingSingleRoom),
+                          ),
+                          DropdownMenuItem(
+                            value: 'shared',
+                            child: Text(l10n.housingSharedRoom),
+                          ),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _housingRoomType = value),
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(l10n.housingHasAc),
+                        value: _housingHasAc,
+                        onChanged: (value) =>
+                            setState(() => _housingHasAc = value),
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(l10n.housingHasWifi),
+                        value: _housingHasWifi,
+                        onChanged: (value) =>
+                            setState(() => _housingHasWifi = value),
+                      ),
+                      TextFormField(
+                        initialValue: _housingMealsIncluded?.toString(),
+                        decoration: InputDecoration(
+                          labelText: l10n.housingMealsIncluded,
+                        ),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) =>
+                            _housingMealsIncluded = int.tryParse(value),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.add_photo_alternate_outlined),
+                        title: Text(l10n.housingPhotos),
+                        subtitle: Text(
+                          '${_existingHousingImageUrls.length + _newHousingImageFiles.length}/5',
+                        ),
+                        onTap:
+                            _existingHousingImageUrls.length +
+                                    _newHousingImageFiles.length <
+                                5
+                            ? _pickHousingImages
+                            : null,
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'İletişim',

@@ -118,7 +118,8 @@ class StorageService {
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
 
       // Define the storage path for the verification document
-      final String path = 'verification_documents/$userId/${timestamp}_$documentType$extension';
+      final String path =
+          'verification_documents/$userId/${timestamp}_$documentType$extension';
       final Reference ref = _storage.ref().child(path);
 
       // Determine content type based on file extension
@@ -166,9 +167,7 @@ class StorageService {
 
       final SettableMetadata metadata = SettableMetadata(
         contentType: 'image/jpeg',
-        customMetadata: {
-          'uploadedAt': DateTime.now().toIso8601String(),
-        },
+        customMetadata: {'uploadedAt': DateTime.now().toIso8601String()},
       );
 
       final TaskSnapshot uploadTask = await ref.putFile(imageFile, metadata);
@@ -185,7 +184,10 @@ class StorageService {
   ///
   /// The images are stored at `listing_images/{listingId}/{index}_{timestamp}.jpg`.
   /// Returns a list of download URL strings.
-  Future<List<String>> uploadListingImages(String listingId, List<File> imageFiles) async {
+  Future<List<String>> uploadListingImages(
+    String listingId,
+    List<File> imageFiles,
+  ) async {
     try {
       final List<String> downloadUrls = [];
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -203,7 +205,10 @@ class StorageService {
           },
         );
 
-        final TaskSnapshot uploadTask = await ref.putFile(imageFiles[i], metadata);
+        final TaskSnapshot uploadTask = await ref.putFile(
+          imageFiles[i],
+          metadata,
+        );
         final String url = await uploadTask.ref.getDownloadURL();
         downloadUrls.add(url);
       }
@@ -213,6 +218,115 @@ class StorageService {
       throw Exception('Failed to upload listing images: ${e.message}');
     } catch (e) {
       throw Exception('Unexpected error during listing image upload: $e');
+    }
+  }
+
+  Future<List<String>> uploadHousingImages(
+    String listingId,
+    List<File> imageFiles,
+  ) async {
+    try {
+      final urls = <String>[];
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      for (var i = 0; i < imageFiles.length; i++) {
+        final ref = _storage.ref().child(
+          'housing_images/$listingId/${i}_$timestamp.jpg',
+        );
+        final task = await ref.putFile(
+          imageFiles[i],
+          SettableMetadata(
+            contentType: 'image/jpeg',
+            customMetadata: {'listingId': listingId, 'imageIndex': '$i'},
+          ),
+        );
+        urls.add(await task.ref.getDownloadURL());
+      }
+      return urls;
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to upload housing images: ${e.message}');
+    }
+  }
+
+  /// Uploads a jobseeker certificate file to Firebase Storage.
+  /// Path: `certificates/{userId}/{certId}`
+  Future<String> uploadCertificateFile({
+    required String userId,
+    required String certId,
+    required File file,
+  }) async {
+    try {
+      final String filePath = file.path;
+      final String extension = filePath.contains('.')
+          ? filePath.substring(filePath.lastIndexOf('.'))
+          : '.jpg';
+
+      final String path = 'certificates/$userId/$certId$extension';
+      final Reference ref = _storage.ref().child(path);
+
+      String contentType = 'application/octet-stream';
+      final extLower = extension.toLowerCase();
+      if (extLower == '.pdf') {
+        contentType = 'application/pdf';
+      } else if (['.jpg', '.jpeg'].contains(extLower)) {
+        contentType = 'image/jpeg';
+      } else if (extLower == '.png') {
+        contentType = 'image/png';
+      }
+
+      final SettableMetadata metadata = SettableMetadata(
+        contentType: contentType,
+        customMetadata: {
+          'userId': userId,
+          'certId': certId,
+          'uploadedAt': DateTime.now().toIso8601String(),
+        },
+      );
+
+      final TaskSnapshot uploadTask = await ref.putFile(file, metadata);
+      return await uploadTask.ref.getDownloadURL();
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to upload certificate file: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error during certificate upload: $e');
+    }
+  }
+
+  /// Uploads a profile intro video to Firebase Storage.
+  /// Path: `user_videos/{userId}/intro.mp4`
+  Future<String> uploadIntroVideo(String userId, File videoFile) async {
+    try {
+      final String path = 'user_videos/$userId/intro.mp4';
+      final Reference ref = _storage.ref().child(path);
+
+      final SettableMetadata metadata = SettableMetadata(
+        contentType: 'video/mp4',
+        customMetadata: {
+          'userId': userId,
+          'uploadedAt': DateTime.now().toIso8601String(),
+        },
+      );
+
+      final TaskSnapshot uploadTask = await ref.putFile(videoFile, metadata);
+      final String downloadUrl = await uploadTask.ref.getDownloadURL();
+      return downloadUrl;
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to upload intro video: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error during intro video upload: $e');
+    }
+  }
+
+  /// Deletes a profile intro video from Firebase Storage.
+  Future<void> deleteIntroVideo(String userId) async {
+    try {
+      final String path = 'user_videos/$userId/intro.mp4';
+      final Reference ref = _storage.ref().child(path);
+      await ref.delete();
+    } on FirebaseException catch (e) {
+      if (e.code == 'object-not-found') return;
+      throw Exception('Failed to delete intro video: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error during intro video deletion: $e');
     }
   }
 }

@@ -36,7 +36,13 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   final _locationController = TextEditingController();
   final _contactController = TextEditingController();
   final List<File> _selectedImageFiles = [];
+  final List<File> _housingImageFiles = [];
+  String? _housingRoomType;
+  bool _housingHasAc = false;
+  bool _housingHasWifi = false;
+  int? _housingMealsIncluded;
   bool _submitting = false;
+  bool _isUrgent = false;
   String? _selectedCity;
   String? _selectedRegion;
   double? _lat;
@@ -84,6 +90,16 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     }
   }
 
+  Future<void> _pickHousingImages() async {
+    final picked = await ImagePicker().pickMultiImage(imageQuality: 80);
+    if (!mounted || picked.isEmpty) return;
+    setState(
+      () => _housingImageFiles.addAll(
+        picked.take(5 - _housingImageFiles.length).map((x) => File(x.path)),
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final l10n = AppLocalizations.of(context)!;
@@ -123,6 +139,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               id: '',
               posterId: user.uid,
               posterName: user.email,
+              isUrgent: _isUrgent,
               title: _titleController.text.trim(),
               description: _descController.text.trim(),
               category: _selectedCategory.name,
@@ -141,15 +158,27 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               contractStartDate: _contractStartDate,
               contractEndDate: _contractEndDate,
               contactInfo: _contactController.text.trim(),
+              housingRoomType: _housingRoomType,
+              housingHasAc: _housingRoomType == null ? null : _housingHasAc,
+              housingHasWifi: _housingRoomType == null ? null : _housingHasWifi,
+              housingMealsIncluded: _housingMealsIncluded,
             ),
           );
 
-      if (_selectedImageFiles.isNotEmpty) {
+      if (_selectedImageFiles.isNotEmpty || _housingImageFiles.isNotEmpty) {
         final storageService = ref.read(storageServiceProvider);
-        final imageUrls = await storageService.uploadListingImages(
-          listingId,
-          _selectedImageFiles,
-        );
+        final imageUrls = _selectedImageFiles.isEmpty
+            ? <String>[]
+            : await storageService.uploadListingImages(
+                listingId,
+                _selectedImageFiles,
+              );
+        final housingImageUrls = _housingImageFiles.isEmpty
+            ? <String>[]
+            : await storageService.uploadHousingImages(
+                listingId,
+                _housingImageFiles,
+              );
 
         final existingListing = await ref
             .read(listingServiceProvider)
@@ -162,6 +191,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   id: existingListing.id,
                   posterId: existingListing.posterId,
                   posterName: existingListing.posterName,
+                  isUrgent: existingListing.isUrgent,
                   title: existingListing.title,
                   description: existingListing.description,
                   category: existingListing.category,
@@ -181,6 +211,11 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   contractEndDate: existingListing.contractEndDate,
                   contactInfo: existingListing.contactInfo,
                   images: imageUrls,
+                  housingRoomType: existingListing.housingRoomType,
+                  housingHasAc: existingListing.housingHasAc,
+                  housingHasWifi: existingListing.housingHasWifi,
+                  housingMealsIncluded: existingListing.housingMealsIncluded,
+                  housingImages: housingImageUrls,
                   status: existingListing.status,
                   createdAt: existingListing.createdAt,
                 ),
@@ -482,6 +517,15 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                     ? AppLocalizations.of(context)!.regionRequired
                     : null,
               ),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.bolt, color: Colors.deepOrange.shade700),
+                title: Text(l10n.urgentListingLabel),
+                subtitle: Text(l10n.urgentListingHint),
+                value: _isUrgent,
+                onChanged: (value) => setState(() => _isUrgent = value),
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Şehir',
@@ -657,6 +701,66 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   ],
                 ),
               ],
+              const SizedBox(height: 16),
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: Text(l10n.housingAddTitle),
+                leading: const Icon(Icons.home_work_outlined),
+                children: [
+                  DropdownButtonFormField<String?>(
+                    initialValue: _housingRoomType,
+                    decoration: InputDecoration(
+                      labelText: l10n.housingRoomType,
+                    ),
+                    items: [
+                      DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text(l10n.optionalNotSpecified),
+                      ),
+                      DropdownMenuItem(
+                        value: 'single',
+                        child: Text(l10n.housingSingleRoom),
+                      ),
+                      DropdownMenuItem(
+                        value: 'shared',
+                        child: Text(l10n.housingSharedRoom),
+                      ),
+                    ],
+                    onChanged: (value) =>
+                        setState(() => _housingRoomType = value),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.housingHasAc),
+                    value: _housingHasAc,
+                    onChanged: (value) => setState(() => _housingHasAc = value),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.housingHasWifi),
+                    value: _housingHasWifi,
+                    onChanged: (value) =>
+                        setState(() => _housingHasWifi = value),
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: l10n.housingMealsIncluded,
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) =>
+                        _housingMealsIncluded = int.tryParse(value),
+                  ),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.add_photo_alternate_outlined),
+                    title: Text(l10n.housingPhotos),
+                    subtitle: Text('${_housingImageFiles.length}/5'),
+                    onTap: _housingImageFiles.length < 5
+                        ? _pickHousingImages
+                        : null,
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               const Text(
                 'İletişim',

@@ -7,7 +7,9 @@ enum AdminActionType {
   suspendUser,
   banUser,
   approveVerification,
-  rejectVerification;
+  rejectVerification,
+  approveCertificate,
+  rejectCertificate;
 
   String get label {
     switch (this) {
@@ -25,6 +27,10 @@ enum AdminActionType {
         return 'Doğrulamayı Onayla';
       case AdminActionType.rejectVerification:
         return 'Doğrulamayı Reddet';
+      case AdminActionType.approveCertificate:
+        return 'Sertifikayı Onayla';
+      case AdminActionType.rejectCertificate:
+        return 'Sertifikayı Reddet';
     }
   }
 }
@@ -33,7 +39,8 @@ enum AdminActionTargetType {
   user,
   listing,
   report,
-  verification;
+  verification,
+  certificate;
 
   String get label {
     switch (this) {
@@ -45,6 +52,8 @@ enum AdminActionTargetType {
         return 'Şikayet';
       case AdminActionTargetType.verification:
         return 'Doğrulama';
+      case AdminActionTargetType.certificate:
+        return 'Sertifika / Belge';
     }
   }
 }
@@ -112,6 +121,10 @@ class AdminAction {
         return AdminActionType.approveVerification;
       case 'rejectVerification':
         return AdminActionType.rejectVerification;
+      case 'approveCertificate':
+        return AdminActionType.approveCertificate;
+      case 'rejectCertificate':
+        return AdminActionType.rejectCertificate;
       default:
         return AdminActionType.dismissReport;
     }
@@ -127,6 +140,8 @@ class AdminAction {
         return AdminActionTargetType.report;
       case 'verification':
         return AdminActionTargetType.verification;
+      case 'certificate':
+        return AdminActionTargetType.certificate;
       default:
         return AdminActionTargetType.report;
     }

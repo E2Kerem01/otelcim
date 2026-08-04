@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/constants/listing_filters.dart';
 import '../../../../shared/models/user_profile.dart';
+import '../../../discovery/domain/tourism_region.dart';
 
 /// Form widget for editing user profile information.
 ///
@@ -20,6 +23,9 @@ class ProfileForm extends StatefulWidget {
     String? hotelName,
     String? position,
     bool? availableImmediately,
+    String? preferredExperienceLevel,
+    String? preferredEducationLevel,
+    String? preferredRegion,
   }) onChanged;
 
   /// The GlobalKey for the form (for validation from parent)
@@ -43,6 +49,9 @@ class _ProfileFormState extends State<ProfileForm> {
   late final TextEditingController _hotelNameController;
   late final TextEditingController _positionController;
   late bool _availableImmediately;
+  ExperienceLevel? _preferredExperienceLevel;
+  EducationLevel? _preferredEducationLevel;
+  String? _preferredRegion;
 
   bool get _isEmployer => widget.profile?.userType == 'employer';
 
@@ -65,6 +74,13 @@ class _ProfileFormState extends State<ProfileForm> {
       text: widget.profile?.position ?? '',
     );
     _availableImmediately = widget.profile?.availableImmediately ?? false;
+    _preferredExperienceLevel = ExperienceLevel.fromName(
+      widget.profile?.preferredExperienceLevel,
+    );
+    _preferredEducationLevel = EducationLevel.fromName(
+      widget.profile?.preferredEducationLevel,
+    );
+    _preferredRegion = widget.profile?.preferredRegion;
 
     // Add listeners to notify parent of changes
     _displayNameController.addListener(_notifyChange);
@@ -93,6 +109,9 @@ class _ProfileFormState extends State<ProfileForm> {
       hotelName: _hotelNameController.text,
       position: _positionController.text,
       availableImmediately: _availableImmediately,
+      preferredExperienceLevel: _preferredExperienceLevel?.name,
+      preferredEducationLevel: _preferredEducationLevel?.name,
+      preferredRegion: _preferredRegion,
     );
   }
 
@@ -127,6 +146,8 @@ class _ProfileFormState extends State<ProfileForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
     return Form(
       key: widget.formKey,
       child: Column(
@@ -178,6 +199,81 @@ class _ProfileFormState extends State<ProfileForm> {
 
           // Immediate Availability Toggle (SADECE iş arayanlar için)
           if (!_isEmployer) ...[
+            DropdownButtonFormField<ExperienceLevel?>(
+              initialValue: _preferredExperienceLevel,
+              decoration: InputDecoration(
+                labelText: l10n.myExperienceLevelLabel,
+                prefixIcon: const Icon(Icons.work_history_outlined),
+                border: const OutlineInputBorder(),
+              ),
+              items: [
+                DropdownMenuItem<ExperienceLevel?>(
+                  value: null,
+                  child: Text(l10n.optionalSelection),
+                ),
+                ...ExperienceLevel.values.map(
+                  (level) => DropdownMenuItem(
+                    value: level,
+                    child: Text(_experienceLabel(l10n, level)),
+                  ),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() => _preferredExperienceLevel = value);
+                _notifyChange();
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<EducationLevel?>(
+              initialValue: _preferredEducationLevel,
+              decoration: InputDecoration(
+                labelText: l10n.myEducationLevelLabel,
+                prefixIcon: const Icon(Icons.school_outlined),
+                border: const OutlineInputBorder(),
+              ),
+              items: [
+                DropdownMenuItem<EducationLevel?>(
+                  value: null,
+                  child: Text(l10n.optionalSelection),
+                ),
+                ...EducationLevel.values.map(
+                  (level) => DropdownMenuItem(
+                    value: level,
+                    child: Text(_educationLabel(l10n, level)),
+                  ),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() => _preferredEducationLevel = value);
+                _notifyChange();
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String?>(
+              initialValue: _preferredRegion,
+              decoration: InputDecoration(
+                labelText: l10n.preferredRegionLabel,
+                prefixIcon: const Icon(Icons.location_on_outlined),
+                border: const OutlineInputBorder(),
+              ),
+              items: [
+                DropdownMenuItem<String?>(
+                  value: null,
+                  child: Text(l10n.optionalSelection),
+                ),
+                ...tourismRegions.map(
+                  (region) => DropdownMenuItem(
+                    value: region.id,
+                    child: Text(isEnglish ? region.nameEn : region.nameTr),
+                  ),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() => _preferredRegion = value);
+                _notifyChange();
+              },
+            ),
+            const SizedBox(height: 16),
             Card(
               elevation: 0,
               color: _availableImmediately ? Colors.green.shade50 : Colors.grey.shade50,
@@ -258,4 +354,20 @@ class _ProfileFormState extends State<ProfileForm> {
       ),
     );
   }
+
+  String _experienceLabel(AppLocalizations l10n, ExperienceLevel level) =>
+      switch (level) {
+        ExperienceLevel.none => l10n.experienceNone,
+        ExperienceLevel.underOneYear => l10n.experienceUnderOneYear,
+        ExperienceLevel.oneToThreeYears => l10n.experienceOneToThreeYears,
+        ExperienceLevel.threePlusYears => l10n.experienceThreePlusYears,
+      };
+
+  String _educationLabel(AppLocalizations l10n, EducationLevel level) =>
+      switch (level) {
+        EducationLevel.none => l10n.educationNone,
+        EducationLevel.primary => l10n.educationPrimary,
+        EducationLevel.highSchool => l10n.educationHighSchool,
+        EducationLevel.university => l10n.educationUniversity,
+      };
 }

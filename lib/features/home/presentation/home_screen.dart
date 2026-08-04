@@ -6,8 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/providers/paginated_listings_provider.dart';
+import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
+import '../../../shared/utils/match_score.dart';
+import '../../../shared/services/notification_service.dart';
 import '../../ads/presentation/widgets/banner_ad_carousel.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../favorites/services/favorite_service.dart';
@@ -48,6 +51,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     _filters = _AdvancedFilters(region: widget.initialRegion);
     _scrollController.addListener(_onScroll);
+    final initialRegion = widget.initialRegion;
+    if (initialRegion != null) {
+      Future.microtask(
+        () => ref.read(notificationServiceProvider).selectRegion(initialRegion),
+      );
+    }
   }
 
   @override
@@ -89,7 +98,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         listingService: ref.read(listingServiceProvider),
       ),
     );
-    if (result != null && mounted) setState(() => _filters = result);
+    if (result != null && mounted) {
+      setState(() => _filters = result);
+      if (result.region != null) {
+        await ref
+            .read(notificationServiceProvider)
+            .selectRegion(result.region!);
+      }
+    }
   }
 
   @override
@@ -267,9 +283,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         _filterChip(
                           _filters.season!.label,
                           () => setState(
-                            () => _filters = _filters.copyWith(
-                              clearSeason: true,
-                            ),
+                            () =>
+                                _filters = _filters.copyWith(clearSeason: true),
                           ),
                         ),
                       if (_filters.sortOrder != ListingSortOrder.newest)
@@ -567,7 +582,9 @@ class _FilterSheetState extends State<_FilterSheet> {
         ...ListingSeason.values.map(
           (season) => widget.listingService
               .countActiveListings(season: season.code)
-              .then((count) => (key: season.code, count: count, isRegion: false)),
+              .then(
+                (count) => (key: season.code, count: count, isRegion: false),
+              ),
         ),
       ]);
       if (!mounted) return;
@@ -887,6 +904,12 @@ class _ListingCard extends ConsumerWidget {
                   .valueOrNull
                   ?.contains(listing.id) ??
               false;
+    final profile = uid == null
+        ? null
+        : ref.watch(currentUserProfileProvider).valueOrNull;
+    final matchScore = profile?.userType == 'jobseeker'
+        ? calculateMatchScore(listing: listing, profile: profile!)
+        : null;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -946,6 +969,49 @@ class _ListingCard extends ConsumerWidget {
                     if (isSeasonalContract(listing.season)) ...[
                       const SizedBox(width: 8),
                       SeasonBadge(season: listing.season!),
+                    ],
+                    if (matchScore != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.teal.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.teal.shade300),
+                        ),
+                        child: Text(
+                          '%$matchScore ${AppLocalizations.of(context)!.matchLabel}',
+                          style: TextStyle(
+                            color: Colors.teal.shade800,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                    if (listing.isUrgent) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.deepOrange.shade700,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)!.urgentBadge,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
                     const Spacer(),
                     AnimatedScale(

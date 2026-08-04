@@ -679,6 +679,375 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'En Az Üniversite'**
   String get educationUniversity;
+
+  /// No description provided for @proposeInterview.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mülakat Saati Öner'**
+  String get proposeInterview;
+
+  /// No description provided for @interviewProposalTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mülakat Zamanı Önerisi'**
+  String get interviewProposalTitle;
+
+  /// No description provided for @interviewConfirmedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mülakat Onaylandı'**
+  String get interviewConfirmedTitle;
+
+  /// No description provided for @waitingCandidateSelection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adayın mülakat saati seçimi bekleniyor...'**
+  String get waitingCandidateSelection;
+
+  /// No description provided for @confirmSlotPrompt.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu mülakat saatini onaylıyor musunuz?'**
+  String get confirmSlotPrompt;
+
+  /// No description provided for @selectSlot.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seç'**
+  String get selectSlot;
+
+  /// No description provided for @interviewSlotsProposedSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mülakat saatleri başarıyla önerildi.'**
+  String get interviewSlotsProposedSuccess;
+
+  /// No description provided for @introVideoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tanıtım Videosu'**
+  String get introVideoTitle;
+
+  /// No description provided for @introVideoLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'15-30 Saniyelik Tanıtım Videosu'**
+  String get introVideoLabel;
+
+  /// No description provided for @introVideoHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendinizi işverenlere tanıtan kısa bir video yükleyin.'**
+  String get introVideoHint;
+
+  /// No description provided for @uploadVideoAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Video Yükle'**
+  String get uploadVideoAction;
+
+  /// No description provided for @changeVideoAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Videoyu Değiştir'**
+  String get changeVideoAction;
+
+  /// No description provided for @removeVideoAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Videoyu Kaldır'**
+  String get removeVideoAction;
+
+  /// No description provided for @watchIntroVideo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tanıtım Videosunu İzle'**
+  String get watchIntroVideo;
+
+  /// No description provided for @videoDurationWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Video en fazla 30 saniye olmalıdır.'**
+  String get videoDurationWarning;
+
+  /// No description provided for @videoUploadSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tanıtım videosu başarıyla yüklendi!'**
+  String get videoUploadSuccess;
+
+  /// No description provided for @videoRemoveSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tanıtım videosu kaldırıldı.'**
+  String get videoRemoveSuccess;
+
+  /// No description provided for @sendWhatsAppAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'WhatsApp ile Mesaj Gönder'**
+  String get sendWhatsAppAction;
+
+  /// No description provided for @certificateTypeCankurtaran.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cankurtaran Sertifikası'**
+  String get certificateTypeCankurtaran;
+
+  /// No description provided for @certificateTypeEhliyet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sürücü Belgesi (Ehliyet)'**
+  String get certificateTypeEhliyet;
+
+  /// No description provided for @certificateTypeDil.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yabancı Dil Belgesi'**
+  String get certificateTypeDil;
+
+  /// No description provided for @certificateTypeDiger.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer Sertifika'**
+  String get certificateTypeDiger;
+
+  /// No description provided for @certificateStatusPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beklemede'**
+  String get certificateStatusPending;
+
+  /// No description provided for @certificateStatusApproved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onaylandı'**
+  String get certificateStatusApproved;
+
+  /// No description provided for @certificateStatusRejected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reddedildi'**
+  String get certificateStatusRejected;
+
+  /// No description provided for @adminCertificateReviewTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Belge Onay Kuyruğu'**
+  String get adminCertificateReviewTitle;
+
+  /// No description provided for @talentPoolTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yetenek Havuzu'**
+  String get talentPoolTitle;
+
+  /// No description provided for @talentPoolMyPool.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yetenek Havuzum'**
+  String get talentPoolMyPool;
+
+  /// No description provided for @talentPoolSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelecek sezon adayları ve notlar'**
+  String get talentPoolSubtitle;
+
+  /// No description provided for @addToTalentPool.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yetenek Havuzuna Ekle'**
+  String get addToTalentPool;
+
+  /// No description provided for @addedToTalentPool.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aday yetenek havuzunuza eklendi.'**
+  String get addedToTalentPool;
+
+  /// No description provided for @removedFromTalentPool.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aday yetenek havuzundan çıkarıldı.'**
+  String get removedFromTalentPool;
+
+  /// No description provided for @emptyTalentPool.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz Yetenek Havuzunuzda Aday Yok'**
+  String get emptyTalentPool;
+
+  /// No description provided for @emptyTalentPoolSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İş arayanlarla yaptığınız sohbetlerde detay menüsünden \"Yetenek Havuzuna Ekle\" seçeneği ile adayları buraya kaydedebilirsiniz.'**
+  String get emptyTalentPoolSubtitle;
+
+  /// No description provided for @backToChat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sohbete Dön'**
+  String get backToChat;
+
+  /// No description provided for @removeFromPoolConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adayı Havuzdan Çıkar'**
+  String get removeFromPoolConfirmTitle;
+
+  /// No description provided for @housingAddTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lojman Bilgileri Ekle'**
+  String get housingAddTitle;
+
+  /// No description provided for @housingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lojman & Sosyal İmkanlar'**
+  String get housingTitle;
+
+  /// No description provided for @housingRoomType.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oda tipi'**
+  String get housingRoomType;
+
+  /// No description provided for @housingSingleRoom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tek kişilik oda'**
+  String get housingSingleRoom;
+
+  /// No description provided for @housingSharedRoom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok kişilik oda'**
+  String get housingSharedRoom;
+
+  /// No description provided for @housingHasAc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Klima'**
+  String get housingHasAc;
+
+  /// No description provided for @housingHasWifi.
+  ///
+  /// In tr, this message translates to:
+  /// **'Wi-Fi'**
+  String get housingHasWifi;
+
+  /// No description provided for @housingMealsIncluded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük dahil öğün'**
+  String get housingMealsIncluded;
+
+  /// No description provided for @housingPhotos.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lojman fotoğrafları'**
+  String get housingPhotos;
+
+  /// No description provided for @housingAddPhoto.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf ekle'**
+  String get housingAddPhoto;
+
+  /// No description provided for @urgentListingLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acil İhtiyaç'**
+  String get urgentListingLabel;
+
+  /// No description provided for @urgentListingHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölgedeki kullanıcılara anlık bildirim gönderilir.'**
+  String get urgentListingHint;
+
+  /// No description provided for @urgentBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'ACİL'**
+  String get urgentBadge;
+
+  /// No description provided for @urgentNotificationsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acil İlan Bildirimleri'**
+  String get urgentNotificationsTitle;
+
+  /// No description provided for @urgentNotificationsDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçtiğiniz turizm bölgesindeki acil personel ilanlarını anında alın.'**
+  String get urgentNotificationsDescription;
+
+  /// No description provided for @qrPosterTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'QR İlan Posteri'**
+  String get qrPosterTitle;
+
+  /// No description provided for @createQrPosterAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'QR Poster Oluştur'**
+  String get createQrPosterAction;
+
+  /// No description provided for @sharePosterAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Posteri Paylaş'**
+  String get sharePosterAction;
+
+  /// No description provided for @qrPosterScanInstruction.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlanı görüntülemek ve hızlı başvuru yapmak için QR kodu taratın.'**
+  String get qrPosterScanInstruction;
+
+  /// No description provided for @qrPosterFooter.
+  ///
+  /// In tr, this message translates to:
+  /// **'www.otelcim.app • Otel & Turizm İş İlanları Platformu'**
+  String get qrPosterFooter;
+
+  /// No description provided for @whatsappNotInstalled.
+  ///
+  /// In tr, this message translates to:
+  /// **'WhatsApp cihazınızda açılamadı.'**
+  String get whatsappNotInstalled;
+
+  /// No description provided for @preferredRegionLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tercih Edilen Turizm Bölgesi'**
+  String get preferredRegionLabel;
+
+  /// No description provided for @optionalSelection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçim Yapılmadı (isteğe bağlı)'**
+  String get optionalSelection;
+
+  /// No description provided for @myExperienceLevelLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneyim Seviyem'**
+  String get myExperienceLevelLabel;
+
+  /// No description provided for @myEducationLevelLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğitim Durumum'**
+  String get myEducationLevelLabel;
+
+  /// Label used after the percentage on listing match badges.
+  String get matchLabel;
 }
 
 class _AppLocalizationsDelegate

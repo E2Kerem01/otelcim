@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/services/auth_service.dart';
+import '../../../shared/widgets/video_player_dialog.dart';
 import '../../ratings/services/rating_service.dart';
+import '../services/certificate_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -20,6 +22,7 @@ class ProfileScreen extends ConsumerWidget {
     final photoUrl = profile?.photoUrl;
     final themeMode = ref.watch(themeModeProvider);
     final ratings = user == null ? null : ref.watch(userRatingsProvider(user.uid));
+    final approvedCerts = user == null ? null : ref.watch(userApprovedCertificatesProvider(user.uid)).valueOrNull;
     final initial = (displayName?.isNotEmpty ?? false)
         ? displayName![0].toUpperCase()
         : (email.isNotEmpty ? email[0].toUpperCase() : '?');
@@ -90,6 +93,38 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                           ),
                         ],
+                        if (approvedCerts != null && approvedCerts.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: approvedCerts.map((cert) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.blue.shade200),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.verified_rounded, size: 12, color: Colors.blue.shade700),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      cert.title ?? cert.type.label,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.blue.shade900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -97,6 +132,26 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
+          if (profile?.introVideoUrl != null && profile!.introVideoUrl!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Card(
+                color: Colors.blue.shade50.withValues(alpha: 0.4),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.blue.shade100,
+                    child: Icon(Icons.play_arrow_rounded, color: Colors.blue.shade800),
+                  ),
+                  title: const Text('Tanıtım Videosu', style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: const Text('15-30 saniyelik profil videonuz'),
+                  trailing: OutlinedButton.icon(
+                    onPressed: () => VideoPlayerDialog.show(context, videoUrl: profile.introVideoUrl!),
+                    icon: const Icon(Icons.play_circle_outline_rounded, size: 18),
+                    label: const Text('İzle'),
+                  ),
+                ),
+              ),
+            ),
           if (ratings != null)
             ratings.when(
               data: (items) {
@@ -135,6 +190,16 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Card(
             child: ListTile(
+              leading: const Icon(Icons.verified_outlined, color: Colors.blue),
+              title: const Text('Belgelerim / Sertifika Cüzdanı'),
+              subtitle: const Text('Hijyen, cankurtaran, ehliyet ve dil belgelerinizi yönetin'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => context.push('/profile/certificates'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.favorite_outline_rounded),
               title: const Text('Favorilerim'),
               trailing: const Icon(Icons.chevron_right_rounded),
@@ -150,6 +215,18 @@ class ProfileScreen extends ConsumerWidget {
               onTap: () => context.push('/my-listings'),
             ),
           ),
+          if (profile?.userType == 'employer') ...[
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.folder_shared_outlined, color: Colors.indigo),
+                title: const Text('Yetenek Havuzum'),
+                subtitle: const Text('Gelecek sezon adayları ve notlar'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/profile/talent-pool'),
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           Card(
             child: ListTile(

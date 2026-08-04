@@ -13,6 +13,7 @@ class UserProfile {
     'messages': true,
     'listingAlerts': true,
     'seasonalReminders': false,
+    'urgentListings': true,
     'marketing': false,
   };
 
@@ -70,6 +71,13 @@ class UserProfile {
   /// Whether the user is immediately available for work (only for jobseekers)
   final bool availableImmediately;
 
+  final String? preferredExperienceLevel;
+  final String? preferredEducationLevel;
+  final String? preferredRegion;
+
+  /// URL to the user's intro video stored in Firebase Storage (only for jobseekers)
+  final String? introVideoUrl;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -95,21 +103,38 @@ class UserProfile {
     this.quietHoursStart,
     this.quietHoursEnd,
     this.availableImmediately = false,
+    this.preferredExperienceLevel,
+    this.preferredEducationLevel,
+    this.preferredRegion,
+    this.introVideoUrl,
     required this.createdAt,
     required this.updatedAt,
   });
 
   /// Creates a UserProfile from a Firestore DocumentSnapshot
-  factory UserProfile.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory UserProfile.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     final adminRoleString = data['adminRole'] as String?;
 
     final rawPrefs = data['notificationPreferences'] as Map<String, dynamic>?;
     final preferences = <String, bool>{
-      'messages': rawPrefs?['messages'] as bool? ?? defaultNotificationPreferences['messages']!,
-      'listingAlerts': rawPrefs?['listingAlerts'] as bool? ?? defaultNotificationPreferences['listingAlerts']!,
-      'seasonalReminders': rawPrefs?['seasonalReminders'] as bool? ?? defaultNotificationPreferences['seasonalReminders']!,
-      'marketing': rawPrefs?['marketing'] as bool? ?? defaultNotificationPreferences['marketing']!,
+      'messages':
+          rawPrefs?['messages'] as bool? ??
+          defaultNotificationPreferences['messages']!,
+      'listingAlerts':
+          rawPrefs?['listingAlerts'] as bool? ??
+          defaultNotificationPreferences['listingAlerts']!,
+      'seasonalReminders':
+          rawPrefs?['seasonalReminders'] as bool? ??
+          defaultNotificationPreferences['seasonalReminders']!,
+      'urgentListings':
+          rawPrefs?['urgentListings'] as bool? ??
+          defaultNotificationPreferences['urgentListings']!,
+      'marketing':
+          rawPrefs?['marketing'] as bool? ??
+          defaultNotificationPreferences['marketing']!,
     };
 
     return UserProfile(
@@ -135,6 +160,10 @@ class UserProfile {
       quietHoursStart: data['quietHoursStart'] as String?,
       quietHoursEnd: data['quietHoursEnd'] as String?,
       availableImmediately: data['availableImmediately'] as bool? ?? false,
+      preferredExperienceLevel: data['preferredExperienceLevel'] as String?,
+      preferredEducationLevel: data['preferredEducationLevel'] as String?,
+      preferredRegion: data['preferredRegion'] as String?,
+      introVideoUrl: data['introVideoUrl'] as String?,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -160,6 +189,10 @@ class UserProfile {
       'quietHoursStart': quietHoursStart,
       'quietHoursEnd': quietHoursEnd,
       'availableImmediately': availableImmediately,
+      'preferredExperienceLevel': preferredExperienceLevel,
+      'preferredEducationLevel': preferredEducationLevel,
+      'preferredRegion': preferredRegion,
+      'introVideoUrl': introVideoUrl,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -185,6 +218,10 @@ class UserProfile {
     Object? quietHoursStart = _undefined,
     Object? quietHoursEnd = _undefined,
     bool? availableImmediately,
+    Object? preferredExperienceLevel = _undefined,
+    Object? preferredEducationLevel = _undefined,
+    Object? preferredRegion = _undefined,
+    Object? introVideoUrl = _undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -203,7 +240,8 @@ class UserProfile {
       isVerified: isVerified ?? this.isVerified,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       verifiedAt: verifiedAt ?? this.verifiedAt,
-      notificationPreferences: notificationPreferences ?? this.notificationPreferences,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
       quietHoursStart: quietHoursStart == _undefined
           ? this.quietHoursStart
           : quietHoursStart as String?,
@@ -211,6 +249,18 @@ class UserProfile {
           ? this.quietHoursEnd
           : quietHoursEnd as String?,
       availableImmediately: availableImmediately ?? this.availableImmediately,
+      preferredExperienceLevel: preferredExperienceLevel == _undefined
+          ? this.preferredExperienceLevel
+          : preferredExperienceLevel as String?,
+      preferredEducationLevel: preferredEducationLevel == _undefined
+          ? this.preferredEducationLevel
+          : preferredEducationLevel as String?,
+      preferredRegion: preferredRegion == _undefined
+          ? this.preferredRegion
+          : preferredRegion as String?,
+      introVideoUrl: introVideoUrl == _undefined
+          ? this.introVideoUrl
+          : introVideoUrl as String?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -239,6 +289,10 @@ class UserProfile {
         other.quietHoursStart == quietHoursStart &&
         other.quietHoursEnd == quietHoursEnd &&
         other.availableImmediately == availableImmediately &&
+        other.preferredExperienceLevel == preferredExperienceLevel &&
+        other.preferredEducationLevel == preferredEducationLevel &&
+        other.preferredRegion == preferredRegion &&
+        other.introVideoUrl == introVideoUrl &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -260,10 +314,17 @@ class UserProfile {
       isVerified,
       verificationStatus,
       verifiedAt,
-      notificationPreferences.entries.fold<int>(0, (acc, e) => acc ^ Object.hash(e.key, e.value)),
+      notificationPreferences.entries.fold<int>(
+        0,
+        (acc, e) => acc ^ Object.hash(e.key, e.value),
+      ),
       quietHoursStart,
       quietHoursEnd,
       availableImmediately,
+      preferredExperienceLevel,
+      preferredEducationLevel,
+      preferredRegion,
+      introVideoUrl,
       createdAt,
       updatedAt,
     ]);
@@ -279,6 +340,9 @@ class UserProfile {
         'verifiedAt: $verifiedAt, notificationPreferences: $notificationPreferences, '
         'quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, '
         'availableImmediately: $availableImmediately, '
+        'preferredExperienceLevel: $preferredExperienceLevel, '
+        'preferredEducationLevel: $preferredEducationLevel, '
+        'preferredRegion: $preferredRegion, introVideoUrl: $introVideoUrl, '
         'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

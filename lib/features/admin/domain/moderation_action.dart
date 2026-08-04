@@ -123,12 +123,14 @@ extension ModerationActionTypeExtension on ModerationActionType {
     switch (this) {
       case ModerationActionType.banUser:
       case ModerationActionType.rejectVerification:
+      case ModerationActionType.rejectCertificate:
         return true;
       case ModerationActionType.dismissReport:
       case ModerationActionType.warnUser:
       case ModerationActionType.removeListing:
       case ModerationActionType.suspendUser:
       case ModerationActionType.approveVerification:
+      case ModerationActionType.approveCertificate:
         return false;
     }
   }
@@ -144,6 +146,8 @@ extension ModerationActionTypeExtension on ModerationActionType {
       case ModerationActionType.warnUser:
       case ModerationActionType.approveVerification:
       case ModerationActionType.rejectVerification:
+      case ModerationActionType.approveCertificate:
+      case ModerationActionType.rejectCertificate:
         return false;
     }
   }
@@ -179,6 +183,10 @@ extension ModerationActionTypeExtension on ModerationActionType {
         return 'Doğrulama onaylandı';
       case ModerationActionType.rejectVerification:
         return 'Doğrulama reddedildi';
+      case ModerationActionType.approveCertificate:
+        return 'Sertifika onaylandı';
+      case ModerationActionType.rejectCertificate:
+        return 'Sertifika reddedildi';
     }
   }
 }

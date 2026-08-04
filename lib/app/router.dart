@@ -23,15 +23,19 @@ import '../features/listings/presentation/batch_create_listing_screen.dart';
 import '../features/listings/presentation/create_listing_screen.dart';
 import '../features/listings/presentation/edit_listing_screen.dart';
 import '../features/listings/presentation/listing_detail_screen.dart';
+import '../features/listings/presentation/listing_qr_poster_screen.dart';
 import '../features/listings/presentation/my_listings_screen.dart';
 import '../features/nearby/presentation/nearby_listings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/role_selection_screen.dart';
+import '../features/admin/presentation/certificate_review_screen.dart';
+import '../features/profile/presentation/certificates_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/notification_settings_screen.dart';
 import '../features/profile/presentation/privacy_policy_screen.dart';
 import '../features/profile/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
+import '../features/profile/presentation/talent_pool_screen.dart';
 import '../features/profile/presentation/verification_request_screen.dart';
 import '../features/ratings/presentation/submit_rating_screen.dart';
 import '../features/seasonal/presentation/seasonal_calendar_screen.dart';
@@ -230,6 +234,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/listing/:id/qr-poster',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return ListingQrPosterScreen(listingId: id);
+        },
+      ),
+      GoRoute(
         path: '/chat/:conversationId/rate',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
@@ -279,6 +291,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const EditProfileScreen(),
       ),
       GoRoute(
+        path: '/profile/certificates',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CertificatesScreen(),
+      ),
+      GoRoute(
+        path: '/profile/talent-pool',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const TalentPoolScreen(),
+      ),
+      GoRoute(
         path: '/profile/verification',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const VerificationRequestScreen(),
@@ -312,6 +334,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/admin/verifications',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const VerificationReviewScreen(),
+      ),
+      GoRoute(
+        path: '/admin/certificates',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CertificateReviewScreen(),
       ),
       GoRoute(
         path: '/admin/audit-log',

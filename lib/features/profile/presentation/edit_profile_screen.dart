@@ -5,6 +5,7 @@ import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import 'verification_request_screen.dart';
+import 'widgets/intro_video_picker.dart';
 import 'widgets/profile_form.dart';
 import 'widgets/profile_photo_picker.dart';
 
@@ -36,6 +37,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   String? _position;
   String? _photoUrl;
   bool _availableImmediately = false;
+  String? _preferredExperienceLevel;
+  String? _preferredEducationLevel;
+  String? _preferredRegion;
+  String? _introVideoUrl;
 
   /// Handles the save button press
   Future<void> _handleSave() async {
@@ -72,6 +77,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         position: _position,
         userType: currentProfile?.userType ?? 'jobseeker',
         availableImmediately: _availableImmediately,
+        preferredExperienceLevel: _preferredExperienceLevel,
+        preferredEducationLevel: _preferredEducationLevel,
+        preferredRegion: _preferredRegion,
+        introVideoUrl: _introVideoUrl,
         createdAt: currentProfile?.createdAt ?? now,
         updatedAt: now,
       );
@@ -172,6 +181,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _position = profile.position;
             _photoUrl = profile.photoUrl;
             _availableImmediately = profile.availableImmediately;
+            _preferredExperienceLevel = profile.preferredExperienceLevel;
+            _preferredEducationLevel = profile.preferredEducationLevel;
+            _preferredRegion = profile.preferredRegion;
+            _introVideoUrl = profile.introVideoUrl;
           }
 
           final currentUser = authState.value;
@@ -196,7 +209,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     });
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+
+                // Intro Video Picker (SADECE iş arayanlar için)
+                if (profile?.userType != 'employer') ...[
+                  IntroVideoPicker(
+                    videoUrl: _introVideoUrl,
+                    userId: currentUser.uid,
+                    onVideoChanged: (newUrl) {
+                      setState(() {
+                        _introVideoUrl = newUrl;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                ],
 
                 // Profile Form
                 ProfileForm(
@@ -209,6 +236,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     String? hotelName,
                     String? position,
                     bool? availableImmediately,
+                    String? preferredExperienceLevel,
+                    String? preferredEducationLevel,
+                    String? preferredRegion,
                   }) {
                     setState(() {
                       _displayName = displayName;
@@ -219,6 +249,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       if (availableImmediately != null) {
                         _availableImmediately = availableImmediately;
                       }
+                      _preferredExperienceLevel = preferredExperienceLevel;
+                      _preferredEducationLevel = preferredEducationLevel;
+                      _preferredRegion = preferredRegion;
                     });
                   },
                 ),
