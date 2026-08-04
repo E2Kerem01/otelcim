@@ -44,14 +44,15 @@ class VerificationRequest {
     final data = doc.data() as Map<String, dynamic>? ?? <String, dynamic>{};
     return VerificationRequest(
       id: doc.id,
-      employerId: data['employerId'] as String? ?? '',
+      employerId: (data['employerId'] ?? data['userId']) as String? ?? '',
       hotelName: data['hotelName'] as String? ?? '',
       documentUrls: (data['documentUrls'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
       status: _parseStatus(data['status'] as String?),
-      submittedAt: (data['submittedAt'] as Timestamp?)?.toDate(),
+      submittedAt: (data['submittedAt'] as Timestamp?)?.toDate() ??
+          (data['requestedAt'] as Timestamp?)?.toDate(),
       reviewedBy: data['reviewedBy'] as String?,
       reviewedAt: (data['reviewedAt'] as Timestamp?)?.toDate(),
       rejectionReason: data['rejectionReason'] as String?,
@@ -60,10 +61,14 @@ class VerificationRequest {
 
   Map<String, dynamic> toMap() => {
         'employerId': employerId,
+        'userId': employerId,
         'hotelName': hotelName,
         'documentUrls': documentUrls,
         'status': status.name,
         'submittedAt': submittedAt != null
+            ? Timestamp.fromDate(submittedAt!)
+            : FieldValue.serverTimestamp(),
+        'requestedAt': submittedAt != null
             ? Timestamp.fromDate(submittedAt!)
             : FieldValue.serverTimestamp(),
         'reviewedBy': reviewedBy,

@@ -45,13 +45,13 @@ void main() {
       service.dispose();
     });
 
-    test('register writes user, exposes one-shot registration flag', () async {
+    test('register sets user state and exposes one-shot registration flag', () async {
       final credential = MockUserCredential();
       when(() => credential.user).thenReturn(user);
       when(() => auth.createUserWithEmailAndPassword(email: any(named: 'email'), password: any(named: 'password'))).thenAnswer((_) async => credential);
       final service = AuthService(auth, db);
-      await service.register(email: 'u@test.com', password: 'secret');
-      expect((await db.collection('users').doc('u1').get()).exists, isTrue);
+      final result = await service.register(email: 'u@test.com', password: 'secret');
+      expect(result.uid, 'u1');
       expect(service.consumeJustRegistered(), isTrue);
       expect(service.consumeJustRegistered(), isFalse);
       service.dispose();

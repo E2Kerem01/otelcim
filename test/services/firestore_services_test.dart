@@ -15,6 +15,7 @@ import 'package:otelcim/shared/constants/listing_filters.dart';
 import 'package:otelcim/shared/models/app_user.dart';
 import 'package:otelcim/shared/models/conversation.dart';
 import 'package:otelcim/shared/models/report.dart';
+import 'package:otelcim/shared/models/verification_request.dart' as shared_vr;
 import 'package:otelcim/shared/services/chat_service.dart';
 import 'package:otelcim/shared/services/listing_service.dart';
 import 'package:otelcim/shared/services/report_service.dart';
@@ -78,6 +79,39 @@ void main() {
       final submittedId = await service.submitVerificationRequest(const admin.VerificationRequest(employerId: 'e2', hotelName: 'B', documentUrls: [], status: admin.VerificationStatus.pending));
       expect(await service.getVerificationRequest(submittedId), isNotNull);
       expect(await service.watchEmployerVerifications('e2').first, hasLength(1));
+    });
+
+    test('unified canonical verification request schema works seamlessly across shared and admin services', () async {
+      final adminService = admin.VerificationService(db);
+
+      final req = shared_vr.VerificationRequest(
+        id: 'shared_v1',
+        userId: 'emp_123',
+        userEmail: 'emp@hotel.com',
+        hotelName: 'Grand Hotel',
+        hotelAddress: 'Antalya',
+        documentUrls: const ['https://doc.com/license.pdf'],
+        status: 'pending',
+        requestedAt: DateTime.now(),
+      );
+
+      await db.collection('verification_requests').doc(req.id).set(req.toFirestore());
+
+      final pendingFromAdmin = await adminService.watchPendingVerifications().first;
+      expect(pendingFromAdmin, hasLength(1));
+      expect(pendingFromAdmin.first.employerId, 'emp_123');
+      expect(pendingFromAdmin.first.hotelName, 'Grand Hotel');
+
+      final employerVerifsFromAdmin = await adminService.watchEmployerVerifications('emp_123').first;
+      expect(employerVerifsFromAdmin, hasLength(1));
+      expect(employerVerifsFromAdmin.first.id, 'shared_v1');
+
+      final rawDoc = await db.collection('verification_requests').doc('shared_v1').get();
+      expect(rawDoc.data()!['employerId'], 'emp_123');
+      expect(rawDoc.data()!['submittedAt'], isA<Timestamp>());
+      final parsedBack = shared_vr.VerificationRequest.fromFirestore(rawDoc);
+      expect(parsedBack.userId, 'emp_123');
+      expect(parsedBack.hotelName, 'Grand Hotel');
     });
 
     test('analytics returns counts and dashboard metrics', () async {

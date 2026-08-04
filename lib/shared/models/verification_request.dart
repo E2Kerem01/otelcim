@@ -57,13 +57,17 @@ class VerificationRequest {
     final data = doc.data()!;
     return VerificationRequest(
       id: doc.id,
-      userId: data['userId'] as String,
-      userEmail: data['userEmail'] as String,
-      hotelName: data['hotelName'] as String,
-      hotelAddress: data['hotelAddress'] as String,
+      userId: (data['employerId'] ?? data['userId']) as String? ?? '',
+      userEmail: data['userEmail'] as String? ?? '',
+      hotelName: data['hotelName'] as String? ?? '',
+      hotelAddress: data['hotelAddress'] as String? ?? '',
       documentUrls: List<String>.from(data['documentUrls'] as List? ?? []),
       status: data['status'] as String? ?? 'pending',
-      requestedAt: (data['requestedAt'] as Timestamp).toDate(),
+      requestedAt: data['submittedAt'] != null
+          ? (data['submittedAt'] as Timestamp).toDate()
+          : (data['requestedAt'] != null
+              ? (data['requestedAt'] as Timestamp).toDate()
+              : DateTime.now()),
       reviewedAt: data['reviewedAt'] != null
           ? (data['reviewedAt'] as Timestamp).toDate()
           : null,
@@ -75,6 +79,8 @@ class VerificationRequest {
   /// Converts this VerificationRequest to a Map for Firestore storage
   Map<String, dynamic> toFirestore() {
     return {
+      'employerId': userId,
+      'submittedAt': Timestamp.fromDate(requestedAt),
       'userId': userId,
       'userEmail': userEmail,
       'hotelName': hotelName,
