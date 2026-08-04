@@ -64,3 +64,5 @@ logs/security/
 # Environment files
 .env
 .env*.local
+.vercel
+.env*
