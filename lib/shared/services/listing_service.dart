@@ -115,7 +115,7 @@ class ListingService {
           'title': 'Chef de Partie / Aşçıbaşı Yardımcısı',
           'description':
               'İstanbul Şişli lokasyonundaki otel mutfağımız için soğuk ve sıcak büfe tecrübeli aşçı ekibi aranmaktadır. SGK + Yemek + Prim.',
-          'category': 'mutfak',
+          'category': 'mutfakAsci',
           'location': 'İstanbul, Şişli',
           'salary': '45.000 TL / Ay',
           'city': 'İstanbul',
@@ -133,7 +133,7 @@ class ListingService {
           'title': 'Servis Elemanı & Garson (Sezonluk)',
           'description':
               'Bodrum Yalıkavak otelimizde beach ve alakart restoranda çalışacak enerjik servis elemanları aranıyor. Lojman ve dolgun bahşiş imkanı.',
-          'category': 'servis',
+          'category': 'servisGarson',
           'location': 'Muğla, Bodrum',
           'salary': '30.000 TL / Ay + Tip',
           'city': 'Muğla',
@@ -151,7 +151,7 @@ class ListingService {
           'title': 'Kat Hizmetleri Görevlisi (Housekeeping)',
           'description':
               'Nevşehir Ürgüp bölgesindeki butik otelimizde oda temizliği ve düzeninden sorumlu deneyimli kat görevlileri alınacaktır.',
-          'category': 'kat_hizmetleri',
+          'category': 'katHizmetleri',
           'location': 'Nevşehir, Ürgüp',
           'salary': '28.000 TL / Ay',
           'city': 'Nevşehir',
