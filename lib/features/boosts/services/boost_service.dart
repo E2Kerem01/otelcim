@@ -99,12 +99,10 @@ class BoostService {
   Stream<List<BoostPurchase>> watchUserBoostPurchases(String userId) {
     return _db
         .collection('boost_purchases')
+        .where('userId', isEqualTo: userId)
         .snapshots()
         .map((snap) {
-      final list = snap.docs
-          .map(BoostPurchase.fromDoc)
-          .where((p) => p.userId == userId)
-          .toList();
+      final list = snap.docs.map(BoostPurchase.fromDoc).toList();
       list.sort((a, b) {
         final tA = a.purchasedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         final tB = b.purchasedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -119,11 +117,12 @@ class BoostService {
 
   /// Watch active boosts for a specific user
   Stream<List<Boost>> watchUserBoosts(String userId) {
-    return _db.collection('boosts').snapshots().map((snap) {
-      final list = snap.docs
-          .map(Boost.fromDoc)
-          .where((b) => b.userId == userId)
-          .toList();
+    return _db
+        .collection('boosts')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snap) {
+      final list = snap.docs.map(Boost.fromDoc).toList();
       list.sort((a, b) {
         final tA = a.purchasedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         final tB = b.purchasedAt ?? DateTime.fromMillisecondsSinceEpoch(0);

@@ -58,6 +58,38 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         if (displayName?.isNotEmpty == true)
                           Text(email, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                        if (profile?.userType != 'employer') ...[
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: (profile?.availableImmediately ?? false) ? Colors.green.shade50 : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: (profile?.availableImmediately ?? false) ? Colors.green.shade300 : Colors.grey.shade300,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.bolt_rounded,
+                                  size: 14,
+                                  color: (profile?.availableImmediately ?? false) ? Colors.green.shade700 : Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  (profile?.availableImmediately ?? false) ? 'Hemen Başlayabilir' : 'Müsait Değil',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: (profile?.availableImmediately ?? false) ? Colors.green.shade800 : Colors.grey.shade700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

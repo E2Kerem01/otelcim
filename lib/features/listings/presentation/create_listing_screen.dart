@@ -14,6 +14,7 @@ import '../../../shared/services/storage_service.dart';
 import '../../discovery/domain/tourism_region.dart';
 import '../../nearby/services/location_service.dart';
 import '../domain/listing_model.dart';
+import 'listing_requirement_labels.dart';
 import 'season_utils.dart';
 
 class CreateListingScreen extends ConsumerStatefulWidget {
@@ -42,6 +43,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   double? _lng;
   bool _addingLocation = false;
   EmploymentType _employmentType = EmploymentType.fullTime;
+  ExperienceLevel? _experienceLevel;
+  EducationLevel? _educationLevel;
   String? _season;
   DateTime? _contractStartDate;
   DateTime? _contractEndDate;
@@ -132,6 +135,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               minSalaryTl: int.tryParse(_minSalaryController.text.trim()),
               maxSalaryTl: int.tryParse(_maxSalaryController.text.trim()),
               employmentType: _employmentType,
+              experienceLevel: _experienceLevel?.name,
+              educationLevel: _educationLevel?.name,
               season: _season,
               contractStartDate: _contractStartDate,
               contractEndDate: _contractEndDate,
@@ -169,6 +174,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   minSalaryTl: existingListing.minSalaryTl,
                   maxSalaryTl: existingListing.maxSalaryTl,
                   employmentType: existingListing.employmentType,
+                  experienceLevel: existingListing.experienceLevel,
+                  educationLevel: existingListing.educationLevel,
                   season: existingListing.season,
                   contractStartDate: existingListing.contractStartDate,
                   contractEndDate: existingListing.contractEndDate,
@@ -551,6 +558,50 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 onChanged: (value) {
                   if (value != null) setState(() => _employmentType = value);
                 },
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.experienceLevelLabel,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<ExperienceLevel?>(
+                initialValue: _experienceLevel,
+                items: [
+                  DropdownMenuItem<ExperienceLevel?>(
+                    value: null,
+                    child: Text(l10n.optionalNotSpecified),
+                  ),
+                  ...ExperienceLevel.values.map(
+                    (level) => DropdownMenuItem<ExperienceLevel?>(
+                      value: level,
+                      child: Text(experienceLevelLabel(l10n, level)),
+                    ),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _experienceLevel = value),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.educationLevelLabel,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<EducationLevel?>(
+                initialValue: _educationLevel,
+                items: [
+                  DropdownMenuItem<EducationLevel?>(
+                    value: null,
+                    child: Text(l10n.optionalNotSpecified),
+                  ),
+                  ...EducationLevel.values.map(
+                    (level) => DropdownMenuItem<EducationLevel?>(
+                      value: level,
+                      child: Text(educationLevelLabel(l10n, level)),
+                    ),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _educationLevel = value),
               ),
               const SizedBox(height: 16),
               Text(

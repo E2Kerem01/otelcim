@@ -571,6 +571,114 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'OpenStreetMap katkıda bulunanları'**
   String get regionMapAttribution;
+
+  /// No description provided for @listingSafetyTipsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenlik İpuçları'**
+  String get listingSafetyTipsTitle;
+
+  /// No description provided for @listingSafetyTipsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşverenle görüşmeden ve iş yerini ziyaret etmeden ödeme yapmayın. Kimlik, kredi kartı, banka veya diğer hassas kişisel bilgilerinizi paylaşmayın. Şüpheli durumları bize bildirin.'**
+  String get listingSafetyTipsBody;
+
+  /// No description provided for @listingSafetyReportAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlanı Şikâyet Et'**
+  String get listingSafetyReportAction;
+
+  /// No description provided for @availableImmediatelyLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu An Boşta / Hemen Başlayabilir'**
+  String get availableImmediatelyLabel;
+
+  /// No description provided for @availableImmediatelyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşverenlerin sohbet ekranında yeşil rozet ile görünürsünüz.'**
+  String get availableImmediatelyHint;
+
+  /// No description provided for @availableImmediatelyBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hemen Başlayabilir'**
+  String get availableImmediatelyBadge;
+
+  /// No description provided for @notAvailableBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müsait Değil'**
+  String get notAvailableBadge;
+
+  /// No description provided for @experienceLevelLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneyim'**
+  String get experienceLevelLabel;
+
+  /// No description provided for @educationLevelLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğitim Durumu'**
+  String get educationLevelLabel;
+
+  /// No description provided for @optionalNotSpecified.
+  ///
+  /// In tr, this message translates to:
+  /// **'Belirtilmedi (isteğe bağlı)'**
+  String get optionalNotSpecified;
+
+  /// No description provided for @experienceNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneyim Aranmıyor'**
+  String get experienceNone;
+
+  /// No description provided for @experienceUnderOneYear.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 Yıldan Az'**
+  String get experienceUnderOneYear;
+
+  /// No description provided for @experienceOneToThreeYears.
+  ///
+  /// In tr, this message translates to:
+  /// **'1-3 Yıl'**
+  String get experienceOneToThreeYears;
+
+  /// No description provided for @experienceThreePlusYears.
+  ///
+  /// In tr, this message translates to:
+  /// **'3+ Yıl'**
+  String get experienceThreePlusYears;
+
+  /// No description provided for @educationNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğitim Şartı Yok'**
+  String get educationNone;
+
+  /// No description provided for @educationPrimary.
+  ///
+  /// In tr, this message translates to:
+  /// **'En Az İlköğretim'**
+  String get educationPrimary;
+
+  /// No description provided for @educationHighSchool.
+  ///
+  /// In tr, this message translates to:
+  /// **'En Az Lise'**
+  String get educationHighSchool;
+
+  /// No description provided for @educationUniversity.
+  ///
+  /// In tr, this message translates to:
+  /// **'En Az Üniversite'**
+  String get educationUniversity;
 }
 
 class _AppLocalizationsDelegate

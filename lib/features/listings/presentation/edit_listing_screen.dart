@@ -15,6 +15,7 @@ import '../../../shared/services/storage_service.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../discovery/domain/tourism_region.dart';
 import '../domain/listing_model.dart';
+import 'listing_requirement_labels.dart';
 import 'season_utils.dart';
 
 final _editListingProvider = FutureProvider.family<Listing?, String>((ref, id) {
@@ -45,6 +46,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   String? _selectedCity;
   String? _selectedRegion;
   EmploymentType? _employmentType;
+  ExperienceLevel? _experienceLevel;
+  EducationLevel? _educationLevel;
   String? _season;
   DateTime? _contractStartDate;
   DateTime? _contractEndDate;
@@ -74,6 +77,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     _selectedCity = listing.city;
     _selectedRegion = listing.region;
     _employmentType = listing.employmentType;
+    _experienceLevel = ExperienceLevel.fromName(listing.experienceLevel);
+    _educationLevel = EducationLevel.fromName(listing.educationLevel);
     _season = listing.season;
     _contractStartDate = listing.contractStartDate;
     _contractEndDate = listing.contractEndDate;
@@ -160,6 +165,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               minSalaryTl: int.tryParse(_minSalaryController.text.trim()),
               maxSalaryTl: int.tryParse(_maxSalaryController.text.trim()),
               employmentType: _employmentType,
+              experienceLevel: _experienceLevel?.name,
+              educationLevel: _educationLevel?.name,
               season: _season,
               contractStartDate: _contractStartDate,
               contractEndDate: _contractEndDate,
@@ -635,6 +642,52 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         .toList(),
                     onChanged: (value) =>
                         setState(() => _employmentType = value),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.experienceLevelLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<ExperienceLevel?>(
+                    initialValue: _experienceLevel,
+                    items: [
+                      DropdownMenuItem<ExperienceLevel?>(
+                        value: null,
+                        child: Text(l10n.optionalNotSpecified),
+                      ),
+                      ...ExperienceLevel.values.map(
+                        (level) => DropdownMenuItem<ExperienceLevel?>(
+                          value: level,
+                          child: Text(experienceLevelLabel(l10n, level)),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) =>
+                        setState(() => _experienceLevel = value),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.educationLevelLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<EducationLevel?>(
+                    initialValue: _educationLevel,
+                    items: [
+                      DropdownMenuItem<EducationLevel?>(
+                        value: null,
+                        child: Text(l10n.optionalNotSpecified),
+                      ),
+                      ...EducationLevel.values.map(
+                        (level) => DropdownMenuItem<EducationLevel?>(
+                          value: level,
+                          child: Text(educationLevelLabel(l10n, level)),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) =>
+                        setState(() => _educationLevel = value),
                   ),
                   const SizedBox(height: 16),
                   Text(
