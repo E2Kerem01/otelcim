@@ -35,6 +35,7 @@ extension AdminRoleExtension on AdminRole {
 class AppUser {
   final String uid;
   final String email;
+  final String? phoneNumber;
 
   /// Whether this user has admin privileges
   final bool isAdmin;
@@ -45,6 +46,7 @@ class AppUser {
   const AppUser({
     required this.uid,
     required this.email,
+    this.phoneNumber,
     this.isAdmin = false,
     this.adminRole,
   });

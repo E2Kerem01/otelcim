@@ -11,7 +11,11 @@ class AuthService extends ChangeNotifier {
   AuthService(this._auth, this._firestore) {
     _authSub = _auth.authStateChanges().listen((fbUser) {
       if (fbUser != null) {
-        _currentUser = AppUser(uid: fbUser.uid, email: fbUser.email ?? '');
+        _currentUser = AppUser(
+          uid: fbUser.uid,
+          email: fbUser.email ?? '',
+          phoneNumber: fbUser.phoneNumber,
+        );
       } else {
         _currentUser = null;
       }
@@ -38,19 +42,101 @@ class AuthService extends ChangeNotifier {
   AppUser? get currentUser {
     final fbUser = _auth.currentUser;
     if (fbUser != null) {
-      return AppUser(uid: fbUser.uid, email: fbUser.email ?? '');
+      return AppUser(
+        uid: fbUser.uid,
+        email: fbUser.email ?? '',
+        phoneNumber: fbUser.phoneNumber,
+      );
     }
     return _currentUser;
   }
 
   Stream<AppUser?> authStateChanges() => _auth.authStateChanges().map((fbUser) {
         if (fbUser == null) return null;
-        return AppUser(uid: fbUser.uid, email: fbUser.email ?? '');
+        return AppUser(
+          uid: fbUser.uid,
+          email: fbUser.email ?? '',
+          phoneNumber: fbUser.phoneNumber,
+        );
       });
 
-  Future<AppUser> signIn({required String email, required String password}) async {
+  Future<AppUser> signIn({
+    required String email,
+    required String password,
+    bool rememberMe = true,
+  }) async {
+    if (kIsWeb) {
+      await _auth.setPersistence(
+        rememberMe ? Persistence.LOCAL : Persistence.SESSION,
+      );
+    }
     final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
-    final user = AppUser(uid: credential.user!.uid, email: credential.user!.email ?? email);
+    final user = AppUser(
+      uid: credential.user!.uid,
+      email: credential.user!.email ?? email,
+      phoneNumber: credential.user!.phoneNumber,
+    );
+    _currentUser = user;
+    notifyListeners();
+    return user;
+  }
+
+  Future<String> verifyPhoneNumber({required String phoneNumber}) async {
+    final completer = Completer<String>();
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        final userCred = await _auth.signInWithCredential(credential);
+        final fbUser = userCred.user;
+        if (fbUser != null) {
+          _currentUser = AppUser(
+            uid: fbUser.uid,
+            email: fbUser.email ?? '',
+            phoneNumber: fbUser.phoneNumber,
+          );
+          notifyListeners();
+        }
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (!completer.isCompleted) {
+          completer.completeError(e);
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        if (!completer.isCompleted) {
+          completer.complete(verificationId);
+        }
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        if (!completer.isCompleted) {
+          completer.complete(verificationId);
+        }
+      },
+    );
+    return completer.future;
+  }
+
+  Future<AppUser> signInWithSmsCode({
+    required String verificationId,
+    required String smsCode,
+    bool rememberMe = true,
+  }) async {
+    if (kIsWeb) {
+      await _auth.setPersistence(
+        rememberMe ? Persistence.LOCAL : Persistence.SESSION,
+      );
+    }
+    final credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+    final userCredential = await _auth.signInWithCredential(credential);
+    final fbUser = userCredential.user!;
+    final user = AppUser(
+      uid: fbUser.uid,
+      email: fbUser.email ?? '',
+      phoneNumber: fbUser.phoneNumber,
+    );
     _currentUser = user;
     notifyListeners();
     return user;
@@ -58,7 +144,11 @@ class AuthService extends ChangeNotifier {
 
   Future<AppUser> register({required String email, required String password}) async {
     final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-    final user = AppUser(uid: credential.user!.uid, email: credential.user!.email ?? email);
+    final user = AppUser(
+      uid: credential.user!.uid,
+      email: credential.user!.email ?? email,
+      phoneNumber: credential.user!.phoneNumber,
+    );
     _currentUser = user;
     _justRegistered = true;
     notifyListeners();
@@ -89,7 +179,6 @@ class AuthService extends ChangeNotifier {
 
     // 1. Delete user profile documents
     try {
-      await _firestore.collection('users').doc(uid).delete();
       await _firestore.collection('user_profiles').doc(uid).delete();
     } catch (e) {
       debugPrint('Error deleting user profile docs: $e');
