@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/utils/auth_error_mapper.dart';
 
@@ -44,8 +45,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Kayıt Ol')),
+      appBar: AppBar(title: Text(l10n?.registerTitle ?? 'Kayıt Ol')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -58,9 +60,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'E-posta', hintText: 'ornek@eposta.com'),
+                  decoration: InputDecoration(
+                    labelText: l10n?.emailLabel ?? 'E-posta',
+                    hintText: l10n?.emailHint ?? 'ornek@eposta.com',
+                  ),
                   validator: (value) {
-                    if (value == null || !value.contains('@')) return 'Geçerli bir e-posta girin';
+                    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+                    if (value == null || value.trim().isEmpty || !emailRegex.hasMatch(value.trim())) {
+                      return l10n?.emailValidation ?? 'Geçerli bir e-posta girin';
+                    }
                     return null;
                   },
                 ),
@@ -68,9 +76,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Şifre'),
+                  decoration: InputDecoration(labelText: l10n?.passwordLabel ?? 'Şifre'),
                   validator: (value) {
-                    if (value == null || value.length < 6) return 'Şifre en az 6 karakter olmalı';
+                    if (value == null || value.length < 8 || !RegExp(r'[0-9]').hasMatch(value)) {
+                      return l10n?.passwordValidation ?? 'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
+                    }
                     return null;
                   },
                 ),

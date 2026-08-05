@@ -20,10 +20,29 @@
   "@passwordLabel": {
     "description": "Password input field label"
   },
-  "passwordValidation": "Şifre en az 6 karakter olmalı",
+  "passwordValidation": "Şifre en az 8 karakter ve en az 1 rakam içermelidir",
   "@passwordValidation": {
     "description": "Password validation error message"
   },
+  "loginWithEmail": "E-posta ile Giriş",
+  "loginWithPhone": "Telefon ile Giriş",
+  "phoneLabel": "Telefon Numarası",
+  "phoneHint": "5XX XXX XX XX",
+  "phoneValidation": "Geçerli bir telefon numarası girin (ör: 5551234567)",
+  "sendSmsCode": "Kod Gönder",
+  "smsCodeLabel": "SMS Doğrulama Kodu",
+  "smsCodeHint": "6 haneli kod",
+  "smsCodeValidation": "Lütfen 6 haneli doğrulama kodunu girin",
+  "verifySmsCode": "Doğrula ve Giriş Yap",
+  "rememberMe": "Beni Hatırla",
+  "tooManyAttempts": "Çok fazla başarısız deneme. Lütfen {seconds} saniye bekleyin.",
+  "@tooManyAttempts": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "brandTitle": "Türkiye'nin Otel & Turizm İş Platformu",
+  "brandDescription": "Otel ve turizm sektöründe hayalinizdeki işi veya personeli hızlıca bulun.",
   "loginButton": "Giriş Yap",
   "@loginButton": {
     "description": "Login button text"

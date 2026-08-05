@@ -5,7 +5,26 @@
   "emailHint": "example@email.com",
   "emailValidation": "Enter a valid email",
   "passwordLabel": "Password",
-  "passwordValidation": "Password must be at least 6 characters",
+  "passwordValidation": "Password must be at least 8 characters and include at least 1 digit",
+  "loginWithEmail": "Sign in with Email",
+  "loginWithPhone": "Sign in with Phone",
+  "phoneLabel": "Phone Number",
+  "phoneHint": "5XX XXX XX XX",
+  "phoneValidation": "Enter a valid phone number (e.g. 5551234567)",
+  "sendSmsCode": "Send Code",
+  "smsCodeLabel": "SMS Verification Code",
+  "smsCodeHint": "6-digit code",
+  "smsCodeValidation": "Please enter 6-digit verification code",
+  "verifySmsCode": "Verify & Sign In",
+  "rememberMe": "Remember Me",
+  "tooManyAttempts": "Too many failed attempts. Please wait {seconds} seconds.",
+  "@tooManyAttempts": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "brandTitle": "Turkey's Hotel & Tourism Job Platform",
+  "brandDescription": "Find your dream job or staff in the hotel and tourism sector quickly.",
   "loginButton": "Sign In",
   "registerButton": "Register",
   "registerTitle": "Register",

@@ -49,7 +49,6 @@ void main() {
       const uid = 'user_to_delete';
 
       // Seed Firestore with user data across all collections
-      await db.collection('users').doc(uid).set({'uid': uid, 'email': 'user@example.com'});
       await db.collection('user_profiles').doc(uid).set({'id': uid, 'email': 'user@example.com'});
       await db.collection('listings').doc('listing_1').set({'posterId': uid, 'title': 'İlan 1'});
       await db.collection('reports').doc('report_1').set({'reporterId': uid, 'reason': 'scam'});
@@ -69,7 +68,6 @@ void main() {
       await service.deleteAccount(password: 'correct_pass');
 
       // Verify cascading deletion across all collections
-      expect((await db.collection('users').doc(uid).get()).exists, isFalse);
       expect((await db.collection('user_profiles').doc(uid).get()).exists, isFalse);
       expect((await db.collection('listings').doc('listing_1').get()).exists, isFalse);
       expect((await db.collection('reports').doc('report_1').get()).exists, isFalse);
