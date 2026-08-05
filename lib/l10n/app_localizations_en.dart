@@ -24,7 +24,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordLabel => 'Password';
 
   @override
-  String get passwordValidation => 'Password must be at least 6 characters';
+  String get passwordValidation =>
+      'Password must be at least 8 characters and include at least 1 digit';
+
+  @override
+  String get loginWithEmail => 'Sign in with Email';
+
+  @override
+  String get loginWithPhone => 'Sign in with Phone';
+
+  @override
+  String get phoneLabel => 'Phone Number';
+
+  @override
+  String get phoneHint => '5XX XXX XX XX';
+
+  @override
+  String get phoneValidation => 'Enter a valid phone number (e.g. 5551234567)';
+
+  @override
+  String get sendSmsCode => 'Send Code';
+
+  @override
+  String get smsCodeLabel => 'SMS Verification Code';
+
+  @override
+  String get smsCodeHint => '6-digit code';
+
+  @override
+  String get smsCodeValidation => 'Please enter 6-digit verification code';
+
+  @override
+  String get verifySmsCode => 'Verify & Sign In';
+
+  @override
+  String get rememberMe => 'Remember Me';
+
+  @override
+  String tooManyAttempts(int seconds) {
+    return 'Too many failed attempts. Please wait $seconds seconds.';
+  }
+
+  @override
+  String get brandTitle => 'Turkey\'s Hotel & Tourism Job Platform';
+
+  @override
+  String get brandDescription =>
+      'Find your dream job or staff in the hotel and tourism sector quickly.';
 
   @override
   String get loginButton => 'Sign In';

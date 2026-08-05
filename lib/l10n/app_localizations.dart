@@ -131,8 +131,92 @@ abstract class AppLocalizations {
   /// Password validation error message
   ///
   /// In tr, this message translates to:
-  /// **'Şifre en az 6 karakter olmalı'**
+  /// **'Şifre en az 8 karakter ve en az 1 rakam içermelidir'**
   String get passwordValidation;
+
+  /// No description provided for @loginWithEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta ile Giriş'**
+  String get loginWithEmail;
+
+  /// No description provided for @loginWithPhone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefon ile Giriş'**
+  String get loginWithPhone;
+
+  /// No description provided for @phoneLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefon Numarası'**
+  String get phoneLabel;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'5XX XXX XX XX'**
+  String get phoneHint;
+
+  /// No description provided for @phoneValidation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir telefon numarası girin (ör: 5551234567)'**
+  String get phoneValidation;
+
+  /// No description provided for @sendSmsCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod Gönder'**
+  String get sendSmsCode;
+
+  /// No description provided for @smsCodeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'SMS Doğrulama Kodu'**
+  String get smsCodeLabel;
+
+  /// No description provided for @smsCodeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'6 haneli kod'**
+  String get smsCodeHint;
+
+  /// No description provided for @smsCodeValidation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen 6 haneli doğrulama kodunu girin'**
+  String get smsCodeValidation;
+
+  /// No description provided for @verifySmsCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrula ve Giriş Yap'**
+  String get verifySmsCode;
+
+  /// No description provided for @rememberMe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beni Hatırla'**
+  String get rememberMe;
+
+  /// No description provided for @tooManyAttempts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla başarısız deneme. Lütfen {seconds} saniye bekleyin.'**
+  String tooManyAttempts(int seconds);
+
+  /// No description provided for @brandTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Türkiye\'nin Otel & Turizm İş Platformu'**
+  String get brandTitle;
+
+  /// No description provided for @brandDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Otel ve turizm sektöründe hayalinizdeki işi veya personeli hızlıca bulun.'**
+  String get brandDescription;
 
   /// Login button text
   ///

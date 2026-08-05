@@ -24,7 +24,54 @@ class AppLocalizationsTr extends AppLocalizations {
   String get passwordLabel => 'Şifre';
 
   @override
-  String get passwordValidation => 'Şifre en az 6 karakter olmalı';
+  String get passwordValidation =>
+      'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
+
+  @override
+  String get loginWithEmail => 'E-posta ile Giriş';
+
+  @override
+  String get loginWithPhone => 'Telefon ile Giriş';
+
+  @override
+  String get phoneLabel => 'Telefon Numarası';
+
+  @override
+  String get phoneHint => '5XX XXX XX XX';
+
+  @override
+  String get phoneValidation =>
+      'Geçerli bir telefon numarası girin (ör: 5551234567)';
+
+  @override
+  String get sendSmsCode => 'Kod Gönder';
+
+  @override
+  String get smsCodeLabel => 'SMS Doğrulama Kodu';
+
+  @override
+  String get smsCodeHint => '6 haneli kod';
+
+  @override
+  String get smsCodeValidation => 'Lütfen 6 haneli doğrulama kodunu girin';
+
+  @override
+  String get verifySmsCode => 'Doğrula ve Giriş Yap';
+
+  @override
+  String get rememberMe => 'Beni Hatırla';
+
+  @override
+  String tooManyAttempts(int seconds) {
+    return 'Çok fazla başarısız deneme. Lütfen $seconds saniye bekleyin.';
+  }
+
+  @override
+  String get brandTitle => 'Türkiye\'nin Otel & Turizm İş Platformu';
+
+  @override
+  String get brandDescription =>
+      'Otel ve turizm sektöründe hayalinizdeki işi veya personeli hızlıca bulun.';
 
   @override
   String get loginButton => 'Giriş Yap';
