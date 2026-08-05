@@ -178,6 +178,8 @@
   "housingHasWifi": "Wi-Fi",
   "housingMealsIncluded": "Meals included per day",
   "housingPhotos": "Accommodation photos",
+  "staffShuttleRouteLabel": "Staff Shuttle Route",
+  "staffShuttleRouteHint": "E.g. Downtown - Central Station - Hotel",
   "housingAddPhoto": "Add photo",
   "urgentListingLabel": "Urgent Hiring",
   "urgentListingHint": "Users in the region receive an instant notification.",

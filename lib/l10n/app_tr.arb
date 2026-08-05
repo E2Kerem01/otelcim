@@ -315,6 +315,8 @@
   "housingHasWifi": "Wi-Fi",
   "housingMealsIncluded": "Günlük dahil öğün",
   "housingPhotos": "Lojman fotoğrafları",
+  "staffShuttleRouteLabel": "Personel Servisi Güzergahı",
+  "staffShuttleRouteHint": "Örn. Kemer Merkez - Göynük - Otel",
   "housingAddPhoto": "Fotoğraf ekle",
   "urgentListingLabel": "Acil İhtiyaç",
   "urgentListingHint": "Bölgedeki kullanıcılara anlık bildirim gönderilir.",

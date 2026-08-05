@@ -34,6 +34,7 @@ class Listing {
   final bool? housingHasWifi;
   final int? housingMealsIncluded;
   final List<String> housingImages;
+  final String? staffShuttleRoute;
   final ListingStatus status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -74,6 +75,7 @@ class Listing {
     this.housingHasWifi,
     this.housingMealsIncluded,
     this.housingImages = const [],
+    this.staffShuttleRoute,
     this.status = ListingStatus.active,
     this.createdAt,
     this.updatedAt,
@@ -130,6 +132,7 @@ class Listing {
               ?.whereType<String>()
               .toList() ??
           const [],
+      staffShuttleRoute: data['staffShuttleRoute'] as String?,
       status: (data['status'] as String? ?? 'active') == 'closed'
           ? ListingStatus.closed
           : ListingStatus.active,
@@ -177,6 +180,7 @@ class Listing {
     'housingHasWifi': housingHasWifi,
     'housingMealsIncluded': housingMealsIncluded,
     'housingImages': housingImages,
+    'staffShuttleRoute': staffShuttleRoute,
     'status': status == ListingStatus.closed ? 'closed' : 'active',
     'createdAt': FieldValue.serverTimestamp(),
     'updatedAt': FieldValue.serverTimestamp(),
