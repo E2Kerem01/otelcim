@@ -17,6 +17,7 @@ import 'certificates_screen.dart';
 import 'edit_profile_screen.dart';
 import 'notification_settings_screen.dart';
 import 'privacy_settings_screen.dart';
+import '../../referrals/presentation/invite_friends_screen.dart';
 import 'talent_pool_screen.dart';
 
 /// Screen for user profile management.
@@ -200,6 +201,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 icon: Icons.security_rounded,
                                 title: 'Gizlilik ve Veri Ayarları',
                                 subtitle: 'KVKK ve hesap ayarları',
+                              ),
+                              _buildSidebarItem(
+                                id: 'invite',
+                                icon: Icons.card_giftcard_rounded,
+                                title: 'Arkadaşını Davet Et',
+                                subtitle: 'Referans kodu ve ücretsiz boost',
                               ),
                             ],
                           ),
@@ -518,6 +525,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               const SizedBox(height: 12),
               Card(
+                child: ListTile(
+                  leading: Icon(Icons.card_giftcard_rounded, color: Theme.of(context).primaryColor),
+                  title: const Text('Arkadaşını Davet Et'),
+                  subtitle: const Text('Referans kodu ve ücretsiz boost'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => context.push('/profile/invite'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -706,6 +723,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         return const NotificationSettingsScreen();
       case 'privacy':
         return const PrivacySettingsScreen();
+      case 'invite':
+        return const InviteFriendsScreen();
       case 'overview':
       default:
         return _buildOverviewDetail(
@@ -987,6 +1006,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'Gizlilik ve Veri',
                 subtitle: 'Güvenlik ve KVKK',
                 onTap: () => setState(() => _selectedSection = 'privacy'),
+              ),
+              _buildShortcutCard(
+                icon: Icons.card_giftcard_rounded,
+                color: Colors.pink,
+                title: 'Arkadaşını Davet Et',
+                subtitle: 'Referans kodu ve ücretsiz boost',
+                onTap: () => setState(() => _selectedSection = 'invite'),
               ),
             ],
           ),
