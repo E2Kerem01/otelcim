@@ -31,6 +31,14 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _selectedSection = 'overview';
 
+  Future<void> _handleLogout() async {
+    await ref.read(authServiceProvider).signOut();
+    ref.invalidate(currentUserProfileProvider);
+    if (mounted) {
+      context.go('/login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authStateProvider).value;
@@ -238,7 +246,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               ),
                               const SizedBox(height: 10),
                               OutlinedButton.icon(
-                                onPressed: () => ref.read(authServiceProvider).signOut(),
+                                onPressed: _handleLogout,
                                 icon: const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
                                 label: const Text('Çıkış Yap', style: TextStyle(color: Colors.red, fontSize: 13)),
                                 style: OutlinedButton.styleFrom(
@@ -557,7 +565,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               const SizedBox(height: 20),
               OutlinedButton.icon(
-                onPressed: () => ref.read(authServiceProvider).signOut(),
+                onPressed: _handleLogout,
                 icon: const Icon(Icons.logout_rounded, color: Colors.red),
                 label: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
               ),
