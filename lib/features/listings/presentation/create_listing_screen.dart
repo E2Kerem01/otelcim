@@ -34,6 +34,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   final _maxSalaryController = TextEditingController();
   final _locationController = TextEditingController();
   final _contactController = TextEditingController();
+  final _staffShuttleRouteController = TextEditingController();
   final List<XFile> _selectedImageFiles = [];
   final List<XFile> _housingImageFiles = [];
   String? _housingRoomType;
@@ -63,6 +64,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     _maxSalaryController.dispose();
     _locationController.dispose();
     _contactController.dispose();
+    _staffShuttleRouteController.dispose();
     super.dispose();
   }
 
@@ -158,6 +160,10 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               housingHasAc: _housingRoomType == null ? null : _housingHasAc,
               housingHasWifi: _housingRoomType == null ? null : _housingHasWifi,
               housingMealsIncluded: _housingMealsIncluded,
+              staffShuttleRoute:
+                  _staffShuttleRouteController.text.trim().isEmpty
+                  ? null
+                  : _staffShuttleRouteController.text.trim(),
             ),
           );
 
@@ -212,6 +218,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   housingHasWifi: existingListing.housingHasWifi,
                   housingMealsIncluded: existingListing.housingMealsIncluded,
                   housingImages: housingImageUrls,
+                  staffShuttleRoute: existingListing.staffShuttleRoute,
                   status: existingListing.status,
                   createdAt: existingListing.createdAt,
                 ),
@@ -755,6 +762,15 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                         : null,
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _staffShuttleRouteController,
+                decoration: InputDecoration(
+                  labelText: l10n.staffShuttleRouteLabel,
+                  hintText: l10n.staffShuttleRouteHint,
+                ),
+                maxLines: 2,
               ),
               const SizedBox(height: 16),
               const Text(

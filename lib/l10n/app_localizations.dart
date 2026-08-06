@@ -1034,6 +1034,18 @@ abstract class AppLocalizations {
   /// **'Lojman fotoğrafları'**
   String get housingPhotos;
 
+  /// No description provided for @staffShuttleRouteLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Personel Servisi Güzergahı'**
+  String get staffShuttleRouteLabel;
+
+  /// No description provided for @staffShuttleRouteHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. Kemer Merkez - Göynük - Otel'**
+  String get staffShuttleRouteHint;
+
   /// No description provided for @housingAddPhoto.
   ///
   /// In tr, this message translates to:

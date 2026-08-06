@@ -63,7 +63,8 @@ class ListingService {
                   (l) =>
                       l.title.toLowerCase().contains(q) ||
                       l.location.toLowerCase().contains(q) ||
-                      l.description.toLowerCase().contains(q),
+                      l.description.toLowerCase().contains(q) ||
+                      l.staffShuttleRoute?.toLowerCase().contains(q) == true,
                 )
                 .toList();
           }
@@ -330,7 +331,8 @@ class ListingService {
               (l) =>
                   l.title.toLowerCase().contains(q) ||
                   l.location.toLowerCase().contains(q) ||
-                  l.description.toLowerCase().contains(q),
+                  l.description.toLowerCase().contains(q) ||
+                  l.staffShuttleRoute?.toLowerCase().contains(q) == true,
             )
             .toList();
       }

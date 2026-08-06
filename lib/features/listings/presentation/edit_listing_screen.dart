@@ -39,6 +39,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   final _maxSalaryController = TextEditingController();
   final _locationController = TextEditingController();
   final _contactController = TextEditingController();
+  final _staffShuttleRouteController = TextEditingController();
   ListingCategory? _selectedCategory;
   bool _initialized = false;
   bool _submitting = false;
@@ -68,6 +69,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     _maxSalaryController.dispose();
     _locationController.dispose();
     _contactController.dispose();
+    _staffShuttleRouteController.dispose();
     super.dispose();
   }
 
@@ -89,6 +91,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     _contractEndDate = listing.contractEndDate;
     _locationController.text = listing.location;
     _contactController.text = listing.contactInfo;
+    _staffShuttleRouteController.text = listing.staffShuttleRoute ?? '';
     _existingImageUrls = List<String>.from(listing.images);
     _existingHousingImageUrls = List<String>.from(listing.housingImages);
     _housingRoomType = listing.housingRoomType;
@@ -202,6 +205,10 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
               housingHasWifi: _housingRoomType == null ? null : _housingHasWifi,
               housingMealsIncluded: _housingMealsIncluded,
               housingImages: housingImages,
+              staffShuttleRoute:
+                  _staffShuttleRouteController.text.trim().isEmpty
+                  ? null
+                  : _staffShuttleRouteController.text.trim(),
               status: original.status,
               createdAt: original.createdAt,
               updatedAt: original.updatedAt,
@@ -838,6 +845,15 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                             : null,
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _staffShuttleRouteController,
+                    decoration: InputDecoration(
+                      labelText: l10n.staffShuttleRouteLabel,
+                      hintText: l10n.staffShuttleRouteHint,
+                    ),
+                    maxLines: 2,
                   ),
                   const SizedBox(height: 16),
                   const Text(

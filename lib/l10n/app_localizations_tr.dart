@@ -505,6 +505,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get housingPhotos => 'Lojman fotoğrafları';
 
   @override
+  String get staffShuttleRouteLabel => 'Personel Servisi Güzergahı';
+
+  @override
+  String get staffShuttleRouteHint => 'Örn. Kemer Merkez - Göynük - Otel';
+
+  @override
   String get housingAddPhoto => 'Fotoğraf ekle';
 
   @override
