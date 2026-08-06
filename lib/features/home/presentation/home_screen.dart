@@ -32,6 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   String _searchQuery = '';
+  int _columnCount = 1;
   _AdvancedFilters _filters = const _AdvancedFilters();
   PaginationParams _currentParams = (
     category: null,
@@ -184,16 +185,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         child: TextField(
                           controller: _searchController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'İş ilanı ara...',
-                            prefixIcon: Icon(
+                            prefixIcon: const Icon(
                               Icons.search_rounded,
                               color: Colors.grey,
                             ),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(
+                                      Icons.clear_rounded,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      setState(() => _searchQuery = '');
+                                    },
+                                  )
+                                : null,
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           onChanged: (value) =>
                               setState(() => _searchQuery = value.trim()),
@@ -362,30 +375,125 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                child: Text(
-                  '${paginationState.listings.length} sonuç',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                child: Row(
+                  children: [
+                    Text(
+                      '${paginationState.listings.length} sonuç',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const Spacer(),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [1, 2, 3, 4].map((cols) {
+                          final isSelected = _columnCount == cols;
+                          return Tooltip(
+                            message: '$cols Sütun',
+                            child: InkWell(
+                              key: Key('grid_col_$cols'),
+                              onTap: () => setState(() => _columnCount = cols),
+                              borderRadius: BorderRadius.circular(6),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      cols == 1
+                                          ? Icons.view_list_rounded
+                                          : cols == 2
+                                              ? Icons.grid_view_rounded
+                                              : cols == 3
+                                                  ? Icons.grid_on_rounded
+                                                  : Icons.apps_rounded,
+                                      size: 16,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.grey.shade700,
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      '$cols',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.grey.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
             if (paginationState.isLoading && paginationState.listings.isEmpty)
-              const _ListingsSkeletonSliver()
+              _ListingsSkeletonSliver(columnCount: _columnCount)
             else if (paginationState.listings.isEmpty)
               _buildEmptyState(context)
             else ...[
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _ListingCard(
-                        listing: paginationState.listings[index],
+                sliver: _columnCount == 1
+                    ? SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _ListingCard(
+                              listing: paginationState.listings[index],
+                              columnCount: 1,
+                            ),
+                          ),
+                          childCount: paginationState.listings.length,
+                        ),
+                      )
+                    : SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: _columnCount,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: _columnCount == 2
+                              ? 0.78
+                              : _columnCount == 3
+                                  ? 0.68
+                                  : 0.60,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => _ListingCard(
+                            listing: paginationState.listings[index],
+                            columnCount: _columnCount,
+                          ),
+                          childCount: paginationState.listings.length,
+                        ),
                       ),
-                    ),
-                    childCount: paginationState.listings.length,
-                  ),
-                ),
               ),
               if (paginationState.isLoading)
                 const SliverToBoxAdapter(
@@ -817,19 +925,42 @@ class _FilterSheetState extends State<_FilterSheet> {
 
 /// Skeleton placeholder cards shown while the initial page of listings loads.
 class _ListingsSkeletonSliver extends StatelessWidget {
-  const _ListingsSkeletonSliver();
+  const _ListingsSkeletonSliver({this.columnCount = 1});
+
+  final int columnCount;
 
   @override
   Widget build(BuildContext context) {
+    if (columnCount == 1) {
+      return SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _SkeletonCard(columnCount: 1),
+            ),
+            childCount: 4,
+          ),
+        ),
+      );
+    }
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      sliver: SliverList(
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: columnCount,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: columnCount == 2
+              ? 0.78
+              : columnCount == 3
+                  ? 0.68
+                  : 0.60,
+        ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _SkeletonCard(),
-          ),
-          childCount: 4,
+          (context, index) => _SkeletonCard(columnCount: columnCount),
+          childCount: columnCount * 2,
         ),
       ),
     );
@@ -837,6 +968,9 @@ class _ListingsSkeletonSliver extends StatelessWidget {
 }
 
 class _SkeletonCard extends StatefulWidget {
+  const _SkeletonCard({this.columnCount = 1});
+  final int columnCount;
+
   @override
   State<_SkeletonCard> createState() => _SkeletonCardState();
 }
@@ -856,6 +990,7 @@ class _SkeletonCardState extends State<_SkeletonCard>
 
   @override
   Widget build(BuildContext context) {
+    final isGrid = widget.columnCount > 1;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -864,34 +999,84 @@ class _SkeletonCardState extends State<_SkeletonCard>
       },
       child: Card(
         clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(width: 80, height: 16, color: Colors.grey.shade300),
-              const SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                height: 14,
-                color: Colors.grey.shade300,
+        child: isGrid
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: Container(color: Colors.grey.shade300),
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            width: 60,
+                            height: 12,
+                            color: Colors.grey.shade300,
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: 12,
+                            color: Colors.grey.shade300,
+                          ),
+                          Container(
+                            width: 80,
+                            height: 10,
+                            color: Colors.grey.shade300,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 16,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      height: 14,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 160,
+                      height: 12,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 100,
+                      height: 14,
+                      color: Colors.grey.shade300,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              Container(width: 160, height: 12, color: Colors.grey.shade300),
-              const SizedBox(height: 8),
-              Container(width: 100, height: 14, color: Colors.grey.shade300),
-            ],
-          ),
-        ),
       ),
     );
   }
 }
 
 class _ListingCard extends ConsumerWidget {
-  const _ListingCard({required this.listing});
+  const _ListingCard({required this.listing, this.columnCount = 1});
 
   final Listing listing;
+  final int columnCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -910,6 +1095,231 @@ class _ListingCard extends ConsumerWidget {
     final matchScore = profile?.userType == 'jobseeker'
         ? calculateMatchScore(listing: listing, profile: profile!)
         : null;
+
+    final isGrid = columnCount > 1;
+
+    if (isGrid) {
+      return Card(
+        clipBehavior: Clip.antiAlias,
+        elevation: isBoostedActive ? 3 : 1,
+        shape: isBoostedActive
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.amber.shade400, width: 1.5),
+              )
+            : null,
+        child: InkWell(
+          onTap: () => context.push('/listing/${listing.id}'),
+          child: Container(
+            decoration: isBoostedActive
+                ? BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.amber.shade50.withValues(alpha: 0.35),
+                        Colors.white,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  )
+                : null,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: listing.images.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: listing.images.first,
+                              fit: BoxFit.cover,
+                              placeholder: (_, __) => Container(
+                                color: Colors.grey.shade200,
+                              ),
+                              errorWidget: (_, __, ___) => Container(
+                                color: Colors.grey.shade100,
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  size: 24,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            )
+                          : Container(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 0.08),
+                              child: Center(
+                                child: Icon(
+                                  Icons.hotel_rounded,
+                                  size: 32,
+                                  color: Theme.of(
+                                    context,
+                                  ).primaryColor.withValues(alpha: 0.4),
+                                ),
+                              ),
+                            ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: CircleAvatar(
+                        radius: 14,
+                        backgroundColor: Colors.white.withValues(alpha: 0.85),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          iconSize: 16,
+                          tooltip: isFavorite
+                              ? 'Favorilerden çıkar'
+                              : 'Favorilere ekle',
+                          onPressed: () {
+                            if (uid == null) {
+                              context.push('/login');
+                              return;
+                            }
+                            ref
+                                .read(favoriteServiceProvider)
+                                .toggleFavorite(uid, listing.id);
+                          },
+                          icon: Icon(
+                            isFavorite
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color: isFavorite
+                                ? Colors.red
+                                : Colors.grey.shade700,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (isBoostedActive)
+                      const Positioned(
+                        top: 4,
+                        left: 4,
+                        child: BoostBadge(isCompact: true),
+                      ),
+                  ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(
+                                        context,
+                                      ).primaryColor.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      listingCategoryLabel(listing.category),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                if (listing.isUrgent) ...[
+                                  const SizedBox(width: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.deepOrange.shade700,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      AppLocalizations.of(context)!.urgentBadge,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              listing.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: columnCount >= 3 ? 12 : 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  size: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 2),
+                                Expanded(
+                                  child: Text(
+                                    listing.location,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              listing.salary,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: columnCount >= 3 ? 12 : 13,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Card(
       clipBehavior: Clip.antiAlias,

@@ -261,496 +261,598 @@ ${listing.contactInfo}
           final experience = ExperienceLevel.fromName(listing.experienceLevel);
           final education = EducationLevel.fromName(listing.educationLevel);
           final l10n = AppLocalizations.of(context)!;
+          final hasHousing = listing.housingRoomType != null ||
+              listing.housingHasAc != null ||
+              listing.housingHasWifi != null ||
+              listing.housingMealsIncluded != null ||
+              listing.housingImages.isNotEmpty;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ListingImageGallery(listing: listing),
-                Row(
-                  children: [
-                    Chip(
-                      label: Text(listingCategoryLabel(listing.category)),
-                      backgroundColor: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: 0.1),
-                      side: BorderSide.none,
-                    ),
-                    if (isBoostedActive) ...[
-                      const SizedBox(width: 8),
-                      const BoostBadge(isCompact: false),
-                    ],
-                    const Spacer(),
-                    if (listing.createdAt != null)
-                      Text(
-                        '${listing.createdAt!.day}.${listing.createdAt!.month}.${listing.createdAt!.year}',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 13,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  listing.title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      color: Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      listing.location,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).primaryColor.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Maaş',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        listing.salary,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (experience != null || education != null) ...[
-                  const SizedBox(height: 12),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          if (experience != null)
-                            _RequirementRow(
-                              icon: Icons.work_history_outlined,
-                              label: l10n.experienceLevelLabel,
-                              value: experienceLevelLabel(l10n, experience),
-                            ),
-                          if (experience != null && education != null)
-                            const Divider(height: 24),
-                          if (education != null)
-                            _RequirementRow(
-                              icon: Icons.school_outlined,
-                              label: l10n.educationLevelLabel,
-                              value: educationLevelLabel(l10n, education),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 24),
-                const Text(
-                  'İlan Açıklaması',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  listing.description,
-                  style: const TextStyle(fontSize: 14, height: 1.5),
-                ),
-                if (listing.housingRoomType != null ||
-                    listing.housingHasAc != null ||
-                    listing.housingHasWifi != null ||
-                    listing.housingMealsIncluded != null ||
-                    listing.housingImages.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.home_work_outlined),
-                              const SizedBox(width: 8),
-                              Text(
-                                AppLocalizations.of(context)!.housingTitle,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              if (listing.housingRoomType != null)
-                                Chip(
-                                  avatar: const Icon(
-                                    Icons.bed_outlined,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    listing.housingRoomType == 'single'
-                                        ? AppLocalizations.of(
-                                            context,
-                                          )!.housingSingleRoom
-                                        : AppLocalizations.of(
-                                            context,
-                                          )!.housingSharedRoom,
-                                  ),
-                                ),
-                              if (listing.housingHasAc == true)
-                                Chip(
-                                  avatar: const Icon(
-                                    Icons.ac_unit_outlined,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    AppLocalizations.of(context)!.housingHasAc,
-                                  ),
-                                ),
-                              if (listing.housingHasWifi == true)
-                                Chip(
-                                  avatar: const Icon(Icons.wifi, size: 18),
-                                  label: Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.housingHasWifi,
-                                  ),
-                                ),
-                              if (listing.housingMealsIncluded != null)
-                                Chip(
-                                  avatar: const Icon(
-                                    Icons.restaurant_outlined,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    '${AppLocalizations.of(context)!.housingMealsIncluded}: '
-                                    '${listing.housingMealsIncluded}',
-                                  ),
-                                ),
-                            ],
-                          ),
-                          if (listing.housingImages.isNotEmpty) ...[
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              height: 120,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: listing.housingImages.length,
-                                separatorBuilder: (_, _) =>
-                                    const SizedBox(width: 8),
-                                itemBuilder: (context, index) => ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CachedNetworkImage(
-                                    imageUrl: listing.housingImages[index],
-                                    width: 160,
-                                    fit: BoxFit.cover,
-                                    errorWidget: (_, _, _) =>
-                                        const Icon(Icons.broken_image),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 24),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: Theme.of(context).primaryColor,
-                          child: Text(
-                            listing.posterName.isNotEmpty
-                                ? listing.posterName[0].toUpperCase()
-                                : '?',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                listing.posterName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'İlan Sahibi',
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              if (myUid == null)
-                                InkWell(
-                                  onTap: () => context.push('/login'),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.lock_outline,
-                                        size: 14,
-                                        color: Colors.orange.shade800,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          'İletişim bilgisini görmek için giriş yapın',
-                                          style: TextStyle(
-                                            color: Colors.orange.shade800,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              else if (myUid == listing.posterId ||
-                                  _revealContactInfo)
-                                Text(
-                                  listing.contactInfo,
-                                  style: TextStyle(
-                                    color: Colors.grey.shade700,
-                                    fontSize: 13,
-                                  ),
-                                )
-                              else
-                                InkWell(
-                                  onTap: () =>
-                                      setState(() => _revealContactInfo = true),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.visibility_outlined,
-                                        size: 14,
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'İletişim Bilgisini Göster',
-                                        style: TextStyle(
-                                          color: Theme.of(context).primaryColor,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Card(
-                  color: Theme.of(context).colorScheme.tertiaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 800;
+
+              if (isWide) {
+                return Center(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 1140),
+                    padding: const EdgeInsets.all(24),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.shield_outlined,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onTertiaryContainer,
-                        ),
-                        const SizedBox(width: 12),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!.listingSafetyTipsTitle,
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onTertiaryContainer,
-                                      fontWeight: FontWeight.bold,
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _ListingImageGallery(listing: listing),
+                                  _buildHeaderInfo(context, listing, isBoostedActive),
+                                  const SizedBox(height: 16),
+                                  if (experience != null || education != null) ...[
+                                    _buildRequirementsCard(
+                                      context,
+                                      experience,
+                                      education,
+                                      l10n,
                                     ),
+                                    const SizedBox(height: 24),
+                                  ],
+                                  _buildDescriptionSection(listing),
+                                  if (hasHousing) ...[
+                                    const SizedBox(height: 20),
+                                    _buildHousingCard(context, listing, l10n),
+                                  ],
+                                  const SizedBox(height: 24),
+                                  _buildPosterCard(context, listing, myUid),
+                                  const SizedBox(height: 12),
+                                  _buildSafetyTipsCard(context, listing, l10n),
+                                  const SizedBox(height: 40),
+                                ],
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!.listingSafetyTipsBody,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onTertiaryContainer,
-                                      height: 1.4,
-                                    ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextButton.icon(
-                                onPressed: () => _showReportDialog(listing),
-                                icon: const Icon(Icons.flag_outlined),
-                                label: Text(
-                                  AppLocalizations.of(
-                                    context,
-                                  )!.listingSafetyReportAction,
-                                ),
-                              ),
-                            ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 360,
+                          child: _RightStickyActionCard(
+                            listing: listing,
+                            myUid: myUid,
+                            startingChat: _startingChat,
+                            revealContactInfo: _revealContactInfo,
+                            onMessageOwner: () => _messageOwner(listing),
+                            onOpenWhatsApp: () => _openWhatsApp(listing),
+                            onRevealContact: () =>
+                                setState(() => _revealContactInfo = true),
+                            onReport: () => _showReportDialog(listing),
                           ),
                         ),
                       ],
                     ),
                   ),
+                );
+              }
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _ListingImageGallery(listing: listing),
+                    _buildHeaderInfo(context, listing, isBoostedActive),
+                    const SizedBox(height: 16),
+                    _buildSalaryCard(context, listing),
+                    if (experience != null || education != null) ...[
+                      const SizedBox(height: 12),
+                      _buildRequirementsCard(
+                        context,
+                        experience,
+                        education,
+                        l10n,
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    _buildDescriptionSection(listing),
+                    if (hasHousing) ...[
+                      const SizedBox(height: 20),
+                      _buildHousingCard(context, listing, l10n),
+                    ],
+                    const SizedBox(height: 24),
+                    _buildPosterCard(context, listing, myUid),
+                    const SizedBox(height: 12),
+                    _buildSafetyTipsCard(context, listing, l10n),
+                    const SizedBox(height: 80),
+                  ],
                 ),
-                const SizedBox(height: 80),
-              ],
-            ),
+              );
+            },
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Hata: $error')),
       ),
-      bottomNavigationBar: listingAsync.maybeWhen(
-        data: (listing) {
-          if (listing == null) return null;
-          final isOwner = myUid == listing.posterId;
-          final l10n = AppLocalizations.of(context)!;
+      bottomNavigationBar: MediaQuery.sizeOf(context).width >= 800
+          ? null
+          : listingAsync.maybeWhen(
+              data: (listing) {
+                if (listing == null) return null;
+                final isOwner = myUid == listing.posterId;
+                final l10n = AppLocalizations.of(context)!;
 
-          if (isOwner) {
-            final isBoostedActive = BoostBadge.isBoostActive(listing);
-            return Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, -2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () =>
-                          context.push('/listing/${listing.id}/boost'),
-                      icon: const Icon(Icons.rocket_launch_rounded),
-                      label: Text(
-                        isBoostedActive ? 'Öne Çıkarma' : 'İlanı Öne Çıkar',
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber.shade700,
-                        foregroundColor: Colors.white,
-                      ),
+                if (isOwner) {
+                  final isBoostedActive = BoostBadge.isBoostActive(listing);
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, -2),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () =>
-                          context.push('/listing/${listing.id}/qr-poster'),
-                      icon: const Icon(Icons.qr_code_2_rounded),
-                      label: Text(l10n.createQrPosterAction),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () =>
+                                context.push('/listing/${listing.id}/boost'),
+                            icon: const Icon(Icons.rocket_launch_rounded),
+                            label: Text(
+                              isBoostedActive
+                                  ? 'Öne Çıkarma'
+                                  : 'İlanı Öne Çıkar',
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber.shade700,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => context
+                                .push('/listing/${listing.id}/qr-poster'),
+                            icon: const Icon(Icons.qr_code_2_rounded),
+                            label: Text(l10n.createQrPosterAction),
+                          ),
+                        ),
+                      ],
                     ),
+                  );
+                }
+
+                final phone = parsePhoneNumber(listing.contactInfo);
+                final hasWhatsApp = phone != null;
+
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, -2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          }
-
-          final phone = parsePhoneNumber(listing.contactInfo);
-          final hasWhatsApp = phone != null;
-
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: Offset(0, -2),
-                ),
-              ],
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _startingChat
+                              ? null
+                              : () => _messageOwner(listing),
+                          icon: const Icon(Icons.message_outlined),
+                          label: const Text('Mesaj Gönder'),
+                        ),
+                      ),
+                      if (hasWhatsApp) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _openWhatsApp(listing),
+                            icon: const Icon(Icons.chat_rounded),
+                            label: Text(l10n.sendWhatsAppAction),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF25D366),
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              },
+              orElse: () => null,
             ),
-            child: Row(
+    );
+  }
+
+  Widget _buildHeaderInfo(
+      BuildContext context, Listing listing, bool isBoostedActive) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Chip(
+              label: Text(listingCategoryLabel(listing.category)),
+              backgroundColor:
+                  Theme.of(context).primaryColor.withValues(alpha: 0.1),
+              side: BorderSide.none,
+            ),
+            if (isBoostedActive) ...[
+              const SizedBox(width: 8),
+              const BoostBadge(isCompact: false),
+            ],
+            const Spacer(),
+            if (listing.createdAt != null)
+              Text(
+                '${listing.createdAt!.day}.${listing.createdAt!.month}.${listing.createdAt!.year}',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          listing.title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Icon(
+              Icons.location_on_outlined,
+              color: Colors.grey.shade600,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              listing.location,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSalaryCard(BuildContext context, Listing listing) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Maaş',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            listing.salary,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequirementsCard(
+    BuildContext context,
+    ExperienceLevel? experience,
+    EducationLevel? education,
+    AppLocalizations l10n,
+  ) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            if (experience != null)
+              _RequirementRow(
+                icon: Icons.work_history_outlined,
+                label: l10n.experienceLevelLabel,
+                value: experienceLevelLabel(l10n, experience),
+              ),
+            if (experience != null && education != null)
+              const Divider(height: 24),
+            if (education != null)
+              _RequirementRow(
+                icon: Icons.school_outlined,
+                label: l10n.educationLevelLabel,
+                value: educationLevelLabel(l10n, education),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDescriptionSection(Listing listing) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'İlan Açıklaması',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          listing.description,
+          style: const TextStyle(fontSize: 14, height: 1.5),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHousingCard(
+    BuildContext context,
+    Listing listing,
+    AppLocalizations l10n,
+  ) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _startingChat
-                        ? null
-                        : () => _messageOwner(listing),
-                    icon: const Icon(Icons.message_outlined),
-                    label: const Text('Mesaj Gönder'),
-                  ),
+                const Icon(Icons.home_work_outlined),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.housingTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                if (hasWhatsApp) ...[
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _openWhatsApp(listing),
-                      icon: const Icon(Icons.chat_rounded),
-                      label: Text(l10n.sendWhatsAppAction),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF25D366),
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
-          );
-        },
-        orElse: () => null,
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (listing.housingRoomType != null)
+                  Chip(
+                    avatar: const Icon(
+                      Icons.bed_outlined,
+                      size: 18,
+                    ),
+                    label: Text(
+                      listing.housingRoomType == 'single'
+                          ? l10n.housingSingleRoom
+                          : l10n.housingSharedRoom,
+                    ),
+                  ),
+                if (listing.housingHasAc == true)
+                  Chip(
+                    avatar: const Icon(
+                      Icons.ac_unit_outlined,
+                      size: 18,
+                    ),
+                    label: Text(l10n.housingHasAc),
+                  ),
+                if (listing.housingHasWifi == true)
+                  Chip(
+                    avatar: const Icon(Icons.wifi, size: 18),
+                    label: Text(l10n.housingHasWifi),
+                  ),
+                if (listing.housingMealsIncluded != null)
+                  Chip(
+                    avatar: const Icon(
+                      Icons.restaurant_outlined,
+                      size: 18,
+                    ),
+                    label: Text(
+                      '${l10n.housingMealsIncluded}: ${listing.housingMealsIncluded}',
+                    ),
+                  ),
+              ],
+            ),
+            if (listing.housingImages.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 120,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: listing.housingImages.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) => ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: CachedNetworkImage(
+                      imageUrl: listing.housingImages[index],
+                      width: 160,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, _, _) => const Icon(Icons.broken_image),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPosterCard(
+    BuildContext context,
+    Listing listing,
+    String? myUid,
+  ) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: Theme.of(context).primaryColor,
+              child: Text(
+                listing.posterName.isNotEmpty
+                    ? listing.posterName[0].toUpperCase()
+                    : '?',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    listing.posterName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'İlan Sahibi',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (myUid == null)
+                    InkWell(
+                      onTap: () => context.push('/login'),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.lock_outline,
+                            size: 14,
+                            color: Colors.orange.shade800,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              'İletişim bilgisini görmek için giriş yapın',
+                              style: TextStyle(
+                                color: Colors.orange.shade800,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else if (myUid == listing.posterId || _revealContactInfo)
+                    Text(
+                      listing.contactInfo,
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 13,
+                      ),
+                    )
+                  else
+                    InkWell(
+                      onTap: () => setState(() => _revealContactInfo = true),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.visibility_outlined,
+                            size: 14,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'İletişim Bilgisini Göster',
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSafetyTipsCard(
+    BuildContext context,
+    Listing listing,
+    AppLocalizations l10n,
+  ) {
+    return Card(
+      color: Theme.of(context).colorScheme.tertiaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.shield_outlined,
+              color: Theme.of(context).colorScheme.onTertiaryContainer,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.listingSafetyTipsTitle,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onTertiaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.listingSafetyTipsBody,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onTertiaryContainer,
+                          height: 1.4,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  TextButton.icon(
+                    onPressed: () => _showReportDialog(listing),
+                    icon: const Icon(Icons.flag_outlined),
+                    label: Text(l10n.listingSafetyReportAction),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -902,3 +1004,291 @@ class _ListingImageGalleryState extends State<_ListingImageGallery> {
     );
   }
 }
+
+class _RightStickyActionCard extends StatelessWidget {
+  const _RightStickyActionCard({
+    required this.listing,
+    required this.myUid,
+    required this.startingChat,
+    required this.revealContactInfo,
+    required this.onMessageOwner,
+    required this.onOpenWhatsApp,
+    required this.onRevealContact,
+    required this.onReport,
+  });
+
+  final Listing listing;
+  final String? myUid;
+  final bool startingChat;
+  final bool revealContactInfo;
+  final VoidCallback onMessageOwner;
+  final VoidCallback onOpenWhatsApp;
+  final VoidCallback onRevealContact;
+  final VoidCallback onReport;
+
+  @override
+  Widget build(BuildContext context) {
+    final isOwner = myUid == listing.posterId;
+    final isBoostedActive = BoostBadge.isBoostActive(listing);
+    final phone = parsePhoneNumber(listing.contactInfo);
+    final hasWhatsApp = phone != null;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.work_outline_rounded,
+                  color: Theme.of(context).primaryColor,
+                  size: 22,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  isOwner ? 'İlan Yönetimi' : 'İş Başvurusu & İletişim',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Maaş / Ücret',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    listing.salary,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (isOwner) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.push('/listing/${listing.id}/boost'),
+                  icon: const Icon(Icons.rocket_launch_rounded),
+                  label: Text(
+                    isBoostedActive ? 'Öne Çıkarma' : 'İlanı Öne Çıkar',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      context.push('/listing/${listing.id}/qr-poster'),
+                  icon: const Icon(Icons.qr_code_2_rounded),
+                  label: Text(l10n.createQrPosterAction),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+            ] else ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: startingChat ? null : onMessageOwner,
+                  icon: startingChat
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.message_outlined),
+                  label: const Text('Başvur / Mesaj Gönder'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+              if (hasWhatsApp) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: onOpenWhatsApp,
+                    icon: const Icon(Icons.chat_rounded),
+                    label: Text(l10n.sendWhatsAppAction),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25D366),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+            const Divider(height: 28),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  child: Text(
+                    listing.posterName.isNotEmpty
+                        ? listing.posterName[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        listing.posterName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        'İlan Sahibi',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            if (myUid == null)
+              InkWell(
+                onTap: () => context.push('/login'),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.lock_outline,
+                      size: 14,
+                      color: Colors.orange.shade800,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        'İletişim bilgisini görmek için giriş yapın',
+                        style: TextStyle(
+                          color: Colors.orange.shade800,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else if (myUid == listing.posterId || revealContactInfo)
+              SelectableText(
+                listing.contactInfo,
+                style: TextStyle(
+                  color: Colors.grey.shade800,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              )
+            else
+              InkWell(
+                onTap: onRevealContact,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.visibility_outlined,
+                      size: 14,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'İletişim Bilgisini Göster',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.shield_outlined,
+                    size: 16,
+                    color: Colors.grey.shade700,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Otelcim ile doğrudan ve ücretsiz iş başvurusu',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

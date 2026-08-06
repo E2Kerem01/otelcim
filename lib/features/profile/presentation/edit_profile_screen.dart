@@ -100,8 +100,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
       );
 
-      // Navigate back on successful save
-      Navigator.of(context).pop();
+      // Navigate back if standalone route
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

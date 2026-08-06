@@ -41,6 +41,7 @@ import '../features/ratings/presentation/submit_rating_screen.dart';
 import '../features/seasonal/presentation/seasonal_calendar_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import '../shared/services/auth_service.dart';
+import '../shared/widgets/desktop_top_nav_bar.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -105,44 +106,58 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
+          final isDesktop = MediaQuery.sizeOf(context).width >= 768;
+
           return Scaffold(
-            body: navigationShell,
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: navigationShell.currentIndex,
-              onTap: (index) {
-                navigationShell.goBranch(
-                  index,
-                  initialLocation: index == navigationShell.currentIndex,
-                );
-              },
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home_outlined),
-                  activeIcon: Icon(Icons.home_rounded),
-                  label: 'Ana Sayfa',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_view_outlined),
-                  activeIcon: Icon(Icons.grid_view_rounded),
-                  label: 'Kategoriler',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.add_circle_outline_rounded),
-                  activeIcon: Icon(Icons.add_circle_rounded),
-                  label: 'İlan Ver',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.chat_bubble_outline_rounded),
-                  activeIcon: Icon(Icons.chat_bubble_rounded),
-                  label: 'Mesajlar',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person_outline_rounded),
-                  activeIcon: Icon(Icons.person_rounded),
-                  label: 'Hesabım',
+            body: Column(
+              children: [
+                if (isDesktop)
+                  DesktopTopNavBar(
+                    navigationShell: navigationShell,
+                  ),
+                Expanded(
+                  child: navigationShell,
                 ),
               ],
             ),
+            bottomNavigationBar: isDesktop
+                ? null
+                : BottomNavigationBar(
+                    currentIndex: navigationShell.currentIndex,
+                    onTap: (index) {
+                      navigationShell.goBranch(
+                        index,
+                        initialLocation: index == navigationShell.currentIndex,
+                      );
+                    },
+                    items: const [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.home_outlined),
+                        activeIcon: Icon(Icons.home_rounded),
+                        label: 'Ana Sayfa',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.grid_view_outlined),
+                        activeIcon: Icon(Icons.grid_view_rounded),
+                        label: 'Kategoriler',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.add_circle_outline_rounded),
+                        activeIcon: Icon(Icons.add_circle_rounded),
+                        label: 'İlan Ver',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.chat_bubble_outline_rounded),
+                        activeIcon: Icon(Icons.chat_bubble_rounded),
+                        label: 'Mesajlar',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.person_outline_rounded),
+                        activeIcon: Icon(Icons.person_rounded),
+                        label: 'Hesabım',
+                      ),
+                    ],
+                  ),
           );
         },
         branches: [
