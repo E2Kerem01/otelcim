@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +10,7 @@ import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
+import '../../../shared/widgets/xfile_preview_image.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../discovery/domain/tourism_region.dart';
 import '../domain/listing_model.dart';
@@ -52,9 +51,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   DateTime? _contractStartDate;
   DateTime? _contractEndDate;
   List<String> _existingImageUrls = [];
-  final List<File> _newImageFiles = [];
+  final List<XFile> _newImageFiles = [];
   List<String> _existingHousingImageUrls = [];
-  final List<File> _newHousingImageFiles = [];
+  final List<XFile> _newHousingImageFiles = [];
   String? _housingRoomType;
   bool _housingHasAc = false;
   bool _housingHasWifi = false;
@@ -115,10 +114,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     final pickedFiles = await picker.pickMultiImage(imageQuality: 80);
     if (pickedFiles.isNotEmpty) {
       final availableSlots = 5 - totalCount;
-      final filesToAdd = pickedFiles
-          .take(availableSlots)
-          .map((xFile) => File(xFile.path))
-          .toList();
+      final filesToAdd = pickedFiles.take(availableSlots).toList();
 
       setState(() {
         _newImageFiles.addAll(filesToAdd);
@@ -132,9 +128,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     final picked = await ImagePicker().pickMultiImage(imageQuality: 80);
     if (!mounted || picked.isEmpty) return;
     setState(
-      () => _newHousingImageFiles.addAll(
-        picked.take(5 - total).map((x) => File(x.path)),
-      ),
+      () => _newHousingImageFiles.addAll(picked.take(5 - total)),
     );
   }
 
@@ -531,11 +525,10 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.file(
+                              child: XFilePreviewImage(
                                 file,
                                 width: 90,
                                 height: 90,
-                                fit: BoxFit.cover,
                               ),
                             ),
                             Positioned(

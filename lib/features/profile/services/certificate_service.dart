@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/services/storage_service.dart';
@@ -46,7 +45,7 @@ class CertificateService {
     required String userId,
     String? userName,
     String? userEmail,
-    required File file,
+    required XFile file,
     required CertificateType type,
     String? title,
   }) async {

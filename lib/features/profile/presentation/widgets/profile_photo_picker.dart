@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -90,7 +88,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
 
       if (image == null) return;
 
-      await _uploadPhoto(File(image.path));
+      await _uploadPhoto(image);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -103,7 +101,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
   }
 
   /// Uploads the selected photo to Firebase Storage
-  Future<void> _uploadPhoto(File imageFile) async {
+  Future<void> _uploadPhoto(XFile imageFile) async {
     setState(() {
       _isUploading = true;
     });
