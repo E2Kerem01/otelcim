@@ -45,6 +45,26 @@ import '../shared/widgets/desktop_top_nav_bar.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+bool isProtectedRoute(String location) {
+  final segments = Uri.parse(location).pathSegments;
+  final isListingEditRoute =
+      segments.length == 3 &&
+      segments.first == 'listing' &&
+      segments.last == 'edit';
+
+  return location == '/create-listing' ||
+      location == '/batch-create-listing' ||
+      location.startsWith('/chat') ||
+      location.startsWith('/profile') ||
+      location == '/my-listings' ||
+      location == '/my-boosts' ||
+      location == '/favorites' ||
+      location.endsWith('/boost') ||
+      location.startsWith('/onboarding') ||
+      location.startsWith('/admin') ||
+      isListingEditRoute;
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   final authService = ref.watch(authServiceProvider);
   final adminService = ref.watch(adminServiceProvider);
@@ -57,19 +77,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = authService.currentUser != null;
       final location = state.matchedLocation;
 
-      final isProtected =
-          location == '/create-listing' ||
-          location == '/batch-create-listing' ||
-          location.startsWith('/chat') ||
-          location.startsWith('/profile') ||
-          location == '/my-listings' ||
-          location == '/my-boosts' ||
-          location == '/favorites' ||
-          location.endsWith('/boost') ||
-          location == '/onboarding' ||
-          location.startsWith('/admin');
-
-      if (!isLoggedIn && isProtected) {
+      if (!isLoggedIn && isProtectedRoute(location)) {
         return '/login';
       }
 
