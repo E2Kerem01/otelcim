@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import '../domain/boost_model.dart';
 import '../domain/boost_purchase_model.dart';
@@ -10,7 +13,7 @@ class BoostService {
 
   final FirebaseFirestore _db;
 
-  /// Process successful boost purchase and update listing and boost collections in Firestore
+  /// Process successful boost purchase via server-side Cloud Function verification
   Future<void> processBoostPurchase({
     required String listingId,
     required String userId,
@@ -22,78 +25,48 @@ class BoostService {
     String platform = 'in_app_purchase',
   }) async {
     try {
-      int durationDays = 7;
-      BoostDurationType durationTypeEnum = BoostDurationType.days7;
-      String durationTypeStr = '7';
-      double price = priceOverride ?? 49.99;
+      final user = FirebaseAuth.instance.currentUser;
+      final idToken = await user?.getIdToken();
 
-      if (productId.contains('14') || productId == 'boost_14_days') {
-        durationDays = 14;
-        durationTypeEnum = BoostDurationType.days14;
-        durationTypeStr = '14';
-        price = priceOverride ?? 89.99;
-      } else if (productId.contains('30') || productId == 'boost_30_days') {
-        durationDays = 30;
-        durationTypeEnum = BoostDurationType.days30;
-        durationTypeStr = '30';
-        price = priceOverride ?? 149.99;
+      final url = Uri.parse(
+        'https://europe-west1-otelcim-7f0ba.cloudfunctions.net/verifyAndProcessBoostPurchase',
+      );
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          if (idToken != null) 'Authorization': 'Bearer $idToken',
+        },
+        body: jsonEncode({
+          'data': {
+            'listingId': listingId,
+            'productId': productId,
+            'transactionId': transactionId,
+            'purchaseToken': purchaseToken,
+            'verificationData': verificationData,
+            'platform': platform,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        if (body['error'] != null) {
+          throw Exception(body['error']['message'] ?? 'Sunucu doğrulaması başarısız oldu.');
+        }
+        debugPrint('Boost purchase verified and processed via Cloud Function.');
+      } else {
+        final body = jsonDecode(response.body);
+        final msg = body['error']?['message'] ?? 'HTTP ${response.statusCode}: Boost doğrulama hatası.';
+        throw Exception(msg);
       }
-
-      final now = DateTime.now();
-      final expiresAt = now.add(Duration(days: durationDays));
-
-      // 1. Create Boost document
-      final boostDocRef = _db.collection('boosts').doc();
-      final boost = Boost(
-        id: boostDocRef.id,
-        listingId: listingId,
-        userId: userId,
-        durationType: durationTypeEnum,
-        durationDays: durationDays,
-        price: price,
-        purchasedAt: now,
-        expiresAt: expiresAt,
-        platform: platform,
-        transactionId: transactionId,
-        status: BoostStatus.active,
-      );
-      await boostDocRef.set(boost.toMap());
-
-      // 2. Create BoostPurchase record
-      final purchaseDocRef = _db.collection('boost_purchases').doc();
-      final boostPurchase = BoostPurchase(
-        id: purchaseDocRef.id,
-        userId: userId,
-        listingId: listingId,
-        boostId: boostDocRef.id,
-        durationType: durationTypeStr,
-        price: price,
-        platform: platform,
-        transactionId: transactionId,
-        productId: productId,
-        purchaseToken: purchaseToken,
-        verificationData: verificationData,
-        status: PurchaseStatus.completed,
-        purchasedAt: now,
-        verifiedAt: now,
-      );
-      await purchaseDocRef.set(boostPurchase.toMap());
-
-      // 3. Update Listing document
-      await _db.collection('listings').doc(listingId).update({
-        'isBoosted': true,
-        'boostExpiresAt': Timestamp.fromDate(expiresAt),
-        'boostType': productId,
-        'boostPurchaseId': purchaseDocRef.id,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-
-      debugPrint('Boost purchase processed successfully for listing $listingId');
     } catch (e) {
       debugPrint('Error processing boost purchase: $e');
       rethrow;
     }
   }
+
 
   /// Watch active and past boost purchases for a specific user
   Stream<List<BoostPurchase>> watchUserBoostPurchases(String userId) {

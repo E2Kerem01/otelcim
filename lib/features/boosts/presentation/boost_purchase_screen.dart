@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -65,11 +66,19 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
 
       if (paymentService.isAvailable && product != null) {
         purchaseSuccess = await paymentService.purchaseProduct(product);
-      } else {
-        // Fallback / Demo purchase flow when IAP store products are not connected in sandbox/test
+      } else if (kDebugMode) {
+        // Fallback / Demo purchase flow ONLY in debug mode for testing
         await Future.delayed(const Duration(milliseconds: 800));
         purchaseSuccess = true;
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Satın alma mağazası şu an kullanılamıyor.')),
+          );
+        }
+        return;
       }
+
 
       if (purchaseSuccess) {
         double price = 49.99;

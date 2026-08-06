@@ -3,6 +3,7 @@ import {getFirestore} from "firebase-admin/firestore";
 import {getMessaging} from "firebase-admin/messaging";
 import {logger} from "firebase-functions";
 import {onDocumentCreated, onDocumentUpdated} from "firebase-functions/v2/firestore";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
 
 initializeApp();
 
@@ -293,3 +294,128 @@ export const sendInterviewConfirmedNotification = onDocumentUpdated(
     }
   },
 );
+
+interface BoostPurchaseRequest {
+  listingId: string;
+  productId: string;
+  transactionId: string;
+  purchaseToken?: string;
+  verificationData?: string;
+  platform?: string;
+}
+
+const BOOST_PRODUCTS: Record<string, { durationDays: number; price: number; durationTypeEnum: string; durationTypeStr: string }> = {
+  "boost_7_days": { durationDays: 7, price: 49.99, durationTypeEnum: "days7", durationTypeStr: "7" },
+  "boost_14_days": { durationDays: 14, price: 89.99, durationTypeEnum: "days14", durationTypeStr: "14" },
+  "boost_30_days": { durationDays: 30, price: 149.99, durationTypeEnum: "days30", durationTypeStr: "30" },
+};
+
+export const verifyAndProcessBoostPurchase = onCall(
+  {
+    region: "europe-west1",
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Kullanıcı girişi yapılmalıdır.");
+    }
+
+    const userId = request.auth.uid;
+    const data = request.data as BoostPurchaseRequest;
+
+    if (!data.listingId || !data.productId || !data.transactionId) {
+      throw new HttpsError("invalid-argument", "Eksik parametreler (listingId, productId, transactionId).");
+    }
+
+    const productConfig = BOOST_PRODUCTS[data.productId];
+    if (!productConfig) {
+      throw new HttpsError("invalid-argument", "Geçersiz boost ürünü.");
+    }
+
+    // Check duplicate transactionId (replay prevention)
+    const existingPurchases = await db
+      .collection("boost_purchases")
+      .where("transactionId", "==", data.transactionId)
+      .limit(1)
+      .get();
+
+    if (!existingPurchases.empty) {
+      throw new HttpsError("already-exists", "Bu işlem ID'si (transactionId) daha önce kullanılmış.");
+    }
+
+    const listingRef = db.collection("listings").doc(data.listingId);
+    const listingDoc = await listingRef.get();
+    if (!listingDoc.exists) {
+      throw new HttpsError("not-found", "İlan bulunamadı.");
+    }
+
+    const listingData = listingDoc.data() ?? {};
+    if (listingData.posterId !== userId) {
+      throw new HttpsError("permission-denied", "Sadece kendi ilanınızı öne çıkarabilirsiniz.");
+    }
+
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + productConfig.durationDays * 24 * 60 * 60 * 1000);
+    const platform = data.platform || "in_app_purchase";
+
+    const boostRef = db.collection("boosts").doc();
+    const purchaseRef = db.collection("boost_purchases").doc();
+
+    const batch = db.batch();
+
+    batch.set(boostRef, {
+      id: boostRef.id,
+      listingId: data.listingId,
+      userId,
+      durationType: productConfig.durationTypeEnum,
+      durationDays: productConfig.durationDays,
+      price: productConfig.price,
+      purchasedAt: now,
+      expiresAt: expiresAt,
+      platform,
+      transactionId: data.transactionId,
+      status: "active",
+    });
+
+    batch.set(purchaseRef, {
+      id: purchaseRef.id,
+      userId,
+      listingId: data.listingId,
+      boostId: boostRef.id,
+      durationType: productConfig.durationTypeStr,
+      price: productConfig.price,
+      platform,
+      transactionId: data.transactionId,
+      productId: data.productId,
+      purchaseToken: data.purchaseToken || null,
+      verificationData: data.verificationData || null,
+      status: "completed",
+      purchasedAt: now,
+      verifiedAt: now,
+    });
+
+    batch.update(listingRef, {
+      isBoosted: true,
+      boostExpiresAt: expiresAt,
+      boostType: data.productId,
+      boostPurchaseId: purchaseRef.id,
+      updatedAt: now,
+    });
+
+    await batch.commit();
+
+    logger.info("Boost işlemi başarıyla tamamlandı.", {
+      userId,
+      listingId: data.listingId,
+      productId: data.productId,
+      transactionId: data.transactionId,
+    });
+
+    return {
+      success: true,
+      boostId: boostRef.id,
+      purchaseId: purchaseRef.id,
+      expiresAt: expiresAt.toISOString(),
+    };
+  },
+);
+
