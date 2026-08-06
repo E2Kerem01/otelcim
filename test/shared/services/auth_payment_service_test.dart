@@ -7,6 +7,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:otelcim/shared/services/auth_service.dart';
 import 'package:otelcim/shared/services/payment_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 class MockUserCredential extends Mock implements UserCredential {}
@@ -22,6 +23,8 @@ void main() {
     late FakeFirebaseFirestore db;
 
     setUp(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
       auth = MockFirebaseAuth();
       user = MockUser();
       db = FakeFirebaseFirestore();
@@ -43,6 +46,43 @@ void main() {
       expect(result.uid, 'u1');
       expect(result.email, 'u@test.com');
       service.dispose();
+    });
+
+    test('enforceRememberMePreference signs out when remember-me was declined', () async {
+      SharedPreferences.setMockInitialValues({'auth_remember_me': false});
+      when(() => auth.currentUser).thenReturn(user);
+      when(() => auth.signOut()).thenAnswer((_) async {});
+
+      await enforceRememberMePreference(auth: auth);
+
+      verify(() => auth.signOut()).called(1);
+    });
+
+    test('enforceRememberMePreference keeps the session when remember-me was accepted', () async {
+      SharedPreferences.setMockInitialValues({'auth_remember_me': true});
+      when(() => auth.currentUser).thenReturn(user);
+
+      await enforceRememberMePreference(auth: auth);
+
+      verifyNever(() => auth.signOut());
+    });
+
+    test('enforceRememberMePreference defaults to remembered when no preference was ever saved', () async {
+      SharedPreferences.setMockInitialValues({});
+      when(() => auth.currentUser).thenReturn(user);
+
+      await enforceRememberMePreference(auth: auth);
+
+      verifyNever(() => auth.signOut());
+    });
+
+    test('enforceRememberMePreference is a no-op when nobody is signed in', () async {
+      SharedPreferences.setMockInitialValues({'auth_remember_me': false});
+      when(() => auth.currentUser).thenReturn(null);
+
+      await enforceRememberMePreference(auth: auth);
+
+      verifyNever(() => auth.signOut());
     });
 
     test('register sets user state and exposes one-shot registration flag', () async {

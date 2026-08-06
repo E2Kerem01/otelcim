@@ -4,8 +4,38 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/app_user.dart';
+
+/// Key used to persist the user's "remember me" choice on native platforms,
+/// where Firebase Auth has no built-in session-only persistence mode (see
+/// [enforceRememberMePreference]).
+const String _rememberMePrefsKey = 'auth_remember_me';
+
+/// On native platforms (Android/iOS/desktop), Firebase Auth always persists
+/// the session regardless of [FirebaseAuth.setPersistence] — that API only
+/// has an effect on web. So unchecking "remember me" there can't stop the
+/// session from surviving an app restart at the SDK level; instead, [signIn]
+/// and [signInWithSmsCode] record the choice in SharedPreferences, and this
+/// function — called once at app startup, before the UI is shown — signs
+/// the user back out if they'd asked not to be remembered.
+///
+/// No-op on web, where [FirebaseAuth.setPersistence] already does the right
+/// thing at sign-in time.
+///
+/// [auth] is injectable for testing; defaults to [FirebaseAuth.instance].
+Future<void> enforceRememberMePreference({FirebaseAuth? auth}) async {
+  if (kIsWeb) return;
+  final firebaseAuth = auth ?? FirebaseAuth.instance;
+  if (firebaseAuth.currentUser == null) return;
+
+  final prefs = await SharedPreferences.getInstance();
+  final rememberMe = prefs.getBool(_rememberMePrefsKey) ?? true;
+  if (!rememberMe) {
+    await firebaseAuth.signOut();
+  }
+}
 
 class AuthService extends ChangeNotifier {
   AuthService(this._auth, this._firestore) {
@@ -69,6 +99,9 @@ class AuthService extends ChangeNotifier {
       await _auth.setPersistence(
         rememberMe ? Persistence.LOCAL : Persistence.SESSION,
       );
+    } else {
+      await (await SharedPreferences.getInstance())
+          .setBool(_rememberMePrefsKey, rememberMe);
     }
     final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
     final user = AppUser(
@@ -125,6 +158,9 @@ class AuthService extends ChangeNotifier {
       await _auth.setPersistence(
         rememberMe ? Persistence.LOCAL : Persistence.SESSION,
       );
+    } else {
+      await (await SharedPreferences.getInstance())
+          .setBool(_rememberMePrefsKey, rememberMe);
     }
     final credential = PhoneAuthProvider.credential(
       verificationId: verificationId,
@@ -143,6 +179,13 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<AppUser> register({required String email, required String password}) async {
+    if (!kIsWeb) {
+      // A fresh registration should stay signed in on next launch,
+      // regardless of a "don't remember me" choice left over from a
+      // previous account's login on this device.
+      await (await SharedPreferences.getInstance())
+          .setBool(_rememberMePrefsKey, true);
+    }
     final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     final user = AppUser(
       uid: credential.user!.uid,

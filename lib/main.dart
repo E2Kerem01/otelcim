@@ -24,6 +24,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await enforceRememberMePreference();
   runApp(const ProviderScope(child: OtelcimApp()));
 }
 
