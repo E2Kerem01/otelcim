@@ -158,10 +158,43 @@ void main() {
 
     test('boost products create matching durations/prices and user streams', () async {
       final service = BoostService(db);
+      // Boost creation now goes through a Cloud Function
+      // (verifyAndProcessBoostPurchase) rather than a direct client write,
+      // so seed the fake Firestore docs directly here instead of calling
+      // processBoostPurchase().
       for (final entry in {'boost_7_days': 7, 'boost_14_days': 14, 'boost_30_days': 30}.entries) {
         final listingId = 'l${entry.value}';
         await db.collection('listings').doc(listingId).set({'status': 'active'});
-        await service.processBoostPurchase(listingId: listingId, userId: 'u', productId: entry.key, transactionId: 'tx${entry.value}');
+        final now = DateTime.now();
+        final boostRef = db.collection('boosts').doc();
+        await boostRef.set({
+          'id': boostRef.id,
+          'listingId': listingId,
+          'userId': 'u',
+          'durationType': '${entry.value}',
+          'durationDays': entry.value,
+          'price': 49.99,
+          'purchasedAt': Timestamp.fromDate(now),
+          'expiresAt': Timestamp.fromDate(now.add(Duration(days: entry.value))),
+          'platform': 'in_app_purchase',
+          'transactionId': 'tx${entry.value}',
+          'status': 'active',
+        });
+        final purchaseRef = db.collection('boost_purchases').doc();
+        await purchaseRef.set({
+          'id': purchaseRef.id,
+          'userId': 'u',
+          'listingId': listingId,
+          'boostId': boostRef.id,
+          'durationType': '${entry.value}',
+          'price': 49.99,
+          'platform': 'in_app_purchase',
+          'transactionId': 'tx${entry.value}',
+          'productId': entry.key,
+          'status': 'completed',
+          'purchasedAt': Timestamp.fromDate(now),
+          'verifiedAt': Timestamp.fromDate(now),
+        });
       }
       final boosts = await service.watchUserBoosts('u').first;
       expect(boosts.map((e) => e.durationDays).toSet(), {7, 14, 30});
