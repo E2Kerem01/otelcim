@@ -28,6 +28,59 @@ class AppLocalizationsTr extends AppLocalizations {
       'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
 
   @override
+  String get referralCodeLabel => 'Referans Kodu (opsiyonel)';
+
+  @override
+  String get referralCodeHint => 'Arkadaşının kodu';
+
+  @override
+  String get inviteFriendsTitle => 'Arkadaşını Davet Et';
+
+  @override
+  String get inviteFriendsMenuLabel => 'Arkadaşını Davet Et';
+
+  @override
+  String get inviteFriendsDescription =>
+      'Kodunu arkadaşınla paylaş, o kaydolup ilk ilanını yayınladığında veya ilk sohbetini başlattığında sana ücretsiz bir boost hakkı kazandırsın.';
+
+  @override
+  String get yourReferralCodeLabel => 'Referans Kodun';
+
+  @override
+  String get copyCodeAction => 'Kodu Kopyala';
+
+  @override
+  String get codeCopiedMessage => 'Kod kopyalandı';
+
+  @override
+  String get shareCodeAction => 'Paylaş';
+
+  @override
+  String shareReferralMessage(String code) {
+    return 'Otelcim\'de otel/turizm işleri bul veya ilan ver! $code kodumla kayıt ol, ikimiz de kazanalım.';
+  }
+
+  @override
+  String get referralCountLabel => 'Davet Ettiğin Kişi Sayısı';
+
+  @override
+  String get freeBoostCreditsLabel => 'Ücretsiz Boost Hakkın';
+
+  @override
+  String freeBoostBannerText(int count) {
+    return '$count ücretsiz boost hakkınız var';
+  }
+
+  @override
+  String get useFreeBoostAction => 'Ücretsiz Kullan';
+
+  @override
+  String get freeBoostRedeemedMessage => 'Ücretsiz boost uygulandı!';
+
+  @override
+  String get freeBoostRedeemFailedMessage => 'Ücretsiz boost uygulanamadı';
+
+  @override
   String get loginWithEmail => 'E-posta ile Giriş';
 
   @override

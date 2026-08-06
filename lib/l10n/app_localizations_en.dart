@@ -28,6 +28,59 @@ class AppLocalizationsEn extends AppLocalizations {
       'Password must be at least 8 characters and include at least 1 digit';
 
   @override
+  String get referralCodeLabel => 'Referral Code (optional)';
+
+  @override
+  String get referralCodeHint => 'Your friend\'s code';
+
+  @override
+  String get inviteFriendsTitle => 'Invite Friends';
+
+  @override
+  String get inviteFriendsMenuLabel => 'Invite Friends';
+
+  @override
+  String get inviteFriendsDescription =>
+      'Share your code with a friend — when they sign up and publish their first listing or start their first chat, you earn a free boost.';
+
+  @override
+  String get yourReferralCodeLabel => 'Your Referral Code';
+
+  @override
+  String get copyCodeAction => 'Copy Code';
+
+  @override
+  String get codeCopiedMessage => 'Code copied';
+
+  @override
+  String get shareCodeAction => 'Share';
+
+  @override
+  String shareReferralMessage(String code) {
+    return 'Find or post hotel & tourism jobs on Otelcim! Sign up with my code $code and we both win.';
+  }
+
+  @override
+  String get referralCountLabel => 'Friends Referred';
+
+  @override
+  String get freeBoostCreditsLabel => 'Free Boost Credits';
+
+  @override
+  String freeBoostBannerText(int count) {
+    return 'You have $count free boost credit(s)';
+  }
+
+  @override
+  String get useFreeBoostAction => 'Use For Free';
+
+  @override
+  String get freeBoostRedeemedMessage => 'Free boost applied!';
+
+  @override
+  String get freeBoostRedeemFailedMessage => 'Could not apply free boost';
+
+  @override
   String get loginWithEmail => 'Sign in with Email';
 
   @override

@@ -35,6 +35,7 @@ import '../features/profile/presentation/notification_settings_screen.dart';
 import '../features/profile/presentation/privacy_policy_screen.dart';
 import '../features/profile/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
+import '../features/referrals/presentation/invite_friends_screen.dart';
 import '../features/profile/presentation/talent_pool_screen.dart';
 import '../features/profile/presentation/verification_request_screen.dart';
 import '../features/ratings/presentation/submit_rating_screen.dart';
@@ -332,6 +333,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile/notifications',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/profile/invite',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const InviteFriendsScreen(),
       ),
       GoRoute(
         path: '/profile/privacy',

@@ -78,6 +78,25 @@ class UserProfile {
   /// URL to the user's intro video stored in Firebase Storage (only for jobseekers)
   final String? introVideoUrl;
 
+  /// This user's own shareable referral code (set once at registration).
+  final String? referralCode;
+
+  /// The uid of the user who referred this user (set once at registration,
+  /// never changed afterwards).
+  final String? referredBy;
+
+  /// Number of people this user has successfully referred (i.e. that
+  /// triggered a reward). Only ever incremented by the referral Cloud
+  /// Functions or decremented via redeemFreeBoost's paired counter — NOT
+  /// written by ProfileService.updateUserProfile().
+  final int referralCount;
+
+  /// Number of free 7-day boost credits earned via referrals and not yet
+  /// redeemed. Only ever mutated by the referral Cloud Functions
+  /// (increment) and BoostService.redeemFreeBoost() (decrement) — NOT
+  /// written by ProfileService.updateUserProfile().
+  final int freeBoostCredits;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -107,6 +126,10 @@ class UserProfile {
     this.preferredEducationLevel,
     this.preferredRegion,
     this.introVideoUrl,
+    this.referralCode,
+    this.referredBy,
+    this.referralCount = 0,
+    this.freeBoostCredits = 0,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -164,6 +187,10 @@ class UserProfile {
       preferredEducationLevel: data['preferredEducationLevel'] as String?,
       preferredRegion: data['preferredRegion'] as String?,
       introVideoUrl: data['introVideoUrl'] as String?,
+      referralCode: data['referralCode'] as String?,
+      referredBy: data['referredBy'] as String?,
+      referralCount: data['referralCount'] as int? ?? 0,
+      freeBoostCredits: data['freeBoostCredits'] as int? ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -193,6 +220,15 @@ class UserProfile {
       'preferredEducationLevel': preferredEducationLevel,
       'preferredRegion': preferredRegion,
       'introVideoUrl': introVideoUrl,
+      // NOTE: referralCount and freeBoostCredits are intentionally NOT
+      // included here. They are only ever mutated via
+      // FieldValue.increment() by the referral Cloud Functions and by
+      // BoostService.redeemFreeBoost(). Including them in this map would
+      // mean every ProfileService.updateUserProfile() call (triggered by a
+      // routine profile edit) overwrites them with a stale value read at
+      // load time, silently discarding concurrent increments.
+      'referralCode': referralCode,
+      'referredBy': referredBy,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -222,6 +258,10 @@ class UserProfile {
     Object? preferredEducationLevel = _undefined,
     Object? preferredRegion = _undefined,
     Object? introVideoUrl = _undefined,
+    Object? referralCode = _undefined,
+    Object? referredBy = _undefined,
+    int? referralCount,
+    int? freeBoostCredits,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -261,6 +301,14 @@ class UserProfile {
       introVideoUrl: introVideoUrl == _undefined
           ? this.introVideoUrl
           : introVideoUrl as String?,
+      referralCode: referralCode == _undefined
+          ? this.referralCode
+          : referralCode as String?,
+      referredBy: referredBy == _undefined
+          ? this.referredBy
+          : referredBy as String?,
+      referralCount: referralCount ?? this.referralCount,
+      freeBoostCredits: freeBoostCredits ?? this.freeBoostCredits,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -293,6 +341,10 @@ class UserProfile {
         other.preferredEducationLevel == preferredEducationLevel &&
         other.preferredRegion == preferredRegion &&
         other.introVideoUrl == introVideoUrl &&
+        other.referralCode == referralCode &&
+        other.referredBy == referredBy &&
+        other.referralCount == referralCount &&
+        other.freeBoostCredits == freeBoostCredits &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -325,6 +377,10 @@ class UserProfile {
       preferredEducationLevel,
       preferredRegion,
       introVideoUrl,
+      referralCode,
+      referredBy,
+      referralCount,
+      freeBoostCredits,
       createdAt,
       updatedAt,
     ]);
@@ -343,6 +399,8 @@ class UserProfile {
         'preferredExperienceLevel: $preferredExperienceLevel, '
         'preferredEducationLevel: $preferredEducationLevel, '
         'preferredRegion: $preferredRegion, introVideoUrl: $introVideoUrl, '
+        'referralCode: $referralCode, referredBy: $referredBy, '
+        'referralCount: $referralCount, freeBoostCredits: $freeBoostCredits, '
         'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

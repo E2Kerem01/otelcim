@@ -67,6 +67,86 @@ class BoostService {
     }
   }
 
+  /// Redeems one of the user's free (referral-earned) 7-day boost credits
+  /// on [listingId], mirroring [processBoostPurchase]'s 7-day boost but at
+  /// zero cost. Runs in a Firestore transaction so the freeBoostCredits
+  /// check-and-decrement is atomic against concurrent redemptions.
+  ///
+  /// Throws an [Exception] if the user has no free boost credits left.
+  Future<void> redeemFreeBoost({
+    required String listingId,
+    required String userId,
+  }) async {
+    try {
+      final userRef = _db.collection('user_profiles').doc(userId);
+      final boostDocRef = _db.collection('boosts').doc();
+      final purchaseDocRef = _db.collection('boost_purchases').doc();
+      final listingRef = _db.collection('listings').doc(listingId);
+
+      await _db.runTransaction((transaction) async {
+        final userSnap = await transaction.get(userRef);
+        final freeBoostCredits =
+            (userSnap.data()?['freeBoostCredits'] as int?) ?? 0;
+        if (freeBoostCredits <= 0) {
+          throw Exception('Kullanılabilir ücretsiz boost hakkınız yok.');
+        }
+
+        const durationDays = 7;
+        final now = DateTime.now();
+        final expiresAt = now.add(const Duration(days: durationDays));
+        final transactionId =
+            'referral_${now.millisecondsSinceEpoch}';
+
+        final boost = Boost(
+          id: boostDocRef.id,
+          listingId: listingId,
+          userId: userId,
+          durationType: BoostDurationType.days7,
+          durationDays: durationDays,
+          price: 0,
+          purchasedAt: now,
+          expiresAt: expiresAt,
+          platform: 'referral_reward',
+          transactionId: transactionId,
+          status: BoostStatus.active,
+        );
+        transaction.set(boostDocRef, boost.toMap());
+
+        final boostPurchase = BoostPurchase(
+          id: purchaseDocRef.id,
+          userId: userId,
+          listingId: listingId,
+          boostId: boostDocRef.id,
+          durationType: '7',
+          price: 0,
+          platform: 'referral_reward',
+          transactionId: transactionId,
+          productId: 'referral_free_boost',
+          status: PurchaseStatus.completed,
+          purchasedAt: now,
+          verifiedAt: now,
+        );
+        transaction.set(purchaseDocRef, boostPurchase.toMap());
+
+        transaction.update(listingRef, {
+          'isBoosted': true,
+          'boostExpiresAt': Timestamp.fromDate(expiresAt),
+          'boostType': 'referral_free_boost',
+          'boostPurchaseId': purchaseDocRef.id,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+
+        transaction.update(userRef, {
+          'freeBoostCredits': FieldValue.increment(-1),
+        });
+      });
+
+      debugPrint('Free boost redeemed successfully for listing $listingId');
+    } catch (e) {
+      debugPrint('Error redeeming free boost: $e');
+      rethrow;
+    }
+  }
 
   /// Watch active and past boost purchases for a specific user
   Stream<List<BoostPurchase>> watchUserBoostPurchases(String userId) {

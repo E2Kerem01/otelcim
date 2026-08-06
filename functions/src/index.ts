@@ -1,5 +1,5 @@
 import {initializeApp} from "firebase-admin/app";
-import {getFirestore} from "firebase-admin/firestore";
+import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import {getMessaging} from "firebase-admin/messaging";
 import {logger} from "firebase-functions";
 import {onDocumentCreated, onDocumentUpdated} from "firebase-functions/v2/firestore";
@@ -419,3 +419,90 @@ export const verifyAndProcessBoostPurchase = onCall(
   },
 );
 
+/**
+ * Grants a referral reward (1 free 7-day boost credit) to the user who
+ * referred `refereeId`, the first time `refereeId` completes a qualifying
+ * action (publishing their first listing, or starting their first chat).
+ *
+ * Idempotent via the `referralRewardGranted` flag on the referee's own
+ * profile — this flag is only ever written here, never surfaced in the
+ * Dart `UserProfile` model. Runs with the Admin SDK so it can bypass
+ * firestore.rules and write to the referrer's `user_profiles` document
+ * (which the referee's own client is not allowed to do).
+ */
+async function grantReferralRewardIfEligible(
+  refereeId: string,
+  refereeData: FirebaseFirestore.DocumentData
+): Promise<void> {
+  const referredBy = refereeData.referredBy as string | undefined;
+  if (!referredBy) {
+    return;
+  }
+  if (refereeData.referralRewardGranted === true) {
+    return;
+  }
+
+  try {
+    const referrerRef = db.collection("user_profiles").doc(referredBy);
+    const referrerSnapshot = await referrerRef.get();
+    if (!referrerSnapshot.exists) {
+      logger.info("Referans veren kullanıcı bulunamadı; ödül atlandı.", {referredBy, refereeId});
+      return;
+    }
+
+    await referrerRef.update({
+      freeBoostCredits: FieldValue.increment(1),
+      referralCount: FieldValue.increment(1),
+    });
+
+    await db.collection("user_profiles").doc(refereeId).update({
+      referralRewardGranted: true,
+    });
+
+    logger.info("Referans ödülü verildi.", {referredBy, refereeId});
+  } catch (error) {
+    logger.error("Referans ödülü verilemedi.", {referredBy, refereeId, error});
+  }
+}
+
+export const grantReferralRewardOnListingCreated = onDocumentCreated(
+  {
+    document: "listings/{listingId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const listing = event.data?.data();
+    const posterId = listing?.posterId as string | undefined;
+    if (!posterId) {
+      return;
+    }
+
+    const posterSnapshot = await db.collection("user_profiles").doc(posterId).get();
+    if (!posterSnapshot.exists) {
+      return;
+    }
+
+    await grantReferralRewardIfEligible(posterId, posterSnapshot.data() ?? {});
+  },
+);
+
+export const grantReferralRewardOnConversationCreated = onDocumentCreated(
+  {
+    document: "conversations/{conversationId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const conversation = event.data?.data();
+    const seekerId = conversation?.seekerId as string | undefined;
+    if (!seekerId) {
+      return;
+    }
+
+    const seekerSnapshot = await db.collection("user_profiles").doc(seekerId).get();
+    if (!seekerSnapshot.exists) {
+      return;
+    }
+
+    await grantReferralRewardIfEligible(seekerId, seekerSnapshot.data() ?? {});
+  },
+);

@@ -6,6 +6,32 @@
   "emailValidation": "Enter a valid email",
   "passwordLabel": "Password",
   "passwordValidation": "Password must be at least 8 characters and include at least 1 digit",
+  "referralCodeLabel": "Referral Code (optional)",
+  "referralCodeHint": "Your friend's code",
+  "inviteFriendsTitle": "Invite Friends",
+  "inviteFriendsMenuLabel": "Invite Friends",
+  "inviteFriendsDescription": "Share your code with a friend — when they sign up and publish their first listing or start their first chat, you earn a free boost.",
+  "yourReferralCodeLabel": "Your Referral Code",
+  "copyCodeAction": "Copy Code",
+  "codeCopiedMessage": "Code copied",
+  "shareCodeAction": "Share",
+  "shareReferralMessage": "Find or post hotel & tourism jobs on Otelcim! Sign up with my code {code} and we both win.",
+  "@shareReferralMessage": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+  "referralCountLabel": "Friends Referred",
+  "freeBoostCreditsLabel": "Free Boost Credits",
+  "freeBoostBannerText": "You have {count} free boost credit(s)",
+  "@freeBoostBannerText": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "useFreeBoostAction": "Use For Free",
+  "freeBoostRedeemedMessage": "Free boost applied!",
+  "freeBoostRedeemFailedMessage": "Could not apply free boost",
   "loginWithEmail": "Sign in with Email",
   "loginWithPhone": "Sign in with Phone",
   "phoneLabel": "Phone Number",

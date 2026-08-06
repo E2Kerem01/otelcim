@@ -134,6 +134,102 @@ abstract class AppLocalizations {
   /// **'Şifre en az 8 karakter ve en az 1 rakam içermelidir'**
   String get passwordValidation;
 
+  /// No description provided for @referralCodeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Referans Kodu (opsiyonel)'**
+  String get referralCodeLabel;
+
+  /// No description provided for @referralCodeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşının kodu'**
+  String get referralCodeHint;
+
+  /// No description provided for @inviteFriendsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşını Davet Et'**
+  String get inviteFriendsTitle;
+
+  /// No description provided for @inviteFriendsMenuLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşını Davet Et'**
+  String get inviteFriendsMenuLabel;
+
+  /// No description provided for @inviteFriendsDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodunu arkadaşınla paylaş, o kaydolup ilk ilanını yayınladığında veya ilk sohbetini başlattığında sana ücretsiz bir boost hakkı kazandırsın.'**
+  String get inviteFriendsDescription;
+
+  /// No description provided for @yourReferralCodeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Referans Kodun'**
+  String get yourReferralCodeLabel;
+
+  /// No description provided for @copyCodeAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodu Kopyala'**
+  String get copyCodeAction;
+
+  /// No description provided for @codeCopiedMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod kopyalandı'**
+  String get codeCopiedMessage;
+
+  /// No description provided for @shareCodeAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get shareCodeAction;
+
+  /// No description provided for @shareReferralMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Otelcim\'de otel/turizm işleri bul veya ilan ver! {code} kodumla kayıt ol, ikimiz de kazanalım.'**
+  String shareReferralMessage(String code);
+
+  /// No description provided for @referralCountLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Davet Ettiğin Kişi Sayısı'**
+  String get referralCountLabel;
+
+  /// No description provided for @freeBoostCreditsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz Boost Hakkın'**
+  String get freeBoostCreditsLabel;
+
+  /// No description provided for @freeBoostBannerText.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} ücretsiz boost hakkınız var'**
+  String freeBoostBannerText(int count);
+
+  /// No description provided for @useFreeBoostAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz Kullan'**
+  String get useFreeBoostAction;
+
+  /// No description provided for @freeBoostRedeemedMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz boost uygulandı!'**
+  String get freeBoostRedeemedMessage;
+
+  /// No description provided for @freeBoostRedeemFailedMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz boost uygulanamadı'**
+  String get freeBoostRedeemFailedMessage;
+
   /// No description provided for @loginWithEmail.
   ///
   /// In tr, this message translates to:
