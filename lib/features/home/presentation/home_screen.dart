@@ -18,6 +18,7 @@ import '../../listings/domain/listing_model.dart';
 import '../../listings/presentation/season_utils.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../discovery/domain/tourism_region.dart';
+import '../../../core/responsive/responsive_layout.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key, this.initialRegion});
@@ -33,6 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _scrollController = ScrollController();
   String _searchQuery = '';
   int _columnCount = 1;
+  bool _columnCountInitialized = false;
   _AdvancedFilters _filters = const _AdvancedFilters();
   PaginationParams _currentParams = (
     category: null,
@@ -57,6 +59,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       Future.microtask(
         () => ref.read(notificationServiceProvider).selectRegion(initialRegion),
       );
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_columnCountInitialized) {
+      _columnCountInitialized = true;
+      final width = MediaQuery.sizeOf(context).width;
+      if (width >= desktopBreakpoint) {
+        _columnCount = 4;
+      } else if (width >= tabletBreakpoint) {
+        _columnCount = 3;
+      } else if (width >= mobileBreakpoint) {
+        _columnCount = 2;
+      }
     }
   }
 
