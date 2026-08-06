@@ -1130,7 +1130,10 @@ abstract class AppLocalizations {
   /// **'Eğitim Durumum'**
   String get myEducationLevelLabel;
 
-  /// Label used after the percentage on listing match badges.
+  /// No description provided for @matchLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyum'**
   String get matchLabel;
 }
 
