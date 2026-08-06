@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,6 +7,7 @@ import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
+import '../../../shared/widgets/xfile_preview_image.dart';
 import '../domain/listing_model.dart';
 
 class PositionFormData {
@@ -41,7 +40,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
   final _hotelNameController = TextEditingController();
   final _locationController = TextEditingController();
   final _contactController = TextEditingController();
-  final List<File> _selectedImageFiles = [];
+  final List<XFile> _selectedImageFiles = [];
   final List<PositionFormData> _positions = [];
   String? _selectedCity;
   bool _submitting = false;
@@ -100,10 +99,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
     final pickedFiles = await picker.pickMultiImage(imageQuality: 80);
     if (pickedFiles.isNotEmpty) {
       final availableSlots = 5 - _selectedImageFiles.length;
-      final filesToAdd = pickedFiles
-          .take(availableSlots)
-          .map((xFile) => File(xFile.path))
-          .toList();
+      final filesToAdd = pickedFiles.take(availableSlots).toList();
 
       setState(() {
         _selectedImageFiles.addAll(filesToAdd);
@@ -293,11 +289,10 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
+                                  child: XFilePreviewImage(
                                     file,
                                     width: 80,
                                     height: 80,
-                                    fit: BoxFit.cover,
                                   ),
                                 ),
                                 Positioned(

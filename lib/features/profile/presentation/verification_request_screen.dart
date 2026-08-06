@@ -1,6 +1,6 @@
-import 'dart:io';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -51,12 +51,14 @@ class _VerificationRequestScreenState
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
         allowMultiple: false,
+        withData: true,
       );
 
       if (result == null || result.files.isEmpty) return;
 
       final file = result.files.first;
-      if (file.path == null) {
+      final hasUsableData = kIsWeb ? file.bytes != null : true;
+      if (!hasUsableData) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -67,7 +69,7 @@ class _VerificationRequestScreenState
         return;
       }
 
-      await _uploadDocument(File(file.path!), file.name);
+      await _uploadDocument(file.xFile, file.name);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +82,7 @@ class _VerificationRequestScreenState
   }
 
   /// Uploads a document to Firebase Storage
-  Future<void> _uploadDocument(File file, String fileName) async {
+  Future<void> _uploadDocument(XFile file, String fileName) async {
     setState(() {
       _isUploading = true;
     });

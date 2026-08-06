@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,7 +29,7 @@ class IntroVideoPicker extends ConsumerStatefulWidget {
 class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
   final ImagePicker _picker = ImagePicker();
   bool _isUploading = false;
-  File? _localVideoFile;
+  XFile? _localVideoFile;
 
   Future<void> _showVideoSourceOptions() async {
     await showModalBottomSheet<void>(
@@ -70,10 +71,12 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
 
       if (pickedFile == null) return;
 
-      final file = File(pickedFile.path);
-
-      // Validate video duration client-side
-      final tempController = VideoPlayerController.file(file);
+      // Validate video duration client-side. VideoPlayerController.file()
+      // (dart:io) isn't supported on web; XFile.path there is a blob: URL
+      // video_player_web can play via networkUrl().
+      final tempController = kIsWeb
+          ? VideoPlayerController.networkUrl(Uri.parse(pickedFile.path))
+          : VideoPlayerController.file(File(pickedFile.path));
       await tempController.initialize();
       final duration = tempController.value.duration;
       await tempController.dispose();
@@ -93,13 +96,13 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
 
       setState(() {
         _isUploading = true;
-        _localVideoFile = file;
+        _localVideoFile = pickedFile;
       });
 
       final storageService = ref.read(storageServiceProvider);
       final downloadUrl = await storageService.uploadIntroVideo(
         widget.userId,
-        file,
+        pickedFile,
       );
 
       if (!mounted) return;

@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -382,7 +381,7 @@ class __UploadCertificateSheetState
     extends ConsumerState<_UploadCertificateSheet> {
   CertificateType _selectedType = CertificateType.hijyen;
   final _titleController = TextEditingController();
-  File? _selectedFile;
+  XFile? _selectedFile;
   String? _selectedFileName;
   bool _isUploading = false;
   String? _error;
@@ -408,7 +407,7 @@ class __UploadCertificateSheetState
                 final image = await picker.pickImage(source: ImageSource.gallery);
                 if (image != null) {
                   setState(() {
-                    _selectedFile = File(image.path);
+                    _selectedFile = image;
                     _selectedFileName = image.name;
                     _error = null;
                   });
@@ -424,7 +423,7 @@ class __UploadCertificateSheetState
                 final image = await picker.pickImage(source: ImageSource.camera);
                 if (image != null) {
                   setState(() {
-                    _selectedFile = File(image.path);
+                    _selectedFile = image;
                     _selectedFileName = image.name;
                     _error = null;
                   });
@@ -439,11 +438,15 @@ class __UploadCertificateSheetState
                 final result = await FilePicker.platform.pickFiles(
                   type: FileType.custom,
                   allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+                  withData: true,
                 );
-                if (result != null && result.files.single.path != null) {
+                final picked = result?.files.single;
+                final hasUsableData =
+                    picked != null && (kIsWeb ? picked.bytes != null : true);
+                if (hasUsableData) {
                   setState(() {
-                    _selectedFile = File(result.files.single.path!);
-                    _selectedFileName = result.files.single.name;
+                    _selectedFile = picked.xFile;
+                    _selectedFileName = picked.name;
                     _error = null;
                   });
                 }

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +9,7 @@ import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
+import '../../../shared/widgets/xfile_preview_image.dart';
 import '../../discovery/domain/tourism_region.dart';
 import '../../nearby/services/location_service.dart';
 import '../domain/listing_model.dart';
@@ -35,8 +34,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   final _maxSalaryController = TextEditingController();
   final _locationController = TextEditingController();
   final _contactController = TextEditingController();
-  final List<File> _selectedImageFiles = [];
-  final List<File> _housingImageFiles = [];
+  final List<XFile> _selectedImageFiles = [];
+  final List<XFile> _housingImageFiles = [];
   String? _housingRoomType;
   bool _housingHasAc = false;
   bool _housingHasWifi = false;
@@ -79,10 +78,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     final pickedFiles = await picker.pickMultiImage(imageQuality: 80);
     if (pickedFiles.isNotEmpty) {
       final availableSlots = 5 - _selectedImageFiles.length;
-      final filesToAdd = pickedFiles
-          .take(availableSlots)
-          .map((xFile) => File(xFile.path))
-          .toList();
+      final filesToAdd = pickedFiles.take(availableSlots).toList();
 
       setState(() {
         _selectedImageFiles.addAll(filesToAdd);
@@ -95,7 +91,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     if (!mounted || picked.isEmpty) return;
     setState(
       () => _housingImageFiles.addAll(
-        picked.take(5 - _housingImageFiles.length).map((x) => File(x.path)),
+        picked.take(5 - _housingImageFiles.length),
       ),
     );
   }
@@ -418,11 +414,10 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.file(
+                          child: XFilePreviewImage(
                             file,
                             width: 90,
                             height: 90,
-                            fit: BoxFit.cover,
                           ),
                         ),
                         Positioned(

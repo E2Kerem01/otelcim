@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -14,13 +16,13 @@ class VideoPlayerDialog extends StatefulWidget {
   }) : assert(videoUrl != null || videoFile != null, 'Either videoUrl or videoFile must be provided');
 
   final String? videoUrl;
-  final File? videoFile;
+  final XFile? videoFile;
   final String title;
 
   static Future<void> show(
     BuildContext context, {
     String? videoUrl,
-    File? videoFile,
+    XFile? videoFile,
     String title = 'Tanıtım Videosu',
   }) {
     return showDialog<void>(
@@ -53,7 +55,12 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
   Future<void> _initializeVideo() async {
     try {
       if (widget.videoFile != null) {
-        _controller = VideoPlayerController.file(widget.videoFile!);
+        // VideoPlayerController.file() (dart:io) isn't supported on web;
+        // XFile.path there is a blob: URL video_player_web can play via
+        // networkUrl().
+        _controller = kIsWeb
+            ? VideoPlayerController.networkUrl(Uri.parse(widget.videoFile!.path))
+            : VideoPlayerController.file(File(widget.videoFile!.path));
       } else if (widget.videoUrl != null && widget.videoUrl!.isNotEmpty) {
         _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
       } else {

@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// Provider for the StorageService instance
 final storageServiceProvider = Provider<StorageService>((ref) {
@@ -15,6 +17,27 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 class StorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  /// Uploads bytes/file to [ref], using `putData()` on web (where `dart:io`'s
+  /// `File` is unsupported) and `putFile()` elsewhere.
+  Future<TaskSnapshot> _putXFile(
+    Reference ref,
+    XFile xFile,
+    SettableMetadata metadata,
+  ) {
+    if (kIsWeb) {
+      return xFile.readAsBytes().then((bytes) => ref.putData(bytes, metadata));
+    }
+    return ref.putFile(File(xFile.path), metadata);
+  }
+
+  /// Best-effort file extension (including the dot), derived from the
+  /// picked file's name rather than its path — on web, `XFile.path` is a
+  /// blob URL with no real extension.
+  String _extensionOf(XFile xFile, {String fallback = ''}) {
+    final name = xFile.name;
+    return name.contains('.') ? name.substring(name.lastIndexOf('.')) : fallback;
+  }
+
   /// Uploads a profile photo to Firebase Storage.
   ///
   /// The photo is stored at `profile_photos/{userId}/profile.jpg` in Firebase Storage.
@@ -22,7 +45,7 @@ class StorageService {
   ///
   /// Parameters:
   /// - [userId]: The unique identifier for the user
-  /// - [imageFile]: The image file to upload
+  /// - [imageFile]: The picked image to upload
   ///
   /// Returns:
   /// A [Future<String>] containing the download URL of the uploaded photo.
@@ -30,7 +53,7 @@ class StorageService {
   /// Throws:
   /// - [FirebaseException] if the upload fails
   /// - [Exception] for other errors during upload
-  Future<String> uploadProfilePhoto(String userId, File imageFile) async {
+  Future<String> uploadProfilePhoto(String userId, XFile imageFile) async {
     try {
       // Define the storage path for the profile photo
       final String path = 'profile_photos/$userId/profile.jpg';
@@ -46,7 +69,7 @@ class StorageService {
       );
 
       // Upload the file
-      final TaskSnapshot uploadTask = await ref.putFile(imageFile, metadata);
+      final TaskSnapshot uploadTask = await _putXFile(ref, imageFile, metadata);
 
       // Get and return the download URL
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
@@ -95,7 +118,7 @@ class StorageService {
   ///
   /// Parameters:
   /// - [userId]: The unique identifier for the user
-  /// - [documentFile]: The document file to upload (e.g., PDF, image)
+  /// - [documentFile]: The picked document to upload (e.g., PDF, image)
   /// - [documentType]: The type of document (e.g., 'tax_id', 'tourism_license', 'hotel_registration')
   ///
   /// Returns:
@@ -106,13 +129,11 @@ class StorageService {
   /// - [Exception] for other errors during upload
   Future<String> uploadVerificationDocument(
     String userId,
-    File documentFile,
+    XFile documentFile,
     String documentType,
   ) async {
     try {
-      // Get file extension from the file path
-      final String filePath = documentFile.path;
-      final String extension = filePath.substring(filePath.lastIndexOf('.'));
+      final String extension = _extensionOf(documentFile);
 
       // Create timestamp for unique file naming
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -143,7 +164,7 @@ class StorageService {
       );
 
       // Upload the file
-      final TaskSnapshot uploadTask = await ref.putFile(documentFile, metadata);
+      final TaskSnapshot uploadTask = await _putXFile(ref, documentFile, metadata);
 
       // Get and return the download URL
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
@@ -159,7 +180,7 @@ class StorageService {
   ///
   /// The image is stored at `banner_images/{timestamp}.jpg`.
   /// Returns the download URL string.
-  Future<String> uploadBannerImage(File imageFile) async {
+  Future<String> uploadBannerImage(XFile imageFile) async {
     try {
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
       final String path = 'banner_images/$timestamp.jpg';
@@ -170,7 +191,7 @@ class StorageService {
         customMetadata: {'uploadedAt': DateTime.now().toIso8601String()},
       );
 
-      final TaskSnapshot uploadTask = await ref.putFile(imageFile, metadata);
+      final TaskSnapshot uploadTask = await _putXFile(ref, imageFile, metadata);
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
     } on FirebaseException catch (e) {
@@ -186,7 +207,7 @@ class StorageService {
   /// Returns a list of download URL strings.
   Future<List<String>> uploadListingImages(
     String listingId,
-    List<File> imageFiles,
+    List<XFile> imageFiles,
   ) async {
     try {
       final List<String> downloadUrls = [];
@@ -205,7 +226,8 @@ class StorageService {
           },
         );
 
-        final TaskSnapshot uploadTask = await ref.putFile(
+        final TaskSnapshot uploadTask = await _putXFile(
+          ref,
           imageFiles[i],
           metadata,
         );
@@ -223,7 +245,7 @@ class StorageService {
 
   Future<List<String>> uploadHousingImages(
     String listingId,
-    List<File> imageFiles,
+    List<XFile> imageFiles,
   ) async {
     try {
       final urls = <String>[];
@@ -232,7 +254,8 @@ class StorageService {
         final ref = _storage.ref().child(
           'housing_images/$listingId/${i}_$timestamp.jpg',
         );
-        final task = await ref.putFile(
+        final task = await _putXFile(
+          ref,
           imageFiles[i],
           SettableMetadata(
             contentType: 'image/jpeg',
@@ -252,13 +275,10 @@ class StorageService {
   Future<String> uploadCertificateFile({
     required String userId,
     required String certId,
-    required File file,
+    required XFile file,
   }) async {
     try {
-      final String filePath = file.path;
-      final String extension = filePath.contains('.')
-          ? filePath.substring(filePath.lastIndexOf('.'))
-          : '.jpg';
+      final String extension = _extensionOf(file, fallback: '.jpg');
 
       final String path = 'certificates/$userId/$certId$extension';
       final Reference ref = _storage.ref().child(path);
@@ -282,7 +302,7 @@ class StorageService {
         },
       );
 
-      final TaskSnapshot uploadTask = await ref.putFile(file, metadata);
+      final TaskSnapshot uploadTask = await _putXFile(ref, file, metadata);
       return await uploadTask.ref.getDownloadURL();
     } on FirebaseException catch (e) {
       throw Exception('Failed to upload certificate file: ${e.message}');
@@ -293,7 +313,7 @@ class StorageService {
 
   /// Uploads a profile intro video to Firebase Storage.
   /// Path: `user_videos/{userId}/intro.mp4`
-  Future<String> uploadIntroVideo(String userId, File videoFile) async {
+  Future<String> uploadIntroVideo(String userId, XFile videoFile) async {
     try {
       final String path = 'user_videos/$userId/intro.mp4';
       final Reference ref = _storage.ref().child(path);
@@ -306,7 +326,7 @@ class StorageService {
         },
       );
 
-      final TaskSnapshot uploadTask = await ref.putFile(videoFile, metadata);
+      final TaskSnapshot uploadTask = await _putXFile(ref, videoFile, metadata);
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
     } on FirebaseException catch (e) {
