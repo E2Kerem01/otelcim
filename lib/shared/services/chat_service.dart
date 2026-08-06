@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,29 +14,84 @@ class ChatService {
   final FirebaseFirestore _db;
 
   Stream<List<Conversation>> watchConversations(String uid) {
-    return _db
-        .collection('conversations')
-        .where(
-          Filter.or(
-            Filter('posterId', isEqualTo: uid),
-            Filter('seekerId', isEqualTo: uid),
-          ),
-        )
-        .snapshots()
-        .map((snap) {
-      final conversations = snap.docs.map(Conversation.fromDoc).toList();
+    final posterConversations = <String, Conversation>{};
+    final seekerConversations = <String, Conversation>{};
+    var hasPosterSnapshot = false;
+    var hasSeekerSnapshot = false;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? posterSubscription;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? seekerSubscription;
+    late final StreamController<List<Conversation>> controller;
 
+    void emitConversations() {
+      if (!hasPosterSnapshot || !hasSeekerSnapshot || controller.isClosed) {
+        return;
+      }
+
+      final conversations = <Conversation>[
+        ...posterConversations.values,
+        ...seekerConversations.values.where(
+          (conversation) => !posterConversations.containsKey(conversation.id),
+        ),
+      ];
       conversations.sort((a, b) {
         final tA = a.updatedAt ?? a.createdAt ?? DateTime.now();
         final tB = b.updatedAt ?? b.createdAt ?? DateTime.now();
         return tB.compareTo(tA);
       });
+      controller.add(conversations);
+    }
 
-      return conversations;
-    }).handleError((error) {
+    void handleError(Object error, StackTrace stackTrace) {
       debugPrint('Firestore watchConversations warning: $error');
-      return <Conversation>[];
-    });
+    }
+
+    controller = StreamController<List<Conversation>>(
+      onListen: () {
+        posterSubscription = _db
+            .collection('conversations')
+            .where('posterId', isEqualTo: uid)
+            .snapshots()
+            .listen((snapshot) {
+          posterConversations
+            ..clear()
+            ..addEntries(snapshot.docs.map((doc) {
+              final conversation = Conversation.fromDoc(doc);
+              return MapEntry(doc.id, conversation);
+            }));
+          hasPosterSnapshot = true;
+          emitConversations();
+        }, onError: handleError);
+
+        seekerSubscription = _db
+            .collection('conversations')
+            .where('seekerId', isEqualTo: uid)
+            .snapshots()
+            .listen((snapshot) {
+          seekerConversations
+            ..clear()
+            ..addEntries(snapshot.docs.map((doc) {
+              final conversation = Conversation.fromDoc(doc);
+              return MapEntry(doc.id, conversation);
+            }));
+          hasSeekerSnapshot = true;
+          emitConversations();
+        }, onError: handleError);
+      },
+      onPause: () {
+        posterSubscription?.pause();
+        seekerSubscription?.pause();
+      },
+      onResume: () {
+        posterSubscription?.resume();
+        seekerSubscription?.resume();
+      },
+      onCancel: () async {
+        await posterSubscription?.cancel();
+        await seekerSubscription?.cancel();
+      },
+    );
+
+    return controller.stream;
   }
 
   Future<Conversation?> getConversation(String conversationId) async {
