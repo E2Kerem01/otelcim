@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,7 +34,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
+  Timer? _searchDebounce;
   String _searchQuery = '';
+  bool _hasSearchText = false;
   int _columnCount = 1;
   bool _columnCountInitialized = false;
   _AdvancedFilters _filters = const _AdvancedFilters();
@@ -76,14 +80,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _columnCount = 2;
       }
     }
+    if (context.isMobile && _columnCount > 2) {
+      _columnCount = 2;
+    }
   }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    final hasSearchText = value.isNotEmpty;
+    if (_hasSearchText != hasSearchText) {
+      setState(() => _hasSearchText = hasSearchText);
+    }
+
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      setState(() => _searchQuery = value.trim());
+    });
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    setState(() {
+      _hasSearchText = false;
+      _searchQuery = '';
+    });
   }
 
   void _onScroll() {
@@ -130,6 +160,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedCategory = ref.watch(selectedCategoryFilterProvider);
+    final availableColumnCounts = context.isMobile
+        ? const [1, 2]
+        : const [1, 2, 3, 4];
     _currentParams = (
       category: selectedCategory?.name,
       searchQuery: _searchQuery,
@@ -209,16 +242,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Icons.search_rounded,
                               color: Colors.grey,
                             ),
-                            suffixIcon: _searchQuery.isNotEmpty
+                            suffixIcon: _hasSearchText
                                 ? IconButton(
                                     icon: const Icon(
                                       Icons.clear_rounded,
                                       size: 20,
                                     ),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      setState(() => _searchQuery = '');
-                                    },
+                                    onPressed: _clearSearch,
                                   )
                                 : null,
                             border: InputBorder.none,
@@ -226,8 +256,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             focusedBorder: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          onChanged: (value) =>
-                              setState(() => _searchQuery = value.trim()),
+                          onChanged: _onSearchChanged,
                         ),
                       ),
                     ),
@@ -414,7 +443,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: [1, 2, 3, 4].map((cols) {
+                        children: availableColumnCounts.map((cols) {
                           final isSelected = _columnCount == cols;
                           return Tooltip(
                             message: '$cols Sütun',
@@ -528,10 +557,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    // Auto seed sample listings into Firestore if database is empty
-    Future.microtask(
-      () => ref.read(listingServiceProvider).seedSampleListings(),
-    );
     return SliverFillRemaining(
       hasScrollBody: false,
       child: Center(
