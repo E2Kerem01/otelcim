@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../../../l10n/app_localizations.dart';
+import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/payment_service.dart';
@@ -25,6 +27,7 @@ class BoostPurchaseScreen extends ConsumerStatefulWidget {
 class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
   String _selectedProductId = 'boost_14_days';
   bool _isProcessing = false;
+  bool _isRedeemingFreeBoost = false;
 
   @override
   void initState() {
@@ -136,6 +139,46 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
     }
   }
 
+  Future<void> _handleRedeemFreeBoost(String listingId) async {
+    final user = ref.read(authServiceProvider).currentUser;
+    final l10n = AppLocalizations.of(context);
+    if (user == null) return;
+
+    setState(() => _isRedeemingFreeBoost = true);
+    try {
+      final boostService = ref.read(boostServiceProvider);
+      await boostService.redeemFreeBoost(listingId: listingId, userId: user.uid);
+
+      if (mounted) {
+        ref.invalidate(listingServiceProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green.shade700,
+            content: Text(
+              l10n?.freeBoostRedeemedMessage ?? 'Ücretsiz boost uygulandı!',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${l10n?.freeBoostRedeemFailedMessage ?? 'Ücretsiz boost uygulanamadı'}: $e',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRedeemingFreeBoost = false);
+      }
+    }
+  }
+
   double _parsePrice(String priceStr) {
     final cleaned = priceStr.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
     return double.tryParse(cleaned) ?? 49.99;
@@ -143,8 +186,10 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final paymentService = ref.watch(paymentServiceProvider);
     final listingAsync = ref.watch(FutureProvider((ref) => ref.watch(listingServiceProvider).getListing(widget.listingId)));
+    final freeBoostCredits = ref.watch(currentUserProfileProvider).value?.freeBoostCredits ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -225,6 +270,63 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                 ),
 
                 const SizedBox(height: 20),
+
+                if (freeBoostCredits > 0) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.card_giftcard_rounded, color: Colors.green.shade800),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n?.freeBoostBannerText(freeBoostCredits) ??
+                                    '$freeBoostCredits ücretsiz boost hakkınız var',
+                                style: TextStyle(
+                                  color: Colors.green.shade900,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _isRedeemingFreeBoost || _isProcessing
+                                ? null
+                                : () => _handleRedeemFreeBoost(widget.listingId),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green.shade700,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: _isRedeemingFreeBoost
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(l10n?.useFreeBoostAction ?? 'Ücretsiz Kullan'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
 
                 // Benefits Header
                 const Text(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
+import '../../../shared/utils/referral_code.dart';
 import 'verification_request_screen.dart';
 import 'widgets/intro_video_picker.dart';
 import 'widgets/profile_form.dart';
@@ -81,6 +82,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         preferredEducationLevel: _preferredEducationLevel,
         preferredRegion: _preferredRegion,
         introVideoUrl: _introVideoUrl,
+        referralCode: currentProfile?.referralCode ??
+            generateReferralCode(currentUser.uid),
+        referredBy: currentProfile?.referredBy,
         createdAt: currentProfile?.createdAt ?? now,
         updatedAt: now,
       );

@@ -24,6 +24,32 @@
   "@passwordValidation": {
     "description": "Password validation error message"
   },
+  "referralCodeLabel": "Referans Kodu (opsiyonel)",
+  "referralCodeHint": "Arkadaşının kodu",
+  "inviteFriendsTitle": "Arkadaşını Davet Et",
+  "inviteFriendsMenuLabel": "Arkadaşını Davet Et",
+  "inviteFriendsDescription": "Kodunu arkadaşınla paylaş, o kaydolup ilk ilanını yayınladığında veya ilk sohbetini başlattığında sana ücretsiz bir boost hakkı kazandırsın.",
+  "yourReferralCodeLabel": "Referans Kodun",
+  "copyCodeAction": "Kodu Kopyala",
+  "codeCopiedMessage": "Kod kopyalandı",
+  "shareCodeAction": "Paylaş",
+  "shareReferralMessage": "Otelcim'de otel/turizm işleri bul veya ilan ver! {code} kodumla kayıt ol, ikimiz de kazanalım.",
+  "@shareReferralMessage": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+  "referralCountLabel": "Davet Ettiğin Kişi Sayısı",
+  "freeBoostCreditsLabel": "Ücretsiz Boost Hakkın",
+  "freeBoostBannerText": "{count} ücretsiz boost hakkınız var",
+  "@freeBoostBannerText": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "useFreeBoostAction": "Ücretsiz Kullan",
+  "freeBoostRedeemedMessage": "Ücretsiz boost uygulandı!",
+  "freeBoostRedeemFailedMessage": "Ücretsiz boost uygulanamadı",
   "loginWithEmail": "E-posta ile Giriş",
   "loginWithPhone": "Telefon ile Giriş",
   "phoneLabel": "Telefon Numarası",

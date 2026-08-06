@@ -110,6 +110,31 @@ class ProfileService {
     }
   }
 
+  /// Finds the uid of the user who owns the given referral [code].
+  ///
+  /// Returns `null` when no user profile has that referral code (including
+  /// an empty/invalid [code]). `user_profiles` reads are already public per
+  /// firestore.rules, so no additional permissions are required.
+  Future<String?> findUserIdByReferralCode(String code) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collectionName)
+          .where('referralCode', isEqualTo: code)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return null;
+      }
+
+      return querySnapshot.docs.first.id;
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to find user by referral code: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error finding user by referral code: $e');
+    }
+  }
+
   /// Watches a user's profile for real-time updates.
   ///
   /// Returns a stream that emits the user's profile whenever it changes in Firestore.
