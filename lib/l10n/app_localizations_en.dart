@@ -506,6 +506,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get housingPhotos => 'Accommodation photos';
 
   @override
+  String get staffShuttleRouteLabel => 'Staff Shuttle Route';
+
+  @override
+  String get staffShuttleRouteHint => 'E.g. Downtown - Central Station - Hotel';
+
+  @override
   String get housingAddPhoto => 'Add photo';
 
   @override

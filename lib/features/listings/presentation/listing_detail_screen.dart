@@ -266,6 +266,8 @@ ${listing.contactInfo}
               listing.housingHasWifi != null ||
               listing.housingMealsIncluded != null ||
               listing.housingImages.isNotEmpty;
+          final hasShuttle = listing.staffShuttleRoute?.trim().isNotEmpty ==
+              true;
 
           return LayoutBuilder(
             builder: (context, constraints) {
@@ -302,6 +304,14 @@ ${listing.contactInfo}
                                   if (hasHousing) ...[
                                     const SizedBox(height: 20),
                                     _buildHousingCard(context, listing, l10n),
+                                  ],
+                                  if (hasShuttle) ...[
+                                    const SizedBox(height: 20),
+                                    _buildStaffShuttleCard(
+                                      context,
+                                      listing,
+                                      l10n,
+                                    ),
                                   ],
                                   const SizedBox(height: 24),
                                   _buildPosterCard(context, listing, myUid),
@@ -356,6 +366,10 @@ ${listing.contactInfo}
                     if (hasHousing) ...[
                       const SizedBox(height: 20),
                       _buildHousingCard(context, listing, l10n),
+                    ],
+                    if (hasShuttle) ...[
+                      const SizedBox(height: 20),
+                      _buildStaffShuttleCard(context, listing, l10n),
                     ],
                     const SizedBox(height: 24),
                     _buildPosterCard(context, listing, myUid),
@@ -691,6 +705,35 @@ ${listing.contactInfo}
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStaffShuttleCard(
+    BuildContext context,
+    Listing listing,
+    AppLocalizations l10n,
+  ) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.directions_bus_outlined),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.staffShuttleRouteLabel,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(listing.staffShuttleRoute!),
           ],
         ),
       ),
