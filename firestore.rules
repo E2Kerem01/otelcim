@@ -16,6 +16,11 @@ service cloud.firestore {
         get(/databases/$(database)/documents/user_profiles/$(request.auth.uid)).data.isAdmin == true;
     }
 
+    // Prevent regular users from tampering with their isAdmin field
+    function isNotChangingAdminStatus() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']) || isAdmin();
+    }
+
     // Public job marketplace listings. Read is public so anonymous users can
     // browse (home feed, regions, map, nearby). Writes require ownership;
     // moderation (update/delete) is also allowed for admins.
@@ -30,7 +35,9 @@ service cloud.firestore {
     // listings and chat. Only the owner can write their own profile.
     match /user_profiles/{userId} {
       allow read: if true;
-      allow create, update: if isOwner(userId);
+      allow create: if isOwner(userId) &&
+        (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin());
+      allow update: if isOwner(userId) && isNotChangingAdminStatus();
       allow delete: if isOwner(userId) || isAdmin();
 
       match /favorites/{listingId} {
@@ -48,23 +55,34 @@ service cloud.firestore {
       allow write: if isOwner(userId);
     }
 
-    // Chat. watchConversations()/messages currently run unfiltered
-    // collection queries and filter client-side, so read is scoped to any
-    // signed-in user rather than per-participant (see TECH-002 follow-up to
-    // add proper where() filters and tighten this further). Writes require
-    // being a participant.
+    // Chat. Only participants or admins can read conversations and messages.
     match /conversations/{conversationId} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn() &&
+        (resource.data.posterId == request.auth.uid ||
+         resource.data.seekerId == request.auth.uid ||
+         isAdmin());
       allow create: if isSignedIn() &&
         (request.resource.data.posterId == request.auth.uid ||
          request.resource.data.seekerId == request.auth.uid);
       allow update: if isSignedIn() &&
         (resource.data.posterId == request.auth.uid ||
-         resource.data.seekerId == request.auth.uid);
+         resource.data.seekerId == request.auth.uid) &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['posterId', 'seekerId']);
 
       match /messages/{messageId} {
-        allow read: if isSignedIn();
+        allow read: if isSignedIn() &&
+          (get(/databases/$(database)/documents/conversations/$(conversationId)).data.posterId == request.auth.uid ||
+           get(/databases/$(database)/documents/conversations/$(conversationId)).data.seekerId == request.auth.uid ||
+           isAdmin());
         allow create: if isSignedIn() &&
+          (get(/databases/$(database)/documents/conversations/$(conversationId)).data.posterId == request.auth.uid ||
+           get(/databases/$(database)/documents/conversations/$(conversationId)).data.seekerId == request.auth.uid);
+      }
+
+      // Interview time proposals/confirmations, scoped to conversation participants.
+      match /interview_slots/{slotId} {
+        allow read, write: if isSignedIn() &&
           (get(/databases/$(database)/documents/conversations/$(conversationId)).data.posterId == request.auth.uid ||
            get(/databases/$(database)/documents/conversations/$(conversationId)).data.seekerId == request.auth.uid);
       }
@@ -87,26 +105,52 @@ service cloud.firestore {
       allow update: if isAdmin();
     }
 
-    // Boosts / purchases. watchUserBoosts()/watchUserBoostPurchases() run
-    // unfiltered collection queries (see TECH-002 follow-up) so read is
-    // scoped to any signed-in user; writes require ownership.
+    // Boosts / purchases. Reads are scoped to the owner (or admin) — these
+    // contain purchase/pricing data. Direct client-side creates/updates of
+    // paid boosts are disabled; paid purchases must go through the
+    // verifyAndProcessBoostPurchase Cloud Function (Admin SDK, bypasses
+    // these rules). Only the zero-cost referral reward path is allowed
+    // directly from the client.
     match /boosts/{boostId} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
       allow create, update: if isSignedIn() &&
-        request.resource.data.userId == request.auth.uid;
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.platform == 'referral_reward' &&
+        request.resource.data.price == 0;
     }
     match /boost_purchases/{purchaseId} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() &&
-        request.resource.data.userId == request.auth.uid;
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.platform == 'referral_reward' &&
+        request.resource.data.price == 0;
     }
 
     // Ratings are publicly visible (shown on profiles), only the rater can
-    // create their own rating document.
+    // create their own rating document, for someone else, with a valid
+    // 1-5 score.
     match /ratings/{ratingId} {
       allow read: if true;
       allow create: if isSignedIn() &&
-        request.resource.data.raterId == request.auth.uid;
+        request.resource.data.raterId == request.auth.uid &&
+        request.resource.data.ratedUserId != request.auth.uid &&
+        request.resource.data.stars is number &&
+        request.resource.data.stars >= 1 &&
+        request.resource.data.stars <= 5;
+    }
+
+    // Certificate wallet: owner reads/creates their own certificates; admin
+    // can read any (needed for the pending-review query) and is the only
+    // one who can update status (approve/reject).
+    match /certificates/{certId} {
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
     // Sponsor banners: public read, admin-managed.
@@ -119,7 +163,8 @@ service cloud.firestore {
     // trigger source (read via Admin SDK, bypasses these rules). Client
     // only ever creates/updates/deletes its own entry here.
     match /seasonal_subscriptions/{subscriptionId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() &&
         request.resource.data.userId == request.auth.uid;
       allow update, delete: if isSignedIn() &&
@@ -137,3 +182,4 @@ service cloud.firestore {
     }
   }
 }
+
