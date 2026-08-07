@@ -1215,16 +1215,23 @@ class _ListingCard extends ConsumerWidget {
                               ),
                             )
                           : Container(
-                              color: Theme.of(
-                                context,
-                              ).primaryColor.withValues(alpha: 0.08),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    listingCategoryColor(listing.category),
+                                    listingCategoryColor(
+                                      listing.category,
+                                    ).withValues(alpha: 0.72),
+                                  ],
+                                ),
+                              ),
                               child: Center(
                                 child: Icon(
-                                  Icons.hotel_rounded,
-                                  size: 32,
-                                  color: Theme.of(
-                                    context,
-                                  ).primaryColor.withValues(alpha: 0.4),
+                                  listingCategoryIcon(listing.category),
+                                  size: 34,
+                                  color: Colors.white.withValues(alpha: 0.92),
                                 ),
                               ),
                             ),
@@ -1289,9 +1296,9 @@ class _ListingCard extends ConsumerWidget {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(
-                                        context,
-                                      ).primaryColor.withValues(alpha: 0.1),
+                                      color: listingCategoryColor(
+                                        listing.category,
+                                      ).withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
@@ -1301,7 +1308,9 @@ class _ListingCard extends ConsumerWidget {
                                       style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
-                                        color: Theme.of(context).primaryColor,
+                                        color: listingCategoryColor(
+                                          listing.category,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1426,9 +1435,9 @@ class _ListingCard extends ConsumerWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).primaryColor.withValues(alpha: 0.1),
+                        color: listingCategoryColor(
+                          listing.category,
+                        ).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -1436,7 +1445,7 @@ class _ListingCard extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
+                          color: listingCategoryColor(listing.category),
                         ),
                       ),
                     ),
@@ -1531,28 +1540,50 @@ class _ListingCard extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (listing.images.isNotEmpty) ...[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: listing.images.first,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          placeholder: (_, __) => Container(
-                            color: Colors.grey.shade200,
-                            width: 60,
-                            height: 60,
-                          ),
-                          errorWidget: (_, __, ___) => const Icon(
-                            Icons.broken_image,
-                            size: 24,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: listing.images.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: listing.images.first,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                              placeholder: (_, __) => Container(
+                                color: Colors.grey.shade200,
+                                width: 60,
+                                height: 60,
+                              ),
+                              errorWidget: (_, __, ___) => const Icon(
+                                Icons.broken_image,
+                                size: 24,
+                                color: Colors.grey,
+                              ),
+                            )
+                          : Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    listingCategoryColor(listing.category),
+                                    listingCategoryColor(
+                                      listing.category,
+                                    ).withValues(alpha: 0.72),
+                                  ],
+                                ),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  listingCategoryIcon(listing.category),
+                                  size: 26,
+                                  color: Colors.white.withValues(alpha: 0.92),
+                                ),
+                              ),
+                            ),
+                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

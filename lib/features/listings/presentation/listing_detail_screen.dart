@@ -953,13 +953,19 @@ class _ListingImageGalleryState extends State<_ListingImageGallery> {
         orElse: () => ListingCategory.diger,
       );
       final categoryIcon = listingCategoryIcons[categoryEnum] ?? Icons.hotel;
+      final categoryColor =
+          listingCategoryColors[categoryEnum] ?? Theme.of(context).primaryColor;
 
       return Container(
         width: double.infinity,
         height: 180,
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [categoryColor, categoryColor.withValues(alpha: 0.72)],
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Center(
@@ -969,13 +975,13 @@ class _ListingImageGalleryState extends State<_ListingImageGallery> {
               Icon(
                 categoryIcon,
                 size: 56,
-                color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                color: Colors.white.withValues(alpha: 0.92),
               ),
               const SizedBox(height: 8),
               Text(
                 listingCategoryLabels[categoryEnum] ?? 'Otelcim İlanı',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
+                style: const TextStyle(
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
