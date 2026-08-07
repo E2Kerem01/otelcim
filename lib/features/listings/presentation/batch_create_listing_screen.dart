@@ -224,6 +224,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _hotelNameController,
+                        autofillHints: const <String>[],
                         decoration: const InputDecoration(hintText: 'Örn. Grand Deluxe Hotel'),
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Otel adı gereklidir' : null,
                       ),
@@ -232,6 +233,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _locationController,
+                        autofillHints: const <String>[],
                         decoration: const InputDecoration(hintText: 'Örn. Muğla / Bodrum'),
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Konum gereklidir' : null,
                       ),
@@ -252,6 +254,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _contactController,
+                        autofillHints: const <String>[],
                         decoration: const InputDecoration(hintText: 'Örn. 0555 123 4567 / ik@hotel.com'),
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'İletişim bilgisi gereklidir' : null,
                       ),
@@ -414,6 +417,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.titleController,
+                              autofillHints: const <String>[],
                               decoration: const InputDecoration(hintText: 'Örn. Resepsiyonist / Garson / Aşçı'),
                               validator: (v) => (v == null || v.trim().isEmpty) ? 'Başlık gereklidir' : null,
                             ),
@@ -434,6 +438,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.salaryController,
+                              autofillHints: const <String>[],
                               decoration: const InputDecoration(hintText: 'Örn. 35.000₺ + yemek + lojman'),
                               validator: (v) => (v == null || v.trim().isEmpty) ? 'Maaş bilgisi gereklidir' : null,
                             ),
@@ -443,6 +448,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                                 Expanded(
                                   child: TextFormField(
                                     controller: pos.minSalaryController,
+                                    autofillHints: const <String>[],
                                     keyboardType: TextInputType.number,
                                     decoration: const InputDecoration(labelText: 'En Düşük Maaş (TL)'),
                                     validator: (v) => _salaryRangeValidator(pos),
@@ -452,6 +458,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                                 Expanded(
                                   child: TextFormField(
                                     controller: pos.maxSalaryController,
+                                    autofillHints: const <String>[],
                                     keyboardType: TextInputType.number,
                                     decoration: const InputDecoration(labelText: 'En Yüksek Maaş (TL)'),
                                     validator: (v) => _salaryRangeValidator(pos),
@@ -464,6 +471,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.descController,
+                              autofillHints: const <String>[],
                               maxLines: 3,
                               decoration: const InputDecoration(hintText: 'Pozisyon detayları ve aranan nitelikler...'),
                               validator: (v) => (v == null || v.trim().isEmpty) ? 'Açıklama gereklidir' : null,

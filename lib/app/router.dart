@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -48,6 +49,35 @@ import '../shared/services/auth_service.dart';
 import '../shared/widgets/desktop_top_nav_bar.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+Page<T> buildAppPage<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+}) {
+  final wrappedChild = PopScope(
+    canPop: true,
+    onPopInvokedWithResult: (didPop, result) {
+      // PopScope guarantees pop event capture and router state synchronization
+    },
+    child: child,
+  );
+
+  if (Theme.of(context).platform == TargetPlatform.iOS) {
+    return CupertinoPage<T>(
+      key: state.pageKey,
+      name: state.name ?? state.path,
+      arguments: state.pathParameters,
+      child: wrappedChild,
+    );
+  }
+  return MaterialPage<T>(
+    key: state.pageKey,
+    name: state.name ?? state.path,
+    arguments: state.pathParameters,
+    child: wrappedChild,
+  );
+}
 
 bool isProtectedRoute(String location) {
   final segments = Uri.parse(location).pathSegments;
@@ -114,25 +144,52 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/splash',
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const SplashScreen(),
+        ),
       ),
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/login',
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const LoginScreen(),
+        ),
+      ),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const RegisterScreen(),
+        ),
       ),
       GoRoute(
         path: '/account-suspended',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const AccountSuspendedScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const AccountSuspendedScreen(),
+        ),
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const OnboardingScreen(),
+        ),
       ),
       GoRoute(
         path: '/onboarding/role',
-        builder: (context, state) => const RoleSelectionScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const RoleSelectionScreen(),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -195,7 +252,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/',
-                builder: (context, state) => const HomeScreen(),
+                pageBuilder: (context, state) => buildAppPage(
+                  context: context,
+                  state: state,
+                  child: const HomeScreen(),
+                ),
               ),
             ],
           ),
@@ -203,7 +264,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/categories',
-                builder: (context, state) => const CategoriesScreen(),
+                pageBuilder: (context, state) => buildAppPage(
+                  context: context,
+                  state: state,
+                  child: const CategoriesScreen(),
+                ),
               ),
             ],
           ),
@@ -211,7 +276,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/create-listing',
-                builder: (context, state) => const CreateListingScreen(),
+                pageBuilder: (context, state) => buildAppPage(
+                  context: context,
+                  state: state,
+                  child: const CreateListingScreen(),
+                ),
               ),
             ],
           ),
@@ -219,7 +288,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/chat',
-                builder: (context, state) => const ChatListScreen(),
+                pageBuilder: (context, state) => buildAppPage(
+                  context: context,
+                  state: state,
+                  child: const ChatListScreen(),
+                ),
               ),
             ],
           ),
@@ -227,7 +300,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/profile',
-                builder: (context, state) => const ProfileScreen(),
+                pageBuilder: (context, state) => buildAppPage(
+                  context: context,
+                  state: state,
+                  child: const ProfileScreen(),
+                ),
               ),
             ],
           ),
@@ -236,179 +313,302 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/regions',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const RegionsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const RegionsScreen(),
+        ),
       ),
       GoRoute(
         path: '/regions/map',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const RegionMapScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const RegionMapScreen(),
+        ),
       ),
       GoRoute(
         path: '/regions/:regionId',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) =>
-            HomeScreen(initialRegion: state.pathParameters['regionId']),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: HomeScreen(initialRegion: state.pathParameters['regionId']),
+        ),
       ),
       GoRoute(
         path: '/nearby',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const NearbyListingsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const NearbyListingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/listing/:id',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
-          return ListingDetailScreen(listingId: id);
+          return buildAppPage(
+            context: context,
+            state: state,
+            child: ListingDetailScreen(listingId: id),
+          );
         },
       ),
       GoRoute(
         path: '/listing/:id/edit',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
-          return EditListingScreen(listingId: id);
+          return buildAppPage(
+            context: context,
+            state: state,
+            child: EditListingScreen(listingId: id),
+          );
         },
       ),
       GoRoute(
         path: '/listing/:id/boost',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
-          return BoostPurchaseScreen(listingId: id);
+          return buildAppPage(
+            context: context,
+            state: state,
+            child: BoostPurchaseScreen(listingId: id),
+          );
         },
       ),
       GoRoute(
         path: '/listing/:id/qr-poster',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
-          return ListingQrPosterScreen(listingId: id);
+          return buildAppPage(
+            context: context,
+            state: state,
+            child: ListingQrPosterScreen(listingId: id),
+          );
         },
       ),
       GoRoute(
         path: '/chat/:conversationId/rate',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final conversationId = state.pathParameters['conversationId']!;
-          return SubmitRatingScreen(conversationId: conversationId);
+          return buildAppPage(
+            context: context,
+            state: state,
+            child: SubmitRatingScreen(conversationId: conversationId),
+          );
         },
       ),
       GoRoute(
         path: '/chat/:conversationId',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final conversationId = state.pathParameters['conversationId']!;
-          return ChatDetailScreen(
-            conversationId: conversationId,
-            initialText: state.extra as String?,
+          return buildAppPage(
+            context: context,
+            state: state,
+            child: ChatDetailScreen(
+              conversationId: conversationId,
+              initialText: state.extra as String?,
+            ),
           );
         },
       ),
       GoRoute(
         path: '/favorites',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const FavoritesScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const FavoritesScreen(),
+        ),
       ),
       GoRoute(
         path: '/my-listings',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const MyListingsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const MyListingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/batch-create-listing',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const BatchCreateListingScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const BatchCreateListingScreen(),
+        ),
       ),
       GoRoute(
         path: '/my-boosts',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const MyBoostsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const MyBoostsScreen(),
+        ),
       ),
       GoRoute(
         path: '/seasonal-calendar',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const SeasonalCalendarScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const SeasonalCalendarScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/edit',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const EditProfileScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const EditProfileScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/certificates',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const CertificatesScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const CertificatesScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/talent-pool',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const TalentPoolScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const TalentPoolScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/verification',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const VerificationRequestScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const VerificationRequestScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/notifications',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const NotificationSettingsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const NotificationSettingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/invite',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const InviteFriendsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const InviteFriendsScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/privacy',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const PrivacySettingsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const PrivacySettingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile/privacy/policy',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const PrivacyPolicyScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const PrivacyPolicyScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const AdminDashboardScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const AdminDashboardScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin/reports',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ReportsModerationScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const ReportsModerationScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin/users',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const UserManagementScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const UserManagementScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin/listings',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ListingManagementScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const ListingManagementScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin/verifications',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const VerificationReviewScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const VerificationReviewScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin/certificates',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const CertificateReviewScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const CertificateReviewScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin/audit-log',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const AuditLogScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const AuditLogScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin/banners',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const AdminBannerAdsScreen(),
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const AdminBannerAdsScreen(),
+        ),
       ),
     ],
   );
