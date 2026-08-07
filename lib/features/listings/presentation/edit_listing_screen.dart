@@ -373,19 +373,24 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Durum: ${listing.status == ListingStatus.active ? 'Aktif' : 'Kapalı'}',
+                        'Durum: ${switch (listing.status) {
+                          ListingStatus.active => 'Aktif',
+                          ListingStatus.closed => 'Kapalı',
+                          ListingStatus.removed => 'Yönetici tarafından kaldırıldı',
+                        }}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      TextButton(
-                        onPressed: _submitting
-                            ? null
-                            : () => _toggleStatus(listing),
-                        child: Text(
-                          listing.status == ListingStatus.active
-                              ? 'Kapat'
-                              : 'Tekrar Aktifleştir',
+                      if (listing.status != ListingStatus.removed)
+                        TextButton(
+                          onPressed: _submitting
+                              ? null
+                              : () => _toggleStatus(listing),
+                          child: Text(
+                            listing.status == ListingStatus.active
+                                ? 'Kapat'
+                                : 'Tekrar Aktifleştir',
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 8),

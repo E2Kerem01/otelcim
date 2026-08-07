@@ -130,105 +130,86 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
 
     setState(() => _submitting = true);
     try {
-      final listingId = await ref
-          .read(listingServiceProvider)
-          .createListing(
-            Listing(
-              id: '',
-              posterId: user.uid,
-              posterName: user.email,
-              isUrgent: _isUrgent,
-              title: _titleController.text.trim(),
-              description: _descController.text.trim(),
-              category: _selectedCategory.name,
-              location: _locationController.text.trim(),
-              salary: _salaryController.text.trim(),
-              city: _selectedCity,
-              region: _selectedRegion,
-              lat: _lat,
-              lng: _lng,
-              minSalaryTl: int.tryParse(_minSalaryController.text.trim()),
-              maxSalaryTl: int.tryParse(_maxSalaryController.text.trim()),
-              employmentType: _employmentType,
-              experienceLevel: _experienceLevel?.name,
-              educationLevel: _educationLevel?.name,
-              season: _season,
-              contractStartDate: _contractStartDate,
-              contractEndDate: _contractEndDate,
-              contactInfo: _contactController.text.trim(),
-              housingRoomType: _housingRoomType,
-              housingHasAc: _housingRoomType == null ? null : _housingHasAc,
-              housingHasWifi: _housingRoomType == null ? null : _housingHasWifi,
-              housingMealsIncluded: _housingMealsIncluded,
-              staffShuttleRoute:
-                  _staffShuttleRouteController.text.trim().isEmpty
-                  ? null
-                  : _staffShuttleRouteController.text.trim(),
-            ),
+      final listingService = ref.read(listingServiceProvider);
+      final listingId = listingService.newListingId();
+
+      // Upload images first (against the pre-generated ID) so the listing
+      // document is only written once, fully formed. A failed upload no
+      // longer blocks publishing entirely - it degrades to a photo-less
+      // listing with a clear warning, since image uploads are the most
+      // likely thing to fail (e.g. Storage not provisioned on the Firebase
+      // project) and losing the whole listing over it is worse than
+      // publishing without photos.
+      final storageService = ref.read(storageServiceProvider);
+      var imageUrls = <String>[];
+      var housingImageUrls = <String>[];
+      var imageUploadFailed = false;
+      try {
+        if (_selectedImageFiles.isNotEmpty) {
+          imageUrls = await storageService.uploadListingImages(
+            listingId,
+            _selectedImageFiles,
           );
-
-      if (_selectedImageFiles.isNotEmpty || _housingImageFiles.isNotEmpty) {
-        final storageService = ref.read(storageServiceProvider);
-        final imageUrls = _selectedImageFiles.isEmpty
-            ? <String>[]
-            : await storageService.uploadListingImages(
-                listingId,
-                _selectedImageFiles,
-              );
-        final housingImageUrls = _housingImageFiles.isEmpty
-            ? <String>[]
-            : await storageService.uploadHousingImages(
-                listingId,
-                _housingImageFiles,
-              );
-
-        final existingListing = await ref
-            .read(listingServiceProvider)
-            .getListing(listingId);
-        if (existingListing != null) {
-          await ref
-              .read(listingServiceProvider)
-              .updateListing(
-                Listing(
-                  id: existingListing.id,
-                  posterId: existingListing.posterId,
-                  posterName: existingListing.posterName,
-                  isUrgent: existingListing.isUrgent,
-                  title: existingListing.title,
-                  description: existingListing.description,
-                  category: existingListing.category,
-                  location: existingListing.location,
-                  salary: existingListing.salary,
-                  city: existingListing.city,
-                  region: existingListing.region,
-                  lat: existingListing.lat,
-                  lng: existingListing.lng,
-                  minSalaryTl: existingListing.minSalaryTl,
-                  maxSalaryTl: existingListing.maxSalaryTl,
-                  employmentType: existingListing.employmentType,
-                  experienceLevel: existingListing.experienceLevel,
-                  educationLevel: existingListing.educationLevel,
-                  season: existingListing.season,
-                  contractStartDate: existingListing.contractStartDate,
-                  contractEndDate: existingListing.contractEndDate,
-                  contactInfo: existingListing.contactInfo,
-                  images: imageUrls,
-                  housingRoomType: existingListing.housingRoomType,
-                  housingHasAc: existingListing.housingHasAc,
-                  housingHasWifi: existingListing.housingHasWifi,
-                  housingMealsIncluded: existingListing.housingMealsIncluded,
-                  housingImages: housingImageUrls,
-                  staffShuttleRoute: existingListing.staffShuttleRoute,
-                  status: existingListing.status,
-                  createdAt: existingListing.createdAt,
-                ),
-              );
         }
+        if (_housingImageFiles.isNotEmpty) {
+          housingImageUrls = await storageService.uploadHousingImages(
+            listingId,
+            _housingImageFiles,
+          );
+        }
+      } catch (e) {
+        debugPrint('Listing image upload failed, publishing without photos: $e');
+        imageUploadFailed = true;
       }
+
+      await listingService.createListingWithId(
+        listingId,
+        Listing(
+          id: listingId,
+          posterId: user.uid,
+          posterName: user.email,
+          isUrgent: _isUrgent,
+          title: _titleController.text.trim(),
+          description: _descController.text.trim(),
+          category: _selectedCategory.name,
+          location: _locationController.text.trim(),
+          salary: _salaryController.text.trim(),
+          city: _selectedCity,
+          region: _selectedRegion,
+          lat: _lat,
+          lng: _lng,
+          minSalaryTl: int.tryParse(_minSalaryController.text.trim()),
+          maxSalaryTl: int.tryParse(_maxSalaryController.text.trim()),
+          employmentType: _employmentType,
+          experienceLevel: _experienceLevel?.name,
+          educationLevel: _educationLevel?.name,
+          season: _season,
+          contractStartDate: _contractStartDate,
+          contractEndDate: _contractEndDate,
+          contactInfo: _contactController.text.trim(),
+          images: imageUrls,
+          housingRoomType: _housingRoomType,
+          housingHasAc: _housingRoomType == null ? null : _housingHasAc,
+          housingHasWifi: _housingRoomType == null ? null : _housingHasWifi,
+          housingMealsIncluded: _housingMealsIncluded,
+          housingImages: housingImageUrls,
+          staffShuttleRoute:
+              _staffShuttleRouteController.text.trim().isEmpty
+              ? null
+              : _staffShuttleRouteController.text.trim(),
+        ),
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İlanınız başarıyla yayınlandı!')),
+          SnackBar(
+            content: Text(
+              imageUploadFailed
+                  ? 'İlanınız yayınlandı, ancak fotoğraflar yüklenemedi. Daha sonra düzenleyerek tekrar ekleyebilirsiniz.'
+                  : 'İlanınız başarıyla yayınlandı!',
+            ),
+            backgroundColor: imageUploadFailed ? Colors.orange.shade800 : null,
+          ),
         );
         Navigator.of(context).pop();
       }

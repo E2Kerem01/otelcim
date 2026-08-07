@@ -6,10 +6,20 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 
 class PaymentService extends ChangeNotifier {
   PaymentService(this._iap) {
-    _initialize();
+    // in_app_purchase has no Flutter Web platform implementation (only
+    // in_app_purchase_android / in_app_purchase_storekit are registered in
+    // pubspec.yaml, both mobile-only). Touching InAppPurchase.instance or
+    // any of its methods on web either throws or hangs waiting on a
+    // platform channel that will never respond - this froze the boost
+    // purchase screen on web (isLoading never resets, spinner never
+    // clears). Skip initialization entirely on web; isAvailable stays
+    // false and the UI falls back to its "store unavailable" path.
+    if (_iap != null) {
+      _initialize();
+    }
   }
 
-  final InAppPurchase _iap;
+  final InAppPurchase? _iap;
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
 
   bool _isAvailable = false;
@@ -29,14 +39,16 @@ class PaymentService extends ChangeNotifier {
   };
 
   Future<void> _initialize() async {
+    final iap = _iap;
+    if (iap == null) return;
     try {
-      _isAvailable = await _iap.isAvailable();
+      _isAvailable = await iap.isAvailable();
       if (!_isAvailable) {
         debugPrint('IAP not available on this device');
         return;
       }
 
-      _purchaseSub = _iap.purchaseStream.listen(
+      _purchaseSub = iap.purchaseStream.listen(
         _onPurchaseUpdate,
         onError: (error) {
           debugPrint('IAP purchase stream error: $error');
@@ -64,7 +76,7 @@ class PaymentService extends ChangeNotifier {
       }
 
       if (purchase.pendingCompletePurchase) {
-        _iap.completePurchase(purchase);
+        _iap!.completePurchase(purchase);
       }
     }
     notifyListeners();
@@ -80,7 +92,7 @@ class PaymentService extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final response = await _iap.queryProductDetails(_productIds);
+      final response = await _iap!.queryProductDetails(_productIds);
       if (response.error != null) {
         debugPrint('IAP product query error: ${response.error}');
         _products = [];
@@ -108,7 +120,7 @@ class PaymentService extends ChangeNotifier {
 
     try {
       final purchaseParam = PurchaseParam(productDetails: product);
-      final success = await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+      final success = await _iap!.buyNonConsumable(purchaseParam: purchaseParam);
       return success;
     } catch (e) {
       debugPrint('IAP purchase error: $e');
@@ -126,7 +138,7 @@ class PaymentService extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      await _iap.restorePurchases();
+      await _iap!.restorePurchases();
       debugPrint('IAP purchases restored');
     } catch (e) {
       debugPrint('IAP restore purchases error: $e');
@@ -153,7 +165,8 @@ class PaymentService extends ChangeNotifier {
     return false;
   }
 
-  Stream<List<PurchaseDetails>> get purchaseStream => _iap.purchaseStream;
+  Stream<List<PurchaseDetails>> get purchaseStream =>
+      _iap?.purchaseStream ?? const Stream.empty();
 
   @override
   void dispose() {
@@ -163,7 +176,7 @@ class PaymentService extends ChangeNotifier {
 }
 
 final paymentServiceProvider = ChangeNotifierProvider<PaymentService>(
-  (ref) => PaymentService(InAppPurchase.instance),
+  (ref) => PaymentService(kIsWeb ? null : InAppPurchase.instance),
 );
 
 final productsProvider = Provider<List<ProductDetails>>((ref) {

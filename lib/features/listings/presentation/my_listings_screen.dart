@@ -88,7 +88,11 @@ class MyListingsScreen extends ConsumerWidget {
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
-                      '${listingCategoryLabel(listing.category)} · ${listing.status == ListingStatus.active ? 'Aktif' : 'Kapalı'}',
+                      '${listingCategoryLabel(listing.category)} · ${switch (listing.status) {
+                        ListingStatus.active => 'Aktif',
+                        ListingStatus.closed => 'Kapalı',
+                        ListingStatus.removed => 'Yönetici tarafından kaldırıldı',
+                      }}',
                     ),
                   ),
                   trailing: Row(

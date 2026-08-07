@@ -124,11 +124,21 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     final uid = ref.read(authStateProvider).value?.uid;
     if (uid == null) return;
     _messageController.clear();
-    await ref.read(chatServiceProvider).sendMessage(
-          conversationId: widget.conversationId,
-          senderId: uid,
-          text: text,
+    try {
+      await ref.read(chatServiceProvider).sendMessage(
+            conversationId: widget.conversationId,
+            senderId: uid,
+            text: text,
+          );
+    } catch (e) {
+      if (mounted) {
+        // Give the text back so nothing typed is lost on failure.
+        _messageController.text = text;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Mesaj gönderilemedi, tekrar deneyin: $e')),
         );
+      }
+    }
   }
 
   void _showReportDialog() {

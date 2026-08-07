@@ -96,6 +96,58 @@ class AdminService {
     }
   }
 
+  /// Lists the most recently created user profiles, for the admin user
+  /// management screen's default (no search query) view.
+  Stream<List<UserProfile>> watchRecentUsers({int limit = 50}) {
+    return _db
+        .collection('user_profiles')
+        .orderBy('createdAt', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snap) => snap.docs.map(UserProfile.fromFirestore).toList())
+        .handleError((error) {
+          debugPrint('Firestore watchRecentUsers warning: $error');
+          return <UserProfile>[];
+        });
+  }
+
+  /// Searches users by exact-prefix match on email or display name.
+  /// Firestore has no full-text search, so this only matches from the
+  /// start of the string (case-sensitive) - good enough for an admin
+  /// looking up a specific known user.
+  Future<List<UserProfile>> searchUsers(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+    try {
+      final results = await Future.wait([
+        _db
+            .collection('user_profiles')
+            .orderBy('email')
+            .startAt([trimmed])
+            .endAt(['$trimmed'])
+            .limit(20)
+            .get(),
+        _db
+            .collection('user_profiles')
+            .orderBy('displayName')
+            .startAt([trimmed])
+            .endAt(['$trimmed'])
+            .limit(20)
+            .get(),
+      ]);
+      final byId = <String, UserProfile>{};
+      for (final snap in results) {
+        for (final doc in snap.docs) {
+          byId[doc.id] = UserProfile.fromFirestore(doc);
+        }
+      }
+      return byId.values.toList();
+    } catch (e) {
+      debugPrint('Error searching users: $e');
+      return [];
+    }
+  }
+
   /// Get a user's profile with admin fields
   Future<UserProfile?> getUserProfile(String userId) async {
     try {

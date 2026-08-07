@@ -8,8 +8,11 @@ import '../features/ads/presentation/admin_banner_ads_screen.dart';
 import '../features/admin/presentation/admin_dashboard_screen.dart';
 import '../features/admin/presentation/audit_log_screen.dart';
 import '../features/admin/presentation/reports_moderation_screen.dart';
+import '../features/admin/presentation/listing_management_screen.dart';
+import '../features/admin/presentation/user_management_screen.dart';
 import '../features/admin/presentation/verification_review_screen.dart';
 import '../features/admin/services/admin_service.dart';
+import '../features/auth/presentation/account_suspended_screen.dart';
 import '../features/boosts/presentation/boost_purchase_screen.dart';
 import '../features/boosts/presentation/my_boosts_screen.dart';
 import '../features/categories/presentation/categories_screen.dart';
@@ -82,11 +85,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/login';
       }
 
-      if (isLoggedIn && location.startsWith('/admin')) {
+      if (isLoggedIn && location != '/account-suspended') {
         final profile = await adminService.getUserProfile(
           authService.currentUser!.uid,
         );
-        if (!adminService.isAdminProfile(profile)) return '/';
+
+        final suspensionActive =
+            profile != null &&
+            profile.isSuspended &&
+            (profile.suspensionEnd == null ||
+                profile.suspensionEnd!.isAfter(DateTime.now()));
+        if (profile != null && (profile.isBanned || suspensionActive)) {
+          return '/account-suspended';
+        }
+
+        if (location.startsWith('/admin') &&
+            !adminService.isAdminProfile(profile)) {
+          return '/';
+        }
       }
 
       if (isLoggedIn && (location == '/login' || location == '/register')) {
@@ -104,6 +120,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/account-suspended',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AccountSuspendedScreen(),
       ),
       GoRoute(
         path: '/onboarding',
@@ -358,6 +379,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/admin/reports',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ReportsModerationScreen(),
+      ),
+      GoRoute(
+        path: '/admin/users',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const UserManagementScreen(),
+      ),
+      GoRoute(
+        path: '/admin/listings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ListingManagementScreen(),
       ),
       GoRoute(
         path: '/admin/verifications',

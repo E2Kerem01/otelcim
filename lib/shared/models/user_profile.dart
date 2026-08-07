@@ -103,6 +103,24 @@ class UserProfile {
   /// Timestamp when the profile was last updated
   final DateTime updatedAt;
 
+  /// Whether an admin has temporarily suspended this account. Only ever
+  /// written by ModerationService (admin actions) - enforced at login via
+  /// AuthService.
+  final bool isSuspended;
+
+  /// If set, the suspension automatically lifts after this date. A null
+  /// value with [isSuspended] true means the suspension is indefinite.
+  final DateTime? suspensionEnd;
+
+  final String? suspensionReason;
+
+  /// Whether an admin has permanently banned this account. Only ever
+  /// written by ModerationService (admin actions) - enforced at login via
+  /// AuthService.
+  final bool isBanned;
+
+  final String? banReason;
+
   const UserProfile({
     required this.id,
     required this.email,
@@ -132,6 +150,11 @@ class UserProfile {
     this.freeBoostCredits = 0,
     required this.createdAt,
     required this.updatedAt,
+    this.isSuspended = false,
+    this.suspensionEnd,
+    this.suspensionReason,
+    this.isBanned = false,
+    this.banReason,
   });
 
   /// Creates a UserProfile from a Firestore DocumentSnapshot
@@ -193,6 +216,13 @@ class UserProfile {
       freeBoostCredits: data['freeBoostCredits'] as int? ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      isSuspended: data['isSuspended'] as bool? ?? false,
+      suspensionEnd: data['suspensionEnd'] != null
+          ? (data['suspensionEnd'] as Timestamp).toDate()
+          : null,
+      suspensionReason: data['suspensionReason'] as String?,
+      isBanned: data['isBanned'] as bool? ?? false,
+      banReason: data['banReason'] as String?,
     );
   }
 
@@ -346,7 +376,12 @@ class UserProfile {
         other.referralCount == referralCount &&
         other.freeBoostCredits == freeBoostCredits &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.isSuspended == isSuspended &&
+        other.suspensionEnd == suspensionEnd &&
+        other.suspensionReason == suspensionReason &&
+        other.isBanned == isBanned &&
+        other.banReason == banReason;
   }
 
   @override
@@ -383,6 +418,11 @@ class UserProfile {
       freeBoostCredits,
       createdAt,
       updatedAt,
+      isSuspended,
+      suspensionEnd,
+      suspensionReason,
+      isBanned,
+      banReason,
     ]);
   }
 

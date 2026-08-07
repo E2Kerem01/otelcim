@@ -132,10 +132,16 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
       final contactInfo = _contactController.text.trim();
 
       List<String> imageUrls = [];
+      var imageUploadFailed = false;
       if (_selectedImageFiles.isNotEmpty) {
-        final storageService = ref.read(storageServiceProvider);
-        final batchId = 'batch_${DateTime.now().millisecondsSinceEpoch}';
-        imageUrls = await storageService.uploadListingImages(batchId, _selectedImageFiles);
+        try {
+          final storageService = ref.read(storageServiceProvider);
+          final batchId = 'batch_${DateTime.now().millisecondsSinceEpoch}';
+          imageUrls = await storageService.uploadListingImages(batchId, _selectedImageFiles);
+        } catch (e) {
+          debugPrint('Batch listing image upload failed, publishing without photos: $e');
+          imageUploadFailed = true;
+        }
       }
 
       final listingsToCreate = _positions.map((pos) {
@@ -161,7 +167,14 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${listingsToCreate.length} adet ilan başarıyla yayınlandı!')),
+          SnackBar(
+            content: Text(
+              imageUploadFailed
+                  ? '${listingsToCreate.length} adet ilan yayınlandı, ancak otel fotoğrafları yüklenemedi.'
+                  : '${listingsToCreate.length} adet ilan başarıyla yayınlandı!',
+            ),
+            backgroundColor: imageUploadFailed ? Colors.orange.shade800 : null,
+          ),
         );
         Navigator.of(context).pop();
       }

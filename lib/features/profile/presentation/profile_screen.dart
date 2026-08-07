@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
-import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/widgets/video_player_dialog.dart';
 import '../../boosts/presentation/my_boosts_screen.dart';
@@ -47,7 +46,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final profile = ref.watch(currentUserProfileProvider).value;
     final displayName = profile?.displayName;
     final photoUrl = profile?.photoUrl;
-    final themeMode = ref.watch(themeModeProvider);
     final ratings = user == null ? null : ref.watch(userRatingsProvider(user.uid));
     final approvedCerts = user == null ? null : ref.watch(userApprovedCertificatesProvider(user.uid)).valueOrNull;
     final initial = (displayName?.isNotEmpty ?? false)
@@ -213,45 +211,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const Divider(height: 1),
 
-                        // Sidebar Footer: Theme Switcher & Sign out
+                        // Sidebar Footer: Sign out
                         Padding(
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.palette_outlined, size: 18),
-                                  const SizedBox(width: 8),
-                                  const Text('Görünüm', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                  const Spacer(),
-                                  SizedBox(
-                                    height: 32,
-                                    child: SegmentedButton<ThemeMode>(
-                                      segments: const [
-                                        ButtonSegment(
-                                          value: ThemeMode.light,
-                                          icon: Icon(Icons.light_mode, size: 14),
-                                        ),
-                                        ButtonSegment(
-                                          value: ThemeMode.dark,
-                                          icon: Icon(Icons.dark_mode, size: 14),
-                                        ),
-                                        ButtonSegment(
-                                          value: ThemeMode.system,
-                                          icon: Icon(Icons.settings_suggest, size: 14),
-                                        ),
-                                      ],
-                                      selected: {themeMode},
-                                      showSelectedIcon: false,
-                                      onSelectionChanged: (selection) {
-                                        ref.read(themeModeProvider.notifier).setThemeMode(selection.first);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
                               OutlinedButton.icon(
                                 onPressed: _handleLogout,
                                 icon: const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
@@ -531,53 +496,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   subtitle: const Text('Referans kodu ve ücretsiz boost'),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => context.push('/profile/invite'),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Görünüm',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: SegmentedButton<ThemeMode>(
-                          segments: const [
-                            ButtonSegment(
-                              value: ThemeMode.light,
-                              icon: Icon(Icons.light_mode_outlined),
-                              label: Text('Açık'),
-                            ),
-                            ButtonSegment(
-                              value: ThemeMode.dark,
-                              icon: Icon(Icons.dark_mode_outlined),
-                              label: Text('Koyu'),
-                            ),
-                            ButtonSegment(
-                              value: ThemeMode.system,
-                              icon: Icon(Icons.settings_suggest_outlined),
-                              label: Text('Sistem'),
-                            ),
-                          ],
-                          selected: {themeMode},
-                          showSelectedIcon: false,
-                          onSelectionChanged: (selection) {
-                            ref
-                                .read(themeModeProvider.notifier)
-                                .setThemeMode(selection.first);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
               const SizedBox(height: 20),

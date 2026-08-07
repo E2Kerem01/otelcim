@@ -154,8 +154,10 @@ class DesktopTopNavBar extends ConsumerWidget {
 
                 // Center Nav Links
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: navItems.map((item) {
                       final isSelected = navigationShell.currentIndex == item.index;
 
@@ -218,6 +220,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                         ),
                       );
                     }).toList(),
+                    ),
                   ),
                 ),
 

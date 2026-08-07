@@ -45,6 +45,20 @@ class AdminDashboardScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             _AdminCard(
+              icon: Icons.people_alt_outlined,
+              title: 'Kullanıcı Yönetimi',
+              subtitle: 'Kullanıcı arayın, askıya alın veya yasaklayın.',
+              onTap: () => context.push('/admin/users'),
+            ),
+            const SizedBox(height: 12),
+            _AdminCard(
+              icon: Icons.list_alt_outlined,
+              title: 'İlan Yönetimi',
+              subtitle: 'İlan arayın, kaldırın veya geri yükleyin.',
+              onTap: () => context.push('/admin/listings'),
+            ),
+            const SizedBox(height: 12),
+            _AdminCard(
               icon: Icons.card_membership_outlined,
               title: 'Belge Onay Kuyruğu',
               subtitle: 'İş arayanların hijyen, cankurtaran, ehliyet vb. belgelerini onaylayın.',

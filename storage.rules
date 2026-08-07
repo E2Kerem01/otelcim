@@ -1,0 +1,82 @@
+rules_version = '2';
+
+// Firebase Cloud Storage rules for Otelcim.
+//
+// Previously unmanaged (no storage.rules file existed in this repo, unlike
+// firestore.rules) — whatever rules were active only lived in Firebase
+// Console state, outside version control and outside review.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        firestore.get(/databases/(default)/documents/user_profiles/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // profile_photos/{userId}/profile.jpg
+    match /profile_photos/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(userId) && isImage() && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // listing_images/{listingId}/{file}
+    // Written before the Firestore listing document exists (image upload
+    // happens first so the doc can be created once, fully formed), so
+    // ownership can't be checked against the listing doc here. Any signed-in
+    // user may write; Firestore rules gate what listing doc can actually
+    // reference these URLs.
+    match /listing_images/{listingId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImage() && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // housing_images/{listingId}/{file} - same rationale as listing_images.
+    match /housing_images/{listingId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImage() && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // verification_documents/{userId}/{timestamp}_{documentType}.{ext}
+    // Sensitive (tax ID, tourism license) - owner and admins only.
+    match /verification_documents/{userId}/{fileName} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) && request.resource.size < 15 * 1024 * 1024;
+    }
+
+    // certificates/{userId}/{certId}.{ext}
+    match /certificates/{userId}/{fileName} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) && request.resource.size < 15 * 1024 * 1024;
+    }
+
+    // user_videos/{userId}/intro.mp4
+    match /user_videos/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(userId) && request.resource.size < 50 * 1024 * 1024;
+      allow delete: if isOwner(userId);
+    }
+
+    // banner_images/{timestamp}.jpg - admin-managed sponsor banners.
+    match /banner_images/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage();
+    }
+
+    // Deny everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

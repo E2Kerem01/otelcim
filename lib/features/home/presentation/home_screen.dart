@@ -684,17 +684,18 @@ class _AdvancedFilters {
   );
 }
 
-class _FilterSheet extends StatefulWidget {
+class _FilterSheet extends ConsumerStatefulWidget {
   const _FilterSheet({required this.initial, required this.listingService});
   final _AdvancedFilters initial;
   final ListingService listingService;
   @override
-  State<_FilterSheet> createState() => _FilterSheetState();
+  ConsumerState<_FilterSheet> createState() => _FilterSheetState();
 }
 
-class _FilterSheetState extends State<_FilterSheet> {
+class _FilterSheetState extends ConsumerState<_FilterSheet> {
   String? _city;
   String? _region;
+  ListingCategory? _category;
   late final TextEditingController _minController;
   late final TextEditingController _maxController;
   late ListingDateFilter _date;
@@ -709,6 +710,7 @@ class _FilterSheetState extends State<_FilterSheet> {
     super.initState();
     _city = widget.initial.city;
     _region = widget.initial.region;
+    _category = ref.read(selectedCategoryFilterProvider);
     _minController = TextEditingController(
       text: widget.initial.minSalaryTl?.toString() ?? '',
     );
@@ -805,6 +807,24 @@ class _FilterSheetState extends State<_FilterSheet> {
               ),
             ],
             onChanged: (value) => setState(() => _city = value),
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<ListingCategory?>(
+            initialValue: _category,
+            decoration: const InputDecoration(labelText: 'İş branşı'),
+            items: [
+              const DropdownMenuItem<ListingCategory?>(
+                value: null,
+                child: Text('Tüm branşlar'),
+              ),
+              ...ListingCategory.values.map(
+                (value) => DropdownMenuItem(
+                  value: value,
+                  child: Text(listingCategoryLabels[value]!),
+                ),
+              ),
+            ],
+            onChanged: (value) => setState(() => _category = value),
           ),
           const SizedBox(height: 14),
           DropdownButtonFormField<String?>(
@@ -922,8 +942,11 @@ class _FilterSheetState extends State<_FilterSheet> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () =>
-                      Navigator.pop(context, const _AdvancedFilters()),
+                  onPressed: () {
+                    ref.read(selectedCategoryFilterProvider.notifier).state =
+                        null;
+                    Navigator.pop(context, const _AdvancedFilters());
+                  },
                   child: const Text('Temizle'),
                 ),
               ),
@@ -941,6 +964,8 @@ class _FilterSheetState extends State<_FilterSheet> {
                       );
                       return;
                     }
+                    ref.read(selectedCategoryFilterProvider.notifier).state =
+                        _category;
                     Navigator.pop(
                       context,
                       _AdvancedFilters(

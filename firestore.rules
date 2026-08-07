@@ -37,7 +37,7 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isOwner(userId) &&
         (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin());
-      allow update: if isOwner(userId) && isNotChangingAdminStatus();
+      allow update: if (isOwner(userId) || isAdmin()) && isNotChangingAdminStatus();
       allow delete: if isOwner(userId) || isAdmin();
 
       match /favorites/{listingId} {

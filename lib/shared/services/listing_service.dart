@@ -194,6 +194,18 @@ class ListingService {
     return ref.id;
   }
 
+  /// Generates a Firestore document ID without writing anything.
+  ///
+  /// Used to upload listing/housing images to their final storage path
+  /// *before* the listing document is created, so the document can be
+  /// written once with images already attached instead of created empty
+  /// and patched afterward.
+  String newListingId() => _db.collection('listings').doc().id;
+
+  Future<void> createListingWithId(String id, Listing listing) async {
+    await _db.collection('listings').doc(id).set(listing.toMap());
+  }
+
   Future<List<String>> createBatchListings(List<Listing> listings) async {
     if (listings.isEmpty) return [];
     final batch = _db.batch();
@@ -425,6 +437,43 @@ class ListingService {
       sortOrder: sortOrder,
       season: season,
     );
+  }
+
+  /// Most recently created listings of ANY status (active/closed/removed),
+  /// for the admin listing management screen. Deliberately unfiltered by
+  /// status so admins can see and restore removed listings too.
+  Stream<List<Listing>> watchRecentListingsForAdmin({int limit = 50}) {
+    return _db
+        .collection('listings')
+        .orderBy('createdAt', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snap) => snap.docs.map(Listing.fromDoc).toList())
+        .handleError((error) {
+          debugPrint('Firestore watchRecentListingsForAdmin warning: $error');
+          return <Listing>[];
+        });
+  }
+
+  /// Prefix-searches listing titles for the admin listing management
+  /// screen. Firestore has no full-text search - matches from the start
+  /// of the title only.
+  Future<List<Listing>> searchListingsForAdmin(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+    try {
+      final snap = await _db
+          .collection('listings')
+          .orderBy('title')
+          .startAt([trimmed])
+          .endAt(['$trimmed'])
+          .limit(30)
+          .get();
+      return snap.docs.map(Listing.fromDoc).toList();
+    } catch (e) {
+      debugPrint('Error searching listings: $e');
+      return [];
+    }
   }
 }
 

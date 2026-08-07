@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/utils/auth_error_mapper.dart';
 import '../../../shared/utils/referral_code.dart';
+import '../../../shared/widgets/auth_brand_panel.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -85,70 +87,139 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n?.registerTitle ?? 'Kayıt Ol')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final isWide = mediaWidth > 840;
+
+    final formContent = Padding(
+      padding: EdgeInsets.all(isWide ? 32 : 24),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Icon(Icons.hotel_rounded, size: 48, color: otelcimBlue),
+            const SizedBox(height: 8),
+            Text(
+              l10n?.registerTitle ?? 'Kayıt Ol',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 24),
+            TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: l10n?.emailLabel ?? 'E-posta',
+                hintText: l10n?.emailHint ?? 'ornek@eposta.com',
+                prefixIcon: const Icon(Icons.email_outlined),
+              ),
+              validator: (value) {
+                final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+                if (value == null || value.trim().isEmpty || !emailRegex.hasMatch(value.trim())) {
+                  return l10n?.emailValidation ?? 'Geçerli bir e-posta girin';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: l10n?.passwordLabel ?? 'Şifre',
+                prefixIcon: const Icon(Icons.lock_outline),
+              ),
+              validator: (value) {
+                if (value == null || value.length < 8 || !RegExp(r'[0-9]').hasMatch(value)) {
+                  return l10n?.passwordValidation ?? 'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _referralCodeController,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: l10n?.referralCodeLabel ?? 'Referans Kodu (opsiyonel)',
+                hintText: l10n?.referralCodeHint ?? 'Arkadaşının kodu',
+                prefixIcon: const Icon(Icons.card_giftcard_outlined),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _loading ? null : _submit,
+              child: _loading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : Text(l10n?.registerButton ?? 'Kayıt Ol'),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: l10n?.emailLabel ?? 'E-posta',
-                    hintText: l10n?.emailHint ?? 'ornek@eposta.com',
-                  ),
-                  validator: (value) {
-                    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-                    if (value == null || value.trim().isEmpty || !emailRegex.hasMatch(value.trim())) {
-                      return l10n?.emailValidation ?? 'Geçerli bir e-posta girin';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: l10n?.passwordLabel ?? 'Şifre'),
-                  validator: (value) {
-                    if (value == null || value.length < 8 || !RegExp(r'[0-9]').hasMatch(value)) {
-                      return l10n?.passwordValidation ?? 'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _referralCodeController,
-                  textCapitalization: TextCapitalization.characters,
-                  decoration: InputDecoration(
-                    labelText: l10n?.referralCodeLabel ?? 'Referans Kodu (opsiyonel)',
-                    hintText: l10n?.referralCodeHint ?? 'Arkadaşının kodu',
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _loading ? null : _submit,
-                  child: _loading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Text('Kayıt Ol'),
-                ),
-                const SizedBox(height: 12),
+                const Text('Zaten hesabın var mı?'),
                 TextButton(
                   onPressed: () => context.go('/login'),
-                  child: const Text('Zaten hesabın var mı? Giriş yap'),
+                  child: Text(
+                    l10n?.loginButton ?? 'Giriş yap',
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: otelcimBlue),
+                  ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (isWide) {
+      return Scaffold(
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(child: formContent),
+                    const Expanded(child: AuthBrandPanel()),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: formContent,
+              ),
             ),
           ),
         ),

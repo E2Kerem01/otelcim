@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../shared/constants/listing_filters.dart';
 
-enum ListingStatus { active, closed }
+enum ListingStatus { active, closed, removed }
 
 class Listing {
   final String id;
@@ -133,9 +133,11 @@ class Listing {
               .toList() ??
           const [],
       staffShuttleRoute: data['staffShuttleRoute'] as String?,
-      status: (data['status'] as String? ?? 'active') == 'closed'
-          ? ListingStatus.closed
-          : ListingStatus.active,
+      status: switch (data['status'] as String? ?? 'active') {
+        'closed' => ListingStatus.closed,
+        'removed' => ListingStatus.removed,
+        _ => ListingStatus.active,
+      },
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
       isBoosted: data['isBoosted'] as bool? ?? false,
@@ -181,7 +183,11 @@ class Listing {
     'housingMealsIncluded': housingMealsIncluded,
     'housingImages': housingImages,
     'staffShuttleRoute': staffShuttleRoute,
-    'status': status == ListingStatus.closed ? 'closed' : 'active',
+    'status': switch (status) {
+      ListingStatus.closed => 'closed',
+      ListingStatus.removed => 'removed',
+      ListingStatus.active => 'active',
+    },
     'createdAt': FieldValue.serverTimestamp(),
     'updatedAt': FieldValue.serverTimestamp(),
     'isBoosted': isBoosted,
