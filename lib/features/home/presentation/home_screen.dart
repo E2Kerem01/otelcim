@@ -528,10 +528,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           mainAxisSpacing: 12,
                           crossAxisSpacing: 12,
                           childAspectRatio: _columnCount == 2
-                              ? 0.78
+                              ? 0.80
                               : _columnCount == 3
-                                  ? 0.68
-                                  : 0.60,
+                                  ? 0.88
+                                  : 1.05,
                         ),
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => _ListingCard(
@@ -1021,10 +1021,10 @@ class _ListingsSkeletonSliver extends StatelessWidget {
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
           childAspectRatio: columnCount == 2
-              ? 0.78
+              ? 0.80
               : columnCount == 3
-                  ? 0.68
-                  : 0.60,
+                  ? 0.88
+                  : 1.05,
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) => _SkeletonCard(columnCount: columnCount),
