@@ -188,7 +188,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final paymentService = ref.watch(paymentServiceProvider);
-    final listingAsync = ref.watch(FutureProvider((ref) => ref.watch(listingServiceProvider).getListing(widget.listingId)));
+    final listingAsync = ref.watch(singleListingProvider(widget.listingId));
     final freeBoostCredits = ref.watch(currentUserProfileProvider).value?.freeBoostCredits ?? 0;
 
     return Scaffold(

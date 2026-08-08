@@ -96,7 +96,7 @@ class _BoostPurchaseCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final listingAsync = ref.watch(FutureProvider((ref) => ref.watch(listingServiceProvider).getListing(purchase.listingId)));
+    final listingAsync = ref.watch(singleListingProvider(purchase.listingId));
 
     final purchasedAt = purchase.purchasedAt;
     final dateStr = purchasedAt != null

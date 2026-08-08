@@ -29,9 +29,7 @@ class ListingQrPosterScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final listingAsync = ref.watch(
-      FutureProvider((ref) => ref.watch(listingServiceProvider).getListing(listingId)),
-    );
+    final listingAsync = ref.watch(singleListingProvider(listingId));
 
     return Scaffold(
       appBar: AppBar(

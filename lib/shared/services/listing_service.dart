@@ -493,3 +493,19 @@ class PaginatedListingsResult {
 final listingServiceProvider = Provider<ListingService>(
   (ref) => ListingService(FirebaseFirestore.instance),
 );
+
+/// Fetches a single listing by ID, cached per listingId.
+///
+/// Screens that need one listing by ID must watch this shared family
+/// provider rather than constructing `FutureProvider((ref) => ...)`
+/// inline inside build() - an inline provider has no stable identity, so
+/// Riverpod treats every rebuild as a brand new provider and restarts the
+/// fetch from scratch, which reads as a permanently spinning loading
+/// state to the user. This bit boost_purchase_screen.dart,
+/// listing_qr_poster_screen.dart, and my_boosts_screen.dart.
+final singleListingProvider = FutureProvider.family<Listing?, String>((
+  ref,
+  listingId,
+) {
+  return ref.watch(listingServiceProvider).getListing(listingId);
+});

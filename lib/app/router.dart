@@ -55,27 +55,33 @@ Page<T> buildAppPage<T>({
   required GoRouterState state,
   required Widget child,
 }) {
-  final wrappedChild = PopScope(
-    canPop: true,
-    onPopInvokedWithResult: (didPop, result) {
-      // PopScope guarantees pop event capture and router state synchronization
-    },
-    child: child,
-  );
-
+  // Only the CupertinoPage/MaterialPage branch matters here: CupertinoPage
+  // brings CupertinoPageTransitionsBuilder's proper interactive swipe-back
+  // gesture handling on iOS, which is what actually keeps the router state
+  // and navigator stack in sync during a native swipe-back (including a
+  // cancelled/partial swipe). A PopScope wrapper was added here previously
+  // to "guarantee" that sync but had an empty onPopInvokedWithResult - it
+  // did nothing functionally and instead added an extra Element between
+  // GoRouter's page and the screen, which caused
+  // "element._lifecycleState == _ElementLifecycle.inactive is not true"
+  // crashes whenever a screen called Navigator.of(context).pop() itself
+  // (e.g. after a successful form submission) while GoRouter was also
+  // reconciling the page. Removed - CupertinoPage/MaterialPage alone is
+  // the real fix, per Flutter's own recommended pattern for platform-aware
+  // page transitions in go_router.
   if (Theme.of(context).platform == TargetPlatform.iOS) {
     return CupertinoPage<T>(
       key: state.pageKey,
       name: state.name ?? state.path,
       arguments: state.pathParameters,
-      child: wrappedChild,
+      child: child,
     );
   }
   return MaterialPage<T>(
     key: state.pageKey,
     name: state.name ?? state.path,
     arguments: state.pathParameters,
-    child: wrappedChild,
+    child: child,
   );
 }
 
