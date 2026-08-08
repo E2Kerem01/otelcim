@@ -99,7 +99,12 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lütfen kırmızı ile işaretli alanları doldurun.')),
+      );
+      return;
+    }
     final l10n = AppLocalizations.of(context)!;
     if (isSeasonalContract(_season) &&
         (_contractStartDate == null || _contractEndDate == null)) {
@@ -808,7 +813,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   }
 
   String? _salaryValidator(String? value) {
-    final parsed = int.tryParse(value?.trim() ?? '');
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) return null;
+    final parsed = int.tryParse(trimmed);
     if (parsed == null || parsed < 0) return 'Geçerli tutar girin';
     final min = int.tryParse(_minSalaryController.text.trim());
     final max = int.tryParse(_maxSalaryController.text.trim());
