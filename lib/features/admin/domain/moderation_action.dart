@@ -128,7 +128,10 @@ extension ModerationActionTypeExtension on ModerationActionType {
       case ModerationActionType.dismissReport:
       case ModerationActionType.warnUser:
       case ModerationActionType.removeListing:
+      case ModerationActionType.restoreListing:
       case ModerationActionType.suspendUser:
+      case ModerationActionType.unsuspendUser:
+      case ModerationActionType.unbanUser:
       case ModerationActionType.approveVerification:
       case ModerationActionType.approveCertificate:
         return false;
@@ -144,6 +147,9 @@ extension ModerationActionTypeExtension on ModerationActionType {
         return true;
       case ModerationActionType.dismissReport:
       case ModerationActionType.warnUser:
+      case ModerationActionType.restoreListing:
+      case ModerationActionType.unsuspendUser:
+      case ModerationActionType.unbanUser:
       case ModerationActionType.approveVerification:
       case ModerationActionType.rejectVerification:
       case ModerationActionType.approveCertificate:
@@ -175,10 +181,16 @@ extension ModerationActionTypeExtension on ModerationActionType {
         return 'Kullanıcı uyarıldı';
       case ModerationActionType.removeListing:
         return 'İlan kaldırıldı';
+      case ModerationActionType.restoreListing:
+        return 'İlan geri yüklendi';
       case ModerationActionType.suspendUser:
         return 'Kullanıcı askıya alındı';
+      case ModerationActionType.unsuspendUser:
+        return 'Askı kaldırıldı';
       case ModerationActionType.banUser:
         return 'Kullanıcı yasaklandı';
+      case ModerationActionType.unbanUser:
+        return 'Yasak kaldırıldı';
       case ModerationActionType.approveVerification:
         return 'Doğrulama onaylandı';
       case ModerationActionType.rejectVerification:

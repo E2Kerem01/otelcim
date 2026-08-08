@@ -85,8 +85,11 @@ class AdminService {
         return actionType == AdminActionType.dismissReport ||
             actionType == AdminActionType.warnUser ||
             actionType == AdminActionType.removeListing ||
+            actionType == AdminActionType.restoreListing ||
             actionType == AdminActionType.suspendUser ||
+            actionType == AdminActionType.unsuspendUser ||
             actionType == AdminActionType.banUser ||
+            actionType == AdminActionType.unbanUser ||
             actionType == AdminActionType.approveVerification ||
             actionType == AdminActionType.rejectVerification;
 

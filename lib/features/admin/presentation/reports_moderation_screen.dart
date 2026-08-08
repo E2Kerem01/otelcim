@@ -68,6 +68,9 @@ class _ReportCardState extends ConsumerState<_ReportCard> {
           await moderation.suspendUser(userId: report.targetId, adminId: adminId, reason: reason);
         case AdminActionType.banUser:
           await moderation.banUser(userId: report.targetId, adminId: adminId, reason: reason);
+        case AdminActionType.restoreListing:
+        case AdminActionType.unsuspendUser:
+        case AdminActionType.unbanUser:
         case AdminActionType.approveVerification:
         case AdminActionType.rejectVerification:
         case AdminActionType.approveCertificate:

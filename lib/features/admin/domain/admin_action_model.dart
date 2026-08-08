@@ -4,8 +4,11 @@ enum AdminActionType {
   dismissReport,
   warnUser,
   removeListing,
+  restoreListing,
   suspendUser,
+  unsuspendUser,
   banUser,
+  unbanUser,
   approveVerification,
   rejectVerification,
   approveCertificate,
@@ -19,10 +22,16 @@ enum AdminActionType {
         return 'Kullanıcıyı Uyar';
       case AdminActionType.removeListing:
         return 'İlanı Kaldır';
+      case AdminActionType.restoreListing:
+        return 'İlanı Geri Yükle';
       case AdminActionType.suspendUser:
         return 'Kullanıcıyı Askıya Al';
+      case AdminActionType.unsuspendUser:
+        return 'Askıyı Kaldır';
       case AdminActionType.banUser:
         return 'Kullanıcıyı Yasakla';
+      case AdminActionType.unbanUser:
+        return 'Yasağı Kaldır';
       case AdminActionType.approveVerification:
         return 'Doğrulamayı Onayla';
       case AdminActionType.rejectVerification:
@@ -113,10 +122,16 @@ class AdminAction {
         return AdminActionType.warnUser;
       case 'removeListing':
         return AdminActionType.removeListing;
+      case 'restoreListing':
+        return AdminActionType.restoreListing;
       case 'suspendUser':
         return AdminActionType.suspendUser;
+      case 'unsuspendUser':
+        return AdminActionType.unsuspendUser;
       case 'banUser':
         return AdminActionType.banUser;
+      case 'unbanUser':
+        return AdminActionType.unbanUser;
       case 'approveVerification':
         return AdminActionType.approveVerification;
       case 'rejectVerification':

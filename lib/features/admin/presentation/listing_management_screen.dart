@@ -7,6 +7,8 @@ import '../../../shared/constants/categories.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../listings/domain/listing_model.dart';
+import '../domain/admin_action_model.dart';
+import '../services/admin_service.dart';
 import '../services/moderation_service.dart';
 
 final _recentListingsProvider = StreamProvider.autoDispose<List<Listing>>(
@@ -187,6 +189,16 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
             adminId: adminId,
             reason: reason,
           );
+      await ref.read(adminServiceProvider).logAdminAction(
+            AdminAction(
+              adminId: adminId,
+              actionType: AdminActionType.removeListing,
+              targetType: AdminActionTargetType.listing,
+              targetId: widget.listing.id,
+              reason: reason,
+              details: {'listingTitle': widget.listing.title},
+            ),
+          );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İlan kaldırıldı.')));
       }
@@ -210,6 +222,15 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
       await ref.read(moderationServiceProvider).restoreListing(
             listingId: widget.listing.id,
             adminId: adminId,
+          );
+      await ref.read(adminServiceProvider).logAdminAction(
+            AdminAction(
+              adminId: adminId,
+              actionType: AdminActionType.restoreListing,
+              targetType: AdminActionTargetType.listing,
+              targetId: widget.listing.id,
+              details: {'listingTitle': widget.listing.title},
+            ),
           );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İlan geri yüklendi.')));

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/services/auth_service.dart';
+import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
 import '../services/moderation_service.dart';
 
@@ -276,7 +277,18 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Yasağı Kaldır',
                               '${user.email} kullanıcısının yasağını kaldırmak istiyor musunuz?',
-                              (adminId) => moderation.unbanUser(userId: user.id, adminId: adminId),
+                              (adminId) async {
+                                await moderation.unbanUser(userId: user.id, adminId: adminId);
+                                await ref.read(adminServiceProvider).logAdminAction(
+                                      AdminAction(
+                                        adminId: adminId,
+                                        actionType: AdminActionType.unbanUser,
+                                        targetType: AdminActionTargetType.user,
+                                        targetId: user.id,
+                                        details: {'userEmail': user.email},
+                                      ),
+                                    );
+                              },
                             ),
                     icon: const Icon(Icons.lock_open_outlined),
                     label: const Text('Yasağı Kaldır'),
@@ -288,11 +300,24 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Kullanıcıyı Yasakla',
                               '${user.email} kalıcı olarak yasaklanacak.',
-                              (adminId) => moderation.banUser(
-                                userId: user.id,
-                                adminId: adminId,
-                                reason: 'Admin panelinden yasaklandı',
-                              ),
+                              (adminId) async {
+                                const reason = 'Admin panelinden yasaklandı';
+                                await moderation.banUser(
+                                  userId: user.id,
+                                  adminId: adminId,
+                                  reason: reason,
+                                );
+                                await ref.read(adminServiceProvider).logAdminAction(
+                                      AdminAction(
+                                        adminId: adminId,
+                                        actionType: AdminActionType.banUser,
+                                        targetType: AdminActionTargetType.user,
+                                        targetId: user.id,
+                                        reason: reason,
+                                        details: {'userEmail': user.email},
+                                      ),
+                                    );
+                              },
                               requireReason: true,
                             ),
                     icon: const Icon(Icons.block),
@@ -305,7 +330,18 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Askıyı Kaldır',
                               '${user.email} kullanıcısının askısını kaldırmak istiyor musunuz?',
-                              (adminId) => moderation.unsuspendUser(userId: user.id, adminId: adminId),
+                              (adminId) async {
+                                await moderation.unsuspendUser(userId: user.id, adminId: adminId);
+                                await ref.read(adminServiceProvider).logAdminAction(
+                                      AdminAction(
+                                        adminId: adminId,
+                                        actionType: AdminActionType.unsuspendUser,
+                                        targetType: AdminActionTargetType.user,
+                                        targetId: user.id,
+                                        details: {'userEmail': user.email},
+                                      ),
+                                    );
+                              },
                             ),
                     icon: const Icon(Icons.play_circle_outline),
                     label: const Text('Askıyı Kaldır'),
@@ -317,12 +353,25 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Kullanıcıyı Askıya Al',
                               '${user.email} 7 gün süreyle askıya alınacak.',
-                              (adminId) => moderation.suspendUser(
-                                userId: user.id,
-                                adminId: adminId,
-                                reason: 'Admin panelinden askıya alındı',
-                                suspensionEnd: DateTime.now().add(const Duration(days: 7)),
-                              ),
+                              (adminId) async {
+                                const reason = 'Admin panelinden askıya alındı';
+                                await moderation.suspendUser(
+                                  userId: user.id,
+                                  adminId: adminId,
+                                  reason: reason,
+                                  suspensionEnd: DateTime.now().add(const Duration(days: 7)),
+                                );
+                                await ref.read(adminServiceProvider).logAdminAction(
+                                      AdminAction(
+                                        adminId: adminId,
+                                        actionType: AdminActionType.suspendUser,
+                                        targetType: AdminActionTargetType.user,
+                                        targetId: user.id,
+                                        reason: reason,
+                                        details: {'userEmail': user.email},
+                                      ),
+                                    );
+                              },
                             ),
                     icon: const Icon(Icons.pause_circle_outline),
                     label: const Text('Askıya Al (7 gün)'),
