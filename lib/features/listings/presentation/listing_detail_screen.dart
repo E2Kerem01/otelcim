@@ -142,10 +142,10 @@ ${listing.title}
 
 ${listing.description}
 
-İletişim: ${listing.posterName}
-${listing.contactInfo}
+İlan sahibi: ${listing.posterName}
+İletişim bilgilerini görmek ve başvurmak için Otelcim'de giriş yapın.
 
-🔗 Otelcim Uygulamasını İndir: https://otelcim.app
+🔗 https://otelcim.vercel.app/#/listing/${listing.id}
 ''';
 
     try {
