@@ -175,7 +175,12 @@ class Listing {
     'employmentType': employmentType?.name,
     'experienceLevel': experienceLevel,
     'educationLevel': educationLevel,
-    'contactInfo': contactInfo,
+    // contactInfo is deliberately NOT written here - it lives in the
+    // listings/{id}/private/contact subcollection instead (see
+    // ListingService), because this listing doc is publicly readable and
+    // contactInfo must not be. Callers still read/write it through this
+    // model's contactInfo field; ListingService handles routing it to the
+    // right place.
     'images': images,
     'housingRoomType': housingRoomType,
     'housingHasAc': housingHasAc,
@@ -199,6 +204,50 @@ class Listing {
     'viewCount': viewCount,
     'messageCount': messageCount,
   };
+
+  /// Used by ListingService.getListing to merge in the contactInfo value
+  /// fetched separately from listings/{id}/private/contact.
+  Listing copyWithContactInfo(String contactInfo) => Listing(
+    id: id,
+    posterId: posterId,
+    posterName: posterName,
+    posterVerified: posterVerified,
+    isUrgent: isUrgent,
+    title: title,
+    description: description,
+    category: category,
+    season: season,
+    contractStartDate: contractStartDate,
+    contractEndDate: contractEndDate,
+    location: location,
+    salary: salary,
+    city: city,
+    region: region,
+    lat: lat,
+    lng: lng,
+    minSalaryTl: minSalaryTl,
+    maxSalaryTl: maxSalaryTl,
+    employmentType: employmentType,
+    experienceLevel: experienceLevel,
+    educationLevel: educationLevel,
+    contactInfo: contactInfo,
+    images: images,
+    housingRoomType: housingRoomType,
+    housingHasAc: housingHasAc,
+    housingHasWifi: housingHasWifi,
+    housingMealsIncluded: housingMealsIncluded,
+    housingImages: housingImages,
+    staffShuttleRoute: staffShuttleRoute,
+    status: status,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+    isBoosted: isBoosted,
+    boostExpiresAt: boostExpiresAt,
+    boostType: boostType,
+    boostPurchaseId: boostPurchaseId,
+    viewCount: viewCount,
+    messageCount: messageCount,
+  );
 
   static EmploymentType? _employmentTypeFromString(String? value) {
     for (final type in EmploymentType.values) {

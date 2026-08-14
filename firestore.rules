@@ -29,6 +29,18 @@ service cloud.firestore {
       allow create: if isSignedIn() &&
         request.resource.data.posterId == request.auth.uid;
       allow update, delete: if isOwner(resource.data.posterId) || isAdmin();
+
+      // Contact details (phone/email) are split out from the listing doc
+      // above, which is publicly readable, so anonymous users can't read
+      // them straight off the wire by fetching the listing. Any signed-in
+      // user may read (matches the in-app "sign in to reveal contact
+      // info" UX); only the listing's owner or an admin may write it.
+      match /private/contact {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn() &&
+          (get(/databases/$(database)/documents/listings/$(listingId)).data.posterId == request.auth.uid ||
+           isAdmin());
+      }
     }
 
     // Public profile data (hotel name, verified badge, bio) shown on

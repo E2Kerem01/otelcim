@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +21,27 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint('Arka plan FCM mesajı alındı: ${message.messageId}');
 }
 
+// TEST-ONLY scaffolding, off by default. Never set in production builds.
+// Points Auth/Firestore at the local emulator suite and optionally
+// auto-signs-in a seeded test account, so live UI testing never touches
+// production data or requires typing a password into the app.
+const bool _kUseFirebaseEmulator = bool.fromEnvironment('E2E_USE_EMULATOR');
+const String _kE2eTestEmail = String.fromEnvironment('E2E_TEST_EMAIL');
+const String _kE2eTestPassword = String.fromEnvironment('E2E_TEST_PASSWORD');
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (_kUseFirebaseEmulator) {
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    if (_kE2eTestEmail.isNotEmpty && _kE2eTestPassword.isNotEmpty) {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _kE2eTestEmail,
+        password: _kE2eTestPassword,
+      );
+    }
+  }
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await enforceRememberMePreference();
   runApp(const ProviderScope(child: OtelcimApp()));

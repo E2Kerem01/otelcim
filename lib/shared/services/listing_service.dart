@@ -182,16 +182,26 @@ class ListingService {
       ];
 
       for (final data in samples) {
-        await _db.collection('listings').add(data);
+        final contactInfo = data.remove('contactInfo') as String;
+        final ref = await _db.collection('listings').add(data);
+        await _contactRef(ref.id).set({'value': contactInfo});
       }
     } catch (e) {
       debugPrint('Error seeding sample listings: $e');
     }
   }
 
+  /// contactInfo lives in listings/{id}/private/contact, not on the public
+  /// listing doc - see the comment on Listing.toMap. isSignedIn() (not
+  /// ownership) gates reads there, matching the in-app "sign in to reveal
+  /// contact info" UX; only the owner/admin may write it (firestore.rules).
+  DocumentReference<Map<String, dynamic>> _contactRef(String listingId) =>
+      _db.collection('listings').doc(listingId).collection('private').doc('contact');
+
   Future<String> createListing(Listing listing) async {
-    final ref = await _db.collection('listings').add(listing.toMap());
-    return ref.id;
+    final id = newListingId();
+    await createListingWithId(id, listing);
+    return id;
   }
 
   /// Generates a Firestore document ID without writing anything.
@@ -204,6 +214,7 @@ class ListingService {
 
   Future<void> createListingWithId(String id, Listing listing) async {
     await _db.collection('listings').doc(id).set(listing.toMap());
+    await _contactRef(id).set({'value': listing.contactInfo});
   }
 
   Future<List<String>> createBatchListings(List<Listing> listings) async {
@@ -214,14 +225,21 @@ class ListingService {
       final docRef = _db.collection('listings').doc();
       ids.add(docRef.id);
       batch.set(docRef, listing.toMap());
+      batch.set(_contactRef(docRef.id), {'value': listing.contactInfo});
     }
     await batch.commit();
     return ids;
   }
 
-  Future<void> updateListing(Listing listing) {
+  Future<void> updateListing(Listing listing) async {
     final data = listing.toMap()..remove('createdAt');
-    return _db.collection('listings').doc(listing.id).update(data);
+    // Listings created before the contactInfo migration may still have a
+    // legacy top-level contactInfo field left over on the public doc (see
+    // Listing.toMap) - strip it on every edit so the leak self-heals as
+    // owners touch their listings, instead of only affecting new writes.
+    data['contactInfo'] = FieldValue.delete();
+    await _db.collection('listings').doc(listing.id).update(data);
+    await _contactRef(listing.id).set({'value': listing.contactInfo});
   }
 
   Future<void> closeListing(String listingId) {
@@ -240,7 +258,22 @@ class ListingService {
     try {
       final doc = await _db.collection('listings').doc(listingId).get();
       if (!doc.exists) return null;
-      return Listing.fromDoc(doc);
+      var listing = Listing.fromDoc(doc);
+
+      // contactInfo lives in a separate, sign-in-gated subdoc (see
+      // Listing.toMap). Signed-out callers simply get '' back here, which
+      // is the existing "sign in to see contact info" UI state.
+      try {
+        final contactDoc = await _contactRef(listingId).get();
+        final value = contactDoc.data()?['value'] as String?;
+        if (value != null) {
+          listing = listing.copyWithContactInfo(value);
+        }
+      } catch (e) {
+        debugPrint('Firestore getListing contact subdoc error: $e');
+      }
+
+      return listing;
     } catch (e) {
       debugPrint('Firestore getListing error: $e');
       return null;
