@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +9,9 @@ import '../../../shared/widgets/video_player_dialog.dart';
 import '../../boosts/presentation/my_boosts_screen.dart';
 import '../../favorites/presentation/favorites_screen.dart';
 import '../../listings/presentation/my_listings_screen.dart';
+import '../../ratings/domain/rating_model.dart';
 import '../../ratings/services/rating_service.dart';
+import '../domain/certificate_model.dart';
 import '../services/certificate_service.dart';
 import 'certificates_screen.dart';
 import 'edit_profile_screen.dart';
@@ -18,6 +19,7 @@ import 'notification_settings_screen.dart';
 import 'privacy_settings_screen.dart';
 import '../../referrals/presentation/invite_friends_screen.dart';
 import 'talent_pool_screen.dart';
+import 'widgets/profile_screen_widgets.dart';
 
 /// Screen for user profile management.
 /// Supports responsive Master-Detail layout for Desktop/Tablet wide screens (>= 768px).
@@ -76,22 +78,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                           child: Row(
                             children: [
-                              CircleAvatar(
+                              ProfileAvatar(
+                                photoUrl: photoUrl,
+                                initial: initial,
                                 radius: 28,
-                                backgroundColor: Theme.of(context).primaryColor,
-                                backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
-                                    ? CachedNetworkImageProvider(photoUrl)
-                                    : null,
-                                child: (photoUrl == null || photoUrl.isEmpty)
-                                    ? Text(
-                                        initial,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      )
-                                    : null,
+                                fontSize: 22,
                               ),
                               const SizedBox(width: 14),
                               Expanded(
@@ -144,67 +135,77 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           child: ListView(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             children: [
-                              _buildSidebarItem(
-                                id: 'overview',
+                              ProfileSidebarItem(
                                 icon: Icons.grid_view_rounded,
                                 title: 'Genel Bakış',
                                 subtitle: 'Profil özeti ve istatistikler',
+                                isSelected: _selectedSection == 'overview',
+                                onTap: () => setState(() => _selectedSection = 'overview'),
                               ),
-                              _buildSidebarItem(
-                                id: 'edit',
+                              ProfileSidebarItem(
                                 icon: Icons.edit_outlined,
                                 title: 'Profili Düzenle',
                                 subtitle: 'Kişisel bilgiler, fotoğraf ve cv',
+                                isSelected: _selectedSection == 'edit',
+                                onTap: () => setState(() => _selectedSection = 'edit'),
                               ),
-                              _buildSidebarItem(
-                                id: 'certificates',
+                              ProfileSidebarItem(
                                 icon: Icons.verified_outlined,
                                 title: 'Belgelerim / Sertifika Cüzdanı',
                                 subtitle: 'Hijyen, ehliyet, sertifika yönetimi',
                                 badgeCount: approvedCerts?.length,
+                                isSelected: _selectedSection == 'certificates',
+                                onTap: () => setState(() => _selectedSection = 'certificates'),
                               ),
-                              _buildSidebarItem(
-                                id: 'favorites',
+                              ProfileSidebarItem(
                                 icon: Icons.favorite_outline_rounded,
                                 title: 'Favorilerim',
                                 subtitle: 'Kaydedilen ilanlar',
+                                isSelected: _selectedSection == 'favorites',
+                                onTap: () => setState(() => _selectedSection = 'favorites'),
                               ),
-                              _buildSidebarItem(
-                                id: 'my_listings',
+                              ProfileSidebarItem(
                                 icon: Icons.list_alt_rounded,
                                 title: 'İlanlarım',
                                 subtitle: 'Yayındaki ve pasif ilanlar',
+                                isSelected: _selectedSection == 'my_listings',
+                                onTap: () => setState(() => _selectedSection = 'my_listings'),
                               ),
                               if (profile?.userType == 'employer')
-                                _buildSidebarItem(
-                                  id: 'talent_pool',
+                                ProfileSidebarItem(
                                   icon: Icons.folder_shared_outlined,
                                   title: 'Yetenek Havuzum',
                                   subtitle: 'Aday listesi ve notlar',
+                                  isSelected: _selectedSection == 'talent_pool',
+                                  onTap: () => setState(() => _selectedSection = 'talent_pool'),
                                 ),
-                              _buildSidebarItem(
-                                id: 'boosts',
+                              ProfileSidebarItem(
                                 icon: Icons.rocket_launch_rounded,
                                 title: 'Öne Çıkarılan İlanlarım',
                                 subtitle: 'Doping ve öne çıkarma paketleri',
+                                isSelected: _selectedSection == 'boosts',
+                                onTap: () => setState(() => _selectedSection = 'boosts'),
                               ),
-                              _buildSidebarItem(
-                                id: 'notifications',
+                              ProfileSidebarItem(
                                 icon: Icons.notifications_outlined,
                                 title: 'Bildirim Ayarları',
                                 subtitle: 'Sohbet ve duyuru tercihleri',
+                                isSelected: _selectedSection == 'notifications',
+                                onTap: () => setState(() => _selectedSection = 'notifications'),
                               ),
-                              _buildSidebarItem(
-                                id: 'privacy',
+                              ProfileSidebarItem(
                                 icon: Icons.security_rounded,
                                 title: 'Gizlilik ve Veri Ayarları',
                                 subtitle: 'KVKK ve hesap ayarları',
+                                isSelected: _selectedSection == 'privacy',
+                                onTap: () => setState(() => _selectedSection = 'privacy'),
                               ),
-                              _buildSidebarItem(
-                                id: 'invite',
+                              ProfileSidebarItem(
                                 icon: Icons.card_giftcard_rounded,
                                 title: 'Arkadaşını Davet Et',
                                 subtitle: 'Referans kodu ve ücretsiz boost',
+                                isSelected: _selectedSection == 'invite',
+                                onTap: () => setState(() => _selectedSection = 'invite'),
                               ),
                             ],
                           ),
@@ -269,18 +270,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      CircleAvatar(
+                      ProfileAvatar(
+                        photoUrl: photoUrl,
+                        initial: initial,
                         radius: 30,
-                        backgroundColor: Theme.of(context).primaryColor,
-                        backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
-                            ? CachedNetworkImageProvider(photoUrl)
-                            : null,
-                        child: (photoUrl == null || photoUrl.isEmpty)
-                            ? Text(
-                                initial,
-                                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                              )
-                            : null,
+                        fontSize: 24,
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -411,92 +405,69 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   error: (err, stack) => const SizedBox.shrink(),
                 ),
               const SizedBox(height: 20),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.edit_outlined),
-                  title: const Text('Profili Düzenle'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/profile/edit'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.edit_outlined,
+                title: 'Profili Düzenle',
+                onTap: () => context.push('/profile/edit'),
               ),
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.verified_outlined, color: Colors.blue),
-                  title: const Text('Belgelerim / Sertifika Cüzdanı'),
-                  subtitle: const Text('Hijyen, cankurtaran, ehliyet ve dil belgelerinizi yönetin'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/profile/certificates'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.verified_outlined,
+                iconColor: Colors.blue,
+                title: 'Belgelerim / Sertifika Cüzdanı',
+                subtitle: 'Hijyen, cankurtaran, ehliyet ve dil belgelerinizi yönetin',
+                onTap: () => context.push('/profile/certificates'),
               ),
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.favorite_outline_rounded),
-                  title: const Text('Favorilerim'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/favorites'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.favorite_outline_rounded,
+                title: 'Favorilerim',
+                onTap: () => context.push('/favorites'),
               ),
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.list_alt_rounded),
-                  title: const Text('İlanlarım'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/my-listings'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.list_alt_rounded,
+                title: 'İlanlarım',
+                onTap: () => context.push('/my-listings'),
               ),
               if (profile?.userType == 'employer') ...[
                 const SizedBox(height: 12),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.folder_shared_outlined, color: Colors.indigo),
-                    title: const Text('Yetenek Havuzum'),
-                    subtitle: const Text('Gelecek sezon adayları ve notlar'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/profile/talent-pool'),
-                  ),
+                ProfileMenuTile(
+                  icon: Icons.folder_shared_outlined,
+                  iconColor: Colors.indigo,
+                  title: 'Yetenek Havuzum',
+                  subtitle: 'Gelecek sezon adayları ve notlar',
+                  onTap: () => context.push('/profile/talent-pool'),
                 ),
               ],
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.rocket_launch_rounded, color: Colors.amber.shade800),
-                  title: const Text('Öne Çıkarılan İlanlarım'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/my-boosts'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.rocket_launch_rounded,
+                iconColor: Colors.amber.shade800,
+                title: 'Öne Çıkarılan İlanlarım',
+                onTap: () => context.push('/my-boosts'),
               ),
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.notifications_outlined),
-                  title: const Text('Bildirim Ayarları'),
-                  subtitle: const Text('Mesaj, ilan ve duyuru bildirimleri'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/profile/notifications'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.notifications_outlined,
+                title: 'Bildirim Ayarları',
+                subtitle: 'Mesaj, ilan ve duyuru bildirimleri',
+                onTap: () => context.push('/profile/notifications'),
               ),
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.security_rounded),
-                  title: const Text('Gizlilik ve Veri Ayarları'),
-                  subtitle: const Text('KVKK, veri indirme ve hesap silme'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/profile/privacy'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.security_rounded,
+                title: 'Gizlilik ve Veri Ayarları',
+                subtitle: 'KVKK, veri indirme ve hesap silme',
+                onTap: () => context.push('/profile/privacy'),
               ),
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.card_giftcard_rounded, color: Theme.of(context).primaryColor),
-                  title: const Text('Arkadaşını Davet Et'),
-                  subtitle: const Text('Referans kodu ve ücretsiz boost'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push('/profile/invite'),
-                ),
+              ProfileMenuTile(
+                icon: Icons.card_giftcard_rounded,
+                iconColor: Theme.of(context).primaryColor,
+                title: 'Arkadaşını Davet Et',
+                subtitle: 'Referans kodu ve ücretsiz boost',
+                onTap: () => context.push('/profile/invite'),
               ),
               const SizedBox(height: 20),
               OutlinedButton.icon(
@@ -511,106 +482,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  /// Builds individual master menu sidebar items for desktop layout.
-  Widget _buildSidebarItem({
-    required String id,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    int? badgeCount,
-  }) {
-    final isSelected = _selectedSection == id;
-    final primaryColor = Theme.of(context).primaryColor;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
-      child: Material(
-        color: isSelected
-            ? primaryColor.withAlpha(24)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(10),
-          onTap: () {
-            setState(() {
-              _selectedSection = id;
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: isSelected
-                  ? Border.all(color: primaryColor.withAlpha(80), width: 1)
-                  : null,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  size: 22,
-                  color: isSelected ? primaryColor : Colors.grey.shade700,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                          color: isSelected ? primaryColor : null,
-                        ),
-                      ),
-                      Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (badgeCount != null && badgeCount > 0)
-                  Container(
-                    margin: const EdgeInsets.only(left: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '$badgeCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                if (isSelected)
-                  Container(
-                    margin: const EdgeInsets.only(left: 8),
-                    width: 4,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   /// Builds the detail panel content based on the selected menu section.
   Widget _buildDetailContent(
     String section,
@@ -621,8 +492,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     String? displayName,
     String? photoUrl,
     String initial,
-    AsyncValue<List<dynamic>>? ratings,
-    List<dynamic>? approvedCerts,
+    AsyncValue<List<Rating>>? ratings,
+    List<Certificate>? approvedCerts,
   ) {
     switch (section) {
       case 'edit':
@@ -668,11 +539,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     String? displayName,
     String? photoUrl,
     String initial,
-    AsyncValue<List<dynamic>>? ratings,
-    List<dynamic>? approvedCerts,
+    AsyncValue<List<Rating>>? ratings,
+    List<Certificate>? approvedCerts,
   ) {
-    final primaryColor = Theme.of(context).primaryColor;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profil Genel Bakışı'),
@@ -700,22 +569,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
+                  ProfileAvatar(
+                    photoUrl: photoUrl,
+                    initial: initial,
                     radius: 44,
-                    backgroundColor: primaryColor,
-                    backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
-                        ? CachedNetworkImageProvider(photoUrl)
-                        : null,
-                    child: (photoUrl == null || photoUrl.isEmpty)
-                        ? Text(
-                            initial,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : null,
+                    fontSize: 36,
                   ),
                   const SizedBox(width: 20),
                   Expanded(
@@ -883,49 +741,49 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             mainAxisSpacing: 16,
             childAspectRatio: 2.2,
             children: [
-              _buildShortcutCard(
+              ProfileShortcutCard(
                 icon: Icons.edit_outlined,
                 color: Colors.purple,
                 title: 'Profili Düzenle',
                 subtitle: 'Kişisel ve iş detayları',
                 onTap: () => setState(() => _selectedSection = 'edit'),
               ),
-              _buildShortcutCard(
+              ProfileShortcutCard(
                 icon: Icons.verified_outlined,
                 color: Colors.blue,
                 title: 'Sertifika Cüzdanı',
                 subtitle: '${approvedCerts?.length ?? 0} onaylı belge',
                 onTap: () => setState(() => _selectedSection = 'certificates'),
               ),
-              _buildShortcutCard(
+              ProfileShortcutCard(
                 icon: Icons.list_alt_rounded,
                 color: Colors.teal,
                 title: 'İlanlarım',
                 subtitle: 'İlanlarınızı yönetin',
                 onTap: () => setState(() => _selectedSection = 'my_listings'),
               ),
-              _buildShortcutCard(
+              ProfileShortcutCard(
                 icon: Icons.favorite_outline_rounded,
                 color: Colors.red,
                 title: 'Favorilerim',
                 subtitle: 'Kayıtlı ilanlar',
                 onTap: () => setState(() => _selectedSection = 'favorites'),
               ),
-              _buildShortcutCard(
+              ProfileShortcutCard(
                 icon: Icons.notifications_outlined,
                 color: Colors.amber.shade900,
                 title: 'Bildirim Ayarları',
                 subtitle: 'Sessiz saatler ve tercihler',
                 onTap: () => setState(() => _selectedSection = 'notifications'),
               ),
-              _buildShortcutCard(
+              ProfileShortcutCard(
                 icon: Icons.security_rounded,
                 color: Colors.indigo,
                 title: 'Gizlilik ve Veri',
                 subtitle: 'Güvenlik ve KVKK',
                 onTap: () => setState(() => _selectedSection = 'privacy'),
               ),
-              _buildShortcutCard(
+              ProfileShortcutCard(
                 icon: Icons.card_giftcard_rounded,
                 color: Colors.pink,
                 title: 'Arkadaşını Davet Et',
@@ -939,49 +797,4 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildShortcutCard({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: color.withAlpha(25),
-                child: Icon(icon, color: color, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
