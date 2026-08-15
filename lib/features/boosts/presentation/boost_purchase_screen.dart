@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,12 +34,12 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    unawaited(Future.microtask(() async {
       final paymentService = ref.read(paymentServiceProvider);
       if (paymentService.products.isEmpty && !paymentService.isLoading) {
-        paymentService.fetchProducts();
+        await paymentService.fetchProducts();
       }
-    });
+    }));
   }
 
   Future<void> _handlePurchase(Listing listing, List<ProductDetails> products) async {
@@ -66,12 +68,26 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
 
       bool purchaseSuccess = false;
       String transactionId = 'tx_${DateTime.now().millisecondsSinceEpoch}';
+      String? purchaseToken;
+      String? verificationData;
+      final platform =
+          defaultTargetPlatform == TargetPlatform.iOS ? 'app_store' : 'google_play';
 
       if (paymentService.isAvailable && product != null) {
-        purchaseSuccess = await paymentService.purchaseProduct(product);
+        final purchaseDetails = await paymentService.purchaseProduct(product);
+        purchaseSuccess = purchaseDetails != null;
+        if (purchaseDetails != null) {
+          transactionId = purchaseDetails.purchaseID ?? transactionId;
+          final receipt = purchaseDetails.verificationData.serverVerificationData;
+          purchaseToken = platform == 'google_play' ? receipt : null;
+          verificationData = platform == 'app_store' ? receipt : null;
+        }
       } else if (kDebugMode) {
-        // Fallback / Demo purchase flow ONLY in debug mode for testing
-        await Future.delayed(const Duration(milliseconds: 800));
+        // Fallback / Demo purchase flow ONLY in debug mode for testing.
+        // Note: verifyAndProcessBoostPurchase requires a real store receipt
+        // and will reject this with an error even in debug builds, since
+        // there is no store-side verification to satisfy locally.
+        await Future<void>.delayed(const Duration(milliseconds: 800));
         purchaseSuccess = true;
       } else {
         if (mounted) {
@@ -94,6 +110,9 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
           productId: _selectedProductId,
           transactionId: transactionId,
           priceOverride: product != null ? _parsePrice(product.price) : price,
+          purchaseToken: purchaseToken,
+          verificationData: verificationData,
+          platform: platform,
         );
 
         if (mounted) {

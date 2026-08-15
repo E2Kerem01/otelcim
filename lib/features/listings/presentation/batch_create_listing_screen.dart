@@ -137,7 +137,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
         try {
           final storageService = ref.read(storageServiceProvider);
           final batchId = 'batch_${DateTime.now().millisecondsSinceEpoch}';
-          imageUrls = await storageService.uploadListingImages(batchId, _selectedImageFiles);
+          imageUrls = await storageService.uploadListingImages(user.uid, batchId, _selectedImageFiles);
         } catch (e) {
           debugPrint('Batch listing image upload failed, publishing without photos: $e');
           imageUploadFailed = true;

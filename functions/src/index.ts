@@ -1,13 +1,22 @@
+import * as jwt from "jsonwebtoken";
 import {initializeApp} from "firebase-admin/app";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import {getMessaging} from "firebase-admin/messaging";
 import {logger} from "firebase-functions";
+import {defineSecret} from "firebase-functions/params";
 import {onDocumentCreated, onDocumentUpdated} from "firebase-functions/v2/firestore";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 
 initializeApp();
 
 const db = getFirestore();
+
+// --- Store purchase verification secrets ---------------------------------
+// Configure with `firebase functions:secrets:set <NAME>` once the app is
+// registered on each store. See verifyGooglePlayPurchase / verifyAppStorePurchase.
+const playServiceAccountJson = defineSecret("PLAY_SERVICE_ACCOUNT_JSON");
+const androidPackageName = defineSecret("ANDROID_PACKAGE_NAME");
+const appStoreSharedSecret = defineSecret("APPSTORE_SHARED_SECRET");
 
 export const sendChatMessageNotification = onDocumentCreated(
   {
@@ -298,7 +307,6 @@ export const sendInterviewConfirmedNotification = onDocumentUpdated(
 interface BoostPurchaseRequest {
   listingId: string;
   productId: string;
-  transactionId: string;
   purchaseToken?: string;
   verificationData?: string;
   platform?: string;
@@ -310,9 +318,182 @@ const BOOST_PRODUCTS: Record<string, { durationDays: number; price: number; dura
   "boost_30_days": { durationDays: 30, price: 149.99, durationTypeEnum: "days30", durationTypeStr: "30" },
 };
 
+type SupportedStorePlatform = "google_play" | "app_store";
+
+async function getGooglePlayAccessToken(serviceAccountJson: string): Promise<string> {
+  let credentials: { client_email?: string; private_key?: string };
+  try {
+    credentials = JSON.parse(serviceAccountJson);
+  } catch {
+    throw new HttpsError("internal", "Play servis hesabı anahtarı okunamadı (geçersiz JSON).");
+  }
+  if (!credentials.client_email || !credentials.private_key) {
+    throw new HttpsError("internal", "Play servis hesabı anahtarında client_email/private_key eksik.");
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const assertion = jwt.sign(
+    {
+      scope: "https://www.googleapis.com/auth/androidpublisher",
+      aud: "https://oauth2.googleapis.com/token",
+      iat: now,
+      exp: now + 3600,
+    },
+    credentials.private_key,
+    {algorithm: "RS256", issuer: credentials.client_email}
+  );
+
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion,
+    }),
+  });
+
+  if (!response.ok) {
+    logger.error("Google OAuth2 erişim jetonu alınamadı.", {status: response.status});
+    throw new HttpsError("internal", "Google Play kimlik doğrulaması başarısız.");
+  }
+
+  const body = (await response.json()) as { access_token?: string };
+  if (!body.access_token) {
+    throw new HttpsError("internal", "Google Play erişim jetonu alınamadı.");
+  }
+  return body.access_token;
+}
+
+/**
+ * Verifies a Google Play purchase token against the Android Publisher API
+ * (purchases.products.get) and returns the store's authoritative orderId,
+ * to be used as the canonical transaction id — never trust a client-chosen
+ * transactionId, since a client could reuse a genuine token/receipt while
+ * claiming a fresh id to bypass replay protection.
+ *
+ * Requires two Firebase secrets, set once the app has a real Play Console
+ * listing: `PLAY_SERVICE_ACCOUNT_JSON` (a Play Console API-access service
+ * account's JSON key, Settings > API access) and `ANDROID_PACKAGE_NAME`
+ * (the app's real applicationId — currently still the Flutter placeholder
+ * `com.example.otelcim` in android/app/build.gradle.kts, so this cannot be
+ * wired up until the app is actually registered on Play Console).
+ */
+async function verifyGooglePlayPurchase(purchaseToken: string, productId: string): Promise<string> {
+  const serviceAccountJson = playServiceAccountJson.value();
+  const packageName = androidPackageName.value();
+  if (!serviceAccountJson || !packageName) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Google Play satın alma doğrulaması henüz yapılandırılmadı. Lütfen destek ile iletişime geçin."
+    );
+  }
+
+  const accessToken = await getGooglePlayAccessToken(serviceAccountJson);
+
+  const url =
+    `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(packageName)}` +
+    `/purchases/products/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}`;
+
+  const response = await fetch(url, {headers: {Authorization: `Bearer ${accessToken}`}});
+  if (!response.ok) {
+    logger.error("Android Publisher API isteği başarısız.", {status: response.status});
+    throw new HttpsError("permission-denied", "Google Play satın alma doğrulanamadı.");
+  }
+
+  const purchase = (await response.json()) as { purchaseState?: number; orderId?: string };
+
+  // purchaseState: 0 = purchased, 1 = canceled, 2 = pending
+  if (purchase.purchaseState !== 0) {
+    throw new HttpsError("permission-denied", "Satın alma tamamlanmamış veya iptal edilmiş.");
+  }
+  if (!purchase.orderId) {
+    throw new HttpsError("permission-denied", "Google Play satın alma kimliği (orderId) alınamadı.");
+  }
+  return purchase.orderId;
+}
+
+interface AppleVerifyReceiptTransaction {
+  product_id: string;
+  transaction_id: string;
+  cancellation_date_ms?: string;
+}
+
+interface AppleVerifyReceiptResponse {
+  status: number;
+  receipt?: { in_app?: AppleVerifyReceiptTransaction[] };
+  latest_receipt_info?: AppleVerifyReceiptTransaction[];
+}
+
+async function callAppleVerifyReceipt(
+  url: string,
+  receiptData: string,
+  sharedSecret: string
+): Promise<AppleVerifyReceiptResponse> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      "receipt-data": receiptData,
+      "password": sharedSecret,
+      "exclude-old-transactions": true,
+    }),
+  });
+  return (await response.json()) as AppleVerifyReceiptResponse;
+}
+
+/**
+ * Verifies an App Store receipt against Apple's verifyReceipt endpoint and
+ * returns the store's authoritative transaction_id for the matching
+ * product — never trust a client-chosen transactionId (same reasoning as
+ * verifyGooglePlayPurchase above).
+ *
+ * `verifyReceipt` (not the newer App Store Server API) is the correct
+ * endpoint for this app because the installed in_app_purchase_storekit
+ * (^0.3.0) plugin is StoreKit1-based, so `serverVerificationData` is the
+ * base64 App Store receipt blob, not a StoreKit2 signed transaction.
+ *
+ * Requires the `APPSTORE_SHARED_SECRET` Firebase secret (App Store Connect
+ * > your app > App Information > App-Specific Shared Secret), which can
+ * only be generated once the app is actually registered on App Store
+ * Connect — the bundle id is currently still the Flutter placeholder
+ * `com.example.otelcim` in ios/Runner.xcodeproj/project.pbxproj.
+ */
+async function verifyAppStorePurchase(verificationData: string, productId: string): Promise<string> {
+  const sharedSecret = appStoreSharedSecret.value();
+  if (!sharedSecret) {
+    throw new HttpsError(
+      "failed-precondition",
+      "App Store satın alma doğrulaması henüz yapılandırılmadı. Lütfen destek ile iletişime geçin."
+    );
+  }
+
+  let result = await callAppleVerifyReceipt("https://buy.itunes.apple.com/verifyReceipt", verificationData, sharedSecret);
+
+  // 21007: this receipt is from the sandbox environment — retry there.
+  if (result.status === 21007) {
+    result = await callAppleVerifyReceipt("https://sandbox.itunes.apple.com/verifyReceipt", verificationData, sharedSecret);
+  }
+
+  if (result.status !== 0) {
+    logger.error("App Store makbuz doğrulaması başarısız.", {status: result.status});
+    throw new HttpsError("permission-denied", "App Store satın alma doğrulanamadı.");
+  }
+
+  const transactions = result.latest_receipt_info ?? result.receipt?.in_app ?? [];
+  const matchingTransaction = transactions.find((item) => item.product_id === productId);
+  if (!matchingTransaction) {
+    throw new HttpsError("permission-denied", "Makbuzda bu ürüne ait bir satın alma bulunamadı.");
+  }
+  if (matchingTransaction.cancellation_date_ms) {
+    throw new HttpsError("permission-denied", "Satın alma iptal edilmiş.");
+  }
+  return matchingTransaction.transaction_id;
+}
+
 export const verifyAndProcessBoostPurchase = onCall(
   {
     region: "europe-west1",
+    secrets: [playServiceAccountJson, androidPackageName, appStoreSharedSecret],
   },
   async (request) => {
     if (!request.auth) {
@@ -322,8 +503,8 @@ export const verifyAndProcessBoostPurchase = onCall(
     const userId = request.auth.uid;
     const data = request.data as BoostPurchaseRequest;
 
-    if (!data.listingId || !data.productId || !data.transactionId) {
-      throw new HttpsError("invalid-argument", "Eksik parametreler (listingId, productId, transactionId).");
+    if (!data.listingId || !data.productId) {
+      throw new HttpsError("invalid-argument", "Eksik parametreler (listingId, productId).");
     }
 
     const productConfig = BOOST_PRODUCTS[data.productId];
@@ -331,15 +512,37 @@ export const verifyAndProcessBoostPurchase = onCall(
       throw new HttpsError("invalid-argument", "Geçersiz boost ürünü.");
     }
 
+    // The store token/receipt is mandatory: the caller must prove the
+    // purchase actually happened via a real store receipt, not just assert
+    // a price/product. The transaction id used below comes from the
+    // verified receipt/token itself (orderId / transaction_id), never from
+    // client input — a client-supplied transactionId could otherwise be
+    // used to replay the same genuine receipt under a "fresh" fake id.
+    const platform = data.platform as SupportedStorePlatform | undefined;
+    let transactionId: string;
+    if (platform === "google_play") {
+      if (!data.purchaseToken) {
+        throw new HttpsError("invalid-argument", "purchaseToken zorunludur (Google Play).");
+      }
+      transactionId = await verifyGooglePlayPurchase(data.purchaseToken, data.productId);
+    } else if (platform === "app_store") {
+      if (!data.verificationData) {
+        throw new HttpsError("invalid-argument", "verificationData zorunludur (App Store).");
+      }
+      transactionId = await verifyAppStorePurchase(data.verificationData, data.productId);
+    } else {
+      throw new HttpsError("invalid-argument", "Geçersiz platform. 'google_play' veya 'app_store' olmalıdır.");
+    }
+
     // Check duplicate transactionId (replay prevention)
     const existingPurchases = await db
       .collection("boost_purchases")
-      .where("transactionId", "==", data.transactionId)
+      .where("transactionId", "==", transactionId)
       .limit(1)
       .get();
 
     if (!existingPurchases.empty) {
-      throw new HttpsError("already-exists", "Bu işlem ID'si (transactionId) daha önce kullanılmış.");
+      throw new HttpsError("already-exists", "Bu satın alma daha önce işlenmiş.");
     }
 
     const listingRef = db.collection("listings").doc(data.listingId);
@@ -355,7 +558,6 @@ export const verifyAndProcessBoostPurchase = onCall(
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + productConfig.durationDays * 24 * 60 * 60 * 1000);
-    const platform = data.platform || "in_app_purchase";
 
     const boostRef = db.collection("boosts").doc();
     const purchaseRef = db.collection("boost_purchases").doc();
@@ -372,7 +574,7 @@ export const verifyAndProcessBoostPurchase = onCall(
       purchasedAt: now,
       expiresAt: expiresAt,
       platform,
-      transactionId: data.transactionId,
+      transactionId,
       status: "active",
     });
 
@@ -384,7 +586,7 @@ export const verifyAndProcessBoostPurchase = onCall(
       durationType: productConfig.durationTypeStr,
       price: productConfig.price,
       platform,
-      transactionId: data.transactionId,
+      transactionId,
       productId: data.productId,
       purchaseToken: data.purchaseToken || null,
       verificationData: data.verificationData || null,
@@ -407,13 +609,120 @@ export const verifyAndProcessBoostPurchase = onCall(
       userId,
       listingId: data.listingId,
       productId: data.productId,
-      transactionId: data.transactionId,
+      transactionId,
     });
 
     return {
       success: true,
       boostId: boostRef.id,
       purchaseId: purchaseRef.id,
+      expiresAt: expiresAt.toISOString(),
+    };
+  },
+);
+
+/**
+ * Redeems one of the caller's free (referral-earned) 7-day boost credits on
+ * one of their own listings. Runs entirely under the Admin SDK so the
+ * freeBoostCredits check-and-decrement, the boosts/boost_purchases writes,
+ * and the listing update all happen atomically in one transaction that the
+ * client cannot partially perform or spoof — firestore.rules denies all
+ * client writes to boosts/boost_purchases and to freeBoostCredits, so this
+ * function is the only way those documents change.
+ */
+export const redeemFreeBoost = onCall(
+  {
+    region: "europe-west1",
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Kullanıcı girişi yapılmalıdır.");
+    }
+
+    const userId = request.auth.uid;
+    const listingId = (request.data as { listingId?: string })?.listingId;
+    if (!listingId) {
+      throw new HttpsError("invalid-argument", "Eksik parametre (listingId).");
+    }
+
+    const listingRef = db.collection("listings").doc(listingId);
+    const userRef = db.collection("user_profiles").doc(userId);
+    const boostRef = db.collection("boosts").doc();
+    const purchaseRef = db.collection("boost_purchases").doc();
+
+    const durationDays = 7;
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
+    const transactionId = `referral_${boostRef.id}`;
+
+    const result = await db.runTransaction(async (transaction) => {
+      const [listingDoc, userDoc] = await Promise.all([
+        transaction.get(listingRef),
+        transaction.get(userRef),
+      ]);
+
+      if (!listingDoc.exists) {
+        throw new HttpsError("not-found", "İlan bulunamadı.");
+      }
+      if (listingDoc.data()?.posterId !== userId) {
+        throw new HttpsError("permission-denied", "Sadece kendi ilanınızı öne çıkarabilirsiniz.");
+      }
+
+      const freeBoostCredits = (userDoc.data()?.freeBoostCredits as number | undefined) ?? 0;
+      if (freeBoostCredits <= 0) {
+        throw new HttpsError("failed-precondition", "Kullanılabilir ücretsiz boost hakkınız yok.");
+      }
+
+      transaction.set(boostRef, {
+        id: boostRef.id,
+        listingId,
+        userId,
+        durationType: "days7",
+        durationDays,
+        price: 0,
+        purchasedAt: now,
+        expiresAt,
+        platform: "referral_reward",
+        transactionId,
+        status: "active",
+      });
+
+      transaction.set(purchaseRef, {
+        id: purchaseRef.id,
+        userId,
+        listingId,
+        boostId: boostRef.id,
+        durationType: "7",
+        price: 0,
+        platform: "referral_reward",
+        transactionId,
+        productId: "referral_free_boost",
+        status: "completed",
+        purchasedAt: now,
+        verifiedAt: now,
+      });
+
+      transaction.update(listingRef, {
+        isBoosted: true,
+        boostExpiresAt: expiresAt,
+        boostType: "referral_free_boost",
+        boostPurchaseId: purchaseRef.id,
+        updatedAt: now,
+      });
+
+      transaction.update(userRef, {
+        freeBoostCredits: FieldValue.increment(-1),
+      });
+
+      return {boostId: boostRef.id, purchaseId: purchaseRef.id};
+    });
+
+    logger.info("Ücretsiz boost kullanıldı.", {userId, listingId, boostId: result.boostId});
+
+    return {
+      success: true,
+      boostId: result.boostId,
+      purchaseId: result.purchaseId,
       expiresAt: expiresAt.toISOString(),
     };
   },

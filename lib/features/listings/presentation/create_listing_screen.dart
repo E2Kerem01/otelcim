@@ -10,11 +10,10 @@ import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
 import '../../../shared/widgets/xfile_preview_image.dart';
-import '../../discovery/domain/tourism_region.dart';
 import '../../nearby/services/location_service.dart';
 import '../domain/listing_model.dart';
-import 'listing_requirement_labels.dart';
 import 'season_utils.dart';
+import 'widgets/listing_form_fields.dart';
 
 class CreateListingScreen extends ConsumerStatefulWidget {
   const CreateListingScreen({super.key});
@@ -152,12 +151,14 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
       try {
         if (_selectedImageFiles.isNotEmpty) {
           imageUrls = await storageService.uploadListingImages(
+            user.uid,
             listingId,
             _selectedImageFiles,
           );
         }
         if (_housingImageFiles.isNotEmpty) {
           housingImageUrls = await storageService.uploadHousingImages(
+            user.uid,
             listingId,
             _housingImageFiles,
           );
@@ -316,16 +317,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<ListingCategory>(
-                initialValue: _selectedCategory,
-                items: ListingCategory.values
-                    .map(
-                      (c) => DropdownMenuItem(
-                        value: c,
-                        child: Text(listingCategoryLabels[c]!),
-                      ),
-                    )
-                    .toList(),
+              ListingCategoryDropdown(
+                value: _selectedCategory,
                 onChanged: (val) {
                   if (val != null) setState(() => _selectedCategory = val);
                 },
@@ -336,11 +329,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              ListingTextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  hintText: 'Örn. Bodrum Resort Resepsiyon Görevlisi',
-                ),
+                hintText: 'Örn. Bodrum Resort Resepsiyon Görevlisi',
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Başlık gerekli' : null,
               ),
@@ -448,11 +439,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              ListingTextFormField(
                 controller: _locationController,
-                decoration: const InputDecoration(
-                  hintText: 'Örn. Muğla / Bodrum',
-                ),
+                hintText: 'Örn. Muğla / Bodrum',
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Konum gerekli' : null,
               ),
@@ -485,21 +474,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedRegion,
-                hint: Text(AppLocalizations.of(context)!.regionSelectHint),
-                items: tourismRegions
-                    .map(
-                      (region) => DropdownMenuItem(
-                        value: region.id,
-                        child: Text(
-                          Localizations.localeOf(context).languageCode == 'en'
-                              ? region.nameEn
-                              : region.nameTr,
-                        ),
-                      ),
-                    )
-                    .toList(),
+              TourismRegionDropdown(
+                value: _selectedRegion,
                 onChanged: (value) => setState(() => _selectedRegion = value),
                 validator: (value) => value == null
                     ? AppLocalizations.of(context)!.regionRequired
@@ -520,15 +496,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedCity,
-                hint: const Text('Şehir seçin'),
-                items: turkishTourismCities
-                    .map(
-                      (city) =>
-                          DropdownMenuItem(value: city, child: Text(city)),
-                    )
-                    .toList(),
+              TourismCityDropdown(
+                value: _selectedCity,
                 onChanged: (value) => setState(() => _selectedCity = value),
                 validator: (value) =>
                     value == null ? 'Şehir seçmeniz gerekiyor' : null,
@@ -536,40 +505,17 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               const SizedBox(height: 16),
               const Text('Maaş', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              TextFormField(
+              ListingTextFormField(
                 controller: _salaryController,
-                decoration: const InputDecoration(
-                  hintText: 'Örn. 35.000₺ + yemek',
-                ),
+                hintText: 'Örn. 35.000₺ + yemek',
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'Maaş bilgisi gerekli'
                     : null,
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _minSalaryController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'En düşük maaş (TL)',
-                      ),
-                      validator: _salaryValidator,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _maxSalaryController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'En yüksek maaş (TL)',
-                      ),
-                      validator: _salaryValidator,
-                    ),
-                  ),
-                ],
+              SalaryRangeFields(
+                minController: _minSalaryController,
+                maxController: _maxSalaryController,
               ),
               const SizedBox(height: 16),
               const Text(
@@ -577,16 +523,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<EmploymentType>(
-                initialValue: _employmentType,
-                items: EmploymentType.values
-                    .map(
-                      (type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(type.label),
-                      ),
-                    )
-                    .toList(),
+              EmploymentTypeDropdown(
+                value: _employmentType,
                 onChanged: (value) {
                   if (value != null) setState(() => _employmentType = value);
                 },
@@ -597,20 +535,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<ExperienceLevel?>(
-                initialValue: _experienceLevel,
-                items: [
-                  DropdownMenuItem<ExperienceLevel?>(
-                    value: null,
-                    child: Text(l10n.optionalNotSpecified),
-                  ),
-                  ...ExperienceLevel.values.map(
-                    (level) => DropdownMenuItem<ExperienceLevel?>(
-                      value: level,
-                      child: Text(experienceLevelLabel(l10n, level)),
-                    ),
-                  ),
-                ],
+              ExperienceLevelDropdown(
+                value: _experienceLevel,
                 onChanged: (value) => setState(() => _experienceLevel = value),
               ),
               const SizedBox(height: 16),
@@ -619,20 +545,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<EducationLevel?>(
-                initialValue: _educationLevel,
-                items: [
-                  DropdownMenuItem<EducationLevel?>(
-                    value: null,
-                    child: Text(l10n.optionalNotSpecified),
-                  ),
-                  ...EducationLevel.values.map(
-                    (level) => DropdownMenuItem<EducationLevel?>(
-                      value: level,
-                      child: Text(educationLevelLabel(l10n, level)),
-                    ),
-                  ),
-                ],
+              EducationLevelDropdown(
+                value: _educationLevel,
                 onChanged: (value) => setState(() => _educationLevel = value),
               ),
               const SizedBox(height: 16),
@@ -641,121 +555,42 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<String?>(
-                initialValue: _season,
-                items: [
-                  DropdownMenuItem<String?>(
-                    value: null,
-                    child: Text(l10n.seasonNone),
-                  ),
-                  ...listingSeasonValues.map(
-                    (season) => DropdownMenuItem<String?>(
-                      value: season,
-                      child: Text(listingSeasonLabel(l10n, season)),
-                    ),
-                  ),
-                ],
-                onChanged: (value) => setState(() {
+              SeasonAndContractDatesSection(
+                season: _season,
+                onSeasonChanged: (value) => setState(() {
                   _season = value;
                   if (!isSeasonalContract(value)) {
                     _contractStartDate = null;
                     _contractEndDate = null;
                   }
                 }),
-              ),
-              if (isSeasonalContract(_season)) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _pickContractDate(isStart: true),
-                        icon: const Icon(Icons.calendar_today_outlined),
-                        label: Text(
-                          '${l10n.contractStartDateLabel}: ${formatContractDate(_contractStartDate, l10n)}',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _pickContractDate(isStart: false),
-                        icon: const Icon(Icons.event_available_outlined),
-                        label: Text(
-                          '${l10n.contractEndDateLabel}: ${formatContractDate(_contractEndDate, l10n)}',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 16),
-              ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                title: Text(l10n.housingAddTitle),
-                leading: const Icon(Icons.home_work_outlined),
-                children: [
-                  DropdownButtonFormField<String?>(
-                    initialValue: _housingRoomType,
-                    decoration: InputDecoration(
-                      labelText: l10n.housingRoomType,
-                    ),
-                    items: [
-                      DropdownMenuItem<String?>(
-                        value: null,
-                        child: Text(l10n.optionalNotSpecified),
-                      ),
-                      DropdownMenuItem(
-                        value: 'single',
-                        child: Text(l10n.housingSingleRoom),
-                      ),
-                      DropdownMenuItem(
-                        value: 'shared',
-                        child: Text(l10n.housingSharedRoom),
-                      ),
-                    ],
-                    onChanged: (value) =>
-                        setState(() => _housingRoomType = value),
-                  ),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.housingHasAc),
-                    value: _housingHasAc,
-                    onChanged: (value) => setState(() => _housingHasAc = value),
-                  ),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.housingHasWifi),
-                    value: _housingHasWifi,
-                    onChanged: (value) =>
-                        setState(() => _housingHasWifi = value),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: l10n.housingMealsIncluded,
-                    ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) =>
-                        _housingMealsIncluded = int.tryParse(value),
-                  ),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.add_photo_alternate_outlined),
-                    title: Text(l10n.housingPhotos),
-                    subtitle: Text('${_housingImageFiles.length}/5'),
-                    onTap: _housingImageFiles.length < 5
-                        ? _pickHousingImages
-                        : null,
-                  ),
-                ],
+                contractStartDate: _contractStartDate,
+                contractEndDate: _contractEndDate,
+                onPickContractDate: _pickContractDate,
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              ListingHousingSection(
+                roomType: _housingRoomType,
+                onRoomTypeChanged: (value) =>
+                    setState(() => _housingRoomType = value),
+                hasAc: _housingHasAc,
+                onHasAcChanged: (value) => setState(() => _housingHasAc = value),
+                hasWifi: _housingHasWifi,
+                onHasWifiChanged: (value) =>
+                    setState(() => _housingHasWifi = value),
+                mealsIncludedInitialValue: null,
+                onMealsIncludedChanged: (value) =>
+                    _housingMealsIncluded = int.tryParse(value),
+                photoCount: _housingImageFiles.length,
+                onAddPhotos: _housingImageFiles.length < 5
+                    ? _pickHousingImages
+                    : null,
+              ),
+              const SizedBox(height: 16),
+              ListingTextFormField(
                 controller: _staffShuttleRouteController,
-                decoration: InputDecoration(
-                  labelText: l10n.staffShuttleRouteLabel,
-                  hintText: l10n.staffShuttleRouteHint,
-                ),
+                labelText: l10n.staffShuttleRouteLabel,
+                hintText: l10n.staffShuttleRouteHint,
                 maxLines: 2,
               ),
               const SizedBox(height: 16),
@@ -764,11 +599,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              ListingTextFormField(
                 controller: _contactController,
-                decoration: const InputDecoration(
-                  hintText: 'Örn. 0555 123 4567',
-                ),
+                hintText: 'Örn. 0555 123 4567',
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'İletişim bilgisi gerekli'
                     : null,
@@ -779,48 +612,24 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              ListingTextFormField(
                 controller: _descController,
                 maxLines: 4,
-                decoration: const InputDecoration(
-                  hintText: 'İlanınızla ilgili tüm detayları açıklayın...',
-                ),
+                hintText: 'İlanınızla ilgili tüm detayları açıklayın...',
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Açıklama gerekli' : null,
               ),
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _submitting ? null : _submit,
-                  child: _submitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('İlanı Yayınla'),
-                ),
+              ListingSubmitButton(
+                isSubmitting: _submitting,
+                label: 'İlanı Yayınla',
+                onPressed: _submit,
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  String? _salaryValidator(String? value) {
-    final trimmed = value?.trim() ?? '';
-    if (trimmed.isEmpty) return null;
-    final parsed = int.tryParse(trimmed);
-    if (parsed == null || parsed < 0) return 'Geçerli tutar girin';
-    final min = int.tryParse(_minSalaryController.text.trim());
-    final max = int.tryParse(_maxSalaryController.text.trim());
-    if (min != null && max != null && min > max) return 'Aralığı kontrol edin';
-    return null;
   }
 
   Future<void> _pickContractDate({required bool isStart}) async {

@@ -203,9 +203,13 @@ class StorageService {
 
   /// Uploads multiple images for a listing to Firebase Storage.
   ///
-  /// The images are stored at `listing_images/{listingId}/{index}_{timestamp}.jpg`.
+  /// The images are stored at
+  /// `listing_images/{userId}/{listingId}/{index}_{timestamp}.jpg` — the
+  /// `userId` segment lets storage.rules verify the uploader owns the path
+  /// without needing to read the (possibly not-yet-created) listing doc.
   /// Returns a list of download URL strings.
   Future<List<String>> uploadListingImages(
+    String userId,
     String listingId,
     List<XFile> imageFiles,
   ) async {
@@ -214,7 +218,7 @@ class StorageService {
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
 
       for (int i = 0; i < imageFiles.length; i++) {
-        final String path = 'listing_images/$listingId/${i}_$timestamp.jpg';
+        final String path = 'listing_images/$userId/$listingId/${i}_$timestamp.jpg';
         final Reference ref = _storage.ref().child(path);
 
         final SettableMetadata metadata = SettableMetadata(
@@ -244,6 +248,7 @@ class StorageService {
   }
 
   Future<List<String>> uploadHousingImages(
+    String userId,
     String listingId,
     List<XFile> imageFiles,
   ) async {
@@ -252,7 +257,7 @@ class StorageService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       for (var i = 0; i < imageFiles.length; i++) {
         final ref = _storage.ref().child(
-          'housing_images/$listingId/${i}_$timestamp.jpg',
+          'housing_images/$userId/$listingId/${i}_$timestamp.jpg',
         );
         final task = await _putXFile(
           ref,

@@ -31,21 +31,22 @@ service firebase.storage {
       allow write: if isOwner(userId) && isImage() && request.resource.size < 10 * 1024 * 1024;
     }
 
-    // listing_images/{listingId}/{file}
-    // Written before the Firestore listing document exists (image upload
-    // happens first so the doc can be created once, fully formed), so
-    // ownership can't be checked against the listing doc here. Any signed-in
-    // user may write; Firestore rules gate what listing doc can actually
-    // reference these URLs.
-    match /listing_images/{listingId}/{fileName} {
+    // listing_images/{userId}/{listingId}/{file}
+    // Images are written before the Firestore listing document exists
+    // (upload happens first so the doc can be created once, fully formed),
+    // so ownership can't be checked against the listing doc here. The
+    // userId path segment lets us check ownership directly instead: only
+    // the uploader can write/overwrite/delete under their own uid, so one
+    // signed-in user can no longer clobber another user's listing images.
+    match /listing_images/{userId}/{listingId}/{fileName} {
       allow read: if true;
-      allow write: if isSignedIn() && isImage() && request.resource.size < 10 * 1024 * 1024;
+      allow write: if isOwner(userId) && isImage() && request.resource.size < 10 * 1024 * 1024;
     }
 
-    // housing_images/{listingId}/{file} - same rationale as listing_images.
-    match /housing_images/{listingId}/{fileName} {
+    // housing_images/{userId}/{listingId}/{file} - same rationale as listing_images.
+    match /housing_images/{userId}/{listingId}/{fileName} {
       allow read: if true;
-      allow write: if isSignedIn() && isImage() && request.resource.size < 10 * 1024 * 1024;
+      allow write: if isOwner(userId) && isImage() && request.resource.size < 10 * 1024 * 1024;
     }
 
     // verification_documents/{userId}/{timestamp}_{documentType}.{ext}

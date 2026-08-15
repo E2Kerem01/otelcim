@@ -50,15 +50,15 @@ class BoostService {
         }),
       );
 
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final error = body['error'] as Map<String, dynamic>?;
       if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        if (body['error'] != null) {
-          throw Exception(body['error']['message'] ?? 'Sunucu doğrulaması başarısız oldu.');
+        if (error != null) {
+          throw Exception(error['message'] as String? ?? 'Sunucu doğrulaması başarısız oldu.');
         }
         debugPrint('Boost purchase verified and processed via Cloud Function.');
       } else {
-        final body = jsonDecode(response.body);
-        final msg = body['error']?['message'] ?? 'HTTP ${response.statusCode}: Boost doğrulama hatası.';
+        final msg = error?['message'] as String? ?? 'HTTP ${response.statusCode}: Boost doğrulama hatası.';
         throw Exception(msg);
       }
     } catch (e) {
@@ -68,9 +68,11 @@ class BoostService {
   }
 
   /// Redeems one of the user's free (referral-earned) 7-day boost credits
-  /// on [listingId], mirroring [processBoostPurchase]'s 7-day boost but at
-  /// zero cost. Runs in a Firestore transaction so the freeBoostCredits
-  /// check-and-decrement is atomic against concurrent redemptions.
+  /// on [listingId] via the redeemFreeBoost Cloud Function. The
+  /// check-and-decrement of freeBoostCredits, and the boosts/boost_purchases
+  /// writes, all happen server-side in one transaction — firestore.rules
+  /// denies clients from writing those documents directly, since a client
+  /// transaction can't be trusted to have actually consumed a credit.
   ///
   /// Throws an [Exception] if the user has no free boost credits left.
   Future<void> redeemFreeBoost({
@@ -78,68 +80,30 @@ class BoostService {
     required String userId,
   }) async {
     try {
-      final userRef = _db.collection('user_profiles').doc(userId);
-      final boostDocRef = _db.collection('boosts').doc();
-      final purchaseDocRef = _db.collection('boost_purchases').doc();
-      final listingRef = _db.collection('listings').doc(listingId);
+      final user = FirebaseAuth.instance.currentUser;
+      final idToken = await user?.getIdToken();
 
-      await _db.runTransaction((transaction) async {
-        final userSnap = await transaction.get(userRef);
-        final freeBoostCredits =
-            (userSnap.data()?['freeBoostCredits'] as int?) ?? 0;
-        if (freeBoostCredits <= 0) {
-          throw Exception('Kullanılabilir ücretsiz boost hakkınız yok.');
-        }
+      final url = Uri.parse(
+        'https://europe-west1-otelcim-7f0ba.cloudfunctions.net/redeemFreeBoost',
+      );
 
-        const durationDays = 7;
-        final now = DateTime.now();
-        final expiresAt = now.add(const Duration(days: durationDays));
-        final transactionId =
-            'referral_${now.millisecondsSinceEpoch}';
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          if (idToken != null) 'Authorization': 'Bearer $idToken',
+        },
+        body: jsonEncode({
+          'data': {'listingId': listingId},
+        }),
+      );
 
-        final boost = Boost(
-          id: boostDocRef.id,
-          listingId: listingId,
-          userId: userId,
-          durationType: BoostDurationType.days7,
-          durationDays: durationDays,
-          price: 0,
-          purchasedAt: now,
-          expiresAt: expiresAt,
-          platform: 'referral_reward',
-          transactionId: transactionId,
-          status: BoostStatus.active,
-        );
-        transaction.set(boostDocRef, boost.toMap());
-
-        final boostPurchase = BoostPurchase(
-          id: purchaseDocRef.id,
-          userId: userId,
-          listingId: listingId,
-          boostId: boostDocRef.id,
-          durationType: '7',
-          price: 0,
-          platform: 'referral_reward',
-          transactionId: transactionId,
-          productId: 'referral_free_boost',
-          status: PurchaseStatus.completed,
-          purchasedAt: now,
-          verifiedAt: now,
-        );
-        transaction.set(purchaseDocRef, boostPurchase.toMap());
-
-        transaction.update(listingRef, {
-          'isBoosted': true,
-          'boostExpiresAt': Timestamp.fromDate(expiresAt),
-          'boostType': 'referral_free_boost',
-          'boostPurchaseId': purchaseDocRef.id,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-
-        transaction.update(userRef, {
-          'freeBoostCredits': FieldValue.increment(-1),
-        });
-      });
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final error = body['error'] as Map<String, dynamic>?;
+      if (response.statusCode != 200 || error != null) {
+        final msg = error?['message'] as String? ?? 'HTTP ${response.statusCode}: Boost doğrulama hatası.';
+        throw Exception(msg);
+      }
 
       debugPrint('Free boost redeemed successfully for listing $listingId');
     } catch (e) {
@@ -162,7 +126,7 @@ class BoostService {
         return tB.compareTo(tA);
       });
       return list;
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Error watching user boost purchases: $error');
       return <BoostPurchase>[];
     });
@@ -182,7 +146,7 @@ class BoostService {
         return tB.compareTo(tA);
       });
       return list;
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Error watching user boosts: $error');
       return <Boost>[];
     });

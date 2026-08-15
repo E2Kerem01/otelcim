@@ -15,7 +15,7 @@ class PaymentService extends ChangeNotifier {
     // clears). Skip initialization entirely on web; isAvailable stays
     // false and the UI falls back to its "store unavailable" path.
     if (_iap != null) {
-      _initialize();
+      unawaited(_initialize());
     }
   }
 
@@ -50,7 +50,7 @@ class PaymentService extends ChangeNotifier {
 
       _purchaseSub = iap.purchaseStream.listen(
         _onPurchaseUpdate,
-        onError: (error) {
+        onError: (Object error) {
           debugPrint('IAP purchase stream error: $error');
         },
       );
@@ -76,7 +76,7 @@ class PaymentService extends ChangeNotifier {
       }
 
       if (purchase.pendingCompletePurchase) {
-        _iap!.completePurchase(purchase);
+        unawaited(_iap!.completePurchase(purchase));
       }
     }
     notifyListeners();
@@ -112,19 +112,53 @@ class PaymentService extends ChangeNotifier {
     }
   }
 
-  Future<bool> purchaseProduct(ProductDetails product) async {
+  /// Launches the platform purchase flow for [product] and waits for the
+  /// store to report a terminal result for it via [purchaseStream].
+  ///
+  /// Returns the completed [PurchaseDetails] (which carries the real store
+  /// transaction id and receipt/token in `verificationData`) on success, or
+  /// `null` if the purchase was cancelled, failed, or timed out. Callers
+  /// must forward `verificationData.serverVerificationData` to the backend
+  /// for server-side verification — never fabricate a transaction id.
+  Future<PurchaseDetails?> purchaseProduct(ProductDetails product) async {
     if (!_isAvailable) {
       debugPrint('IAP not available, cannot purchase');
-      return false;
+      return null;
     }
+
+    final iap = _iap!;
+    final completer = Completer<PurchaseDetails?>();
+    late final StreamSubscription<List<PurchaseDetails>> subscription;
+    subscription = iap.purchaseStream.listen((purchases) {
+      for (final purchase in purchases) {
+        if (purchase.productID != product.id) continue;
+        if (completer.isCompleted) continue;
+        if (purchase.status == PurchaseStatus.purchased ||
+            purchase.status == PurchaseStatus.restored) {
+          completer.complete(purchase);
+        } else if (purchase.status == PurchaseStatus.error ||
+            purchase.status == PurchaseStatus.canceled) {
+          completer.complete(null);
+        }
+      }
+    });
 
     try {
       final purchaseParam = PurchaseParam(productDetails: product);
-      final success = await _iap!.buyNonConsumable(purchaseParam: purchaseParam);
-      return success;
+      final requestSent = await iap.buyNonConsumable(purchaseParam: purchaseParam);
+      if (!requestSent) {
+        return null;
+      }
+
+      return await completer.future.timeout(
+        const Duration(minutes: 5),
+        onTimeout: () => null,
+      );
     } catch (e) {
       debugPrint('IAP purchase error: $e');
-      return false;
+      return null;
+    } finally {
+      await subscription.cancel();
     }
   }
 
@@ -170,7 +204,7 @@ class PaymentService extends ChangeNotifier {
 
   @override
   void dispose() {
-    _purchaseSub?.cancel();
+    unawaited(_purchaseSub?.cancel() ?? Future.value());
     super.dispose();
   }
 }

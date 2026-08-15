@@ -21,6 +21,34 @@ service cloud.firestore {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']) || isAdmin();
     }
 
+    // Prevent regular users from tampering with fields that are only ever
+    // meant to be written by Cloud Functions running under the Admin SDK
+    // (which bypasses these rules entirely): referral credits/count granted
+    // by grantReferralRewardIfEligible, and the isAdmin flag above.
+    function isNotChangingServerControlledProfileFields() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['isAdmin', 'freeBoostCredits', 'referralCount', 'referralRewardGranted']) || isAdmin();
+    }
+
+    // Boost/ownership fields on a listing are only ever meant to be written
+    // by Cloud Functions (verifyAndProcessBoostPurchase, redeemFreeBoost)
+    // running under the Admin SDK, which bypasses these rules entirely. The
+    // listing owner may still edit their own listing's content, just not
+    // these server-controlled fields.
+    function isNotChangingBoostOrOwnershipFields() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['isBoosted', 'boostExpiresAt', 'boostType', 'boostPurchaseId', 'posterId']);
+    }
+
+    // 'removed' is a moderation state set by ModerationService.removeListing
+    // (admin-only in the app). Without this, an owner could bypass a
+    // takedown by writing status: 'active' straight back onto their own
+    // removed listing. Owners may still freely toggle active <-> closed.
+    function isNotBypassingListingModeration() {
+      return (resource.data.status != 'removed' && request.resource.data.status != 'removed') ||
+        isAdmin();
+    }
+
     // Public job marketplace listings. Read is public so anonymous users can
     // browse (home feed, regions, map, nearby). Writes require ownership;
     // moderation (update/delete) is also allowed for admins.
@@ -28,7 +56,9 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isSignedIn() &&
         request.resource.data.posterId == request.auth.uid;
-      allow update, delete: if isOwner(resource.data.posterId) || isAdmin();
+      allow update: if (isOwner(resource.data.posterId) && isNotChangingBoostOrOwnershipFields() &&
+        isNotBypassingListingModeration()) || isAdmin();
+      allow delete: if isOwner(resource.data.posterId) || isAdmin();
 
       // Contact details (phone/email) are split out from the listing doc
       // above, which is publicly readable, so anonymous users can't read
@@ -49,7 +79,8 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isOwner(userId) &&
         (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin());
-      allow update: if (isOwner(userId) || isAdmin()) && isNotChangingAdminStatus();
+      allow update: if (isOwner(userId) || isAdmin()) &&
+        isNotChangingAdminStatus() && isNotChangingServerControlledProfileFields();
       allow delete: if isOwner(userId) || isAdmin();
 
       match /favorites/{listingId} {
@@ -87,9 +118,20 @@ service cloud.firestore {
           (get(/databases/$(database)/documents/conversations/$(conversationId)).data.posterId == request.auth.uid ||
            get(/databases/$(database)/documents/conversations/$(conversationId)).data.seekerId == request.auth.uid ||
            isAdmin());
+        // Being a participant is enough to send a message, but the message
+        // itself must be genuinely from the caller: senderId must match
+        // request.auth.uid (a participant can't post as the other party),
+        // sentAt must be the real server timestamp (not a client-chosen
+        // date), and only these three fields may be set.
         allow create: if isSignedIn() &&
           (get(/databases/$(database)/documents/conversations/$(conversationId)).data.posterId == request.auth.uid ||
-           get(/databases/$(database)/documents/conversations/$(conversationId)).data.seekerId == request.auth.uid);
+           get(/databases/$(database)/documents/conversations/$(conversationId)).data.seekerId == request.auth.uid) &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.keys().hasOnly(['senderId', 'text', 'sentAt']) &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 &&
+          request.resource.data.text.size() <= 5000 &&
+          request.resource.data.sentAt == request.time;
       }
 
       // Interview time proposals/confirmations, scoped to conversation participants.
@@ -118,26 +160,23 @@ service cloud.firestore {
     }
 
     // Boosts / purchases. Reads are scoped to the owner (or admin) — these
-    // contain purchase/pricing data. Direct client-side creates/updates of
-    // paid boosts are disabled; paid purchases must go through the
-    // verifyAndProcessBoostPurchase Cloud Function (Admin SDK, bypasses
-    // these rules). Only the zero-cost referral reward path is allowed
-    // directly from the client.
+    // contain purchase/pricing data. ALL writes (paid or free/referral) are
+    // disabled for clients: paid purchases go through
+    // verifyAndProcessBoostPurchase and free redemptions go through
+    // redeemFreeBoost, both Cloud Functions running under the Admin SDK
+    // (which bypasses these rules). A client write path here — even one
+    // gated on price == 0 — cannot be trusted to have actually consumed a
+    // credit, since that consumption happens on a *different* document
+    // (user_profiles.freeBoostCredits) that these rules can't correlate.
     match /boosts/{boostId} {
       allow read: if isSignedIn() &&
         (resource.data.userId == request.auth.uid || isAdmin());
-      allow create, update: if isSignedIn() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.platform == 'referral_reward' &&
-        request.resource.data.price == 0;
+      allow write: if false;
     }
     match /boost_purchases/{purchaseId} {
       allow read: if isSignedIn() &&
         (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isSignedIn() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.platform == 'referral_reward' &&
-        request.resource.data.price == 0;
+      allow write: if false;
     }
 
     // Ratings are publicly visible (shown on profiles), only the rater can
