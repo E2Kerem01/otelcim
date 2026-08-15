@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -46,11 +48,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// Navigate to the next slide or complete onboarding
   void _nextPage() {
     if (_currentPage < _totalSlides - 1) {
-      _pageController.animateToPage(
+      unawaited(_pageController.animateToPage(
         _currentPage + 1,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-      );
+      ));
     } else {
       _completeOnboarding();
     }

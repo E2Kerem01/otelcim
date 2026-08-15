@@ -158,7 +158,7 @@ class ProfileService {
         return null;
       }
       return UserProfile.fromFirestore(snapshot);
-    }).handleError((error) {
+    }).handleError((Object error) {
       if (error is FirebaseException) {
         throw Exception('Failed to watch user profile: ${error.message}');
       }

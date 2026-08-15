@@ -40,11 +40,11 @@ class _BannerAdCarouselState extends ConsumerState<BannerAdCarousel> {
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!mounted || !_pageController.hasClients) return;
       final nextIndex = (_currentIndex + 1) % itemCount;
-      _pageController.animateToPage(
+      unawaited(_pageController.animateToPage(
         nextIndex,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
-      );
+      ));
     });
   }
 

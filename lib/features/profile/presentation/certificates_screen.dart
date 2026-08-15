@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -152,14 +154,14 @@ class CertificatesScreen extends ConsumerWidget {
   }
 
   static void _showUploadSheet(BuildContext context, WidgetRef ref, String userId) {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => _UploadCertificateSheet(userId: userId),
-    );
+    ));
   }
 }
 
@@ -393,7 +395,7 @@ class __UploadCertificateSheetState
   }
 
   Future<void> _pickFile() async {
-    showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       builder: (context) => SafeArea(
         child: Wrap(

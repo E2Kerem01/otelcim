@@ -36,7 +36,7 @@ class BannerAdService {
       });
 
       return list;
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Error watching active banner ads: $error');
       return <BannerAd>[];
     });
@@ -57,7 +57,7 @@ class BannerAdService {
         return tB.compareTo(tA);
       });
       return list;
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Error watching all banner ads: $error');
       return <BannerAd>[];
     });

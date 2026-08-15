@@ -69,7 +69,7 @@ class TalentPoolService {
         return tB.compareTo(tA);
       });
       return items;
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Error watching talent pool: $error');
       return <TalentPoolItem>[];
     });

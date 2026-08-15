@@ -133,7 +133,7 @@ class ChatService {
         return tA.compareTo(tB);
       });
       return messages;
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Firestore watchMessages warning: $error');
       return <Message>[];
     });
@@ -233,7 +233,7 @@ class ChatService {
         return tB.compareTo(tA);
       });
       return items;
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Firestore watchInterviewSlots error: $error');
       return <InterviewSlot>[];
     });

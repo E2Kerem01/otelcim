@@ -69,7 +69,7 @@ void main() {
 
     test('verification service watches, approves and rejects requests', () async {
       final service = admin.VerificationService(db);
-      await db.collection('verification_requests').doc('v1').set({'employerId': 'e', 'hotelName': 'A', 'documentUrls': [], 'status': 'pending', 'submittedAt': Timestamp.now()});
+      await db.collection('verification_requests').doc('v1').set({'employerId': 'e', 'hotelName': 'A', 'documentUrls': <String>[], 'status': 'pending', 'submittedAt': Timestamp.now()});
       expect(await service.watchPendingVerifications().first, hasLength(1));
       await service.approveVerification(verificationId: 'v1', adminId: 'a');
       expect((await db.collection('verification_requests').doc('v1').get()).data()!['status'], 'approved');

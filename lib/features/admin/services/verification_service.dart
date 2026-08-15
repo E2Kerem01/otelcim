@@ -18,7 +18,7 @@ class VerificationService {
         .snapshots()
         .map((snap) {
       return snap.docs.map(VerificationRequest.fromDoc).toList();
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Firestore watchPendingVerifications warning: $error');
       return <VerificationRequest>[];
     });
@@ -93,7 +93,7 @@ class VerificationService {
         .snapshots()
         .map((snap) {
       return snap.docs.map(VerificationRequest.fromDoc).toList();
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Firestore watchEmployerVerifications warning: $error');
       return <VerificationRequest>[];
     });

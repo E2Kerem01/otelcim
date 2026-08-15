@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +41,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
 
   /// Shows a bottom sheet with camera and gallery options
   Future<void> _showPhotoSourceOptions() async {
-    await showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       builder: (context) => SafeArea(
         child: Wrap(
@@ -49,7 +51,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
               title: const Text('Kamera'),
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.camera);
+                unawaited(_pickImage(ImageSource.camera));
               },
             ),
             ListTile(
@@ -57,7 +59,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
               title: const Text('Galeri'),
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.gallery);
+                unawaited(_pickImage(ImageSource.gallery));
               },
             ),
             if (widget.photoUrl != null)
@@ -67,7 +69,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
                     style: TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
-                  _removePhoto();
+                  unawaited(_removePhoto());
                 },
               ),
           ],

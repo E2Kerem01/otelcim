@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +17,7 @@ class TalentPoolScreen extends ConsumerWidget {
     String employerId,
     TalentPoolItem item,
   ) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Adayı Havuzdan Çıkar'),
@@ -46,7 +48,7 @@ class TalentPoolScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 
   @override
@@ -213,7 +215,7 @@ class TalentPoolScreen extends ConsumerWidget {
                           alignment: Alignment.centerRight,
                           child: OutlinedButton.icon(
                             onPressed: () {
-                              context.push('/chat/${item.conversationId}');
+                              unawaited(context.push('/chat/${item.conversationId}'));
                             },
                             icon: const Icon(
                               Icons.chat_bubble_outline_rounded,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -45,7 +46,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
               title: const Text('Kameradan Çek (max 30sn)'),
               onTap: () {
                 Navigator.pop(context);
-                _pickAndUploadVideo(ImageSource.camera);
+                unawaited(_pickAndUploadVideo(ImageSource.camera));
               },
             ),
             ListTile(
@@ -53,7 +54,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
               title: const Text('Galeriden Seç (max 30sn)'),
               onTap: () {
                 Navigator.pop(context);
-                _pickAndUploadVideo(ImageSource.gallery);
+                unawaited(_pickAndUploadVideo(ImageSource.gallery));
               },
             ),
           ],
@@ -187,12 +188,12 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
   }
 
   void _watchVideo() {
-    VideoPlayerDialog.show(
+    unawaited(VideoPlayerDialog.show(
       context,
       videoUrl: widget.videoUrl,
       videoFile: _localVideoFile,
       title: 'Tanıtım Videosu',
-    );
+    ));
   }
 
   @override

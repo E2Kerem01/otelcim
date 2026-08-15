@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -83,7 +84,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
     final confirmTextController = TextEditingController();
     bool isDeleting = false;
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
@@ -209,7 +210,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
           },
         );
       },
-    );
+    ));
   }
 
   @override

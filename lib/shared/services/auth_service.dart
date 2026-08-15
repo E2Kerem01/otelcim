@@ -296,7 +296,7 @@ class AuthService extends ChangeNotifier {
 
   @override
   void dispose() {
-    _authSub?.cancel();
+    unawaited(_authSub?.cancel() ?? Future.value());
     super.dispose();
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +22,7 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
     String? selectedCategory;
     String selectedSeason = ListingSeason.yaz2025.code;
 
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -140,7 +142,7 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
           },
         );
       },
-    );
+    ));
   }
 
   @override
@@ -396,11 +398,11 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                                   Switch(
                                     value: sub.enabled,
                                     onChanged: (val) {
-                                      ref.read(seasonalServiceProvider).toggleSubscription(
+                                      unawaited(ref.read(seasonalServiceProvider).toggleSubscription(
                                             userId: user.uid,
                                             subscriptionId: sub.id,
                                             enabled: val,
-                                          );
+                                          ));
                                     },
                                   ),
                                   IconButton(

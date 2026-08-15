@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,14 +13,14 @@ class AdminBannerAdsScreen extends ConsumerWidget {
   const AdminBannerAdsScreen({super.key});
 
   void _showBannerForm(BuildContext context, WidgetRef ref, [BannerAd? existingAd]) {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) => _BannerAdFormSheet(existingAd: existingAd),
-    );
+    ));
   }
 
   Future<void> _deleteBanner(BuildContext context, WidgetRef ref, BannerAd ad) async {
@@ -122,7 +124,7 @@ class AdminBannerAdsScreen extends ConsumerWidget {
                 onEdit: () => _showBannerForm(context, ref, banner),
                 onDelete: () => _deleteBanner(context, ref, banner),
                 onToggleActive: (val) {
-                  ref.read(bannerAdServiceProvider).toggleActive(banner.id, val);
+                  unawaited(ref.read(bannerAdServiceProvider).toggleActive(banner.id, val));
                 },
               );
             },

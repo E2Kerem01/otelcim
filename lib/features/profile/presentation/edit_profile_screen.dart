@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -270,12 +272,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     children: [
                       OutlinedButton.icon(
                         onPressed: () {
-                          Navigator.of(context).push(
+                          unawaited(Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) =>
                                   const VerificationRequestScreen(),
                             ),
-                          );
+                          ));
                         },
                         icon: const Icon(Icons.verified),
                         label: const Text('Otelinizi Doğrulayın'),

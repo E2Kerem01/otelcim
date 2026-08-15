@@ -50,7 +50,7 @@ class AdminService {
 
     return query.snapshots().map((snap) {
       return snap.docs.map(AdminAction.fromDoc).toList();
-    }).handleError((error) {
+    }).handleError((Object error) {
       debugPrint('Firestore watchAuditLog warning: $error');
       return <AdminAction>[];
     });
@@ -108,7 +108,7 @@ class AdminService {
         .limit(limit)
         .snapshots()
         .map((snap) => snap.docs.map(UserProfile.fromFirestore).toList())
-        .handleError((error) {
+        .handleError((Object error) {
           debugPrint('Firestore watchRecentUsers warning: $error');
           return <UserProfile>[];
         });

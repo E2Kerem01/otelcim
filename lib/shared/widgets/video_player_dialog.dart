@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
@@ -49,7 +50,7 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
   @override
   void initState() {
     super.initState();
-    _initializeVideo();
+    unawaited(_initializeVideo());
   }
 
   Future<void> _initializeVideo() async {
@@ -68,7 +69,7 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
       }
 
       await _controller!.initialize();
-      _controller!.setLooping(true);
+      await _controller!.setLooping(true);
       await _controller!.play();
 
       if (mounted) {
@@ -88,7 +89,7 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
 
   @override
   void dispose() {
-    _controller?.dispose();
+    unawaited(_controller?.dispose() ?? Future.value());
     super.dispose();
   }
 
@@ -186,9 +187,9 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
                             onTap: () {
                               setState(() {
                                 if (_controller!.value.isPlaying) {
-                                  _controller!.pause();
+                                  unawaited(_controller!.pause());
                                 } else {
-                                  _controller!.play();
+                                  unawaited(_controller!.play());
                                 }
                               });
                             },

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -245,7 +247,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                     ElevatedButton.icon(
                       onPressed: () {
                         if (!isLoggedIn) {
-                          context.push('/login');
+                          unawaited(context.push('/login'));
                         } else {
                           navigationShell.goBranch(
                             2,

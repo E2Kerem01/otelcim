@@ -71,7 +71,7 @@ class ListingService {
 
           return listings;
         })
-        .handleError((error) {
+        .handleError((Object error) {
           debugPrint('Firestore watchActiveListings warning: $error');
           return <Listing>[];
         });
@@ -95,7 +95,7 @@ class ListingService {
 
           return listings;
         })
-        .handleError((error) {
+        .handleError((Object error) {
           debugPrint('Firestore watchMyListings warning: $error');
           return <Listing>[];
         });
@@ -482,7 +482,7 @@ class ListingService {
         .limit(limit)
         .snapshots()
         .map((snap) => snap.docs.map(Listing.fromDoc).toList())
-        .handleError((error) {
+        .handleError((Object error) {
           debugPrint('Firestore watchRecentListingsForAdmin warning: $error');
           return <Listing>[];
         });

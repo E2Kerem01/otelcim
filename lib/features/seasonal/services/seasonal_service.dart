@@ -76,7 +76,7 @@ class SeasonalService {
         .collection('seasonal_subscriptions')
         .snapshots()
         .map((snap) => snap.docs.map(SeasonalSubscription.fromDoc).toList())
-        .handleError((e) {
+        .handleError((Object e) {
       debugPrint('Error watching seasonal subscriptions: $e');
       return <SeasonalSubscription>[];
     });

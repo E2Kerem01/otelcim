@@ -117,7 +117,7 @@ class VerificationService {
         return null;
       }
       return VerificationRequest.fromFirestore(querySnapshot.docs.first);
-    }).handleError((error) {
+    }).handleError((Object error) {
       if (error is FirebaseException) {
         throw Exception('Failed to watch verification request: ${error.message}');
       }

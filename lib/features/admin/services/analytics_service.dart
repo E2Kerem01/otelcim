@@ -69,7 +69,7 @@ class AdminAnalyticsService {
         .where('status', isEqualTo: 'active')
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((error) {
+        .handleError((Object error) {
       debugPrint('Error watching active listings count: $error');
       return 0;
     });
@@ -83,7 +83,7 @@ class AdminAnalyticsService {
         .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoffDate))
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((error) {
+        .handleError((Object error) {
       debugPrint('Error watching new users count: $error');
       return 0;
     });
@@ -95,7 +95,7 @@ class AdminAnalyticsService {
         .collection('reports')
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((error) {
+        .handleError((Object error) {
       debugPrint('Error watching open reports count: $error');
       return 0;
     });
@@ -108,7 +108,7 @@ class AdminAnalyticsService {
         .where('status', isEqualTo: 'pending')
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((error) {
+        .handleError((Object error) {
       debugPrint('Error watching pending verifications count: $error');
       return 0;
     });
