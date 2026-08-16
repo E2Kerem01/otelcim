@@ -178,7 +178,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Header Logo & App Title
-          const Icon(Icons.hotel_rounded, size: 48, color: otelcimBlue),
+          const Icon(Icons.card_travel_rounded, size: 48, color: otelcimBlue),
           const SizedBox(height: 8),
           Text(
             l10n?.appName ?? 'Otelcim',

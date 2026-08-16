@@ -12,7 +12,7 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.hotel_rounded, size: 64, color: otelcimBlue),
+            Icon(Icons.card_travel_rounded, size: 64, color: otelcimBlue),
             SizedBox(height: 16),
             Text('Otelcim', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: otelcimBlue)),
             SizedBox(height: 24),

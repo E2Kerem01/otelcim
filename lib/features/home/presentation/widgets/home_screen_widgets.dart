@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/responsive/responsive_layout.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/constants/categories.dart';
 import '../../../../shared/constants/listing_filters.dart';
@@ -1042,6 +1043,314 @@ class ListingCard extends ConsumerWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Column header row for [ListingTableRow], mirroring a classifieds-style
+/// table (image + title, category, location, price, date columns).
+/// Hidden on mobile widths where the row itself stacks those fields instead.
+class ListingTableHeader extends StatelessWidget {
+  const ListingTableHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (context.isMobile) return const SizedBox.shrink();
+
+    final style = TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+      color: Colors.grey.shade600,
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+      child: Row(
+        children: [
+          const SizedBox(width: 56 + 12),
+          Expanded(flex: 4, child: Text('İlan Başlığı', style: style)),
+          Expanded(flex: 2, child: Text('Kategori', style: style)),
+          Expanded(flex: 2, child: Text('Konum', style: style)),
+          Expanded(
+            flex: 2,
+            child: Text('Ücret', style: style, textAlign: TextAlign.right),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 2,
+            child:
+                Text('İlan Tarihi', style: style, textAlign: TextAlign.right),
+          ),
+          const SizedBox(width: 32),
+        ],
+      ),
+    );
+  }
+}
+
+/// A dense, single-row listing entry laid out in columns on wider screens
+/// (thumbnail + title | category | location | salary | date), collapsing to
+/// a stacked mobile row when there isn't room for separate columns.
+class ListingTableRow extends ConsumerWidget {
+  const ListingTableRow({super.key, required this.listing});
+
+  final Listing listing;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isBoostedActive = BoostBadge.isBoostActive(listing);
+    final uid = ref.watch(authStateProvider).value?.uid;
+    final isFavorite = uid == null
+        ? false
+        : ref
+                  .watch(favoriteIdsProvider(uid))
+                  .valueOrNull
+                  ?.contains(listing.id) ??
+              false;
+
+    final dateLabel = listing.createdAt == null
+        ? ''
+        : '${listing.createdAt!.day.toString().padLeft(2, '0')}.'
+              '${listing.createdAt!.month.toString().padLeft(2, '0')}.'
+              '${listing.createdAt!.year}';
+
+    final thumbnail = ClipRRect(
+      borderRadius: BorderRadius.circular(6),
+      child: listing.images.isNotEmpty
+          ? CachedNetworkImage(
+              imageUrl: listing.images.first,
+              width: 56,
+              height: 56,
+              fit: BoxFit.cover,
+              placeholder: (_, __) =>
+                  Container(width: 56, height: 56, color: Colors.grey.shade200),
+              errorWidget: (_, __, ___) => const SizedBox(
+                width: 56,
+                height: 56,
+                child: Icon(Icons.broken_image, size: 20, color: Colors.grey),
+              ),
+            )
+          : Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    listingCategoryColor(listing.category),
+                    listingCategoryColor(listing.category)
+                        .withValues(alpha: 0.72),
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  listingCategoryIcon(listing.category),
+                  size: 22,
+                  color: Colors.white.withValues(alpha: 0.92),
+                ),
+              ),
+            ),
+    );
+
+    final titleRow = Row(
+      children: [
+        Expanded(
+          child: Text(
+            listing.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+        ),
+        if (listing.isUrgent) ...[
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.deepOrange.shade700,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              AppLocalizations.of(context)!.urgentBadge,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+
+    final favoriteButton = SizedBox(
+      width: 32,
+      height: 32,
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        visualDensity: VisualDensity.compact,
+        tooltip: isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle',
+        onPressed: () {
+          if (uid == null) {
+            unawaited(context.push('/login'));
+            return;
+          }
+          unawaited(
+            ref.read(favoriteServiceProvider).toggleFavorite(uid, listing.id),
+          );
+        },
+        icon: Icon(
+          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          size: 18,
+          color: isFavorite ? Colors.red : Colors.grey.shade500,
+        ),
+      ),
+    );
+
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(
+          color: isBoostedActive
+              ? Colors.amber.shade400
+              : Colors.grey.shade200,
+          width: isBoostedActive ? 1.5 : 1,
+        ),
+      ),
+      child: InkWell(
+        onTap: () => context.push('/listing/${listing.id}'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          child: context.isMobile
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    thumbnail,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          titleRow,
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 13,
+                                color: Colors.grey.shade600,
+                              ),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  listing.location,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  listing.salary,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                              ),
+                              if (dateLabel.isNotEmpty)
+                                Text(
+                                  dateLabel,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    favoriteButton,
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    thumbnail,
+                    const SizedBox(width: 12),
+                    Expanded(flex: 4, child: titleRow),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        listingCategoryLabel(listing.category),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: listingCategoryColor(listing.category),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        listing.location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        listing.salary,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        dateLabel,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ),
+                    favoriteButton,
+                  ],
+                ),
         ),
       ),
     );

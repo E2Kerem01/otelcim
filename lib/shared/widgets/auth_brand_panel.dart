@@ -26,7 +26,7 @@ class AuthBrandPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
-            Icons.hotel_rounded,
+            Icons.card_travel_rounded,
             size: 100,
             color: Colors.white.withValues(alpha: 0.2),
           ),

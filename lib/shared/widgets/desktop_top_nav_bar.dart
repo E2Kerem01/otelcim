@@ -118,7 +118,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                             ],
                           ),
                           child: const Icon(
-                            Icons.hotel_rounded,
+                            Icons.card_travel_rounded,
                             color: Colors.white,
                             size: 22,
                           ),

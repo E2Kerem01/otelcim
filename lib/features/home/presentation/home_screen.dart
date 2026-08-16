@@ -32,6 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _hasSearchText = false;
   int _columnCount = 1;
   bool _columnCountInitialized = false;
+  bool _isTableView = false;
   HomeAdvancedFilters _filters = const HomeAdvancedFilters();
   PaginationParams _currentParams = (
     category: null,
@@ -436,13 +437,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: availableColumnCounts.map((cols) {
-                          final isSelected = _columnCount == cols;
-                          return Tooltip(
-                            message: '$cols Sütun',
+                        children: [
+                          ...availableColumnCounts.map((cols) {
+                            final isSelected =
+                                !_isTableView && _columnCount == cols;
+                            return Tooltip(
+                              message: '$cols Sütun',
+                              child: InkWell(
+                                key: Key('grid_col_$cols'),
+                                onTap: () => setState(() {
+                                  _isTableView = false;
+                                  _columnCount = cols;
+                                }),
+                                borderRadius: BorderRadius.circular(6),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        cols == 1
+                                            ? Icons.view_list_rounded
+                                            : cols == 2
+                                                ? Icons.grid_view_rounded
+                                                : cols == 3
+                                                    ? Icons.grid_on_rounded
+                                                    : Icons.apps_rounded,
+                                        size: 16,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.grey.shade700,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        '$cols',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: isSelected
+                                              ? Colors.white
+                                              : Colors.grey.shade700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                          Tooltip(
+                            message: 'Tablo Görünümü',
                             child: InkWell(
-                              key: Key('grid_col_$cols'),
-                              onTap: () => setState(() => _columnCount = cols),
+                              key: const Key('grid_col_table'),
+                              onTap: () =>
+                                  setState(() => _isTableView = true),
                               borderRadius: BorderRadius.circular(6),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 150),
@@ -451,44 +509,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: isSelected
+                                  color: _isTableView
                                       ? Theme.of(context).primaryColor
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      cols == 1
-                                          ? Icons.view_list_rounded
-                                          : cols == 2
-                                              ? Icons.grid_view_rounded
-                                              : cols == 3
-                                                  ? Icons.grid_on_rounded
-                                                  : Icons.apps_rounded,
-                                      size: 16,
-                                      color: isSelected
-                                          ? Colors.white
-                                          : Colors.grey.shade700,
-                                    ),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                      '$cols',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: isSelected
-                                            ? Colors.white
-                                            : Colors.grey.shade700,
-                                      ),
-                                    ),
-                                  ],
+                                child: Icon(
+                                  Icons.table_rows_rounded,
+                                  size: 16,
+                                  color: _isTableView
+                                      ? Colors.white
+                                      : Colors.grey.shade700,
                                 ),
                               ),
                             ),
-                          );
-                        }).toList(),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -496,13 +532,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             if (paginationState.isLoading && paginationState.listings.isEmpty)
-              ListingsSkeletonSliver(columnCount: _columnCount)
+              ListingsSkeletonSliver(columnCount: _isTableView ? 1 : _columnCount)
             else if (paginationState.listings.isEmpty)
               _buildEmptyState(context)
             else ...[
+              if (_isTableView)
+                const SliverToBoxAdapter(child: ListingTableHeader()),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: _columnCount == 1
+                sliver: _isTableView
+                    ? SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: ListingTableRow(
+                              listing: paginationState.listings[index],
+                            ),
+                          ),
+                          childCount: paginationState.listings.length,
+                        ),
+                      )
+                    : _columnCount == 1
                     ? SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => Padding(
