@@ -47,12 +47,14 @@ Kod tabanının genel katman ayrımı anlaşılır ve test altyapısı mevcut; a
 
 Öneri: `request.resource.data.senderId == request.auth.uid` şartı, alan allowlist'i, tip/boyut kontrolleri ve değiştirilemez sunucu zaman stratejisi ekleyin.
 
-### P1 — Kritik kurallar için otomatik test/CI kapısı görünmüyor
+### P1 — Kritik kurallar için otomatik test/CI kapısı görünmüyor — ✅ Çözüldü (2026-08-22)
 
 - Firestore ve Storage kuralları için emülatör tabanlı test dosyası bulunamadı.
 - `.github/workflows` bulunamadı; analiz ve testlerin merge öncesinde zorunlu çalıştığına dair repo içi kanıt yok.
 
 Öneri: `@firebase/rules-unit-testing` ile pozitif/negatif yetki testleri yazın. CI'da Flutter analiz/test, TypeScript build ve rules testlerini zorunlu hale getirin.
+
+Uygulandı: `rules-tests/` altında `@firebase/rules-unit-testing` + Vitest ile 21 pozitif/negatif kural testi (boost/referral kilidi, storage sahiplik namespace'i, mesaj bütünlüğü, admin-only alanlar, moderasyon bypass'ı vb.) ve `.github/workflows/rules_tests.yml` ile PR/push üzerinde otomatik çalışan bir emülatör CI kapısı eklendi. Detaylar için `rules-tests/README.md`.
 
 ### P2 — God widget / yüksek değişiklik maliyeti
 
@@ -87,7 +89,7 @@ Bu dosyalar görünüm, durum, veri erişimi ve eylem akışlarını aynı yerde
 1. Boost istemci yazmalarını kapatın ve ilan güncelleme allowlist'i ekleyin.
 2. Satın alma makbuzunu gerçek mağaza API'leriyle doğrulayın; idempotency ve App Check ekleyin.
 3. Storage sahipliği ile mesaj bütünlüğü kurallarını düzeltin.
-4. Tüm güvenlik kuralları için emülatör testleri ve CI kapısı ekleyin.
+4. ✅ Tüm güvenlik kuralları için emülatör testleri ve CI kapısı ekleyin.
 5. Create/edit listing ortak formunu çıkarın; ardından home/detail/profile ekranlarını parçalayın.
 6. Ortak hata modeli ve daha katı analiz politikasını kademeli uygulayın.
 
