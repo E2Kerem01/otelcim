@@ -43,9 +43,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authStateProvider).value;
+    final user = ref.watch(authStateProvider).valueOrNull;
     final email = user?.email ?? '';
-    final profile = ref.watch(currentUserProfileProvider).value;
+    // .valueOrNull, not .value: an AsyncError's .value getter rethrows the
+    // error synchronously from build(), which would take down the whole
+    // account screen (blank/grey in release mode) on any transient profile
+    // stream failure instead of just rendering with profile == null.
+    final profile = ref.watch(currentUserProfileProvider).valueOrNull;
     final displayName = profile?.displayName;
     final photoUrl = profile?.photoUrl;
     final ratings = user == null ? null : ref.watch(userRatingsProvider(user.uid));

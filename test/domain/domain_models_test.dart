@@ -174,6 +174,27 @@ void main() {
       expect(legacyParsed.notificationPreferences['marketing'], isFalse);
     });
 
+    test('UserProfile.fromFirestore tolerates an FCM-token-only doc without crashing', () async {
+      // Regression test: NotificationService.setCurrentUser merges just an
+      // fcmToken into user_profiles/{uid} right after sign-in. For an
+      // account whose real profile was never created (registration
+      // interrupted, or created outside the app's register() flow), this
+      // is the *only* content of the doc when the profile screen first
+      // reads it. fromFirestore used to `as String`-cast email/userType and
+      // `as Timestamp`-cast createdAt/updatedAt unconditionally, throwing a
+      // type error that crashed the whole account screen in production.
+      final db = FakeFirebaseFirestore();
+      await db.collection('profiles').doc('fcm-only').set({
+        'fcmToken': 'some-token',
+        'fcmTokenUpdatedAt': DateTime(2026, 1, 1),
+      });
+      final parsed = UserProfile.fromFirestore(await db.collection('profiles').doc('fcm-only').get());
+      expect(parsed.email, '');
+      expect(parsed.userType, 'job_seeker');
+      expect(parsed.createdAt, isNotNull);
+      expect(parsed.updatedAt, isNotNull);
+    });
+
     test('shared VerificationRequest copyWith, equality and round-trip', () async {
       final now = DateTime(2026, 1, 1);
       final request = shared.VerificationRequest(id: 'v', userId: 'u', userEmail: 'u@test.com', hotelName: 'Otel', hotelAddress: 'Adres', documentUrls: const ['doc'], requestedAt: now);

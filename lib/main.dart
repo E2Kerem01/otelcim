@@ -81,6 +81,14 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
       themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      // Without this, the handful of screens that go through
+      // AppLocalizations (region/experience-level pickers, safety tips,
+      // urgent-hiring label...) follow the device's system locale, while
+      // the rest of the app hardcodes Turkish text directly - on an
+      // English-language device that mix reads as random English
+      // fragments in an otherwise-Turkish app. Otelcim is Turkish-market
+      // only today, so pin the locale instead of leaving it inconsistent.
+      locale: const Locale('tr'),
       routerConfig: router,
     );
   }

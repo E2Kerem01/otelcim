@@ -185,14 +185,20 @@ class UserProfile {
 
     return UserProfile(
       id: doc.id,
-      email: data['email'] as String,
+      // A user_profiles doc can exist with only a subset of fields written
+      // - e.g. NotificationService.setCurrentUser merges in just an FCM
+      // token right after sign-in, before the real profile doc (email,
+      // userType, ...) has been created for a not-fully-onboarded account.
+      // Falling back here instead of an unchecked cast keeps the profile
+      // screen rendering (with placeholder values) rather than crashing.
+      email: data['email'] as String? ?? '',
       displayName: data['displayName'] as String?,
       phoneNumber: data['phoneNumber'] as String?,
       bio: data['bio'] as String?,
       photoUrl: data['photoUrl'] as String?,
       hotelName: data['hotelName'] as String?,
       position: data['position'] as String?,
-      userType: data['userType'] as String,
+      userType: data['userType'] as String? ?? 'job_seeker',
       isAdmin: data['isAdmin'] as bool? ?? false,
       adminRole: adminRoleString != null
           ? AdminRoleExtension.fromFirestore(adminRoleString)
@@ -214,8 +220,8 @@ class UserProfile {
       referredBy: data['referredBy'] as String?,
       referralCount: data['referralCount'] as int? ?? 0,
       freeBoostCredits: data['freeBoostCredits'] as int? ?? 0,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isSuspended: data['isSuspended'] as bool? ?? false,
       suspensionEnd: data['suspensionEnd'] != null
           ? (data['suspensionEnd'] as Timestamp).toDate()
