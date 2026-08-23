@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../error/error_reporter.dart';
 import '../models/verification_request.dart';
 
 /// Provider for the VerificationService instance
@@ -27,19 +28,18 @@ class VerificationService {
   /// Parameters:
   /// - [request]: The VerificationRequest to submit
   ///
-  /// Throws:
-  /// - [FirebaseException] if the submission fails
-  /// - [Exception] for other errors during submission
+  /// Throws the original error (logged via [logError] first) if the
+  /// submission fails; callers map it to a user-facing message via
+  /// `mapToFailure()`.
   Future<void> submitVerificationRequest(VerificationRequest request) async {
     try {
       await _firestore
           .collection(_collectionName)
           .doc(request.id)
           .set(request.toFirestore());
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to submit verification request: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error submitting verification request: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'VerificationService.submitVerificationRequest');
+      rethrow;
     }
   }
 
@@ -55,9 +55,8 @@ class VerificationService {
   /// A [Future<VerificationRequest?>] containing the user's verification request,
   /// or null if not found.
   ///
-  /// Throws:
-  /// - [FirebaseException] if the fetch fails
-  /// - [Exception] for other errors during retrieval
+  /// Throws the original error (logged via [logError] first) if the fetch
+  /// fails; callers map it to a user-facing message via `mapToFailure()`.
   Future<VerificationRequest?> getUserVerificationRequest(
       String userId) async {
     try {
@@ -84,10 +83,9 @@ class VerificationService {
       }
 
       return VerificationRequest.fromFirestore(querySnapshot.docs.first);
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to fetch verification request: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error fetching verification request: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'VerificationService.getUserVerificationRequest');
+      rethrow;
     }
   }
 
@@ -117,11 +115,9 @@ class VerificationService {
         return null;
       }
       return VerificationRequest.fromFirestore(querySnapshot.docs.first);
-    }).handleError((Object error) {
-      if (error is FirebaseException) {
-        throw Exception('Failed to watch verification request: ${error.message}');
-      }
-      throw Exception('Unexpected error watching verification request: $error');
+    }).handleError((Object error, StackTrace stackTrace) {
+      logError(error, stackTrace, context: 'VerificationService.watchVerificationRequest');
+      Error.throwWithStackTrace(error, stackTrace);
     });
   }
 }

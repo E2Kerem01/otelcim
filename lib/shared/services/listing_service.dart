@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/listings/domain/listing_model.dart';
 import '../constants/listing_filters.dart';
+import '../error/error_reporter.dart';
 
 class ListingService {
   ListingService(this._db);
@@ -71,8 +71,8 @@ class ListingService {
 
           return listings;
         })
-        .handleError((Object error) {
-          debugPrint('Firestore watchActiveListings warning: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+          logError(error, stackTrace, context: 'ListingService.watchActiveListings');
           return <Listing>[];
         });
   }
@@ -95,8 +95,8 @@ class ListingService {
 
           return listings;
         })
-        .handleError((Object error) {
-          debugPrint('Firestore watchMyListings warning: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+          logError(error, stackTrace, context: 'ListingService.watchMyListings');
           return <Listing>[];
         });
   }
@@ -186,8 +186,8 @@ class ListingService {
         final ref = await _db.collection('listings').add(data);
         await _contactRef(ref.id).set({'value': contactInfo});
       }
-    } catch (e) {
-      debugPrint('Error seeding sample listings: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'ListingService.seedSampleListings');
     }
   }
 
@@ -269,13 +269,13 @@ class ListingService {
         if (value != null) {
           listing = listing.copyWithContactInfo(value);
         }
-      } catch (e) {
-        debugPrint('Firestore getListing contact subdoc error: $e');
+      } catch (e, stackTrace) {
+        logError(e, stackTrace, context: 'ListingService.getListing (contact subdoc)');
       }
 
       return listing;
-    } catch (e) {
-      debugPrint('Firestore getListing error: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'ListingService.getListing');
       return null;
     }
   }
@@ -426,8 +426,8 @@ class ListingService {
         lastDocument: lastDoc,
         hasMore: hasMore,
       );
-    } catch (e) {
-      debugPrint('Firestore getPaginatedListings error: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'ListingService.getPaginatedListings');
       return PaginatedListingsResult(
         listings: [],
         lastDocument: null,
@@ -482,8 +482,8 @@ class ListingService {
         .limit(limit)
         .snapshots()
         .map((snap) => snap.docs.map(Listing.fromDoc).toList())
-        .handleError((Object error) {
-          debugPrint('Firestore watchRecentListingsForAdmin warning: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+          logError(error, stackTrace, context: 'ListingService.watchRecentListingsForAdmin');
           return <Listing>[];
         });
   }
@@ -503,8 +503,8 @@ class ListingService {
           .limit(30)
           .get();
       return snap.docs.map(Listing.fromDoc).toList();
-    } catch (e) {
-      debugPrint('Error searching listings: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'ListingService.searchListingsForAdmin');
       return [];
     }
   }

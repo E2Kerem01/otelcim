@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../error/error_reporter.dart';
 import '../models/user_profile.dart';
 
 /// Provider for the ProfileService instance
@@ -42,9 +43,8 @@ class ProfileService {
   /// Returns:
   /// A [Future<UserProfile?>] containing the user's profile, or null if not found.
   ///
-  /// Throws:
-  /// - [FirebaseException] if the fetch fails
-  /// - [Exception] for other errors during retrieval
+  /// Throws the original error (logged via [logError] first) if the fetch
+  /// fails; callers map it to a user-facing message via `mapToFailure()`.
   Future<UserProfile?> getUserProfile(String userId) async {
     try {
       final DocumentSnapshot<Map<String, dynamic>> doc =
@@ -55,10 +55,9 @@ class ProfileService {
       }
 
       return UserProfile.fromFirestore(doc);
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to fetch user profile: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error fetching user profile: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ProfileService.getUserProfile');
+      rethrow;
     }
   }
 
@@ -70,19 +69,18 @@ class ProfileService {
   /// Parameters:
   /// - [profile]: The UserProfile to create
   ///
-  /// Throws:
-  /// - [FirebaseException] if the creation fails
-  /// - [Exception] for other errors during creation
+  /// Throws the original error (logged via [logError] first) if the
+  /// creation fails; callers map it to a user-facing message via
+  /// `mapToFailure()`.
   Future<void> createUserProfile(UserProfile profile) async {
     try {
       await _firestore
           .collection(_collectionName)
           .doc(profile.id)
           .set(profile.toFirestore());
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to create user profile: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error creating user profile: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ProfileService.createUserProfile');
+      rethrow;
     }
   }
 
@@ -94,19 +92,18 @@ class ProfileService {
   /// Parameters:
   /// - [profile]: The UserProfile with updated data
   ///
-  /// Throws:
-  /// - [FirebaseException] if the update fails
-  /// - [Exception] for other errors during update
+  /// Throws the original error (logged via [logError] first) if the
+  /// update fails; callers map it to a user-facing message via
+  /// `mapToFailure()`.
   Future<void> updateUserProfile(UserProfile profile) async {
     try {
       await _firestore
           .collection(_collectionName)
           .doc(profile.id)
           .update(profile.toFirestore());
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to update user profile: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error updating user profile: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ProfileService.updateUserProfile');
+      rethrow;
     }
   }
 
@@ -128,10 +125,9 @@ class ProfileService {
       }
 
       return querySnapshot.docs.first.id;
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to find user by referral code: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error finding user by referral code: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ProfileService.findUserIdByReferralCode');
+      rethrow;
     }
   }
 
@@ -158,11 +154,9 @@ class ProfileService {
         return null;
       }
       return UserProfile.fromFirestore(snapshot);
-    }).handleError((Object error) {
-      if (error is FirebaseException) {
-        throw Exception('Failed to watch user profile: ${error.message}');
-      }
-      throw Exception('Unexpected error watching user profile: $error');
+    }).handleError((Object error, StackTrace stackTrace) {
+      logError(error, stackTrace, context: 'ProfileService.watchUserProfile');
+      Error.throwWithStackTrace(error, stackTrace);
     });
   }
 }

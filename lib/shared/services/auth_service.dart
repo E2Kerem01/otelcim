@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../error/error_reporter.dart';
 import '../models/app_user.dart';
 
 /// Key used to persist the user's "remember me" choice on native platforms,
@@ -223,8 +224,8 @@ class AuthService extends ChangeNotifier {
     // 1. Delete user profile documents
     try {
       await _firestore.collection('user_profiles').doc(uid).delete();
-    } catch (e) {
-      debugPrint('Error deleting user profile docs: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AuthService.deleteAccount (user profile docs)');
     }
 
     // 2. Delete user's listings
@@ -233,8 +234,8 @@ class AuthService extends ChangeNotifier {
       for (final doc in listingsSnap.docs) {
         await doc.reference.delete();
       }
-    } catch (e) {
-      debugPrint('Error deleting listings: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AuthService.deleteAccount (listings)');
     }
 
     // 3. Delete user's reports
@@ -243,8 +244,8 @@ class AuthService extends ChangeNotifier {
       for (final doc in reportsSnap.docs) {
         await doc.reference.delete();
       }
-    } catch (e) {
-      debugPrint('Error deleting reports: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AuthService.deleteAccount (reports)');
     }
 
     // 4. Delete user's boosts and boost_purchases
@@ -257,8 +258,8 @@ class AuthService extends ChangeNotifier {
       for (final doc in boostPurchasesSnap.docs) {
         await doc.reference.delete();
       }
-    } catch (e) {
-      debugPrint('Error deleting boosts: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AuthService.deleteAccount (boosts)');
     }
 
     // 5. Delete verification requests
@@ -267,8 +268,8 @@ class AuthService extends ChangeNotifier {
       for (final doc in verifSnap.docs) {
         await doc.reference.delete();
       }
-    } catch (e) {
-      debugPrint('Error deleting verification requests: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AuthService.deleteAccount (verification requests)');
     }
 
     // 6. Delete conversations and subcollection messages
@@ -284,8 +285,8 @@ class AuthService extends ChangeNotifier {
         }
         await doc.reference.delete();
       }
-    } catch (e) {
-      debugPrint('Error deleting conversations: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AuthService.deleteAccount (conversations)');
     }
 
     // 7. Delete Firebase Auth user

@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../error/error_reporter.dart';
+
 class PaymentService extends ChangeNotifier {
   PaymentService(this._iap) {
     // in_app_purchase has no Flutter Web platform implementation (only
@@ -56,8 +58,8 @@ class PaymentService extends ChangeNotifier {
       );
 
       await fetchProducts();
-    } catch (e) {
-      debugPrint('IAP initialization error: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'PaymentService._initialize');
       _isAvailable = false;
     }
     notifyListeners();
@@ -103,8 +105,8 @@ class PaymentService extends ChangeNotifier {
         _products = response.productDetails;
         debugPrint('IAP products fetched: ${_products.length}');
       }
-    } catch (e) {
-      debugPrint('IAP fetch products error: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'PaymentService.fetchProducts');
       _products = [];
     } finally {
       _isLoading = false;
@@ -154,8 +156,8 @@ class PaymentService extends ChangeNotifier {
         const Duration(minutes: 5),
         onTimeout: () => null,
       );
-    } catch (e) {
-      debugPrint('IAP purchase error: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'PaymentService.purchaseProduct');
       return null;
     } finally {
       await subscription.cancel();
@@ -174,8 +176,8 @@ class PaymentService extends ChangeNotifier {
 
       await _iap!.restorePurchases();
       debugPrint('IAP purchases restored');
-    } catch (e) {
-      debugPrint('IAP restore purchases error: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'PaymentService.restorePurchases');
     } finally {
       _isLoading = false;
       notifyListeners();
