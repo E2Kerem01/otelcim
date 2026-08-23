@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../shared/constants/categories.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../listings/domain/listing_model.dart';
@@ -202,10 +204,11 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İlan kaldırıldı.')));
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ListingManagementScreen._remove');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İşlem tamamlanamadı. Lütfen tekrar deneyin.')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {
@@ -235,10 +238,11 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İlan geri yüklendi.')));
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ListingManagementScreen._restore');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İşlem tamamlanamadı. Lütfen tekrar deneyin.')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {

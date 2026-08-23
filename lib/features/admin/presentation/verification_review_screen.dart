@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../domain/admin_action_model.dart';
 import '../domain/verification_request_model.dart';
@@ -93,8 +95,9 @@ class _VerificationCardState extends ConsumerState<_VerificationCard> {
         details: {'employerId': widget.request.employerId, 'hotelName': widget.request.hotelName},
       ));
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(approved ? 'Doğrulama onaylandı.' : 'Doğrulama reddedildi.')));
-    } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İşlem tamamlanamadı.')));
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'VerificationReviewScreen._decide');
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

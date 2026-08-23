@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../domain/rating_model.dart';
@@ -79,10 +81,11 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
           SnackBar(content: Text(error.message)),
         );
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'SubmitRatingScreen._submit');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Değerlendirme kaydedilemedi.')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {

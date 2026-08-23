@@ -71,12 +71,15 @@ Bu dosyalar görünüm, durum, veri erişimi ve eylem akışlarını aynı yerde
 
 Öneri: Önce create/edit listing ortak form modelini ve alan widget'larını çıkarın. Ardından home ve detail ekranlarını bölüm widget'ları + Riverpod controller/use-case sınırlarına ayırın. Satır sayısını tek hedef yapmayın; bağımsız değişim nedenlerini ayırın.
 
-### P2 — Hata yönetimi parçalı ve bazı hatalar sessizce yutuluyor
+### P2 — Hata yönetimi parçalı ve bazı hatalar sessizce yutuluyor — ✅ Kısmen çözüldü (2026-08-23)
 
 - Tarama, `lib` altında çok sayıda geniş `catch (e)` ve en az 15 adet `catch (_)` örneği gösterdi.
 - Örnekler: `lib/features/admin/presentation/listing_management_screen.dart:205`, `lib/features/chat/presentation/chat_detail_screen.dart:102`, `lib/features/home/presentation/home_screen.dart:754`.
 
 Öneri: Firebase/HTTP/storage hatalarını typed failure modeline çeviren ortak sınır oluşturun. Kullanıcı mesajı, telemetry/log ve retry davranışını merkezi belirleyin; gerçekten beklenen durumlar dışında boş `catch` kullanmayın.
+
+Uygulandı: `lib/shared/error/` altında ortak bir hata sınırı eklendi — `AppFailure`/`FailureKind` (typed sonuç), `mapToFailure()` (Firestore/Storage/Auth `FirebaseException` kodlarını ve ağ hatalarını Türkçe, kullanıcıya gösterilebilir bir mesaja çeviren tek nokta; mevcut `auth_error_mapper.dart` bunun içinde tekrar kullanılıyor) ve `logError()` (şu an `debugPrint` üzerinden çalışan, ileride bir crash-reporting servisine tek dosyadan bağlanabilecek merkezi log noktası). Gerçekten hatayı sessizce yutan 9 `catch` bloğu (admin: listing/report/user/verification yönetim ekranları, chat: hired-işaretleme/mesaj gönderme/yetenek havuzuna ekleme, ratings: değerlendirme gönderme) bu sınırı kullanacak şekilde güncellendi — artık her biri hem loglanıyor hem de eşlenmiş, daha spesifik bir kullanıcı mesajı gösteriyor. `boost_purchase_screen.dart`'taki iki `catch (_)` (beklenen `firstWhere` "bulunamadı" düşüşü) ve `location_service.dart`'taki (zaten kendi `LocationFailure` tipine eşleniyor) bilinçli olarak dokunulmadan bırakıldı. Testler: `test/shared/error_mapper_test.dart`.
+- Kalan iş: `lib` genelindeki geniş `catch (e)` kullanımlarının (özellikle `shared/services/*`) bu ortak sınıra taşınması ve `analysis_options.yaml`'a bir lint kuralıyla yeni çıplak `catch (_)`/`catch (e)` eklenmesinin önlenmesi henüz yapılmadı.
 
 ### P2 — Statik analiz politikası minimum düzeyde
 

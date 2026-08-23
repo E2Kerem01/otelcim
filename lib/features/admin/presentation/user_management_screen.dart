@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/services/auth_service.dart';
 import '../domain/admin_action_model.dart';
@@ -199,10 +201,11 @@ class _UserCardState extends ConsumerState<_UserCard> {
           const SnackBar(content: Text('İşlem tamamlandı.')),
         );
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'UserManagementScreen._runAction');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İşlem tamamlanamadı. Lütfen tekrar deneyin.')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {

@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/conversation.dart';
 import '../../../shared/models/report.dart';
 import '../../../shared/providers/profile_provider.dart';
@@ -97,10 +99,11 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
           const SnackBar(content: Text('Görüşme işe alındı olarak işaretlendi.')),
         );
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ChatDetailScreen._markHired');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İşlem tamamlanamadı. Tekrar deneyin.')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {
@@ -128,12 +131,13 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
             senderId: uid,
             text: text,
           );
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ChatDetailScreen._send');
       if (mounted) {
         // Give the text back so nothing typed is lost on failure.
         _messageController.text = text;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Mesaj gönderilemedi, tekrar deneyin: $e')),
+          SnackBar(content: Text('Mesaj gönderilemedi: ${mapToFailure(error).message}')),
         );
       }
     }
@@ -214,10 +218,11 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
           const SnackBar(content: Text('Aday yetenek havuzunuza eklendi.')),
         );
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ChatDetailScreen._addToTalentPool');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İşlem tamamlanamadı. Tekrar deneyin.')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     }

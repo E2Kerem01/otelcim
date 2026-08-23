@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/report.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/report_service.dart';
@@ -89,8 +91,9 @@ class _ReportCardState extends ConsumerState<_ReportCard> {
         await moderation.dismissReport(reportId: report.id, adminId: adminId, reason: '${type.label} işlemi uygulandı');
       }
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${type.label} işlemi tamamlandı.')));
-    } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İşlem tamamlanamadı. Lütfen tekrar deneyin.')));
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ReportsModerationScreen._applyAction');
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
