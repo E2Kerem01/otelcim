@@ -100,8 +100,14 @@ service cloud.firestore {
 
     // Chat. Only participants or admins can read conversations and messages.
     match /conversations/{conversationId} {
+      // resource is null for a conversation id that doesn't exist yet -
+      // ChatService.getOrCreateConversation() does exactly this get() to
+      // decide whether to create it, so this must allow the read instead
+      // of dereferencing resource.data on a null resource (which Firestore
+      // surfaces as permission-denied, not "not found").
       allow read: if isSignedIn() &&
-        (resource.data.posterId == request.auth.uid ||
+        (resource == null ||
+         resource.data.posterId == request.auth.uid ||
          resource.data.seekerId == request.auth.uid ||
          isAdmin());
       allow create: if isSignedIn() &&

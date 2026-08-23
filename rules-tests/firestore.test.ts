@@ -144,6 +144,22 @@ describe('user_profiles', () => {
   });
 });
 
+describe('starting a new conversation', () => {
+  // Regression test: ChatService.getOrCreateConversation() does a getDoc()
+  // on the conversation id *before* it exists, to decide whether to create
+  // it. Firestore rules evaluate `resource` as null for a nonexistent doc,
+  // so a read rule that unconditionally dereferences `resource.data`
+  // throws and comes back as permission-denied instead of "not found" -
+  // silently breaking "send message" for every first-time contact.
+  it('a participant can read a not-yet-created conversation id and then create it', async () => {
+    const seekerDb = testEnv.authenticatedContext(OTHER).firestore();
+    await assertSucceeds(getDoc(doc(seekerDb, 'conversations/C1')));
+    await assertSucceeds(
+      setDoc(doc(seekerDb, 'conversations/C1'), { posterId: OWNER, seekerId: OTHER }),
+    );
+  });
+});
+
 describe('conversation messages', () => {
   async function seedConversation() {
     await seed(testEnv, async (context) => {
