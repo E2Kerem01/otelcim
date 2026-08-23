@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../error/error_reporter.dart';
+
 /// Provider for the StorageService instance
 final storageServiceProvider = Provider<StorageService>((ref) {
   return StorageService();
@@ -50,9 +52,9 @@ class StorageService {
   /// Returns:
   /// A [Future<String>] containing the download URL of the uploaded photo.
   ///
-  /// Throws:
-  /// - [FirebaseException] if the upload fails
-  /// - [Exception] for other errors during upload
+  /// Throws the original error (logged via [logError] first) if the
+  /// upload fails; callers map it to a user-facing message via
+  /// `mapToFailure()`.
   Future<String> uploadProfilePhoto(String userId, XFile imageFile) async {
     try {
       // Define the storage path for the profile photo
@@ -74,10 +76,9 @@ class StorageService {
       // Get and return the download URL
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to upload profile photo: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during photo upload: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'StorageService.uploadProfilePhoto');
+      rethrow;
     }
   }
 
@@ -89,9 +90,10 @@ class StorageService {
   /// Parameters:
   /// - [userId]: The unique identifier for the user whose photo should be deleted
   ///
-  /// Throws:
-  /// - [FirebaseException] if the deletion fails (except for file-not-found errors)
-  /// - [Exception] for other errors during deletion
+  /// Throws the original error (logged via [logError] first) if the
+  /// deletion fails; callers map it to a user-facing message via
+  /// `mapToFailure()`. "object not found" is not an error here - the
+  /// photo is already gone, which is the caller's desired end state.
   Future<void> deleteProfilePhoto(String userId) async {
     try {
       // Define the storage path for the profile photo
@@ -100,14 +102,12 @@ class StorageService {
 
       // Delete the file
       await ref.delete();
-    } on FirebaseException catch (e) {
-      // Ignore "object not found" errors - the photo is already gone
-      if (e.code == 'object-not-found') {
+    } catch (error, stackTrace) {
+      if (error is FirebaseException && error.code == 'object-not-found') {
         return;
       }
-      throw Exception('Failed to delete profile photo: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during photo deletion: $e');
+      logError(error, stackTrace, context: 'StorageService.deleteProfilePhoto');
+      rethrow;
     }
   }
 
@@ -124,9 +124,9 @@ class StorageService {
   /// Returns:
   /// A [Future<String>] containing the download URL of the uploaded document.
   ///
-  /// Throws:
-  /// - [FirebaseException] if the upload fails
-  /// - [Exception] for other errors during upload
+  /// Throws the original error (logged via [logError] first) if the
+  /// upload fails; callers map it to a user-facing message via
+  /// `mapToFailure()`.
   Future<String> uploadVerificationDocument(
     String userId,
     XFile documentFile,
@@ -169,10 +169,9 @@ class StorageService {
       // Get and return the download URL
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to upload verification document: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during document upload: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'StorageService.uploadVerificationDocument');
+      rethrow;
     }
   }
 
@@ -194,10 +193,9 @@ class StorageService {
       final TaskSnapshot uploadTask = await _putXFile(ref, imageFile, metadata);
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to upload banner image: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during banner image upload: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'StorageService.uploadBannerImage');
+      rethrow;
     }
   }
 
@@ -240,10 +238,9 @@ class StorageService {
       }
 
       return downloadUrls;
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to upload listing images: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during listing image upload: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'StorageService.uploadListingImages');
+      rethrow;
     }
   }
 
@@ -270,8 +267,9 @@ class StorageService {
         urls.add(await task.ref.getDownloadURL());
       }
       return urls;
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to upload housing images: ${e.message}');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'StorageService.uploadHousingImages');
+      rethrow;
     }
   }
 
@@ -309,10 +307,9 @@ class StorageService {
 
       final TaskSnapshot uploadTask = await _putXFile(ref, file, metadata);
       return await uploadTask.ref.getDownloadURL();
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to upload certificate file: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during certificate upload: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'StorageService.uploadCertificateFile');
+      rethrow;
     }
   }
 
@@ -334,24 +331,24 @@ class StorageService {
       final TaskSnapshot uploadTask = await _putXFile(ref, videoFile, metadata);
       final String downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
-    } on FirebaseException catch (e) {
-      throw Exception('Failed to upload intro video: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during intro video upload: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'StorageService.uploadIntroVideo');
+      rethrow;
     }
   }
 
-  /// Deletes a profile intro video from Firebase Storage.
+  /// Deletes a profile intro video from Firebase Storage. "object not
+  /// found" is not an error here - the video is already gone, which is
+  /// the caller's desired end state.
   Future<void> deleteIntroVideo(String userId) async {
     try {
       final String path = 'user_videos/$userId/intro.mp4';
       final Reference ref = _storage.ref().child(path);
       await ref.delete();
-    } on FirebaseException catch (e) {
-      if (e.code == 'object-not-found') return;
-      throw Exception('Failed to delete intro video: ${e.message}');
-    } catch (e) {
-      throw Exception('Unexpected error during intro video deletion: $e');
+    } catch (error, stackTrace) {
+      if (error is FirebaseException && error.code == 'object-not-found') return;
+      logError(error, stackTrace, context: 'StorageService.deleteIntroVideo');
+      rethrow;
     }
   }
 }

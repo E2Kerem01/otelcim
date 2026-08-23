@@ -2,6 +2,8 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../error/error_reporter.dart';
+
 class AnalyticsService {
   AnalyticsService(this._analytics);
 
@@ -17,8 +19,8 @@ class AnalyticsService {
         parameters: parameters,
       );
       debugPrint('Analytics event logged: $name');
-    } catch (e) {
-      debugPrint('Error logging analytics event: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AnalyticsService.logEvent');
     }
   }
 
@@ -42,8 +44,8 @@ class AnalyticsService {
   Future<void> setUserId(String? userId) async {
     try {
       await _analytics.setUserId(id: userId);
-    } catch (e) {
-      debugPrint('Error setting analytics user ID: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AnalyticsService.setUserId');
     }
   }
 
@@ -53,8 +55,8 @@ class AnalyticsService {
   }) async {
     try {
       await _analytics.setUserProperty(name: name, value: value);
-    } catch (e) {
-      debugPrint('Error setting analytics user property: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'AnalyticsService.setUserProperty');
     }
   }
 }

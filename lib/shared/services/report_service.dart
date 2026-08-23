@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../error/error_reporter.dart';
 import '../models/report.dart';
 
 class ReportService {
@@ -21,8 +21,8 @@ class ReportService {
             })
             .map(Report.fromDoc)
             .toList())
-        .handleError((Object error) {
-      debugPrint('Error watching pending reports: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+      logError(error, stackTrace, context: 'ReportService.watchPendingReports');
       return <Report>[];
     });
   }
@@ -30,8 +30,8 @@ class ReportService {
   Future<void> submitReport(Report report) async {
     try {
       await _db.collection('reports').add(report.toMap());
-    } catch (e) {
-      debugPrint('Error submitting report: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'ReportService.submitReport');
       rethrow;
     }
   }
@@ -48,8 +48,8 @@ class ReportService {
           .limit(1)
           .get();
       return snap.docs.isNotEmpty;
-    } catch (e) {
-      debugPrint('Error checking duplicate report: $e');
+    } catch (e, stackTrace) {
+      logError(e, stackTrace, context: 'ReportService.hasAlreadyReported');
       return false;
     }
   }
