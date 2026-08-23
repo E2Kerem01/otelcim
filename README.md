@@ -20,3 +20,6 @@ samples, guidance on mobile development, and a full API reference.
 ## Live Web App
 - [Otelcim Web App](https://otelcim.vercel.app/)
 
+## Android APK
+- [Download latest test APK](https://github.com/E2Kerem01/otelcim/releases/latest)
+
