@@ -77,7 +77,7 @@ class DesktopTopNavBar extends ConsumerWidget {
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1280),
+          constraints: const BoxConstraints(maxWidth: 1440),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
