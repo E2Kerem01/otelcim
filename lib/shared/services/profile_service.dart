@@ -64,10 +64,12 @@ class ProfileService {
   /// Creates a new user profile in Firestore.
   ///
   /// The profile is stored with the user's ID as the document ID.
-  /// If a profile already exists for this user, it will be overwritten.
   ///
-  /// Parameters:
-  /// - [profile]: The UserProfile to create
+  /// Written with `merge: true` on purpose: right after sign-up
+  /// [NotificationService.setCurrentUser] may already have created an
+  /// `fcmToken`-only stub at this same path (a race at registration).
+  /// Merging keeps that token instead of clobbering it, and keeps this call
+  /// idempotent if it is retried.
   ///
   /// Throws the original error (logged via [logError] first) if the
   /// creation fails; callers map it to a user-facing message via
@@ -77,7 +79,7 @@ class ProfileService {
       await _firestore
           .collection(_collectionName)
           .doc(profile.id)
-          .set(profile.toFirestore());
+          .set(profile.toFirestore(), SetOptions(merge: true));
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'ProfileService.createUserProfile');
       rethrow;

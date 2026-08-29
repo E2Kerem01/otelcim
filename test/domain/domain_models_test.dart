@@ -131,8 +131,6 @@ void main() {
         userType: 'jobseeker',
         availableImmediately: true,
         introVideoUrl: 'https://example.com/intro.mp4',
-        isAdmin: true,
-        adminRole: AdminRole.contentModerator,
         quietHoursStart: '22:00',
         quietHoursEnd: '08:00',
         preferredExperienceLevel: ExperienceLevel.oneToThreeYears.name,
@@ -150,6 +148,11 @@ void main() {
       expect(profile.notificationPreferences['messages'], isTrue);
       expect(profile.notificationPreferences['marketing'], isFalse);
 
+      // isAdmin / adminRole are server-controlled: read back from Firestore
+      // but never written by the client (firestore.rules rejects it).
+      expect(profile.toFirestore().containsKey('isAdmin'), isFalse);
+      expect(profile.toFirestore().containsKey('adminRole'), isFalse);
+
       final db = FakeFirebaseFirestore();
       await db.collection('profiles').doc('u').set(profile.toFirestore());
       final parsed = UserProfile.fromFirestore(await db.collection('profiles').doc('u').get());
@@ -157,6 +160,17 @@ void main() {
       expect(parsed.availableImmediately, isTrue);
       expect(parsed.introVideoUrl, 'https://example.com/intro.mp4');
       expect(parsed.hashCode, profile.hashCode);
+
+      // A doc that DOES carry admin fields still parses them.
+      await db.collection('profiles').doc('admin').set({
+        ...profile.toFirestore(),
+        'isAdmin': true,
+        'adminRole': 'content_moderator',
+      });
+      final adminParsed = UserProfile.fromFirestore(
+          await db.collection('profiles').doc('admin').get());
+      expect(adminParsed.isAdmin, isTrue);
+      expect(adminParsed.adminRole, AdminRole.contentModerator);
 
       // Test fallback for legacy profiles without availableImmediately, introVideoUrl & notificationPreferences
       await db.collection('profiles').doc('legacy').set({
