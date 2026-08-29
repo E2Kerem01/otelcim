@@ -243,8 +243,14 @@ class UserProfile {
       'hotelName': hotelName,
       'position': position,
       'userType': userType,
-      'isAdmin': isAdmin,
-      'adminRole': adminRole?.toFirestore(),
+      // NOTE: isAdmin and adminRole are intentionally NOT written here. They
+      // are server-controlled - only ever granted out-of-band (Cloud
+      // Functions / console) - and firestore.rules rejects any client write
+      // that so much as introduces the `isAdmin` key onto a profile doc
+      // (isNotChangingAdminStatus / isNotChangingServerControlledProfileFields).
+      // Sending `isAdmin: false` here used to make the very first profile
+      // write fail with permission-denied whenever NotificationService had
+      // already created an fcmToken-only stub doc (a race at registration).
       'isVerified': isVerified,
       'verificationStatus': verificationStatus,
       'verifiedAt': verifiedAt != null ? Timestamp.fromDate(verifiedAt!) : null,

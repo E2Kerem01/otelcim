@@ -11,6 +11,20 @@ import '../../../shared/utils/auth_error_mapper.dart';
 import '../../../shared/utils/referral_code.dart';
 import '../../../shared/widgets/auth_brand_panel.dart';
 
+/// The account type a new user picks at registration.
+///
+/// The [firestoreValue] strings must match what the rest of the app checks
+/// for (`profile_form.dart`, `edit_profile_screen.dart`) and what the seed
+/// data uses: `'jobseeker'` / `'employer'`.
+enum RegistrationRole {
+  jobseeker('jobseeker'),
+  employer('employer');
+
+  const RegistrationRole(this.firestoreValue);
+
+  final String firestoreValue;
+}
+
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -23,25 +37,61 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _referralCodeController = TextEditingController();
+  final _hotelNameController = TextEditingController();
   bool _loading = false;
+
+  /// Chosen account type. Null until the user picks one; registration is
+  /// blocked with an inline error while it stays null.
+  RegistrationRole? _role;
+  bool _showRoleError = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     _referralCodeController.dispose();
+    _hotelNameController.dispose();
     super.dispose();
   }
 
+  void _selectRole(RegistrationRole role) {
+    setState(() {
+      _role = role;
+      _showRoleError = false;
+    });
+  }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    final formValid = _formKey.currentState!.validate();
+    if (_role == null) {
+      setState(() => _showRoleError = true);
+    }
+    if (!formValid || _role == null) return;
+
     setState(() => _loading = true);
     try {
       final user = await ref.read(authServiceProvider).register(
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-      await _createReferralProfileStub(user.uid, user.email);
+      try {
+        await _createInitialProfile(user.uid, user.email, _role!);
+      } catch (e) {
+        // Auth account exists but its profile doc could not be written.
+        // Don't leave the user stuck on a spinner - let them into the app;
+        // the profile screen recreates a stub on first save.
+        debugPrint('Kayıt sonrası profil oluşturulamadı: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Hesabın oluşturuldu ama profil bilgilerin kaydedilemedi. '
+                'Profilini Hesabım bölümünden tamamlayabilirsin.',
+              ),
+            ),
+          );
+        }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
@@ -51,37 +101,49 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  /// Writes a minimal but valid [UserProfile] stub right after registration
-  /// so the referral code / referredBy fields are captured at signup time.
+  /// Writes a minimal but valid [UserProfile] right after registration so the
+  /// account has its [UserProfile.userType] (job seeker vs employer) and the
+  /// referral code / referredBy fields set from the moment it is created.
   ///
-  /// This step must never block the registration flow: any failure (e.g. an
-  /// invalid/unknown referral code, or a transient Firestore error) is
-  /// swallowed and only logged via [debugPrint].
-  Future<void> _createReferralProfileStub(String uid, String email) async {
-    try {
-      final profileService = ref.read(profileServiceProvider);
-      final enteredCode = _referralCodeController.text.trim();
+  /// Only the referral-code *lookup* is best-effort: an unknown code or a
+  /// transient error there is swallowed (and logged) so it can't block
+  /// registration. The profile write itself is intentionally allowed to
+  /// propagate to [_submit]'s handler — losing the chosen role would leave
+  /// the account silently defaulted to a job seeker with no way to fix it.
+  Future<void> _createInitialProfile(
+    String uid,
+    String email,
+    RegistrationRole role,
+  ) async {
+    final profileService = ref.read(profileServiceProvider);
+    final enteredCode = _referralCodeController.text.trim();
 
-      String? referredBy;
-      if (enteredCode.isNotEmpty) {
+    String? referredBy;
+    if (enteredCode.isNotEmpty) {
+      try {
         referredBy = await profileService.findUserIdByReferralCode(enteredCode);
+      } catch (e) {
+        debugPrint('Referans kodu çözümlenemedi (kayıt akışı etkilenmedi): $e');
       }
-
-      final now = DateTime.now();
-      await profileService.createUserProfile(
-        UserProfile(
-          id: uid,
-          email: email,
-          userType: 'jobseeker',
-          referralCode: generateReferralCode(uid),
-          referredBy: referredBy,
-          createdAt: now,
-          updatedAt: now,
-        ),
-      );
-    } catch (e) {
-      debugPrint('Referans kodu işlenirken hata oluştu (kayıt akışı etkilenmedi): $e');
     }
+
+    final hotelName = role == RegistrationRole.employer
+        ? _hotelNameController.text.trim()
+        : null;
+
+    final now = DateTime.now();
+    await profileService.createUserProfile(
+      UserProfile(
+        id: uid,
+        email: email,
+        userType: role.firestoreValue,
+        hotelName: (hotelName != null && hotelName.isNotEmpty) ? hotelName : null,
+        referralCode: generateReferralCode(uid),
+        referredBy: referredBy,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
   }
 
   @override
@@ -108,6 +170,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
             ),
             const SizedBox(height: 24),
+            _RoleSelector(
+              selected: _role,
+              showError: _showRoleError,
+              onSelect: _selectRole,
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
@@ -139,6 +207,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 return null;
               },
             ),
+            if (_role == RegistrationRole.employer) ...[
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _hotelNameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(
+                  labelText: 'Otel / İşletme Adı',
+                  hintText: 'Örn. Bodrum Bay Resort',
+                  prefixIcon: Icon(Icons.business_outlined),
+                ),
+                validator: (value) {
+                  if (_role != RegistrationRole.employer) return null;
+                  if (value == null || value.trim().isEmpty) {
+                    return 'İşletme adını girin';
+                  }
+                  return null;
+                },
+              ),
+            ],
             const SizedBox(height: 16),
             TextFormField(
               controller: _referralCodeController,
@@ -161,8 +248,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   : Text(l10n?.registerButton ?? 'Kayıt Ol'),
             ),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 const Text('Zaten hesabın var mı?'),
                 TextButton(
@@ -222,6 +310,147 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Two stacked cards letting a new user pick their account type. Kept in
+/// this file because it is only ever used by [RegisterScreen]; the
+/// standalone onboarding [RoleSelectionScreen] is a separate, unwired flow.
+class _RoleSelector extends StatelessWidget {
+  const _RoleSelector({
+    required this.selected,
+    required this.showError,
+    required this.onSelect,
+  });
+
+  final RegistrationRole? selected;
+  final bool showError;
+  final ValueChanged<RegistrationRole> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Hesap türü',
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 8),
+        _RoleCard(
+          title: 'İş Arıyorum',
+          description: 'Otel ve turizm ilanlarını gör, başvur.',
+          icon: Icons.work_outline,
+          isSelected: selected == RegistrationRole.jobseeker,
+          onTap: () => onSelect(RegistrationRole.jobseeker),
+        ),
+        const SizedBox(height: 8),
+        _RoleCard(
+          title: 'Personel Arıyorum',
+          description: 'İşletmen için ilan ver, aday bul.',
+          icon: Icons.business_outlined,
+          isSelected: selected == RegistrationRole.employer,
+          onTap: () => onSelect(RegistrationRole.employer),
+        ),
+        if (showError) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Lütfen bir hesap türü seçin',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.error,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _RoleCard extends StatelessWidget {
+  const _RoleCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String title;
+  final String description;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final borderColor = isSelected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.outline.withValues(alpha: 0.4);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: borderColor,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? theme.colorScheme.primary : null,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              size: 20,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outline,
+            ),
+          ],
         ),
       ),
     );
