@@ -88,9 +88,20 @@ void main() {
         expect(data['posterName'], equals(sharedHotelName));
         expect(data['location'], equals(sharedLocation));
         expect(data['city'], equals(sharedCity));
-        expect(data['contactInfo'], equals(sharedContact));
         expect(data['images'], equals(sharedImages));
         expect(data['status'], equals('active'));
+
+        // contactInfo is deliberately kept off the publicly-readable listing
+        // doc and written to the sign-in-gated private/contact subdoc instead
+        // (see ListingService / the contactInfo-privacy migration).
+        expect(data.containsKey('contactInfo'), isFalse);
+        final contactSnap = await db
+            .collection('listings')
+            .doc(createdIds[i])
+            .collection('private')
+            .doc('contact')
+            .get();
+        expect(contactSnap.data()?['value'], equals(sharedContact));
 
         final expected = listingsToCreate[i];
         expect(data['title'], equals(expected.title));
