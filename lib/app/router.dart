@@ -36,6 +36,7 @@ import '../features/onboarding/presentation/role_selection_screen.dart';
 import '../features/admin/presentation/certificate_review_screen.dart';
 import '../features/profile/presentation/certificates_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
+import '../features/profile/presentation/language_settings_screen.dart';
 import '../features/profile/presentation/notification_settings_screen.dart';
 import '../features/profile/presentation/privacy_policy_screen.dart';
 import '../features/profile/presentation/privacy_settings_screen.dart';
@@ -538,6 +539,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           context: context,
           state: state,
           child: const InviteFriendsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/profile/language',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => buildAppPage(
+          context: context,
+          state: state,
+          child: const LanguageSettingsScreen(),
         ),
       ),
       GoRoute(

@@ -359,5 +359,13 @@
   "optionalSelection": "Seçim Yapılmadı (isteğe bağlı)",
   "myExperienceLevelLabel": "Deneyim Seviyem",
   "myEducationLevelLabel": "Eğitim Durumum",
-  "matchLabel": "Uyum"
+  "matchLabel": "Uyum",
+  "languageSettingsTitle": "Uygulama Dili",
+  "@languageSettingsTitle": {
+    "description": "App language picker screen title"
+  },
+  "languageSettingsSubtitle": "Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe gösterilir.",
+  "@languageSettingsSubtitle": {
+    "description": "Explains partial translation coverage on the language picker"
+  }
 }

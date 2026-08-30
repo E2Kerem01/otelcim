@@ -181,25 +181,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             const SizedBox(height: 16),
             TextFormField(
-              controller: _fullNameController,
-              textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Ad Soyad',
-                hintText: 'Örn. Ayşe Yılmaz',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Ad soyad girin';
-                }
-                if (value.trim().length < 3) {
-                  return 'Geçerli bir ad soyad girin';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
@@ -226,6 +207,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               validator: (value) {
                 if (value == null || value.length < 8 || !RegExp(r'[0-9]').hasMatch(value)) {
                   return l10n?.passwordValidation ?? 'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _fullNameController,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Ad Soyad',
+                hintText: 'Örn. Ayşe Yılmaz',
+                prefixIcon: Icon(Icons.person_outline),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Ad soyad girin';
+                }
+                if (value.trim().length < 3) {
+                  return 'Geçerli bir ad soyad girin';
                 }
                 return null;
               },

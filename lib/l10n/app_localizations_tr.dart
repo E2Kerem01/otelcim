@@ -617,4 +617,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get matchLabel => 'Uyum';
+
+  @override
+  String get languageSettingsTitle => 'Uygulama Dili';
+
+  @override
+  String get languageSettingsSubtitle =>
+      'Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe gösterilir.';
 }

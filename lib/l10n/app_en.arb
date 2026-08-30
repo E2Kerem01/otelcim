@@ -216,5 +216,7 @@
   "optionalSelection": "Not Selected (optional)",
   "myExperienceLevelLabel": "My Experience Level",
   "myEducationLevelLabel": "My Education Level",
-  "matchLabel": "Match"
+  "matchLabel": "Match",
+  "languageSettingsTitle": "App Language",
+  "languageSettingsSubtitle": "Some text is not translated yet; untranslated parts are shown in Turkish."
 }

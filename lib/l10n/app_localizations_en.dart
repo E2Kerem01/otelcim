@@ -618,4 +618,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchLabel => 'Match';
+
+  @override
+  String get languageSettingsTitle => 'App Language';
+
+  @override
+  String get languageSettingsSubtitle =>
+      'Some text is not translated yet; untranslated parts are shown in Turkish.';
 }

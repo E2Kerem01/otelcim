@@ -1243,6 +1243,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Uyum'**
   String get matchLabel;
+
+  /// No description provided for @languageSettingsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama Dili'**
+  String get languageSettingsTitle;
+
+  /// No description provided for @languageSettingsSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe gösterilir.'**
+  String get languageSettingsSubtitle;
 }
 
 class _AppLocalizationsDelegate
