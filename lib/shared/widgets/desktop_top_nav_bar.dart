@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 
 /// Desktop Top Navigation Bar for Otelcim.
@@ -23,35 +24,36 @@ class DesktopTopNavBar extends ConsumerWidget {
     final primaryColor = theme.colorScheme.primary;
     final authService = ref.watch(authServiceProvider);
     final isLoggedIn = authService.currentUser != null;
+    final l10n = AppLocalizations.of(context)!;
 
     final navItems = [
       _NavItemData(
         index: 0,
-        label: 'Ana Sayfa',
+        label: l10n.navHome,
         icon: Icons.home_outlined,
         activeIcon: Icons.home_rounded,
       ),
       _NavItemData(
         index: 1,
-        label: 'Kategoriler',
+        label: l10n.navCategories,
         icon: Icons.grid_view_outlined,
         activeIcon: Icons.grid_view_rounded,
       ),
       _NavItemData(
         index: 2,
-        label: 'İlan Ver',
+        label: l10n.navCreateListing,
         icon: Icons.add_circle_outline_rounded,
         activeIcon: Icons.add_circle_rounded,
       ),
       _NavItemData(
         index: 3,
-        label: 'Mesajlar',
+        label: l10n.navMessages,
         icon: Icons.chat_bubble_outline_rounded,
         activeIcon: Icons.chat_bubble_rounded,
       ),
       _NavItemData(
         index: 4,
-        label: 'Hesabım',
+        label: l10n.navProfile,
         icon: Icons.person_outline_rounded,
         activeIcon: Icons.person_rounded,
       ),
@@ -129,7 +131,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'OTELCİM',
+                              l10n.appName.toUpperCase(),
                               style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w800,
@@ -265,9 +267,9 @@ class DesktopTopNavBar extends ConsumerWidget {
                         elevation: 2,
                       ),
                       icon: const Icon(Icons.add_rounded, size: 18),
-                      label: const Text(
-                        'İlan Ver',
-                        style: TextStyle(
+                      label: Text(
+                        l10n.navCreateListing,
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
