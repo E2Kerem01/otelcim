@@ -97,6 +97,14 @@ class UserProfile {
   /// written by ProfileService.updateUserProfile().
   final int freeBoostCredits;
 
+  /// Whether this user has already published their one free "acil ihtiyaç"
+  /// (urgent) listing. The first urgent listing per account is free; every
+  /// one after that must be paid for. Only ever set to true server-side by
+  /// the `reconcileFreeUrgentListingOnCreate` Cloud Function when it
+  /// consumes the free urgent slot — NOT written by
+  /// ProfileService.updateUserProfile().
+  final bool hasUsedFreeUrgentListing;
+
   /// Timestamp when the profile was created
   final DateTime createdAt;
 
@@ -148,6 +156,7 @@ class UserProfile {
     this.referredBy,
     this.referralCount = 0,
     this.freeBoostCredits = 0,
+    this.hasUsedFreeUrgentListing = false,
     required this.createdAt,
     required this.updatedAt,
     this.isSuspended = false,
@@ -220,6 +229,8 @@ class UserProfile {
       referredBy: data['referredBy'] as String?,
       referralCount: data['referralCount'] as int? ?? 0,
       freeBoostCredits: data['freeBoostCredits'] as int? ?? 0,
+      hasUsedFreeUrgentListing:
+          data['hasUsedFreeUrgentListing'] as bool? ?? false,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isSuspended: data['isSuspended'] as bool? ?? false,
@@ -304,6 +315,7 @@ class UserProfile {
     Object? referredBy = _undefined,
     int? referralCount,
     int? freeBoostCredits,
+    bool? hasUsedFreeUrgentListing,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -351,6 +363,8 @@ class UserProfile {
           : referredBy as String?,
       referralCount: referralCount ?? this.referralCount,
       freeBoostCredits: freeBoostCredits ?? this.freeBoostCredits,
+      hasUsedFreeUrgentListing:
+          hasUsedFreeUrgentListing ?? this.hasUsedFreeUrgentListing,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -387,6 +401,7 @@ class UserProfile {
         other.referredBy == referredBy &&
         other.referralCount == referralCount &&
         other.freeBoostCredits == freeBoostCredits &&
+        other.hasUsedFreeUrgentListing == hasUsedFreeUrgentListing &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
         other.isSuspended == isSuspended &&
@@ -428,6 +443,7 @@ class UserProfile {
       referredBy,
       referralCount,
       freeBoostCredits,
+      hasUsedFreeUrgentListing,
       createdAt,
       updatedAt,
       isSuspended,
@@ -453,6 +469,7 @@ class UserProfile {
         'preferredRegion: $preferredRegion, introVideoUrl: $introVideoUrl, '
         'referralCode: $referralCode, referredBy: $referredBy, '
         'referralCount: $referralCount, freeBoostCredits: $freeBoostCredits, '
+        'hasUsedFreeUrgentListing: $hasUsedFreeUrgentListing, '
         'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

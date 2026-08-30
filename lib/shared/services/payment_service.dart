@@ -38,6 +38,7 @@ class PaymentService extends ChangeNotifier {
     'boost_7_days',
     'boost_14_days',
     'boost_30_days',
+    'urgent_listing',
   };
 
   Future<void> _initialize() async {

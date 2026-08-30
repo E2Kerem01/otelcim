@@ -28,6 +28,7 @@ import '../features/listings/presentation/create_listing_screen.dart';
 import '../features/listings/presentation/edit_listing_screen.dart';
 import '../features/listings/presentation/listing_detail_screen.dart';
 import '../features/listings/presentation/listing_qr_poster_screen.dart';
+import '../features/listings/presentation/urgent_listing_purchase_screen.dart';
 import '../features/listings/presentation/my_listings_screen.dart';
 import '../features/nearby/presentation/nearby_listings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
@@ -100,6 +101,7 @@ bool isProtectedRoute(String location) {
       location == '/my-boosts' ||
       location == '/favorites' ||
       location.endsWith('/boost') ||
+      location.endsWith('/urgent') ||
       location.startsWith('/onboarding') ||
       location.startsWith('/admin') ||
       isListingEditRoute;
@@ -385,6 +387,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             context: context,
             state: state,
             child: BoostPurchaseScreen(listingId: id),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/listing/:id/urgent',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return buildAppPage(
+            context: context,
+            state: state,
+            child: UrgentListingPurchaseScreen(listingId: id),
           );
         },
       ),
