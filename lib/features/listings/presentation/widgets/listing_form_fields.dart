@@ -13,6 +13,61 @@ import '../season_utils.dart';
 /// the exact form field markup that used to be inline in both screens —
 /// state (controllers, selected values) still lives in the parent screen.
 
+/// Bold section label above a form field. Pass [isRequired] to append a red
+/// asterisk, matching the "* işaretli alanlar zorunludur" convention on the
+/// create/edit listing forms.
+class ListingFieldLabel extends StatelessWidget {
+  const ListingFieldLabel(this.label, {super.key, this.isRequired = false});
+
+  final String label;
+  final bool isRequired;
+
+  @override
+  Widget build(BuildContext context) {
+    const boldStyle = TextStyle(fontWeight: FontWeight.bold);
+    if (!isRequired) return Text(label, style: boldStyle);
+    return Text.rich(
+      TextSpan(
+        text: label,
+        style: boldStyle,
+        children: [
+          TextSpan(
+            text: ' *',
+            style: boldStyle.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One-line hint explaining the red asterisk, shown once near the top of the
+/// create/edit listing forms.
+class RequiredFieldsLegend extends StatelessWidget {
+  const RequiredFieldsLegend({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          '* ',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.error,
+          ),
+        ),
+        Text(
+          'işaretli alanlar zorunludur',
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
+      ],
+    );
+  }
+}
+
 class ListingTextFormField extends StatelessWidget {
   const ListingTextFormField({
     super.key,

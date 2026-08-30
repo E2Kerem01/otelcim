@@ -288,9 +288,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
             padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const RequiredFieldsLegend(),
+                  const SizedBox(height: 12),
                   // Boost Promotion Card
                   Card(
                     color: isBoostedActive
@@ -406,10 +409,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'İlan Başlığı',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  const ListingFieldLabel('İlan Başlığı', isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _titleController,
@@ -565,10 +565,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                   ),
 
                   const SizedBox(height: 16),
-                  const Text(
-                    'Konum (İl / İlçe)',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  const ListingFieldLabel('Konum (İl / İlçe)', isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _locationController,
@@ -577,31 +574,30 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  Text(
+                  ListingFieldLabel(
                     AppLocalizations.of(context)!.regionLabel,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    isRequired: true,
                   ),
                   const SizedBox(height: 8),
                   TourismRegionDropdown(
                     value: _selectedRegion,
                     onChanged: (value) =>
                         setState(() => _selectedRegion = value),
+                    validator: (value) => value == null
+                        ? AppLocalizations.of(context)!.regionRequired
+                        : null,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Şehir',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  const ListingFieldLabel('Şehir', isRequired: true),
                   const SizedBox(height: 8),
                   TourismCityDropdown(
                     value: _selectedCity,
                     onChanged: (value) => setState(() => _selectedCity = value),
+                    validator: (value) =>
+                        value == null ? 'Şehir seçmeniz gerekiyor' : null,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Maaş',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  const ListingFieldLabel('Maaş', isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _salaryController,
@@ -699,10 +695,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     maxLines: 2,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'İletişim',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  const ListingFieldLabel('İletişim', isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _contactController,
@@ -711,10 +704,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'İlan Açıklaması',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  const ListingFieldLabel('İlan Açıklaması', isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _descController,

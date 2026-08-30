@@ -9,6 +9,7 @@ import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
 import '../../../shared/widgets/xfile_preview_image.dart';
 import '../domain/listing_model.dart';
+import 'widgets/listing_form_fields.dart';
 
 class PositionFormData {
   final TextEditingController titleController = TextEditingController();
@@ -197,9 +198,12 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const RequiredFieldsLegend(),
+              const SizedBox(height: 12),
               // Hotel Information Section
               Card(
                 elevation: 2,
@@ -220,7 +224,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                         ],
                       ),
                       const SizedBox(height: 16),
-                      const Text('Otel / İşletme Adı', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const ListingFieldLabel('Otel / İşletme Adı', isRequired: true),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _hotelNameController,
@@ -229,7 +233,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Otel adı gereklidir' : null,
                       ),
                       const SizedBox(height: 16),
-                      const Text('Konum (İl / İlçe)', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const ListingFieldLabel('Konum (İl / İlçe)', isRequired: true),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _locationController,
@@ -238,7 +242,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Konum gereklidir' : null,
                       ),
                       const SizedBox(height: 16),
-                      const Text('Şehir', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const ListingFieldLabel('Şehir', isRequired: true),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         initialValue: _selectedCity,
@@ -250,7 +254,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                         validator: (value) => value == null ? 'Şehir seçmeniz gerekiyor' : null,
                       ),
                       const SizedBox(height: 16),
-                      const Text('İletişim Bilgisi', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const ListingFieldLabel('İletişim Bilgisi', isRequired: true),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _contactController,
@@ -413,7 +417,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                               },
                             ),
                             const SizedBox(height: 12),
-                            const Text('Pozisyon Başlığı', style: TextStyle(fontWeight: FontWeight.bold)),
+                            const ListingFieldLabel('Pozisyon Başlığı', isRequired: true),
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.titleController,
@@ -434,7 +438,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                               },
                             ),
                             const SizedBox(height: 12),
-                            const Text('Maaş Bilgisi', style: TextStyle(fontWeight: FontWeight.bold)),
+                            const ListingFieldLabel('Maaş Bilgisi', isRequired: true),
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.salaryController,
@@ -467,7 +471,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                               ],
                             ),
                             const SizedBox(height: 12),
-                            const Text('Pozisyon Açıklaması', style: TextStyle(fontWeight: FontWeight.bold)),
+                            const ListingFieldLabel('Pozisyon Açıklaması', isRequired: true),
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.descController,
