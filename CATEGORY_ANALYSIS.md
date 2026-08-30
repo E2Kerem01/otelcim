@@ -2,6 +2,11 @@
 
 _Hazırlanma: 2026-08-30 · Kapsam: `lib/shared/constants/categories.dart` `ListingCategory` enum'u_
 
+> **Durum (2026-08-31):** Öneri A'nın ilk turu uygulandı — `barBarmen`,
+> `spaWellness`, `havuzPlaj`, `rezervasyonSatis`, `muhasebeIk` eklendi
+> (9 → 14 kategori). Kalan eklemeler (önbüro yan roller, pastane/steward,
+> ulaşım, bahçe, çocuk kulübü, depo, sağlık, stajyer) ikinci tur.
+
 ## 1. Mevcut durum
 
 Tek seviyeli, 9 değerli bir enum:
