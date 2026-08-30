@@ -189,6 +189,49 @@ export const sendSeasonalReminders = onDocumentCreated(
   },
 );
 
+/**
+ * Pushes an "urgent listing" notification to everyone subscribed to the
+ * listing's region topic. Shared by the create trigger (free urgent slot,
+ * listing born with isUrgent: true) and the update trigger (paid urgent
+ * slot, verifyAndProcessUrgentListingPurchase flips isUrgent false -> true
+ * after the listing already exists).
+ */
+async function notifyRegionOfUrgentListing(
+  listingId: string,
+  listing: FirebaseFirestore.DocumentData,
+): Promise<void> {
+  const region = listing.region as string | undefined;
+  if (!region) {
+    logger.info("Acil ilanın bölgesi yok; bildirim atlandı.", {listingId});
+    return;
+  }
+
+  const safeRegion = region.trim().toLowerCase().replace(/[^a-z0-9-_.~%]/g, "_");
+  const topic = `region_${safeRegion}`;
+  try {
+    await getMessaging().send({
+      topic,
+      notification: {
+        title: "Acil Personel İhtiyacı",
+        body: `${(listing.title as string | undefined) ?? "Yeni ilan"} için hemen başvurun.`,
+      },
+      data: {
+        type: "urgent_listing",
+        listingId,
+        region,
+      },
+      android: {
+        priority: "high",
+        notification: {channelId: "urgent_listings"},
+      },
+      apns: {payload: {aps: {sound: "default"}}},
+    });
+    logger.info("Acil ilan bildirimi gönderildi.", {listingId, topic});
+  } catch (error) {
+    logger.error("Acil ilan bildirimi gönderilemedi.", {listingId, topic, error});
+  }
+}
+
 export const sendUrgentListingNotification = onDocumentCreated(
   {
     document: "listings/{listingId}",
@@ -200,37 +243,26 @@ export const sendUrgentListingNotification = onDocumentCreated(
     if (!listing || listing.isUrgent !== true) {
       return;
     }
+    await notifyRegionOfUrgentListing(listingId, listing);
+  },
+);
 
-    const region = listing.region as string | undefined;
-    if (!region) {
-      logger.info("Acil ilanın bölgesi yok; bildirim atlandı.", {listingId});
+export const sendUrgentListingNotificationOnUpgrade = onDocumentUpdated(
+  {
+    document: "listings/{listingId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    const listingId = event.params.listingId;
+    // Only the false -> true transition (a paid urgent upgrade). A listing
+    // that was already urgent, or edits that leave isUrgent untouched, must
+    // not re-notify the region.
+    if (!after || after.isUrgent !== true || before?.isUrgent === true) {
       return;
     }
-
-    const safeRegion = region.trim().toLowerCase().replace(/[^a-z0-9-_.~%]/g, "_");
-    const topic = `region_${safeRegion}`;
-    try {
-      await getMessaging().send({
-        topic,
-        notification: {
-          title: "Acil Personel İhtiyacı",
-          body: `${(listing.title as string | undefined) ?? "Yeni ilan"} için hemen başvurun.`,
-        },
-        data: {
-          type: "urgent_listing",
-          listingId,
-          region,
-        },
-        android: {
-          priority: "high",
-          notification: {channelId: "urgent_listings"},
-        },
-        apns: {payload: {aps: {sound: "default"}}},
-      });
-      logger.info("Acil ilan bildirimi gönderildi.", {listingId, topic});
-    } catch (error) {
-      logger.error("Acil ilan bildirimi gönderilemedi.", {listingId, topic, error});
-    }
+    await notifyRegionOfUrgentListing(listingId, after);
   },
 );
 
@@ -317,6 +349,13 @@ const BOOST_PRODUCTS: Record<string, { durationDays: number; price: number; dura
   "boost_14_days": { durationDays: 14, price: 89.99, durationTypeEnum: "days14", durationTypeStr: "14" },
   "boost_30_days": { durationDays: 30, price: 149.99, durationTypeEnum: "days30", durationTypeStr: "30" },
 };
+
+// The single paid "acil ihtiyaç" product. `price` here is only the
+// bookkeeping fallback written onto the purchase record; the real charge is
+// whatever the store product is configured at. Keep the id in sync with
+// PaymentService._productIds and UrgentListingService.urgentListingProductId.
+const URGENT_LISTING_PRODUCT_ID = "urgent_listing";
+const URGENT_LISTING_PRICE = 149.99;
 
 type SupportedStorePlatform = "google_play" | "app_store";
 
@@ -621,6 +660,116 @@ export const verifyAndProcessBoostPurchase = onCall(
   },
 );
 
+interface UrgentListingPurchaseRequest {
+  listingId: string;
+  productId: string;
+  purchaseToken?: string;
+  verificationData?: string;
+  platform?: string;
+}
+
+/**
+ * Verifies a real store receipt for the `urgent_listing` product and then
+ * flips `isUrgent: true` on the caller's listing under the Admin SDK. This
+ * is the paid path for "acil ihtiyaç": the first urgent listing per account
+ * is free (consumed in reconcileFreeUrgentListingOnCreate), every one after
+ * that comes through here.
+ *
+ * Mirrors verifyAndProcessBoostPurchase: store token/receipt is mandatory,
+ * the transaction id comes from the verified receipt (never client input),
+ * and duplicate transaction ids are rejected as replays.
+ */
+export const verifyAndProcessUrgentListingPurchase = onCall(
+  {
+    region: "europe-west1",
+    secrets: [playServiceAccountJson, androidPackageName, appStoreSharedSecret],
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Kullanıcı girişi yapılmalıdır.");
+    }
+
+    const userId = request.auth.uid;
+    const data = request.data as UrgentListingPurchaseRequest;
+
+    if (!data.listingId || !data.productId) {
+      throw new HttpsError("invalid-argument", "Eksik parametreler (listingId, productId).");
+    }
+    if (data.productId !== URGENT_LISTING_PRODUCT_ID) {
+      throw new HttpsError("invalid-argument", "Geçersiz acil ilan ürünü.");
+    }
+
+    const platform = data.platform as SupportedStorePlatform | undefined;
+    let transactionId: string;
+    if (platform === "google_play") {
+      if (!data.purchaseToken) {
+        throw new HttpsError("invalid-argument", "purchaseToken zorunludur (Google Play).");
+      }
+      transactionId = await verifyGooglePlayPurchase(data.purchaseToken, data.productId);
+    } else if (platform === "app_store") {
+      if (!data.verificationData) {
+        throw new HttpsError("invalid-argument", "verificationData zorunludur (App Store).");
+      }
+      transactionId = await verifyAppStorePurchase(data.verificationData, data.productId);
+    } else {
+      throw new HttpsError("invalid-argument", "Geçersiz platform. 'google_play' veya 'app_store' olmalıdır.");
+    }
+
+    const existingPurchases = await db
+      .collection("urgent_listing_purchases")
+      .where("transactionId", "==", transactionId)
+      .limit(1)
+      .get();
+    if (!existingPurchases.empty) {
+      throw new HttpsError("already-exists", "Bu satın alma daha önce işlenmiş.");
+    }
+
+    const listingRef = db.collection("listings").doc(data.listingId);
+    const listingDoc = await listingRef.get();
+    if (!listingDoc.exists) {
+      throw new HttpsError("not-found", "İlan bulunamadı.");
+    }
+    if ((listingDoc.data() ?? {}).posterId !== userId) {
+      throw new HttpsError("permission-denied", "Sadece kendi ilanınızı acil yapabilirsiniz.");
+    }
+
+    const now = new Date();
+    const purchaseRef = db.collection("urgent_listing_purchases").doc();
+    const batch = db.batch();
+
+    batch.set(purchaseRef, {
+      id: purchaseRef.id,
+      userId,
+      listingId: data.listingId,
+      price: URGENT_LISTING_PRICE,
+      platform,
+      transactionId,
+      productId: data.productId,
+      purchaseToken: data.purchaseToken || null,
+      verificationData: data.verificationData || null,
+      status: "completed",
+      purchasedAt: now,
+      verifiedAt: now,
+    });
+
+    batch.update(listingRef, {
+      isUrgent: true,
+      urgentListingPurchaseId: purchaseRef.id,
+      updatedAt: now,
+    });
+
+    await batch.commit();
+
+    logger.info("Acil ilan satın alması tamamlandı.", {
+      userId,
+      listingId: data.listingId,
+      transactionId,
+    });
+
+    return {success: true, purchaseId: purchaseRef.id};
+  },
+);
+
 /**
  * Redeems one of the caller's free (referral-earned) 7-day boost credits on
  * one of their own listings. Runs entirely under the Admin SDK so the
@@ -792,6 +941,61 @@ export const grantReferralRewardOnListingCreated = onDocumentCreated(
     }
 
     await grantReferralRewardIfEligible(posterId, posterSnapshot.data() ?? {});
+  },
+);
+
+/**
+ * "Acil ihtiyaç" free-slot reconciliation. A listing is only ever *born*
+ * with isUrgent: true from the create form's free path — the paid path
+ * always creates it non-urgent and flips the flag afterwards via
+ * verifyAndProcessUrgentListingPurchase. So any listing that arrives urgent
+ * must be spending the poster's single lifetime free urgent slot:
+ *
+ *   - free slot still available -> mark it consumed
+ *     (user_profiles.hasUsedFreeUrgentListing = true)
+ *   - free slot already spent, or the profile doc is missing -> the urgent
+ *     flag isn't backed by anything, so downgrade the listing to non-urgent
+ *
+ * firestore.rules already blocks a client from flipping isUrgent on an
+ * existing listing (isNotChangingBoostOrOwnershipFields), so this only has
+ * to police the create path.
+ */
+export const reconcileFreeUrgentListingOnCreate = onDocumentCreated(
+  {
+    document: "listings/{listingId}",
+    region: "europe-west1",
+  },
+  async (event) => {
+    const listing = event.data?.data();
+    const listingId = event.params.listingId;
+    if (!listing || listing.isUrgent !== true) {
+      return;
+    }
+    const posterId = listing.posterId as string | undefined;
+    if (!posterId) {
+      return;
+    }
+
+    const profileRef = db.collection("user_profiles").doc(posterId);
+    const listingRef = db.collection("listings").doc(listingId);
+    try {
+      await db.runTransaction(async (tx) => {
+        const snap = await tx.get(profileRef);
+        if (!snap.exists) {
+          tx.update(listingRef, {isUrgent: false});
+          return;
+        }
+        const hasUsedFree =
+          (snap.data()?.hasUsedFreeUrgentListing as boolean | undefined) ?? false;
+        if (hasUsedFree) {
+          tx.update(listingRef, {isUrgent: false});
+        } else {
+          tx.update(profileRef, {hasUsedFreeUrgentListing: true});
+        }
+      });
+    } catch (error) {
+      logger.error("Ücretsiz acil ilan hakkı uzlaştırılamadı.", {listingId, error});
+    }
   },
 );
 

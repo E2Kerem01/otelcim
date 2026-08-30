@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "Otelcim",
+  "appName": "HospoJobs",
   "emailLabel": "Email",
   "emailHint": "example@email.com",
   "emailValidation": "Enter a valid email",
@@ -15,7 +15,7 @@
   "copyCodeAction": "Copy Code",
   "codeCopiedMessage": "Code copied",
   "shareCodeAction": "Share",
-  "shareReferralMessage": "Find or post hotel & tourism jobs on Otelcim! Sign up with my code {code} and we both win.",
+  "shareReferralMessage": "Find or post hotel & tourism jobs on HospoJobs! Sign up with my code {code} and we both win.",
   "@shareReferralMessage": {
     "placeholders": {
       "code": {"type": "String"}
@@ -56,7 +56,7 @@
   "registerTitle": "Register",
   "noAccountPrompt": "Don't have an account? Register",
   "hasAccountPrompt": "Already have an account? Sign in",
-  "onboardingWelcome": "Welcome to Otelcim!",
+  "onboardingWelcome": "Welcome to HospoJobs!",
   "onboardingRolePrompt": "Please select your role to provide you with the best experience:",
   "roleJobSeeker": "Looking for a Job",
   "roleJobSeekerDescription": "I'm looking for a job in the hotel and tourism industry. I want to view and apply to job listings.",
@@ -216,5 +216,7 @@
   "optionalSelection": "Not Selected (optional)",
   "myExperienceLevelLabel": "My Experience Level",
   "myEducationLevelLabel": "My Education Level",
-  "matchLabel": "Match"
+  "matchLabel": "Match",
+  "languageSettingsTitle": "App Language",
+  "languageSettingsSubtitle": "Some text is not translated yet; untranslated parts are shown in Turkish."
 }

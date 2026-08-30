@@ -15,6 +15,7 @@ import '../domain/certificate_model.dart';
 import '../services/certificate_service.dart';
 import 'certificates_screen.dart';
 import 'edit_profile_screen.dart';
+import 'language_settings_screen.dart';
 import 'notification_settings_screen.dart';
 import 'privacy_settings_screen.dart';
 import '../../referrals/presentation/invite_friends_screen.dart';
@@ -210,6 +211,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 subtitle: 'Referans kodu ve ücretsiz boost',
                                 isSelected: _selectedSection == 'invite',
                                 onTap: () => setState(() => _selectedSection = 'invite'),
+                              ),
+                              ProfileSidebarItem(
+                                icon: Icons.language_rounded,
+                                title: 'Uygulama Dili',
+                                subtitle: 'Türkçe, English, Русский, Deutsch, العربية',
+                                isSelected: _selectedSection == 'language',
+                                onTap: () => setState(() => _selectedSection = 'language'),
                               ),
                             ],
                           ),
@@ -473,6 +481,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 subtitle: 'Referans kodu ve ücretsiz boost',
                 onTap: () => context.push('/profile/invite'),
               ),
+              const SizedBox(height: 12),
+              ProfileMenuTile(
+                icon: Icons.language_rounded,
+                title: 'Uygulama Dili',
+                subtitle: 'Türkçe, English, Русский, Deutsch, العربية',
+                onTap: () => context.push('/profile/language'),
+              ),
               const SizedBox(height: 20),
               OutlinedButton.icon(
                 onPressed: _handleLogout,
@@ -518,6 +533,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         return const PrivacySettingsScreen();
       case 'invite':
         return const InviteFriendsScreen();
+      case 'language':
+        return const LanguageSettingsScreen();
       case 'overview':
       default:
         return _buildOverviewDetail(

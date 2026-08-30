@@ -13,6 +13,7 @@ import 'app/router.dart';
 import 'app/theme.dart';
 import 'firebase_options.dart';
 import 'shared/services/auth_service.dart';
+import 'shared/services/locale_service.dart';
 import 'shared/services/notification_service.dart';
 
 @pragma('vm:entry-point')
@@ -74,21 +75,23 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
+    final locale = ref.watch(localeControllerProvider);
     return MaterialApp.router(
-      title: 'Otelcim',
+      onGenerateTitle: (context) =>
+          AppLocalizations.of(context)?.appName ?? 'Otelcim',
       debugShowCheckedModeBanner: false,
       theme: otelcimTheme,
       themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      // Without this, the handful of screens that go through
-      // AppLocalizations (region/experience-level pickers, safety tips,
-      // urgent-hiring label...) follow the device's system locale, while
-      // the rest of the app hardcodes Turkish text directly - on an
-      // English-language device that mix reads as random English
-      // fragments in an otherwise-Turkish app. Otelcim is Turkish-market
-      // only today, so pin the locale instead of leaving it inconsistent.
-      locale: const Locale('tr'),
+      // The app still hardcodes most Turkish copy directly in widgets; only
+      // the screens that go through AppLocalizations switch language today.
+      // The locale is user-selectable (Hesabım > Uygulama Dili) and defaults
+      // to Turkish; app_tr.arb is the template so any key not yet translated
+      // in en/ru/de/ar falls back to Turkish rather than showing a key.
+      // Migrating the remaining hardcoded strings to AppLocalizations is
+      // tracked as follow-up work.
+      locale: locale,
       routerConfig: router,
     );
   }

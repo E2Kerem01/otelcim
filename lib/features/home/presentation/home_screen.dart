@@ -186,7 +186,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text(
           widget.initialRegion == null
-              ? 'Otelcim'
+              ? AppLocalizations.of(context)!.appName
               : (Localizations.localeOf(context).languageCode == 'en'
                         ? tourismRegionById(widget.initialRegion)?.nameEn
                         : tourismRegionById(widget.initialRegion)?.nameTr) ??

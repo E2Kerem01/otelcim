@@ -34,6 +34,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _referralCodeController = TextEditingController();
@@ -47,6 +48,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _referralCodeController.dispose();
@@ -130,6 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final hotelName = role == RegistrationRole.employer
         ? _hotelNameController.text.trim()
         : null;
+    final fullName = _fullNameController.text.trim();
 
     final now = DateTime.now();
     await profileService.createUserProfile(
@@ -137,6 +140,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         id: uid,
         email: email,
         userType: role.firestoreValue,
+        displayName: fullName.isNotEmpty ? fullName : null,
         hotelName: (hotelName != null && hotelName.isNotEmpty) ? hotelName : null,
         referralCode: generateReferralCode(uid),
         referredBy: referredBy,
@@ -207,6 +211,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 return null;
               },
             ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _fullNameController,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Ad Soyad',
+                hintText: 'Örn. Ayşe Yılmaz',
+                prefixIcon: Icon(Icons.person_outline),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Ad soyad girin';
+                }
+                if (value.trim().length < 3) {
+                  return 'Geçerli bir ad soyad girin';
+                }
+                return null;
+              },
+            ),
             if (_role == RegistrationRole.employer) ...[
               const SizedBox(height: 16),
               TextFormField(
@@ -272,20 +295,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         body: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(32),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 960),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(child: formContent),
-                    const Expanded(child: AuthBrandPanel()),
-                  ],
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 960),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(child: formContent),
+                      const Expanded(child: AuthBrandPanel()),
+                    ],
+                  ),
                 ),
               ),
             ),

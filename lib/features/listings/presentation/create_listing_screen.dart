@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
+import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
@@ -132,6 +133,18 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
       return;
     }
 
+    // "Acil ihtiyaç" pricing: the first urgent listing per account is free,
+    // every one after that is paid. The free slot is consumed server-side
+    // (reconcileFreeUrgentListingOnCreate); here we only decide whether to
+    // publish this listing as urgent right away (free slot still available)
+    // or publish it as non-urgent and route the user to the paid purchase
+    // screen for it.
+    final hasUsedFreeUrgent =
+        ref.read(currentUserProfileProvider).valueOrNull?.hasUsedFreeUrgentListing ??
+            false;
+    final publishUrgent = _isUrgent && !hasUsedFreeUrgent;
+    final needsUrgentPayment = _isUrgent && hasUsedFreeUrgent;
+
     setState(() => _submitting = true);
     try {
       final listingService = ref.read(listingServiceProvider);
@@ -174,7 +187,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
           id: listingId,
           posterId: user.uid,
           posterName: user.email,
-          isUrgent: _isUrgent,
+          isUrgent: publishUrgent,
           title: _titleController.text.trim(),
           description: _descController.text.trim(),
           category: _selectedCategory.name,
@@ -217,7 +230,16 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
             backgroundColor: imageUploadFailed ? Colors.orange.shade800 : null,
           ),
         );
-        Navigator.of(context).pop();
+        if (needsUrgentPayment) {
+          // Root-navigator route; go() (not push) so leaving the create tab
+          // for the paid flow doesn't strand the "İlan Ver" branch navigator
+          // with a popped-empty stack (black screen).
+          context.go('/listing/$listingId/urgent');
+        } else if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -280,9 +302,12 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const RequiredFieldsLegend(),
+              const SizedBox(height: 12),
               Card(
                 color: Theme.of(context).primaryColor.withAlpha(20),
                 elevation: 0,
@@ -324,10 +349,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              const Text(
-                'İlan Başlığı',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              const ListingFieldLabel('İlan Başlığı', isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _titleController,
@@ -434,10 +456,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               ),
 
               const SizedBox(height: 16),
-              const Text(
-                'Konum (İl / İlçe)',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              const ListingFieldLabel('Konum (İl / İlçe)', isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _locationController,
@@ -469,9 +488,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 onTap: _addingLocation ? null : _addCurrentLocation,
               ),
               const SizedBox(height: 16),
-              Text(
+              ListingFieldLabel(
                 AppLocalizations.of(context)!.regionLabel,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                isRequired: true,
               ),
               const SizedBox(height: 8),
               TourismRegionDropdown(
@@ -490,11 +509,40 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 value: _isUrgent,
                 onChanged: (value) => setState(() => _isUrgent = value),
               ),
+              if (_isUrgent)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, bottom: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Colors.deepOrange.shade700,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          (ref
+                                      .watch(currentUserProfileProvider)
+                                      .valueOrNull
+                                      ?.hasUsedFreeUrgentListing ??
+                                  false)
+                              ? 'Ücretsiz acil ilan hakkınızı kullandınız. '
+                                    'Yayınladıktan sonra bu ilanı acil yapmak '
+                                    'için tek seferlik ücret alınır.'
+                              : 'İlk acil ilanınız ücretsiz.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.deepOrange.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 16),
-              const Text(
-                'Şehir',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              const ListingFieldLabel('Şehir', isRequired: true),
               const SizedBox(height: 8),
               TourismCityDropdown(
                 value: _selectedCity,
@@ -503,7 +551,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                     value == null ? 'Şehir seçmeniz gerekiyor' : null,
               ),
               const SizedBox(height: 16),
-              const Text('Maaş', style: TextStyle(fontWeight: FontWeight.bold)),
+              const ListingFieldLabel('Maaş', isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _salaryController,
@@ -594,10 +642,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 maxLines: 2,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'İletişim',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              const ListingFieldLabel('İletişim', isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _contactController,
@@ -607,10 +652,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                     : null,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'İlan Açıklaması',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              const ListingFieldLabel('İlan Açıklaması', isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _descController,

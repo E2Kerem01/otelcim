@@ -15,6 +15,7 @@ void main() {
         '/my-boosts',
         '/favorites',
         '/listing/listing-id/boost',
+        '/listing/listing-id/urgent',
         '/listing/listing-id/edit',
         '/onboarding',
         '/onboarding/role',
