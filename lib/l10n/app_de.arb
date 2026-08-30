@@ -1,6 +1,6 @@
 {
   "@@locale": "de",
-  "appName": "Otelcim",
+  "appName": "HospoJobs",
   "emailLabel": "E-Mail",
   "emailHint": "beispiel@email.com",
   "emailValidation": "Gültige E-Mail-Adresse eingeben",

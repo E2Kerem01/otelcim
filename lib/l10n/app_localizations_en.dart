@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Otelcim';
+  String get appName => 'HospoJobs';
 
   @override
   String get emailLabel => 'Email';
@@ -57,7 +57,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String shareReferralMessage(String code) {
-    return 'Find or post hotel & tourism jobs on Otelcim! Sign up with my code $code and we both win.';
+    return 'Find or post hotel & tourism jobs on HospoJobs! Sign up with my code $code and we both win.';
   }
 
   @override
@@ -141,7 +141,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hasAccountPrompt => 'Already have an account? Sign in';
 
   @override
-  String get onboardingWelcome => 'Welcome to Otelcim!';
+  String get onboardingWelcome => 'Welcome to HospoJobs!';
 
   @override
   String get onboardingRolePrompt =>

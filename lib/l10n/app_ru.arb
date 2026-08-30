@@ -1,6 +1,6 @@
 {
   "@@locale": "ru",
-  "appName": "Otelcim",
+  "appName": "HospoJobs",
   "emailLabel": "Электронная почта",
   "emailHint": "primer@pochta.com",
   "emailValidation": "Введите корректный адрес эл. почты",

@@ -77,7 +77,8 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(localeControllerProvider);
     return MaterialApp.router(
-      title: 'Otelcim',
+      onGenerateTitle: (context) =>
+          AppLocalizations.of(context)?.appName ?? 'Otelcim',
       debugShowCheckedModeBanner: false,
       theme: otelcimTheme,
       themeMode: ThemeMode.light,
