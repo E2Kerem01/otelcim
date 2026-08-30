@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_localizations.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/ads/presentation/admin_banner_ads_screen.dart';
@@ -203,6 +204,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           final isDesktop = MediaQuery.sizeOf(context).width >= 768;
+          final l10n = AppLocalizations.of(context)!;
 
           return Scaffold(
             body: Column(
@@ -226,31 +228,31 @@ final routerProvider = Provider<GoRouter>((ref) {
                         initialLocation: index == navigationShell.currentIndex,
                       );
                     },
-                    items: const [
+                    items: [
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.home_outlined),
-                        activeIcon: Icon(Icons.home_rounded),
-                        label: 'Ana Sayfa',
+                        icon: const Icon(Icons.home_outlined),
+                        activeIcon: const Icon(Icons.home_rounded),
+                        label: l10n.navHome,
                       ),
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.grid_view_outlined),
-                        activeIcon: Icon(Icons.grid_view_rounded),
-                        label: 'Kategoriler',
+                        icon: const Icon(Icons.grid_view_outlined),
+                        activeIcon: const Icon(Icons.grid_view_rounded),
+                        label: l10n.navCategories,
                       ),
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.add_circle_outline_rounded),
-                        activeIcon: Icon(Icons.add_circle_rounded),
-                        label: 'İlan Ver',
+                        icon: const Icon(Icons.add_circle_outline_rounded),
+                        activeIcon: const Icon(Icons.add_circle_rounded),
+                        label: l10n.navCreateListing,
                       ),
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.chat_bubble_outline_rounded),
-                        activeIcon: Icon(Icons.chat_bubble_rounded),
-                        label: 'Mesajlar',
+                        icon: const Icon(Icons.chat_bubble_outline_rounded),
+                        activeIcon: const Icon(Icons.chat_bubble_rounded),
+                        label: l10n.navMessages,
                       ),
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.person_outline_rounded),
-                        activeIcon: Icon(Icons.person_rounded),
-                        label: 'Hesabım',
+                        icon: const Icon(Icons.person_outline_rounded),
+                        activeIcon: const Icon(Icons.person_rounded),
+                        label: l10n.navProfile,
                       ),
                     ],
                   ),
