@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 
 class ModerationService {
   ModerationService(this._db);
@@ -20,9 +22,9 @@ class ModerationService {
         'reviewedAt': FieldValue.serverTimestamp(),
         'dismissalReason': reason,
       });
-    } catch (e) {
-      debugPrint('Error dismissing report: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.dismissReport');
+      throw mapToFailure(error);
     }
   }
 
@@ -43,9 +45,9 @@ class ModerationService {
         ]),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('Error warning user: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.warnUser');
+      throw mapToFailure(error);
     }
   }
 
@@ -63,9 +65,9 @@ class ModerationService {
         'removalReason': reason,
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('Error removing listing: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.removeListing');
+      throw mapToFailure(error);
     }
   }
 
@@ -87,9 +89,9 @@ class ModerationService {
             : null,
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('Error suspending user: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.suspendUser');
+      throw mapToFailure(error);
     }
   }
 
@@ -108,9 +110,9 @@ class ModerationService {
         'isSuspended': false,
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('Error banning user: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.banUser');
+      throw mapToFailure(error);
     }
   }
 
@@ -130,9 +132,9 @@ class ModerationService {
         'unsuspendedAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('Error unsuspending user: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.unsuspendUser');
+      throw mapToFailure(error);
     }
   }
 
@@ -151,9 +153,9 @@ class ModerationService {
         'unbannedAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('Error unbanning user: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.unbanUser');
+      throw mapToFailure(error);
     }
   }
 
@@ -172,9 +174,9 @@ class ModerationService {
         'restoredAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('Error restoring listing: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.restoreListing');
+      throw mapToFailure(error);
     }
   }
 }

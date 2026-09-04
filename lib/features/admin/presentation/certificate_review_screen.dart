@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../profile/domain/certificate_model.dart';
 import '../../profile/services/certificate_service.dart';
@@ -178,10 +180,15 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
           ),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: '__AdminCertificateCardState._processDecision',
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('İşlem başarısız: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {

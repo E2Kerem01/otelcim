@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/storage_service.dart';
 import '../domain/banner_ad_model.dart';
 import '../services/banner_ad_service.dart';
@@ -51,10 +53,15 @@ class AdminBannerAdsScreen extends ConsumerWidget {
             const SnackBar(content: Text('Banner silindi.')),
           );
         }
-      } catch (e) {
+      } catch (error, stackTrace) {
+        logError(
+          error,
+          stackTrace,
+          context: 'AdminBannerAdsScreen._deleteBanner',
+        );
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Silme hatası: $e')),
+            SnackBar(content: Text(mapToFailure(error).message)),
           );
         }
       }
@@ -320,10 +327,15 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
           const SnackBar(content: Text('Görsel yüklendi.')),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: '_BannerAdFormSheetState._pickAndUploadImage',
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Görsel yükleme hatası: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {
@@ -398,10 +410,11 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
         );
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_BannerAdFormSheetState._save');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Kaydetme hatası: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {

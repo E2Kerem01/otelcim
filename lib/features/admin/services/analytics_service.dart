@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../shared/error/error_reporter.dart';
 
 /// Service for providing admin dashboard analytics and metrics
 class AdminAnalyticsService {
@@ -16,8 +17,8 @@ class AdminAnalyticsService {
           .where('status', isEqualTo: 'active')
           .get();
       return snap.size;
-    } catch (e) {
-      debugPrint('Error getting active listings count: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminAnalyticsService.getActiveListingsCount');
       return 0;
     }
   }
@@ -31,8 +32,8 @@ class AdminAnalyticsService {
           .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoffDate))
           .get();
       return snap.size;
-    } catch (e) {
-      debugPrint('Error getting new users count: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminAnalyticsService.getNewUsersCount');
       return 0;
     }
   }
@@ -42,8 +43,8 @@ class AdminAnalyticsService {
     try {
       final snap = await _db.collection('reports').get();
       return snap.size;
-    } catch (e) {
-      debugPrint('Error getting open reports count: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminAnalyticsService.getOpenReportsCount');
       return 0;
     }
   }
@@ -56,8 +57,12 @@ class AdminAnalyticsService {
           .where('status', isEqualTo: 'pending')
           .get();
       return snap.size;
-    } catch (e) {
-      debugPrint('Error getting pending verifications count: $e');
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'AdminAnalyticsService.getPendingVerificationsCount',
+      );
       return 0;
     }
   }
@@ -69,8 +74,12 @@ class AdminAnalyticsService {
         .where('status', isEqualTo: 'active')
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((Object error) {
-      debugPrint('Error watching active listings count: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'AdminAnalyticsService.watchActiveListingsCount',
+      );
       return 0;
     });
   }
@@ -83,8 +92,12 @@ class AdminAnalyticsService {
         .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoffDate))
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((Object error) {
-      debugPrint('Error watching new users count: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'AdminAnalyticsService.watchNewUsersCount',
+      );
       return 0;
     });
   }
@@ -95,8 +108,12 @@ class AdminAnalyticsService {
         .collection('reports')
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((Object error) {
-      debugPrint('Error watching open reports count: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'AdminAnalyticsService.watchOpenReportsCount',
+      );
       return 0;
     });
   }
@@ -108,8 +125,12 @@ class AdminAnalyticsService {
         .where('status', isEqualTo: 'pending')
         .snapshots()
         .map((snap) => snap.size)
-        .handleError((Object error) {
-      debugPrint('Error watching pending verifications count: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'AdminAnalyticsService.watchPendingVerificationsCount',
+      );
       return 0;
     });
   }
@@ -130,8 +151,8 @@ class AdminAnalyticsService {
         openReports: results[2],
         pendingVerifications: results[3],
       );
-    } catch (e) {
-      debugPrint('Error getting dashboard metrics: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminAnalyticsService.getDashboardMetrics');
       return DashboardMetrics(
         activeListings: 0,
         newUsers: 0,

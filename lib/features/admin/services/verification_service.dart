@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../domain/verification_request_model.dart';
 
 class VerificationService {
@@ -18,8 +19,12 @@ class VerificationService {
         .snapshots()
         .map((snap) {
       return snap.docs.map(VerificationRequest.fromDoc).toList();
-    }).handleError((Object error) {
-      debugPrint('Firestore watchPendingVerifications warning: $error');
+    }).handleError((Object error, StackTrace stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'VerificationService.watchPendingVerifications',
+      );
       return <VerificationRequest>[];
     });
   }
@@ -29,9 +34,13 @@ class VerificationService {
     try {
       final ref = await _db.collection('verification_requests').add(request.toMap());
       return ref.id;
-    } catch (e) {
-      debugPrint('Error submitting verification request: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'VerificationService.submitVerificationRequest',
+      );
+      throw mapToFailure(error);
     }
   }
 
@@ -47,9 +56,13 @@ class VerificationService {
         'reviewedAt': FieldValue.serverTimestamp(),
         'rejectionReason': null,
       });
-    } catch (e) {
-      debugPrint('Error approving verification: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'VerificationService.approveVerification',
+      );
+      throw mapToFailure(error);
     }
   }
 
@@ -66,9 +79,13 @@ class VerificationService {
         'reviewedAt': FieldValue.serverTimestamp(),
         'rejectionReason': reason,
       });
-    } catch (e) {
-      debugPrint('Error rejecting verification: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'VerificationService.rejectVerification',
+      );
+      throw mapToFailure(error);
     }
   }
 
@@ -78,8 +95,12 @@ class VerificationService {
       final doc = await _db.collection('verification_requests').doc(verificationId).get();
       if (!doc.exists) return null;
       return VerificationRequest.fromDoc(doc);
-    } catch (e) {
-      debugPrint('Firestore getVerificationRequest error: $e');
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'VerificationService.getVerificationRequest',
+      );
       return null;
     }
   }
@@ -93,8 +114,12 @@ class VerificationService {
         .snapshots()
         .map((snap) {
       return snap.docs.map(VerificationRequest.fromDoc).toList();
-    }).handleError((Object error) {
-      debugPrint('Firestore watchEmployerVerifications warning: $error');
+    }).handleError((Object error, StackTrace stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: 'VerificationService.watchEmployerVerifications',
+      );
       return <VerificationRequest>[];
     });
   }

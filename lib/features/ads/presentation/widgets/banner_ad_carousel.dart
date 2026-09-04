@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../shared/error/error_mapper.dart';
+import '../../../../shared/error/error_reporter.dart';
 import '../../domain/banner_ad_model.dart';
 import '../../services/banner_ad_service.dart';
 
@@ -58,10 +60,15 @@ class _BannerAdCarouselState extends ConsumerState<BannerAdCarousel> {
           const SnackBar(content: Text('Bağlantı açılamadı.')),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: '_BannerAdCarouselState._openTargetUrl',
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Bağlantı açılırken hata: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     }

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/app_user.dart';
 import '../../../shared/models/user_profile.dart';
 import '../domain/admin_action_model.dart';
@@ -17,9 +18,9 @@ class AdminService {
     try {
       final ref = await _db.collection('admin_audit_log').add(action.toMap());
       return ref.id;
-    } catch (e) {
-      debugPrint('Error logging admin action: $e');
-      rethrow;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminService.logAdminAction');
+      throw mapToFailure(error);
     }
   }
 
@@ -50,8 +51,8 @@ class AdminService {
 
     return query.snapshots().map((snap) {
       return snap.docs.map(AdminAction.fromDoc).toList();
-    }).handleError((Object error) {
-      debugPrint('Firestore watchAuditLog warning: $error');
+    }).handleError((Object error, StackTrace stackTrace) {
+      logError(error, stackTrace, context: 'AdminService.watchAuditLog');
       return <AdminAction>[];
     });
   }
@@ -108,8 +109,8 @@ class AdminService {
         .limit(limit)
         .snapshots()
         .map((snap) => snap.docs.map(UserProfile.fromFirestore).toList())
-        .handleError((Object error) {
-          debugPrint('Firestore watchRecentUsers warning: $error');
+        .handleError((Object error, StackTrace stackTrace) {
+          logError(error, stackTrace, context: 'AdminService.watchRecentUsers');
           return <UserProfile>[];
         });
   }
@@ -145,8 +146,8 @@ class AdminService {
         }
       }
       return byId.values.toList();
-    } catch (e) {
-      debugPrint('Error searching users: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminService.searchUsers');
       return [];
     }
   }
@@ -162,8 +163,8 @@ class AdminService {
       if (!doc.exists) return null;
 
       return UserProfile.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>);
-    } catch (e) {
-      debugPrint('Error getting user profile: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminService.getUserProfile');
       return null;
     }
   }
@@ -179,8 +180,8 @@ class AdminService {
       final doc = await _db.collection('admin_audit_log').doc(actionId).get();
       if (!doc.exists) return null;
       return AdminAction.fromDoc(doc);
-    } catch (e) {
-      debugPrint('Error getting admin action: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminService.getAdminAction');
       return null;
     }
   }
@@ -195,8 +196,8 @@ class AdminService {
           .get();
 
       return snap.docs.map(AdminAction.fromDoc).toList();
-    } catch (e) {
-      debugPrint('Error getting recent audit log: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminService.getRecentAuditLog');
       return [];
     }
   }
