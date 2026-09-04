@@ -6,8 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
-import '../../../shared/utils/auth_error_mapper.dart';
 import '../../../shared/widgets/auth_brand_panel.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -80,7 +81,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mapAuthError(e))),
+        SnackBar(content: Text(mapToFailure(e).message)),
       );
     }
   }
@@ -108,8 +109,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             rememberMe: _rememberMe,
           );
       _failedAttempts = 0;
-    } catch (e) {
-      _handleFailure(e);
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_LoginScreenState._submitEmail');
+      _handleFailure(error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -133,8 +135,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const SnackBar(content: Text('SMS doğrulama kodu gönderildi.')),
         );
       }
-    } catch (e) {
-      _handleFailure(e);
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_LoginScreenState._sendSmsCode');
+      _handleFailure(error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -158,8 +161,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             rememberMe: _rememberMe,
           );
       _failedAttempts = 0;
-    } catch (e) {
-      _handleFailure(e);
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_LoginScreenState._verifySmsCode');
+      _handleFailure(error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }

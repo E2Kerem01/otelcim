@@ -4,10 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
-import '../../../shared/utils/auth_error_mapper.dart';
 import '../../../shared/utils/referral_code.dart';
 import '../../../shared/widgets/auth_brand_panel.dart';
 
@@ -78,25 +79,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           );
       try {
         await _createInitialProfile(user.uid, user.email, _role!);
-      } catch (e) {
+      } catch (error, stackTrace) {
         // Auth account exists but its profile doc could not be written.
         // Don't leave the user stuck on a spinner - let them into the app;
         // the profile screen recreates a stub on first save.
-        debugPrint('Kayıt sonrası profil oluşturulamadı: $e');
+        logError(
+          error,
+          stackTrace,
+          context: '_RegisterScreenState._submit.createInitialProfile',
+        );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Hesabın oluşturuldu ama profil bilgilerin kaydedilemedi. '
-                'Profilini Hesabım bölümünden tamamlayabilirsin.',
-              ),
+            SnackBar(
+              content: Text(mapToFailure(error).message),
             ),
           );
         }
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_RegisterScreenState._submit');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mapToFailure(error).message)),
+        );
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -124,8 +129,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (enteredCode.isNotEmpty) {
       try {
         referredBy = await profileService.findUserIdByReferralCode(enteredCode);
-      } catch (e) {
-        debugPrint('Referans kodu çözümlenemedi (kayıt akışı etkilenmedi): $e');
+      } catch (error, stackTrace) {
+        logError(
+          error,
+          stackTrace,
+          context: '_RegisterScreenState._createInitialProfile.resolveReferralCode',
+        );
       }
     }
 

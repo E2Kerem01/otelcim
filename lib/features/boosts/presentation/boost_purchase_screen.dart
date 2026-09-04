@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
@@ -145,10 +147,11 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
           );
         }
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_BoostPurchaseScreenState._handlePurchase');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('İşlem sırasında bir hata oluştu: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {
@@ -181,13 +184,16 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
         );
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: '_BoostPurchaseScreenState._handleRedeemFreeBoost',
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              '${l10n?.freeBoostRedeemFailedMessage ?? 'Ücretsiz boost uygulanamadı'}: $e',
-            ),
+            content: Text(mapToFailure(error).message),
           ),
         );
       }

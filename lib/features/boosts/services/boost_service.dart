@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../shared/error/error_reporter.dart';
 import '../domain/boost_model.dart';
 import '../domain/boost_purchase_model.dart';
 
@@ -61,8 +62,8 @@ class BoostService {
         final msg = error?['message'] as String? ?? 'HTTP ${response.statusCode}: Boost doğrulama hatası.';
         throw Exception(msg);
       }
-    } catch (e) {
-      debugPrint('Error processing boost purchase: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'BoostService.processBoostPurchase');
       rethrow;
     }
   }
@@ -106,8 +107,8 @@ class BoostService {
       }
 
       debugPrint('Free boost redeemed successfully for listing $listingId');
-    } catch (e) {
-      debugPrint('Error redeeming free boost: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'BoostService.redeemFreeBoost');
       rethrow;
     }
   }
