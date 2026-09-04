@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../error/error_reporter.dart';
+
 /// The languages Otelcim ships. Turkish is the default and the fallback for
 /// any string not yet translated in the other locales (template-arb-file:
 /// app_tr.arb). The non-Turkish locales target the source countries of
@@ -52,8 +54,8 @@ class LocaleController extends StateNotifier<Locale> {
       if (code != null && _isSupported(code)) {
         state = Locale(code);
       }
-    } catch (e) {
-      debugPrint('Kayıtlı dil tercihi okunamadı: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'LocaleController._load');
     }
   }
 
@@ -63,8 +65,8 @@ class LocaleController extends StateNotifier<Locale> {
     try {
       await (await SharedPreferences.getInstance())
           .setString(_localePrefsKey, locale.languageCode);
-    } catch (e) {
-      debugPrint('Dil tercihi kaydedilemedi: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'LocaleController.setLocale');
     }
   }
 }

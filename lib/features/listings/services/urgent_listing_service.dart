@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../shared/error/error_reporter.dart';
+
 /// Talks to the `verifyAndProcessUrgentListingPurchase` Cloud Function, which
 /// verifies a real store receipt for the `urgent_listing` product and then
 /// flips `isUrgent: true` on the listing under the Admin SDK.
@@ -65,8 +67,8 @@ class UrgentListingService {
             'HTTP ${response.statusCode}: Acil ilan doğrulama hatası.';
         throw Exception(msg);
       }
-    } catch (e) {
-      debugPrint('Error processing urgent listing purchase: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'UrgentListingService.processUrgentListingPurchase');
       rethrow;
     }
   }

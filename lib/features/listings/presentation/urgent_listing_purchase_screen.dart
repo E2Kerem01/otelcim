@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/payment_service.dart';
@@ -121,8 +123,9 @@ class _UrgentListingPurchaseScreenState
         ),
       );
       _leave();
-    } catch (e) {
-      _snack('İşlem sırasında bir hata oluştu: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'UrgentListingPurchaseScreen._handlePurchase');
+      _snack(mapToFailure(error).message);
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
