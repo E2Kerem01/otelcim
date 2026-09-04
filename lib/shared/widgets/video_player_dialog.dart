@@ -6,6 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../error/error_mapper.dart';
+import '../error/error_reporter.dart';
+
 /// Modal dialog or screen to play profile intro video.
 /// Supports both network URLs (Firebase Storage) and local files (during preview before save).
 class VideoPlayerDialog extends StatefulWidget {
@@ -77,11 +80,16 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
           _isInitialized = true;
         });
       }
-    } catch (e) {
+    } on Object catch (error, stackTrace) {
+      logError(
+        error,
+        stackTrace,
+        context: '_VideoPlayerDialogState._initializeVideo',
+      );
       if (mounted) {
         setState(() {
           _hasError = true;
-          _errorMessage = e.toString();
+          _errorMessage = mapToFailure(error).message;
         });
       }
     }

@@ -9,6 +9,8 @@ import '../../../../core/responsive/responsive_layout.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/constants/categories.dart';
 import '../../../../shared/constants/listing_filters.dart';
+import '../../../../shared/error/error_mapper.dart';
+import '../../../../shared/error/error_reporter.dart';
 import '../../../../shared/providers/profile_provider.dart';
 import '../../../../shared/services/auth_service.dart';
 import '../../../../shared/services/listing_service.dart';
@@ -157,9 +159,14 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             if (!result.isRegion) result.key: result.count,
         };
       });
-    } catch (e) {
+    } on Object catch (error, stackTrace) {
       // Keep labels usable without counts when an aggregate request fails.
-      debugPrint('Error loading live listing counts: $e');
+      final failure = mapToFailure(error);
+      logError(
+        error,
+        stackTrace,
+        context: '_FilterSheetState._loadLiveCounts: ${failure.message}',
+      );
     }
   }
 

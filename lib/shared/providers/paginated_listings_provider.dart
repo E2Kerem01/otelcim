@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/listings/domain/listing_model.dart';
 import '../constants/listing_filters.dart';
+import '../error/error_mapper.dart';
+import '../error/error_reporter.dart';
 import '../services/listing_service.dart';
 
 /// State class for paginated listings
@@ -74,7 +76,13 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
         isLoading: false,
         lastDocument: result.lastDocument,
       );
-    } catch (e) {
+    } on Object catch (error, stackTrace) {
+      final failure = mapToFailure(error);
+      logError(
+        error,
+        stackTrace,
+        context: 'PaginatedListingsNotifier.loadInitial: ${failure.message}',
+      );
       state = state.copyWith(isLoading: false);
     }
   }
@@ -106,7 +114,13 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
         isLoading: false,
         lastDocument: result.lastDocument,
       );
-    } catch (e) {
+    } on Object catch (error, stackTrace) {
+      final failure = mapToFailure(error);
+      logError(
+        error,
+        stackTrace,
+        context: 'PaginatedListingsNotifier.loadMore: ${failure.message}',
+      );
       state = state.copyWith(isLoading: false);
     }
   }

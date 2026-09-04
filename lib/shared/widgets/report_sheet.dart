@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../error/error_mapper.dart';
+import '../error/error_reporter.dart';
 import '../models/report.dart';
 import '../services/auth_service.dart';
 import '../services/report_service.dart';
@@ -87,10 +89,11 @@ class _ReportSheetContentState extends ConsumerState<_ReportSheetContent> {
           const SnackBar(content: Text('Bildiriminiz alındı, teşekkür ederiz.')),
         );
       }
-    } catch (e) {
+    } on Object catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_ReportSheetContentState._submit');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Bildirim gönderilemedi: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {

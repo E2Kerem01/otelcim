@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../error/error_mapper.dart';
+import '../error/error_reporter.dart';
 import '../models/report.dart';
 import '../services/auth_service.dart';
 import '../services/report_service.dart';
@@ -82,11 +84,12 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (error, stackTrace) {
+      logError(error, stackTrace, context: '_ReportDialogState._submitReport');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hata: $e'),
+            content: Text(mapToFailure(error).message),
             backgroundColor: Colors.red,
           ),
         );

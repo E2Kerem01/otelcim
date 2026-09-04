@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../domain/talent_pool_item.dart';
 
 class TalentPoolService {
@@ -29,8 +31,8 @@ class TalentPoolService {
         addedAt: DateTime.now(),
       );
       await _talentPoolRef(employerId).doc(candidateId).set(item.toMap());
-    } catch (e) {
-      debugPrint('Error adding to talent pool: $e');
+    } on Object catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'TalentPoolService.addToTalentPool');
       rethrow;
     }
   }
@@ -41,8 +43,8 @@ class TalentPoolService {
   }) async {
     try {
       await _talentPoolRef(employerId).doc(candidateId).delete();
-    } catch (e) {
-      debugPrint('Error removing from talent pool: $e');
+    } on Object catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'TalentPoolService.removeFromTalentPool');
       rethrow;
     }
   }
@@ -54,9 +56,9 @@ class TalentPoolService {
     try {
       final doc = await _talentPoolRef(employerId).doc(candidateId).get();
       return doc.exists;
-    } catch (e) {
-      debugPrint('Error checking talent pool membership: $e');
-      return false;
+    } on Object catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'TalentPoolService.isInTalentPool');
+      throw mapToFailure(error);
     }
   }
 
