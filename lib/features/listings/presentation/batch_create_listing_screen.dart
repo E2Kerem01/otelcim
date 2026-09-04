@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
@@ -134,14 +136,16 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
 
       List<String> imageUrls = [];
       var imageUploadFailed = false;
+      String? imageUploadFailureMessage;
       if (_selectedImageFiles.isNotEmpty) {
         try {
           final storageService = ref.read(storageServiceProvider);
           final batchId = 'batch_${DateTime.now().millisecondsSinceEpoch}';
           imageUrls = await storageService.uploadListingImages(user.uid, batchId, _selectedImageFiles);
-        } catch (e) {
-          debugPrint('Batch listing image upload failed, publishing without photos: $e');
+        } catch (error, stackTrace) {
+          logError(error, stackTrace, context: 'BatchCreateListingScreen._submit.imageUpload');
           imageUploadFailed = true;
+          imageUploadFailureMessage = mapToFailure(error).message;
         }
       }
 
@@ -171,7 +175,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
           SnackBar(
             content: Text(
               imageUploadFailed
-                  ? '${listingsToCreate.length} adet ilan yayınlandı, ancak otel fotoğrafları yüklenemedi.'
+                  ? imageUploadFailureMessage!
                   : '${listingsToCreate.length} adet ilan başarıyla yayınlandı!',
             ),
             backgroundColor: imageUploadFailed ? Colors.orange.shade800 : null,
@@ -179,9 +183,12 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
         );
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'BatchCreateListingScreen._submit');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mapToFailure(error).message)),
+        );
       }
     } finally {
       if (mounted) setState(() => _submitting = false);

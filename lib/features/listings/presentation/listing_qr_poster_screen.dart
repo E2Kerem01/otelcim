@@ -5,6 +5,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/listing_service.dart';
 
 class ListingQrPosterScreen extends ConsumerWidget {
@@ -21,8 +23,13 @@ class ListingQrPosterScreen extends ConsumerWidget {
       await SharePlus.instance.share(
         ShareParams(text: text, subject: '$title - QR Poster'),
       );
-    } catch (e) {
-      debugPrint('Error sharing QR poster: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ListingQrPosterScreen._sharePoster');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mapToFailure(error).message)),
+        );
+      }
     }
   }
 

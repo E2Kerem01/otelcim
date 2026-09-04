@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/verification_request.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
@@ -70,11 +72,12 @@ class _VerificationRequestScreenState
       }
 
       await _uploadDocument(file.xFile, file.name);
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'VerificationRequestScreen._pickDocument');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Dosya seçilirken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -115,11 +118,12 @@ class _VerificationRequestScreenState
           backgroundColor: Colors.green,
         ),
       );
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'VerificationRequestScreen._uploadDocument');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Belge yüklenirken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -196,11 +200,12 @@ class _VerificationRequestScreenState
 
       // Navigate back on successful submission
       Navigator.of(context).pop();
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'VerificationRequestScreen._submitRequest');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Talep gönderilirken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );

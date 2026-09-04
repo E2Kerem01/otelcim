@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
@@ -226,11 +228,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         ).showSnackBar(const SnackBar(content: Text('İlan güncellendi.')));
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'EditListingScreen._submit');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
+        ).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -247,11 +250,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         await service.reactivateListing(listing.id);
       }
       ref.invalidate(_editListingProvider(widget.listingId));
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'EditListingScreen._toggleStatus');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
+        ).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);

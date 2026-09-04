@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../domain/certificate_model.dart';
@@ -223,10 +225,11 @@ class _CertificateItemCard extends ConsumerWidget {
             const SnackBar(content: Text('Belge silindi.')),
           );
         }
-      } catch (e) {
+      } catch (error, stackTrace) {
+        logError(error, stackTrace, context: 'CertificateItemCard._confirmDelete');
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Belge silinemedi: $e')),
+            SnackBar(content: Text(mapToFailure(error).message)),
           );
         }
       }
@@ -493,11 +496,12 @@ class __UploadCertificateSheetState
           const SnackBar(content: Text('Belge yüklendi, admin onayına sunuldu.')),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'UploadCertificateSheet._upload');
       if (mounted) {
         setState(() {
           _isUploading = false;
-          _error = 'Yükleme başarısız: $e';
+          _error = mapToFailure(error).message;
         });
       }
     }

@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../shared/error/error_mapper.dart';
+import '../../../../shared/error/error_reporter.dart';
 import '../../../../shared/providers/profile_provider.dart';
 import '../../../../shared/widgets/video_player_dialog.dart';
 
@@ -116,11 +118,12 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
           backgroundColor: Colors.green,
         ),
       );
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'IntroVideoPicker._pickAndUploadVideo');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Video yüklenirken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -173,10 +176,11 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Tanıtım videosu kaldırıldı.')),
       );
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'IntroVideoPicker._removeVideo');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Video silinirken hata oluştu: $e')),
+        SnackBar(content: Text(mapToFailure(error).message)),
       );
     } finally {
       if (mounted) {

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../shared/error/error_mapper.dart';
+import '../../../../shared/error/error_reporter.dart';
 import '../../../../shared/providers/profile_provider.dart';
 
 /// Widget for selecting and uploading a profile photo.
@@ -91,11 +93,12 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
       if (image == null) return;
 
       await _uploadPhoto(image);
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ProfilePhotoPicker._pickImage');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fotoğraf seçilirken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -125,11 +128,12 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
           backgroundColor: Colors.green,
         ),
       );
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ProfilePhotoPicker._uploadPhoto');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fotoğraf yüklenirken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -162,11 +166,12 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
           backgroundColor: Colors.green,
         ),
       );
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ProfilePhotoPicker._removePhoto');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fotoğraf kaldırılırken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );

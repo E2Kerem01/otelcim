@@ -8,6 +8,8 @@ import 'package:share_plus/share_plus.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/report.dart';
 import '../../../shared/services/analytics_service.dart';
 import '../../../shared/services/auth_service.dart';
@@ -92,11 +94,12 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
           context.push('/chat/${result.conversationId}', extra: prefillText),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ListingDetailScreen._messageOwner');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Sohbet başlatılamadı: $e')));
+        ).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
       }
     } finally {
       if (mounted) setState(() => _startingChat = false);
@@ -126,11 +129,12 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
           );
         }
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ListingDetailScreen._openWhatsApp');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('WhatsApp açılamadı: $e')));
+        ).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
       }
     }
   }
@@ -164,8 +168,13 @@ ${listing.description}
             category: listing.category,
             location: listing.location,
           );
-    } catch (e) {
-      debugPrint('Error sharing listing: $e');
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ListingDetailScreen._shareListing');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mapToFailure(error).message)),
+        );
+      }
     }
   }
 

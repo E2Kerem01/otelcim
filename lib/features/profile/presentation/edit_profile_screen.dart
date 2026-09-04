@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
@@ -110,11 +112,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'EditProfileScreen._handleSave');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Profil kaydedilirken hata oluştu: $e'),
+          content: Text(mapToFailure(error).message),
           backgroundColor: Colors.red,
         ),
       );

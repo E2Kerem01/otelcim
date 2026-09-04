@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/chat_service.dart';
 import '../../../shared/services/listing_service.dart';
@@ -70,10 +72,11 @@ class PrivacySettingsScreen extends ConsumerWidget {
           const SnackBar(content: Text('Kişisel verileriniz hazırlandı.')),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'PrivacySettingsScreen._exportUserData');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Veri dışa aktarma hatası: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     }
@@ -184,11 +187,16 @@ class PrivacySettingsScreen extends ConsumerWidget {
                               );
                               context.go('/login');
                             }
-                          } catch (e) {
+                          } catch (error, stackTrace) {
+                            logError(
+                              error,
+                              stackTrace,
+                              context: 'PrivacySettingsScreen._showDeleteAccountDialog',
+                            );
                             setDialogState(() => isDeleting = false);
                             if (dialogContext.mounted) {
                               ScaffoldMessenger.of(dialogContext).showSnackBar(
-                                SnackBar(content: Text('Hesap silme başarısız: Şifrenizi kontrol edin ($e)')),
+                              SnackBar(content: Text(mapToFailure(error).message)),
                               );
                             }
                           }

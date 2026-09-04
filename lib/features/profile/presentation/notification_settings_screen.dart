@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/notification_service.dart';
@@ -49,10 +51,11 @@ class _NotificationSettingsScreenState
           ),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'NotificationSettingsScreen._updatePreference');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ayarlar güncellenirken hata oluştu: $e')),
+          SnackBar(content: Text(mapToFailure(error).message)),
         );
       }
     } finally {
@@ -119,11 +122,12 @@ class _NotificationSettingsScreenState
             ),
           );
         }
-      } catch (e) {
+      } catch (error, stackTrace) {
+        logError(error, stackTrace, context: 'NotificationSettingsScreen._selectQuietHour');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Sessiz saatler güncellenirken hata oluştu: $e'),
+              content: Text(mapToFailure(error).message),
             ),
           );
         }
@@ -153,11 +157,12 @@ class _NotificationSettingsScreenState
           ),
         );
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'NotificationSettingsScreen._clearQuietHours');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Hata oluştu: $e')));
+        ).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
       }
     } finally {
       if (mounted) {

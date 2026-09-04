@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
+import '../../../shared/error/error_mapper.dart';
+import '../../../shared/error/error_reporter.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
@@ -161,6 +163,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
       var imageUrls = <String>[];
       var housingImageUrls = <String>[];
       var imageUploadFailed = false;
+      String? imageUploadFailureMessage;
       try {
         if (_selectedImageFiles.isNotEmpty) {
           imageUrls = await storageService.uploadListingImages(
@@ -176,9 +179,10 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
             _housingImageFiles,
           );
         }
-      } catch (e) {
-        debugPrint('Listing image upload failed, publishing without photos: $e');
+      } catch (error, stackTrace) {
+        logError(error, stackTrace, context: 'CreateListingScreen._submit.imageUpload');
         imageUploadFailed = true;
+        imageUploadFailureMessage = mapToFailure(error).message;
       }
 
       await listingService.createListingWithId(
@@ -224,7 +228,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
           SnackBar(
             content: Text(
               imageUploadFailed
-                  ? 'İlanınız yayınlandı, ancak fotoğraflar yüklenemedi. Daha sonra düzenleyerek tekrar ekleyebilirsiniz.'
+                  ? imageUploadFailureMessage!
                   : 'İlanınız başarıyla yayınlandı!',
             ),
             backgroundColor: imageUploadFailed ? Colors.orange.shade800 : null,
@@ -241,11 +245,12 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
           context.go('/');
         }
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'CreateListingScreen._submit');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
+        ).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
