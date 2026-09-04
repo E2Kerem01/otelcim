@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Reject new bare catch blocks
+        run: bash scripts/check_new_bare_catches.sh "${{ github.base_ref }}"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
