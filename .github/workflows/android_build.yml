@@ -24,11 +24,17 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      - name: Build debug APK (no signing required)
+      # Release build is signed with the debug keystore (see
+      # android/app/build.gradle.kts) so it needs no secrets, and
+      # --split-per-abi keeps each APK small enough to share directly.
+      - name: Build release APKs (split per ABI, debug-signed)
+        run: flutter build apk --release --split-per-abi
+
+      - name: Also build a universal debug APK
         run: flutter build apk --debug
 
-      - name: Upload APK Artifact
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: otelcim-android-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: otelcim-android-apks
+          path: build/app/outputs/flutter-apk/*.apk
