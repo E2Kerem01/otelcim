@@ -162,7 +162,7 @@ class AdminService {
 
       if (!doc.exists) return null;
 
-      return UserProfile.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>);
+      return UserProfile.fromFirestore(doc);
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'AdminService.getUserProfile');
       return null;

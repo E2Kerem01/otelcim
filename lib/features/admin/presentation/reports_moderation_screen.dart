@@ -25,13 +25,13 @@ class ReportsModerationScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Şikâyetler')),
       body: reports.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const _Message(icon: Icons.error_outline, text: 'Şikâyetler yüklenemedi.'),
+        error: (_, _) => const _Message(icon: Icons.error_outline, text: 'Şikâyetler yüklenemedi.'),
         data: (items) => items.isEmpty
             ? const _Message(icon: Icons.task_alt_rounded, text: 'Bekleyen şikâyet bulunmuyor.')
             : ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: items.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) => _ReportCard(report: items[index]),
               ),
       ),

@@ -33,22 +33,28 @@ class LanguageSettingsScreen extends ConsumerWidget {
               style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
           ),
-          for (final locale in kSupportedAppLocales)
-            RadioListTile<String>(
-              value: locale.languageCode,
-              groupValue: current.languageCode,
-              title: Text(kAppLanguageNames[locale.languageCode] ??
-                  locale.languageCode),
-              onChanged: (code) {
-                if (code != null) {
-                  unawaited(
-                    ref
-                        .read(localeControllerProvider.notifier)
-                        .setLocale(Locale(code)),
-                  );
-                }
-              },
+          RadioGroup<String>(
+            groupValue: current.languageCode,
+            onChanged: (code) {
+              if (code != null) {
+                unawaited(
+                  ref
+                      .read(localeControllerProvider.notifier)
+                      .setLocale(Locale(code)),
+                );
+              }
+            },
+            child: Column(
+              children: [
+                for (final locale in kSupportedAppLocales)
+                  RadioListTile<String>(
+                    value: locale.languageCode,
+                    title: Text(kAppLanguageNames[locale.languageCode] ??
+                        locale.languageCode),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );

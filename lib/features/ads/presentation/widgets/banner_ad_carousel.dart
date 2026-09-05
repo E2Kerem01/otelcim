@@ -80,7 +80,7 @@ class _BannerAdCarouselState extends ConsumerState<BannerAdCarousel> {
 
     return activeBannersAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (banners) {
         if (banners.isEmpty) return const SizedBox.shrink();
 

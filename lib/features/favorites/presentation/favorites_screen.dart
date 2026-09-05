@@ -25,11 +25,11 @@ class FavoritesScreen extends ConsumerWidget {
                     : ListView.separated(
                         padding: const EdgeInsets.all(16),
                         itemCount: listings.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
                         itemBuilder: (_, index) => _FavoriteCard(listing: listings[index], uid: uid),
                       ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Text('Favoriler yüklenemedi. Lütfen tekrar deneyin.')),
+                error: (_, _) => const Center(child: Text('Favoriler yüklenemedi. Lütfen tekrar deneyin.')),
               ),
     );
   }
@@ -128,8 +128,8 @@ class _FavoriteCard extends ConsumerWidget {
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) => Container(color: Colors.grey.shade200, width: 60, height: 60),
-                    errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 24, color: Colors.grey),
+                    placeholder: (_, _) => Container(color: Colors.grey.shade200, width: 60, height: 60),
+                    errorWidget: (_, _, _) => const Icon(Icons.broken_image, size: 24, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(width: 10),

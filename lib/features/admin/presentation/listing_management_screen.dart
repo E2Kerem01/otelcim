@@ -101,7 +101,7 @@ class _ListingManagementScreenState extends ConsumerState<ListingManagementScree
                     : _ListingList(listings: listToShow))
                 : recentListings.when(
                     loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (_, __) => const Center(child: Text('İlanlar yüklenemedi.')),
+                    error: (_, _) => const Center(child: Text('İlanlar yüklenemedi.')),
                     data: (items) => items.isEmpty
                         ? const Center(child: Text('Henüz ilan yok.'))
                         : _ListingList(listings: items),
@@ -122,7 +122,7 @@ class _ListingList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: listings.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (_, index) => _ListingCard(listing: listings[index]),
     );
   }

@@ -29,10 +29,10 @@ jobs:
         run: flutter pub get
 
       - name: Analyze
-        # Informational only: the repo has a pre-existing lint/dead-code backlog
-        # (tracked separately) unrelated to individual PRs. Real correctness
-        # gates are the test and build steps below.
-        continue-on-error: true
+        # Blocking: the repo's lint/dead-code backlog was cleared in
+        # chore/analyze-backlog-cleanup, so `flutter analyze` must stay clean.
+        # A new SDK deprecation can surface fresh infos on a Flutter bump —
+        # fix them (or scope an `// ignore:`) as part of that bump.
         run: flutter analyze
 
       - name: Run tests

@@ -26,7 +26,7 @@ class PaymentService extends ChangeNotifier {
 
   bool _isAvailable = false;
   List<ProductDetails> _products = [];
-  List<PurchaseDetails> _purchases = [];
+  final List<PurchaseDetails> _purchases = [];
   bool _isLoading = false;
 
   bool get isAvailable => _isAvailable;

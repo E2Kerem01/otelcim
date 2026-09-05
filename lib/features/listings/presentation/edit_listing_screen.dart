@@ -447,7 +447,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                       scrollDirection: Axis.horizontal,
                       itemCount:
                           totalImageCount + (totalImageCount < 5 ? 1 : 0),
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
                       itemBuilder: (context, index) {
                         if (index == totalImageCount) {
                           return InkWell(
@@ -493,9 +493,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                   width: 90,
                                   height: 90,
                                   fit: BoxFit.cover,
-                                  placeholder: (_, __) =>
+                                  placeholder: (_, _) =>
                                       Container(color: Colors.grey.shade200),
-                                  errorWidget: (_, __, ___) =>
+                                  errorWidget: (_, _, _) =>
                                       const Icon(Icons.broken_image),
                                 ),
                               ),

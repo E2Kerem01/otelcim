@@ -8,6 +8,7 @@ import 'package:otelcim/shared/services/listing_service.dart';
 
 class MockListingService extends Mock implements ListingService {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock implements DocumentSnapshot<Object?> {}
 
 const params = (

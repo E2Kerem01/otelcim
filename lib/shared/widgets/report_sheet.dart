@@ -120,14 +120,21 @@ class _ReportSheetContentState extends ConsumerState<_ReportSheetContent> {
             Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             const Text('Bildirim sebebi', style: TextStyle(fontSize: 13, color: Colors.grey)),
-            ...ReportReason.values.map(
-              (reason) => RadioListTile<ReportReason>(
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-                title: Text(reason.label),
-                value: reason,
-                groupValue: _reason,
-                onChanged: (value) => setState(() => _reason = value ?? _reason),
+            RadioGroup<ReportReason>(
+              groupValue: _reason,
+              onChanged: (value) => setState(() => _reason = value ?? _reason),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: ReportReason.values
+                    .map(
+                      (reason) => RadioListTile<ReportReason>(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        title: Text(reason.label),
+                        value: reason,
+                      ),
+                    )
+                    .toList(),
               ),
             ),
             const SizedBox(height: 8),

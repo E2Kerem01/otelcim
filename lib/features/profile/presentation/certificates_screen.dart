@@ -140,7 +140,7 @@ class CertificatesScreen extends ConsumerWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final cert = items[index];
                     return _CertificateItemCard(cert: cert);
@@ -250,7 +250,6 @@ class _CertificateItemCard extends ConsumerWidget {
         statusIcon = Icons.cancel_rounded;
         break;
       case CertificateStatus.pending:
-      default:
         statusColor = Colors.orange.shade800;
         statusIcon = Icons.hourglass_top_rounded;
         break;
@@ -540,7 +539,7 @@ class __UploadCertificateSheetState
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<CertificateType>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Belge Türü',
                 border: OutlineInputBorder(),

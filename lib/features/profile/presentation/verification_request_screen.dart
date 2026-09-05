@@ -9,7 +9,6 @@ import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/verification_request.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
-import '../../../shared/services/storage_service.dart';
 import '../../../shared/services/verification_service.dart';
 
 /// Screen for submitting employer verification requests.

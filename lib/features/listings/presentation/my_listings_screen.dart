@@ -64,8 +64,8 @@ class MyListingsScreen extends ConsumerWidget {
                             width: 48,
                             height: 48,
                             fit: BoxFit.cover,
-                            placeholder: (_, __) => Container(color: Colors.grey.shade200, width: 48, height: 48),
-                            errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 20),
+                            placeholder: (_, _) => Container(color: Colors.grey.shade200, width: 48, height: 48),
+                            errorWidget: (_, _, _) => const Icon(Icons.broken_image, size: 20),
                           ),
                         )
                       : null,

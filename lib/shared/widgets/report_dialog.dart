@@ -121,7 +121,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<ReportReason>(
-              value: _selectedReason,
+              initialValue: _selectedReason,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),

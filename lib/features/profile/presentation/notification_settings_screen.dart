@@ -66,7 +66,6 @@ class _NotificationSettingsScreenState
   }
 
   Future<void> _selectQuietHour(
-    BuildContext context,
     bool isStart,
     UserProfile profile,
   ) async {
@@ -403,7 +402,7 @@ class _NotificationSettingsScreenState
                           ),
                         ),
                         trailing: const Icon(Icons.access_time_rounded),
-                        onTap: () => _selectQuietHour(context, true, profile),
+                        onTap: () => _selectQuietHour(true, profile),
                       ),
                       const Divider(height: 1),
                       ListTile(
@@ -424,7 +423,7 @@ class _NotificationSettingsScreenState
                           ),
                         ),
                         trailing: const Icon(Icons.access_time_rounded),
-                        onTap: () => _selectQuietHour(context, false, profile),
+                        onTap: () => _selectQuietHour(false, profile),
                       ),
                       if (hasQuietHours) ...[
                         const Divider(height: 1),

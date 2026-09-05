@@ -98,7 +98,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                     : _UserList(users: listToShow))
                 : recentUsers.when(
                     loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (_, __) => const Center(child: Text('Kullanıcılar yüklenemedi.')),
+                    error: (_, _) => const Center(child: Text('Kullanıcılar yüklenemedi.')),
                     data: (items) => items.isEmpty
                         ? const Center(child: Text('Henüz kullanıcı yok.'))
                         : _UserList(users: items),
@@ -119,7 +119,7 @@ class _UserList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: users.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (_, index) => _UserCard(user: users[index]),
     );
   }
