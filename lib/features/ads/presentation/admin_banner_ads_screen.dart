@@ -179,7 +179,7 @@ class _AdminBannerCard extends StatelessWidget {
                       ? CachedNetworkImage(
                           imageUrl: banner.imageUrl,
                           fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => const Icon(Icons.broken_image),
+                          errorWidget: (_, _, _) => const Icon(Icons.broken_image),
                         )
                       : const Icon(Icons.image, color: Colors.grey),
                 ),
@@ -214,7 +214,7 @@ class _AdminBannerCard extends StatelessWidget {
                 Switch(
                   value: banner.isActive,
                   onChanged: onToggleActive,
-                  activeColor: Theme.of(context).primaryColor,
+                  activeThumbColor: Theme.of(context).primaryColor,
                 ),
               ],
             ),
@@ -474,7 +474,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                               CachedNetworkImage(
                                 imageUrl: _imageUrl,
                                 fit: BoxFit.cover,
-                                errorWidget: (_, __, ___) => const Center(child: Text('Görsel yüklenemedi')),
+                                errorWidget: (_, _, _) => const Center(child: Text('Görsel yüklenemedi')),
                               ),
                               Positioned(
                                 right: 8,

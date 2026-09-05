@@ -216,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               });
             },
             style: SegmentedButton.styleFrom(
-              selectedBackgroundColor: otelcimBlue.withOpacity(0.12),
+              selectedBackgroundColor: otelcimBlue.withValues(alpha: 0.12),
               selectedForegroundColor: otelcimBlue,
             ),
           ),

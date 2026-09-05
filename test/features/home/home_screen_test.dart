@@ -3,7 +3,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:otelcim/features/ads/services/banner_ad_service.dart';
-import 'package:otelcim/features/favorites/services/favorite_service.dart';
 import 'package:otelcim/features/home/presentation/home_screen.dart';
 import 'package:otelcim/features/listings/domain/listing_model.dart';
 import 'package:otelcim/l10n/app_localizations.dart';
@@ -23,9 +22,6 @@ class MockPaginatedListingsNotifier extends StateNotifier<PaginatedListingsState
             isLoading: false,
           ),
         );
-
-  @override
-  ListingService get _listingService => throw UnimplementedError();
 
   @override
   PaginationParams get params => (

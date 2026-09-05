@@ -58,8 +58,9 @@ class HomeAdvancedFilters {
   ].where((active) => active).length;
 
   String get salaryLabel {
-    if (minSalaryTl != null && maxSalaryTl != null)
+    if (minSalaryTl != null && maxSalaryTl != null) {
       return '$minSalaryTl - $maxSalaryTl TL';
+    }
     if (minSalaryTl != null) return '$minSalaryTl TL ve üzeri';
     return '$maxSalaryTl TL ve altı';
   }
@@ -616,10 +617,10 @@ class ListingCard extends ConsumerWidget {
                           ? CachedNetworkImage(
                               imageUrl: listing.images.first,
                               fit: BoxFit.cover,
-                              placeholder: (_, __) => Container(
+                              placeholder: (_, _) => Container(
                                 color: Colors.grey.shade200,
                               ),
-                              errorWidget: (_, __, ___) => Container(
+                              errorWidget: (_, _, _) => Container(
                                 color: Colors.grey.shade100,
                                 child: const Icon(
                                   Icons.broken_image,
@@ -962,12 +963,12 @@ class ListingCard extends ConsumerWidget {
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
-                              placeholder: (_, __) => Container(
+                              placeholder: (_, _) => Container(
                                 color: Colors.grey.shade200,
                                 width: 60,
                                 height: 60,
                               ),
-                              errorWidget: (_, __, ___) => const Icon(
+                              errorWidget: (_, _, _) => const Icon(
                                 Icons.broken_image,
                                 size: 24,
                                 color: Colors.grey,
@@ -1130,9 +1131,9 @@ class ListingTableRow extends ConsumerWidget {
               width: 56,
               height: 56,
               fit: BoxFit.cover,
-              placeholder: (_, __) =>
+              placeholder: (_, _) =>
                   Container(width: 56, height: 56, color: Colors.grey.shade200),
-              errorWidget: (_, __, ___) => const SizedBox(
+              errorWidget: (_, _, _) => const SizedBox(
                 width: 56,
                 height: 56,
                 child: Icon(Icons.broken_image, size: 20, color: Colors.grey),

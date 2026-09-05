@@ -11,7 +11,6 @@ import '../../../shared/error/error_reporter.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
-import '../../../shared/services/storage_service.dart';
 import '../../../shared/widgets/xfile_preview_image.dart';
 import '../../nearby/services/location_service.dart';
 import '../domain/listing_model.dart';
@@ -386,7 +385,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   itemCount:
                       _selectedImageFiles.length +
                       (_selectedImageFiles.length < 5 ? 1 : 0),
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
                     if (index == _selectedImageFiles.length) {
                       return InkWell(

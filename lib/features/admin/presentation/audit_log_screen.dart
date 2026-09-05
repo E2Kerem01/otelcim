@@ -63,7 +63,7 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: actions.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemBuilder: (_, index) => _ActionCard(action: actions[index]),
           );
         },

@@ -24,13 +24,13 @@ class VerificationReviewScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Doğrulama Talepleri')),
       body: requests.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Doğrulama talepleri yüklenemedi.')),
+        error: (_, _) => const Center(child: Text('Doğrulama talepleri yüklenemedi.')),
         data: (items) => items.isEmpty
             ? const Center(child: Text('Bekleyen doğrulama talebi bulunmuyor.'))
             : ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: items.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (_, index) => _VerificationCard(request: items[index]),
               ),
       ),

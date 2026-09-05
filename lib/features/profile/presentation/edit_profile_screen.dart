@@ -73,7 +73,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       // Create or update profile
       final profile = UserProfile(
         id: currentUser.uid,
-        email: currentUser.email ?? '',
+        email: currentUser.email,
         displayName: _displayName,
         phoneNumber: _phoneNumber,
         bio: _bio,

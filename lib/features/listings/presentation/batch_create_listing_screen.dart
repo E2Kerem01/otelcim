@@ -153,7 +153,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
         return Listing(
           id: '',
           posterId: user.uid,
-          posterName: hotelName.isNotEmpty ? hotelName : (user.email ?? ''),
+          posterName: hotelName.isNotEmpty ? hotelName : user.email,
           title: pos.titleController.text.trim(),
           description: pos.descController.text.trim(),
           category: pos.selectedCategory.name,
@@ -286,7 +286,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: _selectedImageFiles.length + (_selectedImageFiles.length < 5 ? 1 : 0),
-                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          separatorBuilder: (_, _) => const SizedBox(width: 8),
                           itemBuilder: (context, index) {
                             if (index == _selectedImageFiles.length) {
                               return InkWell(

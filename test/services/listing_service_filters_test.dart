@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:otelcim/features/listings/domain/listing_model.dart';
 import 'package:otelcim/shared/constants/listing_filters.dart';
 import 'package:otelcim/shared/services/listing_service.dart';
 

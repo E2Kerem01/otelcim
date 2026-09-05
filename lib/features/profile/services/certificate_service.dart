@@ -32,6 +32,7 @@ class CertificateService {
     FirebaseFirestore? firestore,
     required StorageService storageService,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        // ignore: prefer_initializing_formals, a private field can't be a named formal
         _storageService = storageService;
 
   final FirebaseFirestore _firestore;

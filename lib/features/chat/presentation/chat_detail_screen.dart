@@ -237,9 +237,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
 
     await showDialog<void>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (dialogContext, setDialogState) {
             return AlertDialog(
               title: Text(l10n?.proposeInterview ?? 'Mülakat Saati Öner'),
               content: SingleChildScrollView(
@@ -267,15 +267,15 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                       OutlinedButton.icon(
                         onPressed: () async {
                           final date = await showDatePicker(
-                            context: context,
+                            context: dialogContext,
                             initialDate: DateTime.now().add(const Duration(days: 1)),
                             firstDate: DateTime.now(),
                             lastDate: DateTime.now().add(const Duration(days: 30)),
                           );
-                          if (date == null || !context.mounted) return;
+                          if (date == null || !dialogContext.mounted) return;
 
                           final time = await showTimePicker(
-                            context: context,
+                            context: dialogContext,
                             initialTime: const TimeOfDay(hour: 10, minute: 0),
                           );
                           if (time == null) return;
@@ -293,14 +293,14 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(dialogContext),
                   child: Text(l10n?.cancelButton ?? 'Vazgeç'),
                 ),
                 FilledButton(
                   onPressed: selectedSlots.isEmpty
                       ? null
                       : () async {
-                          Navigator.pop(context);
+                          Navigator.pop(dialogContext);
                           await ref.read(chatServiceProvider).proposeInterviewSlots(
                                 conversationId: widget.conversationId,
                                 proposedBy: myUid,

@@ -69,7 +69,7 @@ class DesktopTopNavBar extends ConsumerWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -103,7 +103,9 @@ class DesktopTopNavBar extends ConsumerWidget {
                             gradient: LinearGradient(
                               colors: [
                                 primaryColor,
-                                primaryColor.withRed((primaryColor.red + 30).clamp(0, 255)),
+                                primaryColor.withRed(
+                                  ((primaryColor.r * 255.0).round() + 30).clamp(0, 255),
+                                ),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -111,7 +113,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
-                                color: primaryColor.withOpacity(0.3),
+                                color: primaryColor.withValues(alpha: 0.3),
                                 blurRadius: 6,
                                 offset: const Offset(0, 2),
                               ),
@@ -175,7 +177,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                               );
                             },
                             borderRadius: BorderRadius.circular(12),
-                            hoverColor: primaryColor.withOpacity(0.08),
+                            hoverColor: primaryColor.withValues(alpha: 0.08),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.symmetric(
@@ -184,12 +186,12 @@ class DesktopTopNavBar extends ConsumerWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? primaryColor.withOpacity(isDark ? 0.2 : 0.1)
+                                    ? primaryColor.withValues(alpha: isDark ? 0.2 : 0.1)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(12),
                                 border: isSelected
                                     ? Border.all(
-                                        color: primaryColor.withOpacity(0.3),
+                                        color: primaryColor.withValues(alpha: 0.3),
                                         width: 1,
                                       )
                                     : Border.all(color: Colors.transparent, width: 1),

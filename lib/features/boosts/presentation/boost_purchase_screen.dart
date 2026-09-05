@@ -405,32 +405,41 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Center(child: CircularProgressIndicator()),
                   )
-                else ...[
-                  _buildPackageOption(
-                    productId: 'boost_7_days',
-                    title: '7 Günlük Öne Çıkarma',
-                    durationText: '7 Gün boyunca aktif',
-                    priceText: _getFormattedPrice(paymentService.products, 'boost_7_days', '₺49,99'),
-                    badgeText: null,
+                else
+                  RadioGroup<String>(
+                    groupValue: _selectedProductId,
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedProductId = val);
+                    },
+                    child: Column(
+                      children: [
+                        _buildPackageOption(
+                          productId: 'boost_7_days',
+                          title: '7 Günlük Öne Çıkarma',
+                          durationText: '7 Gün boyunca aktif',
+                          priceText: _getFormattedPrice(paymentService.products, 'boost_7_days', '₺49,99'),
+                          badgeText: null,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildPackageOption(
+                          productId: 'boost_14_days',
+                          title: '14 Günlük Öne Çıkarma',
+                          durationText: '14 Gün boyunca aktif',
+                          priceText: _getFormattedPrice(paymentService.products, 'boost_14_days', '₺89,99'),
+                          badgeText: 'EN POPÜLER',
+                          isPopular: true,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildPackageOption(
+                          productId: 'boost_30_days',
+                          title: '30 Günlük Öne Çıkarma',
+                          durationText: '30 Gün boyunca aktif',
+                          priceText: _getFormattedPrice(paymentService.products, 'boost_30_days', '₺149,99'),
+                          badgeText: 'EN AVANTAJLI',
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  _buildPackageOption(
-                    productId: 'boost_14_days',
-                    title: '14 Günlük Öne Çıkarma',
-                    durationText: '14 Gün boyunca aktif',
-                    priceText: _getFormattedPrice(paymentService.products, 'boost_14_days', '₺89,99'),
-                    badgeText: 'EN POPÜLER',
-                    isPopular: true,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildPackageOption(
-                    productId: 'boost_30_days',
-                    title: '30 Günlük Öne Çıkarma',
-                    durationText: '30 Gün boyunca aktif',
-                    priceText: _getFormattedPrice(paymentService.products, 'boost_30_days', '₺149,99'),
-                    badgeText: 'EN AVANTAJLI',
-                  ),
-                ],
 
                 const SizedBox(height: 32),
 
@@ -554,11 +563,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
           children: [
             Radio<String>(
               value: productId,
-              groupValue: _selectedProductId,
               activeColor: Colors.amber.shade800,
-              onChanged: (val) {
-                if (val != null) setState(() => _selectedProductId = val);
-              },
             ),
             const SizedBox(width: 8),
             Expanded(

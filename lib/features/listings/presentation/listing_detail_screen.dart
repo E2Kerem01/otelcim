@@ -239,8 +239,9 @@ ${listing.description}
           ),
           listingAsync.maybeWhen(
             data: (listing) {
-              if (listing == null || listing.posterId == myUid)
+              if (listing == null || listing.posterId == myUid) {
                 return const SizedBox.shrink();
+              }
               return PopupMenuButton<String>(
                 onSelected: (value) {
                   if (value == 'report') {

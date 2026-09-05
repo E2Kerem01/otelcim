@@ -54,7 +54,7 @@ class AccountSuspendedScreen extends ConsumerWidget {
                           );
                         },
                         loading: () => const CircularProgressIndicator(),
-                        error: (_, __) =>
+                        error: (_, _) =>
                             const _Message(title: 'Hesabınıza erişim kısıtlandı'),
                       ) ??
                       const _Message(title: 'Hesabınıza erişim kısıtlandı'),

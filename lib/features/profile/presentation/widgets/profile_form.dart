@@ -314,7 +314,7 @@ class _ProfileFormState extends State<ProfileForm> {
                     style: TextStyle(fontSize: 12),
                   ),
                 ),
-                activeColor: Colors.green.shade700,
+                activeThumbColor: Colors.green.shade700,
               ),
             ),
             const SizedBox(height: 16),

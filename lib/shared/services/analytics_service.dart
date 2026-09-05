@@ -35,8 +35,8 @@ class AnalyticsService {
       parameters: {
         'listing_id': listingId,
         'listing_title': listingTitle,
-        if (category != null) 'category': category,
-        if (location != null) 'location': location,
+        'category': ?category,
+        'location': ?location,
       },
     );
   }
