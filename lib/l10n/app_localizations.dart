@@ -5,7 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_ar.dart';
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_ru.dart';
 import 'app_localizations_tr.dart';
 
 // ignore_for_file: type=lint
@@ -94,7 +97,10 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('ar'),
+    Locale('de'),
     Locale('en'),
+    Locale('ru'),
     Locale('tr'),
   ];
 
@@ -1244,13 +1250,13 @@ abstract class AppLocalizations {
   /// **'Uyum'**
   String get matchLabel;
 
-  /// No description provided for @languageSettingsTitle.
+  /// App language picker screen title
   ///
   /// In tr, this message translates to:
   /// **'Uygulama Dili'**
   String get languageSettingsTitle;
 
-  /// No description provided for @languageSettingsSubtitle.
+  /// Explains partial translation coverage on the language picker
   ///
   /// In tr, this message translates to:
   /// **'Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe gösterilir.'**
@@ -1268,7 +1274,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'tr'].contains(locale.languageCode);
+      <String>['ar', 'de', 'en', 'ru', 'tr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1277,8 +1283,14 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'ar':
+      return AppLocalizationsAr();
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'ru':
+      return AppLocalizationsRu();
     case 'tr':
       return AppLocalizationsTr();
   }
