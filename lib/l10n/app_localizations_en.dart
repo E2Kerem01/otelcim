@@ -162,11 +162,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'I\'m looking for employees for my hotel or business. I want to post job listings.';
 
   @override
-  String get incompletePositionsError =>
-      'Lütfen tüm pozisyon bilgilerini eksiksiz doldurun.';
+  String get incompletePositionsError => 'Please fill in all position details.';
 
   @override
-  String get batchCreateButton => 'Toplu İlan Ver';
+  String get batchCreateButton => 'Batch create listing';
 
   @override
   String get seasonalCalendarTitle => 'Seasonal Hiring Calendar';

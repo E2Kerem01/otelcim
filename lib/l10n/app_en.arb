@@ -218,5 +218,13 @@
   "myEducationLevelLabel": "My Education Level",
   "matchLabel": "Match",
   "languageSettingsTitle": "App Language",
-  "languageSettingsSubtitle": "Some text is not translated yet; untranslated parts are shown in Turkish."
+  "languageSettingsSubtitle": "Some text is not translated yet; untranslated parts are shown in Turkish.",
+  "batchCreateButton": "Batch create listing",
+  "@batchCreateButton": {
+    "description": "Batch create button text"
+  },
+  "incompletePositionsError": "Please fill in all position details.",
+  "@incompletePositionsError": {
+    "description": "Error when positions not filled"
+  }
 }
