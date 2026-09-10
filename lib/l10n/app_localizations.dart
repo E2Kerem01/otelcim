@@ -1261,6 +1261,270 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe gösterilir.'**
   String get languageSettingsSubtitle;
+
+  /// Home feed search field hint
+  ///
+  /// In tr, this message translates to:
+  /// **'İş ilanı ara...'**
+  String get homeSearchHint;
+
+  /// Tooltip on the advanced-filters button
+  ///
+  /// In tr, this message translates to:
+  /// **'Filtreler'**
+  String get filtersTooltip;
+
+  /// Tooltip on the seasonal calendar action
+  ///
+  /// In tr, this message translates to:
+  /// **'Sezon Takvimi'**
+  String get seasonalCalendarTooltip;
+
+  /// Button that clears all active filters
+  ///
+  /// In tr, this message translates to:
+  /// **'Temizle'**
+  String get clearFiltersAction;
+
+  /// Count of listings currently shown in the feed
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} sonuç'**
+  String resultCount(int count);
+
+  /// Tooltip on a grid column-count toggle
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Sütun'**
+  String gridColumnsTooltip(int count);
+
+  /// Tooltip on the table view toggle
+  ///
+  /// In tr, this message translates to:
+  /// **'Tablo Görünümü'**
+  String get tableViewTooltip;
+
+  /// Empty-state heading on the home feed
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz İlan Bulunmuyor'**
+  String get noListingsTitle;
+
+  /// Empty-state explanation on the home feed
+  ///
+  /// In tr, this message translates to:
+  /// **'Sistemde aktif ilan bulunmamaktadır. Örnek ilanları veritabanına ekleyebilir veya yeni bir ilan oluşturabilirsiniz.'**
+  String get noListingsBody;
+
+  /// Empty-state button that seeds sample listings
+  ///
+  /// In tr, this message translates to:
+  /// **'Örnek İlanları Veritabanına Yükle'**
+  String get seedSampleListingsAction;
+
+  /// Empty-state button to create the first listing
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk İlanı Sen Oluştur'**
+  String get createFirstListingAction;
+
+  /// Title of the advanced filters bottom sheet
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişmiş filtreler'**
+  String get advancedFiltersTitle;
+
+  /// Filter field label for city or area
+  ///
+  /// In tr, this message translates to:
+  /// **'Şehir / bölge'**
+  String get cityOrRegionLabel;
+
+  /// Dropdown option that selects every city
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm şehirler'**
+  String get allCitiesOption;
+
+  /// Filter field label for the job field / branch
+  ///
+  /// In tr, this message translates to:
+  /// **'İş branşı'**
+  String get jobBranchLabel;
+
+  /// Dropdown option that selects every job field
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm branşlar'**
+  String get allBranchesOption;
+
+  /// Filter field label for the minimum salary
+  ///
+  /// In tr, this message translates to:
+  /// **'En düşük maaş'**
+  String get minSalaryLabel;
+
+  /// Filter field label for the maximum salary
+  ///
+  /// In tr, this message translates to:
+  /// **'En yüksek maaş'**
+  String get maxSalaryLabel;
+
+  /// Filter field label for the listing date range
+  ///
+  /// In tr, this message translates to:
+  /// **'İlan tarihi'**
+  String get listingDateLabel;
+
+  /// Filter field label for the employment type
+  ///
+  /// In tr, this message translates to:
+  /// **'Çalışma tipi'**
+  String get employmentTypeLabel;
+
+  /// Dropdown option that selects every employment type
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm çalışma tipleri'**
+  String get allEmploymentTypesOption;
+
+  /// Filter field label for the sort order
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralama'**
+  String get sortLabel;
+
+  /// Button that applies the selected filters
+  ///
+  /// In tr, this message translates to:
+  /// **'Filtreleri uygula'**
+  String get applyFiltersAction;
+
+  /// Snackbar shown when min salary exceeds max salary
+  ///
+  /// In tr, this message translates to:
+  /// **'Maaş aralığını kontrol edin.'**
+  String get salaryRangeError;
+
+  /// Active filter chip: minimum salary and above
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} TL ve üzeri'**
+  String salaryMinAndUp(String amount);
+
+  /// Active filter chip: maximum salary and below
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} TL ve altı'**
+  String salaryMaxAndDown(String amount);
+
+  /// Tooltip on the favorite toggle when not favorited
+  ///
+  /// In tr, this message translates to:
+  /// **'Favorilere ekle'**
+  String get addToFavorites;
+
+  /// Tooltip on the favorite toggle when favorited
+  ///
+  /// In tr, this message translates to:
+  /// **'Favorilerden çıkar'**
+  String get removeFromFavorites;
+
+  /// Table view column header: listing title
+  ///
+  /// In tr, this message translates to:
+  /// **'İlan Başlığı'**
+  String get columnListingTitle;
+
+  /// Table view column header: category
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori'**
+  String get columnCategory;
+
+  /// Table view column header: location
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum'**
+  String get columnLocation;
+
+  /// Table view column header: salary
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücret'**
+  String get columnSalary;
+
+  /// Table view column header: listing date
+  ///
+  /// In tr, this message translates to:
+  /// **'İlan Tarihi'**
+  String get columnListingDate;
+
+  /// Employment type: full-time
+  ///
+  /// In tr, this message translates to:
+  /// **'Tam zamanlı'**
+  String get employmentTypeFullTime;
+
+  /// Employment type: part-time
+  ///
+  /// In tr, this message translates to:
+  /// **'Yarı zamanlı'**
+  String get employmentTypePartTime;
+
+  /// Employment type: seasonal
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevsimlik'**
+  String get employmentTypeSeasonal;
+
+  /// Listing date filter: all dates
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümü'**
+  String get dateFilterAll;
+
+  /// Listing date filter: last 24 hours
+  ///
+  /// In tr, this message translates to:
+  /// **'Son 24 saat'**
+  String get dateFilterLast24Hours;
+
+  /// Listing date filter: last week
+  ///
+  /// In tr, this message translates to:
+  /// **'Son hafta'**
+  String get dateFilterLastWeek;
+
+  /// Listing date filter: last month
+  ///
+  /// In tr, this message translates to:
+  /// **'Son ay'**
+  String get dateFilterLastMonth;
+
+  /// Sort order: newest first
+  ///
+  /// In tr, this message translates to:
+  /// **'En yeni'**
+  String get sortOrderNewest;
+
+  /// Sort order: salary high to low
+  ///
+  /// In tr, this message translates to:
+  /// **'Maaş yüksekten düşüğe'**
+  String get sortOrderSalaryHighToLow;
+
+  /// Sort order: salary low to high
+  ///
+  /// In tr, this message translates to:
+  /// **'Maaş düşükten yükseğe'**
+  String get sortOrderSalaryLowToHigh;
+
+  /// Category filter chip that clears the category filter
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümü'**
+  String get allFilterChip;
 }
 
 class _AppLocalizationsDelegate

@@ -180,19 +180,19 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.';
 
   @override
-  String get seasonLabel => 'Sezon';
+  String get seasonLabel => 'Saison';
 
   @override
-  String get seasonSummer2025 => 'Yaz 2025';
+  String get seasonSummer2025 => 'Sommer 2025';
 
   @override
-  String get seasonWinter202526 => 'Kış 2025-26';
+  String get seasonWinter202526 => 'Winter 2025-26';
 
   @override
-  String get seasonYearRound => 'Tüm Yıl';
+  String get seasonYearRound => 'Ganzjährig';
 
   @override
-  String get seasonAny => 'Farketmez / Tüm Sezonlar';
+  String get seasonAny => 'Egal / Alle Saisons';
 
   @override
   String get addSeasonalAlert => 'Hatırlatıcı Ekle';
@@ -616,7 +616,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get myEducationLevelLabel => 'Eğitim Durumum';
 
   @override
-  String get matchLabel => 'Uyum';
+  String get matchLabel => 'Übereinstimmung';
 
   @override
   String get languageSettingsTitle => 'App-Sprache';
@@ -624,4 +624,145 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get languageSettingsSubtitle =>
       'Einige Texte sind noch nicht übersetzt; nicht übersetzte Teile werden auf Türkisch angezeigt.';
+
+  @override
+  String get homeSearchHint => 'Stellenanzeigen suchen...';
+
+  @override
+  String get filtersTooltip => 'Filter';
+
+  @override
+  String get seasonalCalendarTooltip => 'Saisonkalender';
+
+  @override
+  String get clearFiltersAction => 'Zurücksetzen';
+
+  @override
+  String resultCount(int count) {
+    return '$count Ergebnisse';
+  }
+
+  @override
+  String gridColumnsTooltip(int count) {
+    return '$count Spalten';
+  }
+
+  @override
+  String get tableViewTooltip => 'Tabellenansicht';
+
+  @override
+  String get noListingsTitle => 'Noch keine Anzeigen';
+
+  @override
+  String get noListingsBody =>
+      'Es gibt keine aktiven Anzeigen. Du kannst Beispielanzeigen in die Datenbank laden oder eine neue erstellen.';
+
+  @override
+  String get seedSampleListingsAction => 'Beispielanzeigen in Datenbank laden';
+
+  @override
+  String get createFirstListingAction => 'Erstelle die erste Anzeige';
+
+  @override
+  String get advancedFiltersTitle => 'Erweiterte Filter';
+
+  @override
+  String get cityOrRegionLabel => 'Stadt / Region';
+
+  @override
+  String get allCitiesOption => 'Alle Städte';
+
+  @override
+  String get jobBranchLabel => 'Berufsfeld';
+
+  @override
+  String get allBranchesOption => 'Alle Bereiche';
+
+  @override
+  String get minSalaryLabel => 'Mindestgehalt';
+
+  @override
+  String get maxSalaryLabel => 'Höchstgehalt';
+
+  @override
+  String get listingDateLabel => 'Anzeigendatum';
+
+  @override
+  String get employmentTypeLabel => 'Beschäftigungsart';
+
+  @override
+  String get allEmploymentTypesOption => 'Alle Beschäftigungsarten';
+
+  @override
+  String get sortLabel => 'Sortierung';
+
+  @override
+  String get applyFiltersAction => 'Filter anwenden';
+
+  @override
+  String get salaryRangeError => 'Überprüfe den Gehaltsbereich.';
+
+  @override
+  String salaryMinAndUp(String amount) {
+    return 'ab $amount TL';
+  }
+
+  @override
+  String salaryMaxAndDown(String amount) {
+    return 'bis $amount TL';
+  }
+
+  @override
+  String get addToFavorites => 'Zu Favoriten hinzufügen';
+
+  @override
+  String get removeFromFavorites => 'Aus Favoriten entfernen';
+
+  @override
+  String get columnListingTitle => 'Anzeigentitel';
+
+  @override
+  String get columnCategory => 'Kategorie';
+
+  @override
+  String get columnLocation => 'Standort';
+
+  @override
+  String get columnSalary => 'Gehalt';
+
+  @override
+  String get columnListingDate => 'Anzeigendatum';
+
+  @override
+  String get employmentTypeFullTime => 'Vollzeit';
+
+  @override
+  String get employmentTypePartTime => 'Teilzeit';
+
+  @override
+  String get employmentTypeSeasonal => 'Saisonal';
+
+  @override
+  String get dateFilterAll => 'Alle';
+
+  @override
+  String get dateFilterLast24Hours => 'Letzte 24 Stunden';
+
+  @override
+  String get dateFilterLastWeek => 'Letzte Woche';
+
+  @override
+  String get dateFilterLastMonth => 'Letzter Monat';
+
+  @override
+  String get sortOrderNewest => 'Neueste';
+
+  @override
+  String get sortOrderSalaryHighToLow => 'Gehalt: hoch nach niedrig';
+
+  @override
+  String get sortOrderSalaryLowToHigh => 'Gehalt: niedrig nach hoch';
+
+  @override
+  String get allFilterChip => 'Alle';
 }

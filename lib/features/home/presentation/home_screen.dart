@@ -12,6 +12,8 @@ import '../../../shared/services/notification_service.dart';
 import '../../ads/presentation/widgets/banner_ad_carousel.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../discovery/domain/tourism_region.dart';
+import '../../listings/presentation/listing_filter_labels.dart';
+import '../../listings/presentation/season_utils.dart';
 import '../../../core/responsive/responsive_layout.dart';
 import 'widgets/home_screen_widgets.dart';
 
@@ -153,6 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final selectedCategory = ref.watch(selectedCategoryFilterProvider);
     final availableColumnCounts = context.isMobile
         ? const [1, 2]
@@ -195,12 +198,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () => context.push('/seasonal-calendar'),
-            tooltip: 'Sezon Takvimi',
+            tooltip: l10n.seasonalCalendarTooltip,
             icon: const Icon(Icons.calendar_month_rounded),
           ),
           IconButton(
             onPressed: () => context.push('/regions'),
-            tooltip: AppLocalizations.of(context)!.regionsTitle,
+            tooltip: l10n.regionsTitle,
             icon: const Icon(Icons.travel_explore),
           ),
         ],
@@ -231,7 +234,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
-                            hintText: 'İş ilanı ara...',
+                            hintText: l10n.homeSearchHint,
                             prefixIcon: const Icon(
                               Icons.search_rounded,
                               color: Colors.grey,
@@ -260,7 +263,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       label: Text('${_filters.activeCount}'),
                       child: IconButton.filledTonal(
                         onPressed: _openFilters,
-                        tooltip: 'Filtreler',
+                        tooltip: l10n.filtersTooltip,
                         icon: const Icon(Icons.tune_rounded),
                       ),
                     ),
@@ -309,7 +312,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       if (_filters.minSalaryTl != null ||
                           _filters.maxSalaryTl != null)
                         _filterChip(
-                          _filters.salaryLabel,
+                          _filters.salaryLabel(l10n),
                           () => setState(
                             () =>
                                 _filters = _filters.copyWith(clearSalary: true),
@@ -317,7 +320,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       if (_filters.dateFilter != ListingDateFilter.all)
                         _filterChip(
-                          _filters.dateFilter.label,
+                          listingDateFilterLabel(l10n, _filters.dateFilter),
                           () => setState(
                             () => _filters = _filters.copyWith(
                               dateFilter: ListingDateFilter.all,
@@ -326,7 +329,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       if (_filters.employmentType != null)
                         _filterChip(
-                          _filters.employmentType!.label,
+                          employmentTypeLabel(l10n, _filters.employmentType!),
                           () => setState(
                             () => _filters = _filters.copyWith(
                               clearEmploymentType: true,
@@ -335,7 +338,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       if (_filters.season != null)
                         _filterChip(
-                          _filters.season!.label,
+                          listingSeasonLabel(l10n, _filters.season!.code),
                           () => setState(
                             () =>
                                 _filters = _filters.copyWith(clearSeason: true),
@@ -343,7 +346,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       if (_filters.sortOrder != ListingSortOrder.newest)
                         _filterChip(
-                          _filters.sortOrder.label,
+                          listingSortOrderLabel(l10n, _filters.sortOrder),
                           () => setState(
                             () => _filters = _filters.copyWith(
                               sortOrder: ListingSortOrder.newest,
@@ -353,7 +356,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       TextButton(
                         onPressed: () =>
                             setState(() => _filters = const HomeAdvancedFilters()),
-                        child: const Text('Temizle'),
+                        child: Text(l10n.clearFiltersAction),
                       ),
                     ],
                   ),
@@ -378,7 +381,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     if (index == 0) {
                       final isSelected = selectedCategory == null;
                       return ChoiceChip(
-                        label: const Text('Tümü'),
+                        label: Text(l10n.allFilterChip),
                         selected: isSelected,
                         onSelected: (_) =>
                             ref
@@ -419,7 +422,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Row(
                   children: [
                     Text(
-                      '${paginationState.listings.length} sonuç',
+                      l10n.resultCount(paginationState.listings.length),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const Spacer(),
@@ -442,7 +445,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             final isSelected =
                                 !_isTableView && _columnCount == cols;
                             return Tooltip(
-                              message: '$cols Sütun',
+                              message: l10n.gridColumnsTooltip(cols),
                               child: InkWell(
                                 key: Key('grid_col_$cols'),
                                 onTap: () => setState(() {
@@ -496,7 +499,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             );
                           }),
                           Tooltip(
-                            message: 'Tablo Görünümü',
+                            message: l10n.tableViewTooltip,
                             child: InkWell(
                               key: const Key('grid_col_table'),
                               onTap: () =>
@@ -600,6 +603,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverFillRemaining(
       hasScrollBody: false,
       child: Center(
@@ -610,13 +614,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Icon(Icons.hotel_outlined, size: 64, color: Colors.grey.shade400),
               const SizedBox(height: 16),
-              const Text(
-                'Henüz İlan Bulunmuyor',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                l10n.noListingsTitle,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Sistemde aktif ilan bulunmamaktadır. Örnek ilanları veritabanına ekleyebilir veya yeni bir ilan oluşturabilirsiniz.',
+                l10n.noListingsBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
               ),
@@ -626,7 +633,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   await ref.read(listingServiceProvider).seedSampleListings();
                 },
                 icon: const Icon(Icons.download_rounded),
-                label: const Text('Örnek İlanları Veritabanına Yükle'),
+                label: Text(l10n.seedSampleListingsAction),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -640,7 +647,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               OutlinedButton.icon(
                 onPressed: () => context.push('/create-listing'),
                 icon: const Icon(Icons.add_circle_outline),
-                label: const Text('İlk İlanı Sen Oluştur'),
+                label: Text(l10n.createFirstListingAction),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,

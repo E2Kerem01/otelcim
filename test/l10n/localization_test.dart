@@ -61,6 +61,29 @@ void main() {
     expect(captured.profileTitle, 'حسابي');
   });
 
+  testWidgets('home feed strings are translated, not Turkish, in every locale',
+      (tester) async {
+    await pumpForLocale(tester, const Locale('en'));
+    expect(captured.homeSearchHint, 'Search job listings...');
+    expect(captured.resultCount(3), '3 results');
+    expect(captured.advancedFiltersTitle, 'Advanced filters');
+
+    await pumpForLocale(tester, const Locale('de'));
+    expect(captured.homeSearchHint, 'Stellenanzeigen suchen...');
+    expect(captured.employmentTypeLabel, 'Beschäftigungsart');
+    expect(captured.sortOrderNewest, 'Neueste');
+
+    await pumpForLocale(tester, const Locale('ru'));
+    expect(captured.noListingsTitle, 'Пока нет объявлений');
+    expect(captured.tableViewTooltip, 'Табличный вид');
+
+    await pumpForLocale(tester, const Locale('ar'));
+    expect(captured.filtersTooltip, 'عوامل التصفية');
+    expect(captured.gridColumnsTooltip(2), '2 أعمدة');
+    // Previously fell back to Turkish; now backfilled.
+    expect(captured.seasonSummer2025, 'صيف 2025');
+  });
+
   testWidgets('untranslated keys fall back to Turkish, not to a key name',
       (tester) async {
     await pumpForLocale(tester, const Locale('de'));

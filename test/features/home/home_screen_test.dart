@@ -90,6 +90,7 @@ void main() {
         authStateProvider.overrideWith((ref) => Stream.value(null)),
       ],
       child: const MaterialApp(
+        locale: Locale('tr', ''),
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

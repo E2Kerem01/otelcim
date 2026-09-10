@@ -180,19 +180,19 @@ class AppLocalizationsAr extends AppLocalizations {
       'Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.';
 
   @override
-  String get seasonLabel => 'Sezon';
+  String get seasonLabel => 'الموسم';
 
   @override
-  String get seasonSummer2025 => 'Yaz 2025';
+  String get seasonSummer2025 => 'صيف 2025';
 
   @override
-  String get seasonWinter202526 => 'Kış 2025-26';
+  String get seasonWinter202526 => 'شتاء 2025-26';
 
   @override
-  String get seasonYearRound => 'Tüm Yıl';
+  String get seasonYearRound => 'طوال العام';
 
   @override
-  String get seasonAny => 'Farketmez / Tüm Sezonlar';
+  String get seasonAny => 'أي / كل المواسم';
 
   @override
   String get addSeasonalAlert => 'Hatırlatıcı Ekle';
@@ -616,7 +616,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myEducationLevelLabel => 'Eğitim Durumum';
 
   @override
-  String get matchLabel => 'Uyum';
+  String get matchLabel => 'تطابق';
 
   @override
   String get languageSettingsTitle => 'لغة التطبيق';
@@ -624,4 +624,146 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get languageSettingsSubtitle =>
       'بعض النصوص لم تُترجم بعد؛ الأجزاء غير المترجمة تظهر باللغة التركية.';
+
+  @override
+  String get homeSearchHint => 'ابحث عن إعلانات الوظائف...';
+
+  @override
+  String get filtersTooltip => 'عوامل التصفية';
+
+  @override
+  String get seasonalCalendarTooltip => 'التقويم الموسمي';
+
+  @override
+  String get clearFiltersAction => 'مسح';
+
+  @override
+  String resultCount(int count) {
+    return '$count نتيجة';
+  }
+
+  @override
+  String gridColumnsTooltip(int count) {
+    return '$count أعمدة';
+  }
+
+  @override
+  String get tableViewTooltip => 'عرض الجدول';
+
+  @override
+  String get noListingsTitle => 'لا توجد إعلانات بعد';
+
+  @override
+  String get noListingsBody =>
+      'لا توجد إعلانات نشطة. يمكنك تحميل إعلانات نموذجية إلى قاعدة البيانات أو إنشاء إعلان جديد.';
+
+  @override
+  String get seedSampleListingsAction =>
+      'تحميل إعلانات نموذجية إلى قاعدة البيانات';
+
+  @override
+  String get createFirstListingAction => 'أنشئ أول إعلان';
+
+  @override
+  String get advancedFiltersTitle => 'عوامل تصفية متقدمة';
+
+  @override
+  String get cityOrRegionLabel => 'المدينة / المنطقة';
+
+  @override
+  String get allCitiesOption => 'جميع المدن';
+
+  @override
+  String get jobBranchLabel => 'مجال العمل';
+
+  @override
+  String get allBranchesOption => 'جميع المجالات';
+
+  @override
+  String get minSalaryLabel => 'الحد الأدنى للراتب';
+
+  @override
+  String get maxSalaryLabel => 'الحد الأقصى للراتب';
+
+  @override
+  String get listingDateLabel => 'تاريخ الإعلان';
+
+  @override
+  String get employmentTypeLabel => 'نوع التوظيف';
+
+  @override
+  String get allEmploymentTypesOption => 'جميع أنواع التوظيف';
+
+  @override
+  String get sortLabel => 'الترتيب';
+
+  @override
+  String get applyFiltersAction => 'تطبيق عوامل التصفية';
+
+  @override
+  String get salaryRangeError => 'تحقق من نطاق الراتب.';
+
+  @override
+  String salaryMinAndUp(String amount) {
+    return '$amount ليرة فأكثر';
+  }
+
+  @override
+  String salaryMaxAndDown(String amount) {
+    return '$amount ليرة فأقل';
+  }
+
+  @override
+  String get addToFavorites => 'إضافة إلى المفضلة';
+
+  @override
+  String get removeFromFavorites => 'إزالة من المفضلة';
+
+  @override
+  String get columnListingTitle => 'عنوان الإعلان';
+
+  @override
+  String get columnCategory => 'الفئة';
+
+  @override
+  String get columnLocation => 'الموقع';
+
+  @override
+  String get columnSalary => 'الأجر';
+
+  @override
+  String get columnListingDate => 'تاريخ الإعلان';
+
+  @override
+  String get employmentTypeFullTime => 'دوام كامل';
+
+  @override
+  String get employmentTypePartTime => 'دوام جزئي';
+
+  @override
+  String get employmentTypeSeasonal => 'موسمي';
+
+  @override
+  String get dateFilterAll => 'الكل';
+
+  @override
+  String get dateFilterLast24Hours => 'آخر 24 ساعة';
+
+  @override
+  String get dateFilterLastWeek => 'الأسبوع الماضي';
+
+  @override
+  String get dateFilterLastMonth => 'الشهر الماضي';
+
+  @override
+  String get sortOrderNewest => 'الأحدث';
+
+  @override
+  String get sortOrderSalaryHighToLow => 'الراتب: من الأعلى إلى الأدنى';
+
+  @override
+  String get sortOrderSalaryLowToHigh => 'الراتب: من الأدنى إلى الأعلى';
+
+  @override
+  String get allFilterChip => 'الكل';
 }
