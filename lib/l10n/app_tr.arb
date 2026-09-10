@@ -367,5 +367,201 @@
   "languageSettingsSubtitle": "Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe gösterilir.",
   "@languageSettingsSubtitle": {
     "description": "Explains partial translation coverage on the language picker"
+  },
+  "homeSearchHint": "İş ilanı ara...",
+  "@homeSearchHint": {
+    "description": "Home feed search field hint"
+  },
+  "filtersTooltip": "Filtreler",
+  "@filtersTooltip": {
+    "description": "Tooltip on the advanced-filters button"
+  },
+  "seasonalCalendarTooltip": "Sezon Takvimi",
+  "@seasonalCalendarTooltip": {
+    "description": "Tooltip on the seasonal calendar action"
+  },
+  "clearFiltersAction": "Temizle",
+  "@clearFiltersAction": {
+    "description": "Button that clears all active filters"
+  },
+  "resultCount": "{count} sonuç",
+  "@resultCount": {
+    "description": "Count of listings currently shown in the feed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gridColumnsTooltip": "{count} Sütun",
+  "@gridColumnsTooltip": {
+    "description": "Tooltip on a grid column-count toggle",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tableViewTooltip": "Tablo Görünümü",
+  "@tableViewTooltip": {
+    "description": "Tooltip on the table view toggle"
+  },
+  "noListingsTitle": "Henüz İlan Bulunmuyor",
+  "@noListingsTitle": {
+    "description": "Empty-state heading on the home feed"
+  },
+  "noListingsBody": "Sistemde aktif ilan bulunmamaktadır. Örnek ilanları veritabanına ekleyebilir veya yeni bir ilan oluşturabilirsiniz.",
+  "@noListingsBody": {
+    "description": "Empty-state explanation on the home feed"
+  },
+  "seedSampleListingsAction": "Örnek İlanları Veritabanına Yükle",
+  "@seedSampleListingsAction": {
+    "description": "Empty-state button that seeds sample listings"
+  },
+  "createFirstListingAction": "İlk İlanı Sen Oluştur",
+  "@createFirstListingAction": {
+    "description": "Empty-state button to create the first listing"
+  },
+  "advancedFiltersTitle": "Gelişmiş filtreler",
+  "@advancedFiltersTitle": {
+    "description": "Title of the advanced filters bottom sheet"
+  },
+  "cityOrRegionLabel": "Şehir / bölge",
+  "@cityOrRegionLabel": {
+    "description": "Filter field label for city or area"
+  },
+  "allCitiesOption": "Tüm şehirler",
+  "@allCitiesOption": {
+    "description": "Dropdown option that selects every city"
+  },
+  "jobBranchLabel": "İş branşı",
+  "@jobBranchLabel": {
+    "description": "Filter field label for the job field / branch"
+  },
+  "allBranchesOption": "Tüm branşlar",
+  "@allBranchesOption": {
+    "description": "Dropdown option that selects every job field"
+  },
+  "minSalaryLabel": "En düşük maaş",
+  "@minSalaryLabel": {
+    "description": "Filter field label for the minimum salary"
+  },
+  "maxSalaryLabel": "En yüksek maaş",
+  "@maxSalaryLabel": {
+    "description": "Filter field label for the maximum salary"
+  },
+  "listingDateLabel": "İlan tarihi",
+  "@listingDateLabel": {
+    "description": "Filter field label for the listing date range"
+  },
+  "employmentTypeLabel": "Çalışma tipi",
+  "@employmentTypeLabel": {
+    "description": "Filter field label for the employment type"
+  },
+  "allEmploymentTypesOption": "Tüm çalışma tipleri",
+  "@allEmploymentTypesOption": {
+    "description": "Dropdown option that selects every employment type"
+  },
+  "sortLabel": "Sıralama",
+  "@sortLabel": {
+    "description": "Filter field label for the sort order"
+  },
+  "applyFiltersAction": "Filtreleri uygula",
+  "@applyFiltersAction": {
+    "description": "Button that applies the selected filters"
+  },
+  "salaryRangeError": "Maaş aralığını kontrol edin.",
+  "@salaryRangeError": {
+    "description": "Snackbar shown when min salary exceeds max salary"
+  },
+  "salaryMinAndUp": "{amount} TL ve üzeri",
+  "@salaryMinAndUp": {
+    "description": "Active filter chip: minimum salary and above",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "salaryMaxAndDown": "{amount} TL ve altı",
+  "@salaryMaxAndDown": {
+    "description": "Active filter chip: maximum salary and below",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "addToFavorites": "Favorilere ekle",
+  "@addToFavorites": {
+    "description": "Tooltip on the favorite toggle when not favorited"
+  },
+  "removeFromFavorites": "Favorilerden çıkar",
+  "@removeFromFavorites": {
+    "description": "Tooltip on the favorite toggle when favorited"
+  },
+  "columnListingTitle": "İlan Başlığı",
+  "@columnListingTitle": {
+    "description": "Table view column header: listing title"
+  },
+  "columnCategory": "Kategori",
+  "@columnCategory": {
+    "description": "Table view column header: category"
+  },
+  "columnLocation": "Konum",
+  "@columnLocation": {
+    "description": "Table view column header: location"
+  },
+  "columnSalary": "Ücret",
+  "@columnSalary": {
+    "description": "Table view column header: salary"
+  },
+  "columnListingDate": "İlan Tarihi",
+  "@columnListingDate": {
+    "description": "Table view column header: listing date"
+  },
+  "employmentTypeFullTime": "Tam zamanlı",
+  "@employmentTypeFullTime": {
+    "description": "Employment type: full-time"
+  },
+  "employmentTypePartTime": "Yarı zamanlı",
+  "@employmentTypePartTime": {
+    "description": "Employment type: part-time"
+  },
+  "employmentTypeSeasonal": "Mevsimlik",
+  "@employmentTypeSeasonal": {
+    "description": "Employment type: seasonal"
+  },
+  "dateFilterAll": "Tümü",
+  "@dateFilterAll": {
+    "description": "Listing date filter: all dates"
+  },
+  "dateFilterLast24Hours": "Son 24 saat",
+  "@dateFilterLast24Hours": {
+    "description": "Listing date filter: last 24 hours"
+  },
+  "dateFilterLastWeek": "Son hafta",
+  "@dateFilterLastWeek": {
+    "description": "Listing date filter: last week"
+  },
+  "dateFilterLastMonth": "Son ay",
+  "@dateFilterLastMonth": {
+    "description": "Listing date filter: last month"
+  },
+  "sortOrderNewest": "En yeni",
+  "@sortOrderNewest": {
+    "description": "Sort order: newest first"
+  },
+  "sortOrderSalaryHighToLow": "Maaş yüksekten düşüğe",
+  "@sortOrderSalaryHighToLow": {
+    "description": "Sort order: salary high to low"
+  },
+  "sortOrderSalaryLowToHigh": "Maaş düşükten yükseğe",
+  "@sortOrderSalaryLowToHigh": {
+    "description": "Sort order: salary low to high"
+  },
+  "allFilterChip": "Tümü",
+  "@allFilterChip": {
+    "description": "Category filter chip that clears the category filter"
   }
 }

@@ -624,4 +624,145 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get languageSettingsSubtitle =>
       'Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe gösterilir.';
+
+  @override
+  String get homeSearchHint => 'İş ilanı ara...';
+
+  @override
+  String get filtersTooltip => 'Filtreler';
+
+  @override
+  String get seasonalCalendarTooltip => 'Sezon Takvimi';
+
+  @override
+  String get clearFiltersAction => 'Temizle';
+
+  @override
+  String resultCount(int count) {
+    return '$count sonuç';
+  }
+
+  @override
+  String gridColumnsTooltip(int count) {
+    return '$count Sütun';
+  }
+
+  @override
+  String get tableViewTooltip => 'Tablo Görünümü';
+
+  @override
+  String get noListingsTitle => 'Henüz İlan Bulunmuyor';
+
+  @override
+  String get noListingsBody =>
+      'Sistemde aktif ilan bulunmamaktadır. Örnek ilanları veritabanına ekleyebilir veya yeni bir ilan oluşturabilirsiniz.';
+
+  @override
+  String get seedSampleListingsAction => 'Örnek İlanları Veritabanına Yükle';
+
+  @override
+  String get createFirstListingAction => 'İlk İlanı Sen Oluştur';
+
+  @override
+  String get advancedFiltersTitle => 'Gelişmiş filtreler';
+
+  @override
+  String get cityOrRegionLabel => 'Şehir / bölge';
+
+  @override
+  String get allCitiesOption => 'Tüm şehirler';
+
+  @override
+  String get jobBranchLabel => 'İş branşı';
+
+  @override
+  String get allBranchesOption => 'Tüm branşlar';
+
+  @override
+  String get minSalaryLabel => 'En düşük maaş';
+
+  @override
+  String get maxSalaryLabel => 'En yüksek maaş';
+
+  @override
+  String get listingDateLabel => 'İlan tarihi';
+
+  @override
+  String get employmentTypeLabel => 'Çalışma tipi';
+
+  @override
+  String get allEmploymentTypesOption => 'Tüm çalışma tipleri';
+
+  @override
+  String get sortLabel => 'Sıralama';
+
+  @override
+  String get applyFiltersAction => 'Filtreleri uygula';
+
+  @override
+  String get salaryRangeError => 'Maaş aralığını kontrol edin.';
+
+  @override
+  String salaryMinAndUp(String amount) {
+    return '$amount TL ve üzeri';
+  }
+
+  @override
+  String salaryMaxAndDown(String amount) {
+    return '$amount TL ve altı';
+  }
+
+  @override
+  String get addToFavorites => 'Favorilere ekle';
+
+  @override
+  String get removeFromFavorites => 'Favorilerden çıkar';
+
+  @override
+  String get columnListingTitle => 'İlan Başlığı';
+
+  @override
+  String get columnCategory => 'Kategori';
+
+  @override
+  String get columnLocation => 'Konum';
+
+  @override
+  String get columnSalary => 'Ücret';
+
+  @override
+  String get columnListingDate => 'İlan Tarihi';
+
+  @override
+  String get employmentTypeFullTime => 'Tam zamanlı';
+
+  @override
+  String get employmentTypePartTime => 'Yarı zamanlı';
+
+  @override
+  String get employmentTypeSeasonal => 'Mevsimlik';
+
+  @override
+  String get dateFilterAll => 'Tümü';
+
+  @override
+  String get dateFilterLast24Hours => 'Son 24 saat';
+
+  @override
+  String get dateFilterLastWeek => 'Son hafta';
+
+  @override
+  String get dateFilterLastMonth => 'Son ay';
+
+  @override
+  String get sortOrderNewest => 'En yeni';
+
+  @override
+  String get sortOrderSalaryHighToLow => 'Maaş yüksekten düşüğe';
+
+  @override
+  String get sortOrderSalaryLowToHigh => 'Maaş düşükten yükseğe';
+
+  @override
+  String get allFilterChip => 'Tümü';
 }

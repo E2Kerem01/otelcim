@@ -624,4 +624,145 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get languageSettingsSubtitle =>
       'Some text is not translated yet; untranslated parts are shown in Turkish.';
+
+  @override
+  String get homeSearchHint => 'Search job listings...';
+
+  @override
+  String get filtersTooltip => 'Filters';
+
+  @override
+  String get seasonalCalendarTooltip => 'Seasonal calendar';
+
+  @override
+  String get clearFiltersAction => 'Clear';
+
+  @override
+  String resultCount(int count) {
+    return '$count results';
+  }
+
+  @override
+  String gridColumnsTooltip(int count) {
+    return '$count columns';
+  }
+
+  @override
+  String get tableViewTooltip => 'Table view';
+
+  @override
+  String get noListingsTitle => 'No listings yet';
+
+  @override
+  String get noListingsBody =>
+      'There are no active listings. You can load sample listings into the database or create a new one.';
+
+  @override
+  String get seedSampleListingsAction => 'Load sample listings into database';
+
+  @override
+  String get createFirstListingAction => 'Create the first listing';
+
+  @override
+  String get advancedFiltersTitle => 'Advanced filters';
+
+  @override
+  String get cityOrRegionLabel => 'City / area';
+
+  @override
+  String get allCitiesOption => 'All cities';
+
+  @override
+  String get jobBranchLabel => 'Job field';
+
+  @override
+  String get allBranchesOption => 'All fields';
+
+  @override
+  String get minSalaryLabel => 'Minimum salary';
+
+  @override
+  String get maxSalaryLabel => 'Maximum salary';
+
+  @override
+  String get listingDateLabel => 'Listing date';
+
+  @override
+  String get employmentTypeLabel => 'Employment type';
+
+  @override
+  String get allEmploymentTypesOption => 'All employment types';
+
+  @override
+  String get sortLabel => 'Sort';
+
+  @override
+  String get applyFiltersAction => 'Apply filters';
+
+  @override
+  String get salaryRangeError => 'Check the salary range.';
+
+  @override
+  String salaryMinAndUp(String amount) {
+    return '$amount TL and up';
+  }
+
+  @override
+  String salaryMaxAndDown(String amount) {
+    return '$amount TL and below';
+  }
+
+  @override
+  String get addToFavorites => 'Add to favorites';
+
+  @override
+  String get removeFromFavorites => 'Remove from favorites';
+
+  @override
+  String get columnListingTitle => 'Listing title';
+
+  @override
+  String get columnCategory => 'Category';
+
+  @override
+  String get columnLocation => 'Location';
+
+  @override
+  String get columnSalary => 'Salary';
+
+  @override
+  String get columnListingDate => 'Listing date';
+
+  @override
+  String get employmentTypeFullTime => 'Full-time';
+
+  @override
+  String get employmentTypePartTime => 'Part-time';
+
+  @override
+  String get employmentTypeSeasonal => 'Seasonal';
+
+  @override
+  String get dateFilterAll => 'All';
+
+  @override
+  String get dateFilterLast24Hours => 'Last 24 hours';
+
+  @override
+  String get dateFilterLastWeek => 'Last week';
+
+  @override
+  String get dateFilterLastMonth => 'Last month';
+
+  @override
+  String get sortOrderNewest => 'Newest';
+
+  @override
+  String get sortOrderSalaryHighToLow => 'Salary: high to low';
+
+  @override
+  String get sortOrderSalaryLowToHigh => 'Salary: low to high';
+
+  @override
+  String get allFilterChip => 'All';
 }

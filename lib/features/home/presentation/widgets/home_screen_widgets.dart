@@ -19,6 +19,7 @@ import '../../../boosts/presentation/widgets/boost_badge.dart';
 import '../../../discovery/domain/tourism_region.dart';
 import '../../../favorites/services/favorite_service.dart';
 import '../../../listings/domain/listing_model.dart';
+import '../../../listings/presentation/listing_filter_labels.dart';
 import '../../../listings/presentation/season_utils.dart';
 
 /// Widgets used by [HomeScreen] (see that file) split out to keep it
@@ -57,12 +58,12 @@ class HomeAdvancedFilters {
     season != null,
   ].where((active) => active).length;
 
-  String get salaryLabel {
+  String salaryLabel(AppLocalizations l10n) {
     if (minSalaryTl != null && maxSalaryTl != null) {
       return '$minSalaryTl - $maxSalaryTl TL';
     }
-    if (minSalaryTl != null) return '$minSalaryTl TL ve üzeri';
-    return '$maxSalaryTl TL ve altı';
+    if (minSalaryTl != null) return l10n.salaryMinAndUp('$minSalaryTl');
+    return l10n.salaryMaxAndDown('$maxSalaryTl');
   }
 
   HomeAdvancedFilters copyWith({
@@ -183,7 +184,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
     padding: EdgeInsets.fromLTRB(
       20,
       12,
@@ -196,10 +199,13 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Gelişmiş filtreler',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  l10n.advancedFiltersTitle,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               IconButton(
@@ -211,11 +217,11 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           const SizedBox(height: 12),
           DropdownButtonFormField<String?>(
             initialValue: _city,
-            decoration: const InputDecoration(labelText: 'Şehir / bölge'),
+            decoration: InputDecoration(labelText: l10n.cityOrRegionLabel),
             items: [
-              const DropdownMenuItem<String?>(
+              DropdownMenuItem<String?>(
                 value: null,
-                child: Text('Tüm şehirler'),
+                child: Text(l10n.allCitiesOption),
               ),
               ...turkishTourismCities.map(
                 (city) => DropdownMenuItem(value: city, child: Text(city)),
@@ -226,11 +232,11 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           const SizedBox(height: 14),
           DropdownButtonFormField<ListingCategory?>(
             initialValue: _category,
-            decoration: const InputDecoration(labelText: 'İş branşı'),
+            decoration: InputDecoration(labelText: l10n.jobBranchLabel),
             items: [
-              const DropdownMenuItem<ListingCategory?>(
+              DropdownMenuItem<ListingCategory?>(
                 value: null,
-                child: Text('Tüm branşlar'),
+                child: Text(l10n.allBranchesOption),
               ),
               ...ListingCategory.values.map(
                 (value) => DropdownMenuItem(
@@ -244,13 +250,11 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           const SizedBox(height: 14),
           DropdownButtonFormField<String?>(
             initialValue: _region,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.regionLabel,
-            ),
+            decoration: InputDecoration(labelText: l10n.regionLabel),
             items: [
               DropdownMenuItem<String?>(
                 value: null,
-                child: Text(AppLocalizations.of(context)!.regionsTitle),
+                child: Text(l10n.regionsTitle),
               ),
               ...tourismRegions.map(
                 (region) => DropdownMenuItem(
@@ -275,7 +279,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 child: TextField(
                   controller: _minController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'En düşük maaş'),
+                  decoration: InputDecoration(labelText: l10n.minSalaryLabel),
                 ),
               ),
               const SizedBox(width: 12),
@@ -283,9 +287,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 child: TextField(
                   controller: _maxController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'En yüksek maaş',
-                  ),
+                  decoration: InputDecoration(labelText: l10n.maxSalaryLabel),
                 ),
               ),
             ],
@@ -293,11 +295,13 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           const SizedBox(height: 14),
           DropdownButtonFormField<ListingDateFilter>(
             initialValue: _date,
-            decoration: const InputDecoration(labelText: 'İlan tarihi'),
+            decoration: InputDecoration(labelText: l10n.listingDateLabel),
             items: ListingDateFilter.values
                 .map(
-                  (value) =>
-                      DropdownMenuItem(value: value, child: Text(value.label)),
+                  (value) => DropdownMenuItem(
+                    value: value,
+                    child: Text(listingDateFilterLabel(l10n, value)),
+                  ),
                 )
                 .toList(),
             onChanged: (value) {
@@ -307,15 +311,17 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           const SizedBox(height: 14),
           DropdownButtonFormField<EmploymentType?>(
             initialValue: _employmentType,
-            decoration: const InputDecoration(labelText: 'Çalışma tipi'),
+            decoration: InputDecoration(labelText: l10n.employmentTypeLabel),
             items: [
-              const DropdownMenuItem<EmploymentType?>(
+              DropdownMenuItem<EmploymentType?>(
                 value: null,
-                child: Text('Tüm çalışma tipleri'),
+                child: Text(l10n.allEmploymentTypesOption),
               ),
               ...EmploymentType.values.map(
-                (value) =>
-                    DropdownMenuItem(value: value, child: Text(value.label)),
+                (value) => DropdownMenuItem(
+                  value: value,
+                  child: Text(employmentTypeLabel(l10n, value)),
+                ),
               ),
             ],
             onChanged: (value) => setState(() => _employmentType = value),
@@ -323,16 +329,21 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           const SizedBox(height: 14),
           DropdownButtonFormField<ListingSeason?>(
             initialValue: _season,
-            decoration: const InputDecoration(labelText: 'Sezon'),
+            decoration: InputDecoration(labelText: l10n.seasonLabel),
             items: [
-              const DropdownMenuItem<ListingSeason?>(
+              DropdownMenuItem<ListingSeason?>(
                 value: null,
-                child: Text('Farketmez / Tüm Sezonlar'),
+                child: Text(l10n.seasonAny),
               ),
               ...ListingSeason.values.map(
                 (s) => DropdownMenuItem(
                   value: s,
-                  child: Text(_withCount(s.label, _seasonCounts[s.code])),
+                  child: Text(
+                    _withCount(
+                      listingSeasonLabel(l10n, s.code),
+                      _seasonCounts[s.code],
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -341,11 +352,13 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           const SizedBox(height: 14),
           DropdownButtonFormField<ListingSortOrder>(
             initialValue: _sort,
-            decoration: const InputDecoration(labelText: 'Sıralama'),
+            decoration: InputDecoration(labelText: l10n.sortLabel),
             items: ListingSortOrder.values
                 .map(
-                  (value) =>
-                      DropdownMenuItem(value: value, child: Text(value.label)),
+                  (value) => DropdownMenuItem(
+                    value: value,
+                    child: Text(listingSortOrderLabel(l10n, value)),
+                  ),
                 )
                 .toList(),
             onChanged: (value) {
@@ -362,7 +375,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                         null;
                     Navigator.pop(context, const HomeAdvancedFilters());
                   },
-                  child: const Text('Temizle'),
+                  child: Text(l10n.clearFiltersAction),
                 ),
               ),
               const SizedBox(width: 12),
@@ -373,8 +386,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     final max = int.tryParse(_maxController.text.trim());
                     if (min != null && max != null && min > max) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Maaş aralığını kontrol edin.'),
+                        SnackBar(
+                          content: Text(l10n.salaryRangeError),
                         ),
                       );
                       return;
@@ -395,7 +408,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                       ),
                     );
                   },
-                  child: const Text('Filtreleri uygula'),
+                  child: Text(l10n.applyFiltersAction),
                 ),
               ),
             ],
@@ -404,6 +417,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
       ),
     ),
   );
+  }
 }
 
 /// Skeleton placeholder cards shown while the initial page of listings loads.
@@ -563,6 +577,7 @@ class ListingCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isBoostedActive = BoostBadge.isBoostActive(listing);
     final uid = ref.watch(authStateProvider).value?.uid;
     final isFavorite = uid == null
@@ -662,8 +677,8 @@ class ListingCard extends ConsumerWidget {
                           constraints: const BoxConstraints(),
                           iconSize: 16,
                           tooltip: isFavorite
-                              ? 'Favorilerden çıkar'
-                              : 'Favorilere ekle',
+                              ? l10n.removeFromFavorites
+                              : l10n.addToFavorites,
                           onPressed: () {
                             if (uid == null) {
                               unawaited(context.push('/login'));
@@ -922,8 +937,8 @@ class ListingCard extends ConsumerWidget {
                       child: IconButton(
                         visualDensity: VisualDensity.compact,
                         tooltip: isFavorite
-                            ? 'Favorilerden çıkar'
-                            : 'Favorilere ekle',
+                            ? l10n.removeFromFavorites
+                            : l10n.addToFavorites,
                         onPressed: () {
                           if (uid == null) {
                             unawaited(context.push('/login'));
@@ -1067,6 +1082,7 @@ class ListingTableHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     if (context.isMobile) return const SizedBox.shrink();
 
+    final l10n = AppLocalizations.of(context)!;
     final style = TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w600,
@@ -1077,18 +1093,25 @@ class ListingTableHeader extends StatelessWidget {
       child: Row(
         children: [
           const SizedBox(width: 56 + 12),
-          Expanded(flex: 4, child: Text('İlan Başlığı', style: style)),
-          Expanded(flex: 2, child: Text('Kategori', style: style)),
-          Expanded(flex: 2, child: Text('Konum', style: style)),
+          Expanded(flex: 4, child: Text(l10n.columnListingTitle, style: style)),
+          Expanded(flex: 2, child: Text(l10n.columnCategory, style: style)),
+          Expanded(flex: 2, child: Text(l10n.columnLocation, style: style)),
           Expanded(
             flex: 2,
-            child: Text('Ücret', style: style, textAlign: TextAlign.right),
+            child: Text(
+              l10n.columnSalary,
+              style: style,
+              textAlign: TextAlign.right,
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
             flex: 2,
-            child:
-                Text('İlan Tarihi', style: style, textAlign: TextAlign.right),
+            child: Text(
+              l10n.columnListingDate,
+              style: style,
+              textAlign: TextAlign.right,
+            ),
           ),
           const SizedBox(width: 32),
         ],
@@ -1107,6 +1130,7 @@ class ListingTableRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isBoostedActive = BoostBadge.isBoostActive(listing);
     final uid = ref.watch(authStateProvider).value?.uid;
     final isFavorite = uid == null
@@ -1200,7 +1224,7 @@ class ListingTableRow extends ConsumerWidget {
       child: IconButton(
         padding: EdgeInsets.zero,
         visualDensity: VisualDensity.compact,
-        tooltip: isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle',
+        tooltip: isFavorite ? l10n.removeFromFavorites : l10n.addToFavorites,
         onPressed: () {
           if (uid == null) {
             unawaited(context.push('/login'));
