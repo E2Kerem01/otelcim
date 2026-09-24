@@ -766,4 +766,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get allFilterChip => 'الكل';
+
+  @override
+  String get perkHousing => 'سكن';
+
+  @override
+  String perkMeals(int count) {
+    return '$count وجبات';
+  }
+
+  @override
+  String get perkShuttle => 'نقل';
+
+  @override
+  String get verifiedEmployer => 'صاحب عمل موثّق';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'صيف $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'شتاء $years';
+  }
 }

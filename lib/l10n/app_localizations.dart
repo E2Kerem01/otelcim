@@ -1525,6 +1525,42 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tümü'**
   String get allFilterChip;
+
+  /// Feed card chip: the job includes staff housing
+  ///
+  /// In tr, this message translates to:
+  /// **'Lojman'**
+  String get perkHousing;
+
+  /// Feed card chip: meals per day included
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} öğün'**
+  String perkMeals(int count);
+
+  /// Feed card chip: staff shuttle provided
+  ///
+  /// In tr, this message translates to:
+  /// **'Servis'**
+  String get perkShuttle;
+
+  /// Tooltip/semantic label for the verified-employer badge
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrulanmış işveren'**
+  String get verifiedEmployer;
+
+  /// Season label for any summer season code yaz_YYYY
+  ///
+  /// In tr, this message translates to:
+  /// **'Yaz {year}'**
+  String seasonSummerOf(String year);
+
+  /// Season label for any winter season code kis_YYYY_YY
+  ///
+  /// In tr, this message translates to:
+  /// **'Kış {years}'**
+  String seasonWinterOf(String years);
 }
 
 class _AppLocalizationsDelegate

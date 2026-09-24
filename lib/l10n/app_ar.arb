@@ -98,5 +98,11 @@
   "seasonYearRound": "طوال العام",
   "seasonAny": "أي / كل المواسم",
   "matchLabel": "تطابق",
-  "allFilterChip": "الكل"
+  "allFilterChip": "الكل",
+  "perkHousing": "سكن",
+  "perkMeals": "{count} وجبات",
+  "perkShuttle": "نقل",
+  "verifiedEmployer": "صاحب عمل موثّق",
+  "seasonSummerOf": "صيف {year}",
+  "seasonWinterOf": "شتاء {years}"
 }

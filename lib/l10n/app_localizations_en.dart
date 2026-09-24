@@ -765,4 +765,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allFilterChip => 'All';
+
+  @override
+  String get perkHousing => 'Housing';
+
+  @override
+  String perkMeals(int count) {
+    return '$count meals';
+  }
+
+  @override
+  String get perkShuttle => 'Shuttle';
+
+  @override
+  String get verifiedEmployer => 'Verified employer';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'Summer $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'Winter $years';
+  }
 }
