@@ -258,3 +258,54 @@ describe('ratings', () => {
     );
   });
 });
+
+describe('listing creation cannot skip payment', () => {
+  it('a listing cannot be created already boosted or with a purchase id', async () => {
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+    const base = { posterId: OWNER, status: 'active', title: 'Garson' };
+
+    await assertFails(setDoc(doc(db, 'listings/L1'), { ...base, isBoosted: true }));
+    await assertFails(setDoc(doc(db, 'listings/L2'), { ...base, boostExpiresAt: new Date('2099-01-01') }));
+    await assertFails(setDoc(doc(db, 'listings/L3'), { ...base, boostType: 'days30' }));
+    await assertFails(setDoc(doc(db, 'listings/L4'), { ...base, boostPurchaseId: 'fake' }));
+    await assertFails(setDoc(doc(db, 'listings/L5'), { ...base, urgentListingPurchaseId: 'fake' }));
+  });
+
+  it('a normal Listing.toMap() create, including a free urgent listing, still succeeds', async () => {
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+
+    await assertSucceeds(
+      setDoc(doc(db, 'listings/L1'), {
+        posterId: OWNER,
+        status: 'active',
+        title: 'Garson',
+        isUrgent: true,
+        isBoosted: false,
+        boostExpiresAt: null,
+        boostType: null,
+        boostPurchaseId: null,
+      }),
+    );
+  });
+});
+
+describe('talent pool', () => {
+  it('the employer can add, read and remove their own saved candidates', async () => {
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+    const ref = doc(db, `user_profiles/${OWNER}/talent_pool/cand-1`);
+
+    await assertSucceeds(setDoc(ref, { candidateId: 'cand-1', note: 'iyi aday' }));
+    await assertSucceeds(getDoc(ref));
+    await assertSucceeds(deleteDoc(ref));
+  });
+
+  it('another user can neither read nor write someone else\'s talent pool', async () => {
+    await seed(testEnv, async (context) => {
+      await setDoc(doc(context.firestore(), `user_profiles/${OWNER}/talent_pool/cand-1`), { candidateId: 'cand-1' });
+    });
+    const otherDb = testEnv.authenticatedContext(OTHER).firestore();
+
+    await assertFails(getDoc(doc(otherDb, `user_profiles/${OWNER}/talent_pool/cand-1`)));
+    await assertFails(setDoc(doc(otherDb, `user_profiles/${OWNER}/talent_pool/cand-2`), { candidateId: 'cand-2' }));
+  });
+});
