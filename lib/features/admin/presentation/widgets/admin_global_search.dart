@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../shared/error/error_reporter.dart';
 import '../../../../shared/utils/search_keywords.dart';
 
 const _adminGlobalSearchLimit = 8;
@@ -127,7 +128,8 @@ class _AdminGlobalSearchDialogState extends State<_AdminGlobalSearchDialog> {
         _users = [for (final doc in userDocs) _userHit(doc, query)];
         _listings = [for (final doc in listingDocs) _listingHit(doc)];
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminGlobalSearch.search');
       if (!mounted || generation != _requestGeneration) return;
       setState(() {
         _loading = false;
