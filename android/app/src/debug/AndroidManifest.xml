@@ -4,4 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Debug-only: lets E2E builds (dart-define E2E_USE_EMULATOR=true)
+         reach the Firebase Auth emulator over plain HTTP on localhost. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>
