@@ -9,14 +9,19 @@ class AdminAnalyticsService {
 
   final FirebaseFirestore _db;
 
+  /// Server-side `count()` aggregate: billed ~1 read per 1000 matching docs
+  /// instead of downloading every document just to read `.size`.
+  Future<int> _count(Query<Map<String, dynamic>> query) async {
+    final snap = await query.count().get();
+    return snap.count ?? 0;
+  }
+
   /// Returns count of active listings
   Future<int> getActiveListingsCount() async {
     try {
-      final snap = await _db
-          .collection('listings')
-          .where('status', isEqualTo: 'active')
-          .get();
-      return snap.size;
+      return await _count(
+        _db.collection('listings').where('status', isEqualTo: 'active'),
+      );
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'AdminAnalyticsService.getActiveListingsCount');
       return 0;
@@ -27,11 +32,11 @@ class AdminAnalyticsService {
   Future<int> getNewUsersCount({int days = 30}) async {
     try {
       final cutoffDate = DateTime.now().subtract(Duration(days: days));
-      final snap = await _db
-          .collection('user_profiles')
-          .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoffDate))
-          .get();
-      return snap.size;
+      return await _count(
+        _db
+            .collection('user_profiles')
+            .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoffDate)),
+      );
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'AdminAnalyticsService.getNewUsersCount');
       return 0;
@@ -41,8 +46,11 @@ class AdminAnalyticsService {
   /// Returns count of open/pending reports
   Future<int> getOpenReportsCount() async {
     try {
-      final snap = await _db.collection('reports').get();
-      return snap.size;
+      // Only reports still awaiting a decision (dismissReport sets
+      // 'dismissed'); this used to count every report ever filed.
+      return await _count(
+        _db.collection('reports').where('status', isEqualTo: 'pending'),
+      );
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'AdminAnalyticsService.getOpenReportsCount');
       return 0;
@@ -52,11 +60,9 @@ class AdminAnalyticsService {
   /// Returns count of pending verification requests
   Future<int> getPendingVerificationsCount() async {
     try {
-      final snap = await _db
-          .collection('verification_requests')
-          .where('status', isEqualTo: 'pending')
-          .get();
-      return snap.size;
+      return await _count(
+        _db.collection('verification_requests').where('status', isEqualTo: 'pending'),
+      );
     } catch (error, stackTrace) {
       logError(
         error,
@@ -136,6 +142,53 @@ class AdminAnalyticsService {
   }
 
   /// Returns all dashboard metrics at once
+  /// Every headline number for the admin dashboard, fetched in parallel with
+  /// server-side count() aggregates. A failing count (e.g. an index still
+  /// building) shows as null instead of failing the whole panel.
+  Future<AdminOverview> getOverview({int recentDays = 7}) async {
+    final since = Timestamp.fromDate(
+      DateTime.now().subtract(Duration(days: recentDays)),
+    );
+    final users = _db.collection('user_profiles');
+    final listings = _db.collection('listings');
+    final queries = <String, Query<Map<String, dynamic>>>{
+      'users': users,
+      'jobseekers': users.where('userType', isEqualTo: 'jobseeker'),
+      'employers': users.where('userType', isEqualTo: 'employer'),
+      'verifiedEmployers': users.where('isVerified', isEqualTo: true),
+      'banned': users.where('isBanned', isEqualTo: true),
+      'suspended': users.where('isSuspended', isEqualTo: true),
+      'newUsers': users.where('createdAt', isGreaterThanOrEqualTo: since),
+      'listings': listings,
+      'activeListings': listings.where('status', isEqualTo: 'active'),
+      'urgentListings': listings
+          .where('status', isEqualTo: 'active')
+          .where('isUrgent', isEqualTo: true),
+      'boostedListings': listings
+          .where('status', isEqualTo: 'active')
+          .where('isBoosted', isEqualTo: true),
+      'newListings': listings.where('createdAt', isGreaterThanOrEqualTo: since),
+      'pendingReports': _db.collection('reports').where('status', isEqualTo: 'pending'),
+      'pendingVerifications': _db
+          .collection('verification_requests')
+          .where('status', isEqualTo: 'pending'),
+      'pendingCertificates': _db
+          .collection('certificates')
+          .where('status', isEqualTo: 'pending'),
+      'conversations': _db.collection('conversations'),
+    };
+    final keys = queries.keys.toList();
+    final values = await Future.wait(keys.map((key) async {
+      try {
+        return await _count(queries[key]!);
+      } catch (error, stackTrace) {
+        logError(error, stackTrace, context: 'AdminAnalyticsService.getOverview.$key');
+        return null;
+      }
+    }));
+    return AdminOverview(Map.fromIterables(keys, values), recentDays: recentDays);
+  }
+
   Future<DashboardMetrics> getDashboardMetrics({int newUsersDays = 30}) async {
     try {
       final results = await Future.wait([
@@ -181,3 +234,14 @@ class DashboardMetrics {
 final adminAnalyticsServiceProvider = Provider<AdminAnalyticsService>(
   (ref) => AdminAnalyticsService(FirebaseFirestore.instance),
 );
+
+/// Headline counts for the admin dashboard; a null value means that count
+/// could not be loaded.
+class AdminOverview {
+  const AdminOverview(this.counts, {required this.recentDays});
+
+  final Map<String, int?> counts;
+  final int recentDays;
+
+  int? operator [](String key) => counts[key];
+}
