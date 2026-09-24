@@ -4,6 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:otelcim/l10n/app_localizations.dart';
 
+/// Goldens are opt-in; see the guard at the top of each golden test's main().
+const bool runGoldens = bool.fromEnvironment('RUN_GOLDENS');
+
 const goldenLocales = <Locale>[
   Locale('tr'),
   Locale('en'),
