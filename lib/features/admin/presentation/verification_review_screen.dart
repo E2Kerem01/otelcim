@@ -10,6 +10,7 @@ import '../domain/admin_action_model.dart';
 import '../domain/verification_request_model.dart';
 import '../services/admin_service.dart';
 import '../services/verification_service.dart';
+import 'widgets/reason_dialog.dart';
 
 final pendingVerificationsProvider = StreamProvider.autoDispose<List<VerificationRequest>>(
   (ref) => ref.watch(verificationServiceProvider).watchPendingVerifications(),
@@ -60,18 +61,14 @@ class _VerificationCardState extends ConsumerState<_VerificationCard> {
   }
 
   Future<void> _reject() async {
-    final controller = TextEditingController();
-    String? error;
-    final reason = await showDialog<String>(context: context, builder: (context) => StatefulBuilder(builder: (context, setState) => AlertDialog(
-      title: const Text('Doğrulamayı reddet'),
-      content: TextField(controller: controller, autofocus: true, maxLines: 3, decoration: InputDecoration(labelText: 'Red sebebi', errorText: error)),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Vazgeç')), FilledButton(onPressed: () {
-        final value = controller.text.trim();
-        if (value.isEmpty) { setState(() => error = 'Red sebebi zorunludur.'); return; }
-        Navigator.pop(context, value);
-      }, child: const Text('Reddet'))],
-    )));
-    controller.dispose();
+    final reason = await showReasonDialog(
+      context,
+      title: 'Doğrulamayı reddet',
+      reasonLabel: 'Red sebebi',
+      requiredError: 'Red sebebi zorunludur.',
+      confirmLabel: 'Reddet',
+      maxLines: 3,
+    );
     if (reason != null && mounted) await _complete(approved: false, reason: reason);
   }
 

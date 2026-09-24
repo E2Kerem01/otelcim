@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/models/user_profile.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../admin/services/admin_service.dart';
 
@@ -10,19 +11,22 @@ import '../../admin/services/admin_service.dart';
 /// or suspended and the suspension hasn't expired yet. Reachable regardless
 /// of which screen the admin action fired from - the account is locked out
 /// app-wide until an admin lifts it (or the suspension window ends).
+/// Declared once at top level: creating the FutureProvider inside build()
+/// made every rebuild a brand-new provider that never resolved, so the
+/// banned/suspended screen spun forever instead of showing the reason.
+final _restrictedProfileProvider =
+    FutureProvider.autoDispose.family<UserProfile?, String>(
+  (ref, uid) => ref.watch(adminServiceProvider).getUserProfile(uid),
+);
+
 class AccountSuspendedScreen extends ConsumerWidget {
   const AccountSuspendedScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final uid = ref.watch(authStateProvider).value?.uid;
-    final profileAsync = uid == null
-        ? null
-        : ref.watch(
-            FutureProvider(
-              (ref) => ref.watch(adminServiceProvider).getUserProfile(uid),
-            ),
-          );
+    final profileAsync =
+        uid == null ? null : ref.watch(_restrictedProfileProvider(uid));
 
     return Scaffold(
       body: SafeArea(
