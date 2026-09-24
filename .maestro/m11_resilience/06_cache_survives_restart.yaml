@@ -1,0 +1,16 @@
+appId: com.example.otelcim
+name: "m11 - cached feed survives an application restart"
+tags: [m11_resilience, restart, cache]
+---
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*7 sonuç.*"
+- assertNotVisible: ".*Henüz İlan Bulunmuyor.*"

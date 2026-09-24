@@ -6,10 +6,10 @@ tags: [m6, profile]
 - runFlow:
     file: ../common/login.yaml
     env:
-      EMAIL: seeker@e2e.test
+      EMAIL: employer2@e2e.test
 - tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
-    visible: ".*Ayşe Aday.*"
+    visible: ".*Zeynep Otelci.*"
     timeout: 10000
 
 - tapOn: ".*Profili Düzenle.*"
@@ -18,22 +18,17 @@ tags: [m6, profile]
     timeout: 10000
 
 # Ad Soyad alanını güncelle
-- tapOn: ".*Ad Soyad.*"
+- tapOn: "Ad Soyad"
 - eraseText: 30
-- inputText: "Ayşe Güncellendi"
-- hideKeyboard
+- inputText: "Zeynep Güncellendi"
 
 # Hakkında alanını güncelle
-- tapOn: ".*Hakkında.*"
+- tapOn: "Hakkında"
 - eraseText: 50
-- inputText: "Deneyimli resepsiyonist"
-- hideKeyboard
+- inputText: "Butik otel işletmecisi"
 
-# Profili Kaydet butonuna dokun
-- scrollUntilVisible:
-    element: ".*Profili Kaydet.*"
-    direction: DOWN
-- tapOn: ".*Profili Kaydet.*"
+# AppBar'daki Kaydet butonuna dokun (tooltip: Kaydet)
+- tapOn: "Kaydet"
 
 # Kayıt onay mesajını ve profil ekranına dönüşü bekle
 - extendedWaitUntil:
@@ -41,9 +36,9 @@ tags: [m6, profile]
     timeout: 10000
 
 - extendedWaitUntil:
-    visible: ".*Ayşe Güncellendi.*"
+    visible: ".*Zeynep Güncellendi.*"
     timeout: 10000
-- assertVisible: ".*Ayşe Güncellendi.*"
+- assertVisible: ".*Zeynep Güncellendi.*"
 
 # Uygulamayı yeniden başlat (oturum ve veriler korunmalı)
 - launchApp:
@@ -55,14 +50,14 @@ tags: [m6, profile]
 
 - tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
-    visible: ".*Ayşe Güncellendi.*"
+    visible: ".*Zeynep Güncellendi.*"
     timeout: 10000
-- assertVisible: ".*Ayşe Güncellendi.*"
+- assertVisible: ".*Zeynep Güncellendi.*"
 
 # Düzenleme ekranına tekrar girip bio alanının da kalıcı olduğunu doğrula
 - tapOn: ".*Profili Düzenle.*"
 - extendedWaitUntil:
     visible: "Profil"
     timeout: 10000
-- assertVisible: ".*Ayşe Güncellendi.*"
-- assertVisible: ".*Deneyimli resepsiyonist.*"
+- assertVisible: ".*Zeynep Güncellendi.*"
+- assertVisible: ".*Butik otel işletmecisi.*"

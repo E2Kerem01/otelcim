@@ -11,6 +11,8 @@ OUT=${MAESTRO_OUT:-build/maestro}; mkdir -p "$OUT"
 APP=com.example.otelcim
 LOCALE=${E2E_LOCALE:-tr}
 reset_app() {  # fresh install state, fixed locale, no permission dialogs
+  adb shell input keyevent KEYCODE_WAKEUP  # a locked/asleep screen fails every flow
+  adb shell wm dismiss-keyguard
   adb shell pm clear $APP >/dev/null
   adb shell cmd locale set-app-locales $APP --locales "$LOCALE" >/dev/null
   for perm in POST_NOTIFICATIONS ACCESS_FINE_LOCATION ACCESS_COARSE_LOCATION; do
@@ -23,6 +25,7 @@ for f in "${flows[@]}"; do
   [ -d "$f" ] && { set -- "$f"/*.yaml; } || set -- "$f"
   for flow in "$@"; do
     case "$flow" in */common/*|*/seed/*|*/_*) continue;; esac
+    [ -e "${E2E_STOP_FILE:-/c/Users/kmeti/otelcim_e2e/shared/STOP}" ] && { echo "STOPPED"; exit 3; }
     profile=$(sed -n 's/^# seed: *\([a-z]*\).*/\1/p' "$flow" | head -1)  # e.g. "# seed: many"
     node .maestro/seed/seed.mjs $profile >/dev/null || { echo "SEED FAILED"; exit 2; }
     reset_app

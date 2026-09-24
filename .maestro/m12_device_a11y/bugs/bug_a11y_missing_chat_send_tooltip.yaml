@@ -1,0 +1,26 @@
+# BUG-m12-01: Sohbet ekranı gönder butonunda erişilebilirlik etiketi/tooltip eksik
+# Beklenen: İkon-only gönder butonunda 'Gönder' tooltip'i veya Semantics(label: 'Gönder') bulunmalı.
+# Gerçek: chat_detail_widgets.dart:349 satırındaki IconButton'da tooltip ve semantics etiketi bulunmuyor.
+appId: com.example.otelcim
+name: "bug - a11y missing chat send button tooltip"
+tags: [bug, m12, a11y, chat, tooltip]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Merhaba, ilan hâlâ aktif mi?.*"
+    timeout: 10000
+
+# TAHMİN: Erişilebilirlik standardına göre 'Gönder' veya 'Mesaj Gönder' tooltip'i beklenir
+- assertVisible:
+    text: ".*Gönder.*"

@@ -23,7 +23,6 @@ tags: [chat, cross-user]
 - tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
 - inputText: "CV belgelerimi hazırladım, yarın getiriyorum."
 - pressKey: Enter
-- hideKeyboard
 # TAHMİN: Gönder butonu (Icons.send_rounded) sağ altta (92%, 96%)
 - tapOn:
     point: "92%,96%"
@@ -42,7 +41,6 @@ tags: [chat, cross-user]
 - inputText: employer@e2e.test
 - tapOn: "Şifre"
 - inputText: "Test1234!"
-- hideKeyboard
 - tapOn:
     text: "Giriş Yap"
     index: -1

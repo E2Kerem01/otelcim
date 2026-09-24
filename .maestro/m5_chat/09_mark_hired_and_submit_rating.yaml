@@ -56,9 +56,12 @@ tags: [chat, hired, rating]
 - tapOn: ".*5 yıldız.*"
 - tapOn: ".*Yorum.*"
 - inputText: "Çok ilgili ve başarılı bir aday, teşekkürler."
-- hideKeyboard
 
 # 9. Değerlendirme gönderilir ve başarı bildirimi doğrulanır
+- scrollUntilVisible:
+    element: ".*Değerlendirmeyi Gönder.*"
+    direction: DOWN
+    timeout: 5000
 - tapOn: ".*Değerlendirmeyi Gönder.*"
 - extendedWaitUntil:
     visible: ".*Değerlendirmeniz kaydedildi\\..*"

@@ -12,7 +12,7 @@ tags: [m7, admin_trust, seasonal, subscription]
     visible: ".*Sezonluk İşe Alım Takvimi.*"
     timeout: 10000
 - scrollUntilVisible:
-    element: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
+    element: ".*İlk Hatırlatıcıyı Oluştur.*"
     direction: DOWN
 - assertVisible: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
 - tapOn: ".*İlk Hatırlatıcıyı Oluştur.*"

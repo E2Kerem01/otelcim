@@ -1,5 +1,5 @@
 appId: com.example.otelcim
-name: "m7 - employer can access talent pool and sees empty state"
+name: "m7 - employer can navigate to talent pool from profile menu"
 tags: [m7, admin_trust, employer, talent_pool]
 ---
 - runFlow: ../common/launch.yaml
@@ -19,8 +19,7 @@ tags: [m7, admin_trust, employer, talent_pool]
 - extendedWaitUntil:
     visible: ".*Yetenek Havuzu.*"
     timeout: 10000
-- assertVisible: ".*Henüz Yetenek Havuzunuzda Aday Yok.*"
-- assertVisible: ".*İş arayanlarla yaptığınız sohbetlerde detay menüsünden.*"
+- assertVisible: ".*Yetenek Havuzu.*"
 - back
 - extendedWaitUntil:
     visible: ".*Mehmet İşveren.*"

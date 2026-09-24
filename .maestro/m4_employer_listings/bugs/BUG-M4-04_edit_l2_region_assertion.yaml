@@ -1,0 +1,34 @@
+# BUG-M4-04: L2 düzenleme ekranı Flutter DropdownButton assertion'ı ile bozuluyor — beklenen: düzenleme formu açılıp başlık kaydedilebilir / gerçek: seed'deki region "Antalya" değeri dropdown id'si "antalya" ile eşleşmediği için kırmızı Flutter assertion ekranı oluşuyor.
+appId: com.example.otelcim
+name: "BUG-M4-04 - L2 edit region dropdown assertion"
+tags: [m4, bug, skip, edit]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- tapOn: "İlanlarım"
+- extendedWaitUntil:
+    visible: ".*Garson \\(Sezonluk\\).*"
+    timeout: 10000
+# TAHMİN: Seed createdAt sırasındaki L2 satırının üçüncü Düzenle düğmesi olduğu cihaz koşusunda doğrulandı.
+- tapOn:
+    text: "Düzenle"
+    index: 2
+- extendedWaitUntil:
+    visible: "Değişiklikleri Kaydet"
+    timeout: 10000
+# TAHMİN: EditListingScreen başlık TextFormField'ında label/hint yok; mevcut başlık semantik hedef olarak kullanılır.
+- tapOn: ".*Garson \\(Sezonluk\\).*"
+- eraseText: 100
+- inputText: "Garson Güncellendi"
+- scrollUntilVisible:
+    element: "Değişiklikleri Kaydet"
+    direction: DOWN
+- tapOn: "Değişiklikleri Kaydet"
+- extendedWaitUntil:
+    visible: "İlan güncellendi\\."
+    timeout: 15000
+- assertVisible: ".*Garson Güncellendi.*"

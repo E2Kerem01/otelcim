@@ -11,6 +11,9 @@ tags: [m1_auth, access-control]
 - extendedWaitUntil:
     visible: ".*Ayşe Aday.*"
     timeout: 10000
+- scrollUntilVisible:
+    element: ".*Çıkış Yap.*"
+    direction: DOWN
 - tapOn: ".*Çıkış Yap.*"
 - extendedWaitUntil:
     visible: ".*Giriş Yap.*"
@@ -25,4 +28,3 @@ tags: [m1_auth, access-control]
 - extendedWaitUntil:
     visible: ".*Giriş Yap.*"
     timeout: 10000
-

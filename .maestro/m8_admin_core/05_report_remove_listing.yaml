@@ -1,0 +1,33 @@
+appId: com.example.otelcim
+name: "m8 admin removes reported listing from feed"
+tags: [m8_admin_core, reports, listing-moderation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/reports"
+- extendedWaitUntil:
+    visible: ".*Hedef: İlan • L8.*"
+    timeout: 15000
+- assertVisible: ".*İlanı kaldır.*"
+- tapOn: ".*İlanı kaldır.*"
+- extendedWaitUntil:
+    visible: ".*İlanı Kaldır.*"
+    timeout: 5000
+- assertVisible: '.*Sebep \(isteğe bağlı\).*'
+- tapOn: '.*Sebep \(isteğe bağlı\).*'
+- inputText: "Şüpheli ilan doğrulaması"
+- tapOn: ".*Uygula.*"
+- extendedWaitUntil:
+    visible: '.*İlanı Kaldır işlemi tamamlandı\..*'
+    timeout: 10000
+- extendedWaitUntil:
+    visible: '.*Bekleyen şikâyet bulunmuyor\..*'
+    timeout: 10000
+- openLink: "otelcim-e2e://app/"
+- extendedWaitUntil:
+    visible: ".*6 sonuç.*"
+    timeout: 15000
+- assertNotVisible: ".*Güvenlik Görevlisi.*"

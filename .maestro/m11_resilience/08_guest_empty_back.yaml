@@ -1,0 +1,26 @@
+appId: com.example.otelcim
+name: "m11 - guest empty state and filter back navigation are safe"
+tags: [m11_resilience, guest, empty, back]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: '.*İş ilanı ara\.\.\..*'
+- inputText: "BuAramaKesinlikleEşleşmiyor"
+- extendedWaitUntil:
+    visible: ".*0 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Henüz İlan Bulunmuyor.*"
+- assertVisible: ".*Sistemde aktif ilan bulunmamaktadır.*"
+- tapOn: '.*İş ilanı ara\.\.\..*'
+- eraseText: 50
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- tapOn: ".*Filtreler.*"
+- extendedWaitUntil:
+    visible: ".*Gelişmiş filtreler.*"
+    timeout: 10000
+- back
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"

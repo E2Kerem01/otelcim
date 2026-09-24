@@ -44,7 +44,19 @@
 
 ---
 
-### BUG-m6-04: Dil Değiştirilmesine Rağmen Ana Sayfa Kategori Çiplerinde Hardcoded Türkçe Kalması (#60)
+### BUG-m6-04: İş Arayan Profil Düzenleme Ekranında Bölge Seçiminde Çökme (DropdownButton Assertion Error)
+- **Dosya / Satır:** `lib/features/profile/presentation/widgets/profile_form.dart:252-275`
+- **Önem Derecesi:** Kritik (Critical - Red Screen of Death)
+- **Tekrar Üretme:**
+  1. `seeker@e2e.test` (veya `preferredRegion: 'Antalya'` olan herhangi bir iş arayan) ile giriş yapın.
+  2. Hesabım -> Profili Düzenle ekranına gidin.
+- **Beklenen:** Profil düzenleme formu hatasız açılmalı; iş arayana özel deneyim, eğitim, tercih edilen bölge ve "Hemen Başlayabilir" alanları görünmelidir.
+- **Gerçek:** `DropdownButtonFormField<String?>` bileşeninde `initialValue` kullanıcının Firestore profilinden gelen `_preferredRegion` değerini ('Antalya') alırken, `items` listesindeki `DropdownMenuItem` değerleri `region.id` ('antalya') olarak tanımlanmıştır. Büyük/küçük harf uyuşmazlığı nedeniyle Flutter framework'ü `package:flutter/src/material/dropdown.dart: Failed assertion: There should be exactly one item with [DropdownButton]'s value: Antalya` assertion hatası fırlatmakta ve ekran kırmızı ekrana (Red Screen) çökerek kullanılamaz hale gelmektedir.
+- **İlgili Akış:** `.maestro/m6_profile_settings/bugs/bug_seeker_edit_profile_dropdown_crash.yaml`
+
+---
+
+### BUG-m6-05: Dil Değiştirilmesine Rağmen Ana Sayfa Kategori Çiplerinde Hardcoded Türkçe Kalması (#60)
 - **Dosya / Satır:** `lib/features/home/presentation/home_screen.dart:402`
 - **Önem Derecesi:** Orta (Medium)
 - **Tekrar Üretme:**
@@ -55,7 +67,7 @@
 
 ---
 
-### BUG-m6-05: Hesap Silme Onay Kodunun ("SİL") Tüm Dillerde Hardcoded Türkçe Olması
+### BUG-m6-06: Hesap Silme Onay Kodunun ("SİL") Tüm Dillerde Hardcoded Türkçe Olması
 - **Dosya / Satır:** `lib/features/profile/presentation/privacy_settings_screen.dart:136-168`
 - **Önem Derecesi:** Düşük (Low)
 - **Tekrar Üretme:**

@@ -7,11 +7,10 @@ tags: [m2_discovery, filters, edge]
 - extendedWaitUntil:
     visible: ".*Gelişmiş filtreler.*"
     timeout: 10000
-- tapOn: ".*En düşük maaş.*"
+- tapOn: "En düşük maaş"
 - inputText: "40000"
-- tapOn: ".*En yüksek maaş.*"
+- tapOn: "En yüksek maaş"
 - inputText: "30000"
-- hideKeyboard
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:
     visible: '.*Maaş aralığını kontrol edin\..*'

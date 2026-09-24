@@ -5,7 +5,6 @@ tags: [m2_discovery, search]
 - runFlow: ../common/launch.yaml
 - tapOn: '.*İş ilanı ara\.\.\..*'
 - inputText: "Garson"
-- hideKeyboard
 - extendedWaitUntil:
     visible: '.*Garson \(Sezonluk\).*'
     timeout: 10000

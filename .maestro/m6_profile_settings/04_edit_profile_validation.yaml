@@ -6,10 +6,10 @@ tags: [m6, profile, validation]
 - runFlow:
     file: ../common/login.yaml
     env:
-      EMAIL: seeker@e2e.test
+      EMAIL: employer@e2e.test
 - tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
-    visible: ".*Ayşe Aday.*"
+    visible: ".*Mehmet İşveren.*"
     timeout: 10000
 
 - tapOn: ".*Profili Düzenle.*"
@@ -18,29 +18,29 @@ tags: [m6, profile, validation]
     timeout: 10000
 
 # Zorunlu Ad Soyad alanını temizle
-- tapOn: ".*Ad Soyad.*"
+- tapOn: "Ad Soyad"
 - eraseText: 30
-- hideKeyboard
 
 # Geçersiz telefon numarası gir (10 haneden az)
-- tapOn: ".*Telefon Numarası.*"
+- tapOn: "Telefon Numarası"
 - inputText: "0555"
-- hideKeyboard
 
-# Kaydet butonuna dokun
-- scrollUntilVisible:
-    element: ".*Profili Kaydet.*"
-    direction: DOWN
-- tapOn: ".*Profili Kaydet.*"
+# AppBar'daki Kaydet butonuna dokun (tooltip: Kaydet)
+- tapOn: "Kaydet"
 
 # Form doğrulama hatalarını doğrula
 - assertVisible: ".*Ad Soyad gereklidir.*"
 - assertVisible: ".*Telefon numarası en az 10 haneli olmalıdır.*"
 
 # Hatalı telefon formatı (harf ve geçersiz karakter)
-- tapOn: ".*Telefon Numarası.*"
+- tapOn: "Telefon Numarası"
 - eraseText: 10
 - inputText: "abc?!"
-- hideKeyboard
-- tapOn: ".*Profili Kaydet.*"
+- tapOn: "Kaydet"
 - assertVisible: ".*Geçerli bir telefon numarası giriniz.*"
+
+# Zorunlu Otel Adı alanını temizle (işveren doğrulaması)
+- tapOn: "Otel Adı"
+- eraseText: 30
+- tapOn: "Kaydet"
+- assertVisible: ".*Otel Adı gereklidir.*"

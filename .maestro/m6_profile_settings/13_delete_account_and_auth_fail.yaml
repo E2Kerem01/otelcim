@@ -20,11 +20,11 @@ tags: [m6, profile, delete_account, auth]
     visible: "Gizlilik ve Veri Ayarları"
     timeout: 10000
 
-# Hesabımı Sil alanına kaydır ve silme diyaloğunu aç
+# Hesabımı Sil butonuna kaydır ve dokun (kart başlığı yerine butona tam eşleşme)
 - scrollUntilVisible:
-    element: ".*Hesabımı Sil.*"
+    element: "Hesabımı Sil"
     direction: DOWN
-- tapOn: ".*Hesabımı Sil.*"
+- tapOn: "Hesabımı Sil"
 
 - extendedWaitUntil:
     visible: "Hesabınızı Silin"
@@ -32,18 +32,16 @@ tags: [m6, profile, delete_account, auth]
 
 - assertVisible: ".*BU İŞLEM GERİ ALINAMAZ.*"
 
-# Şifreyi gir
-- tapOn: ".*Şifreniz.*"
+# Şifreyi gir (Diyalog içinde hideKeyboard KULLANMA - Android geri tuşu diyaloğu kapatır)
+- tapOn: "Şifreniz"
 - inputText: "Test1234!"
-- hideKeyboard
 
 # Onay metnini gir (SİL)
-- tapOn: ".*SİL.*"
+- tapOn: "SİL"
 - inputText: "SİL"
-- hideKeyboard
 
 # Kalıcı olarak sil butonuna bas
-- tapOn: ".*Hesabımı Kalıcı Olarak Sil.*"
+- tapOn: "Hesabımı Kalıcı Olarak Sil"
 
 # Silme tamamlanınca /login sayfasına dönmeli
 - extendedWaitUntil:
@@ -55,7 +53,6 @@ tags: [m6, profile, delete_account, auth]
 - inputText: "seeker@e2e.test"
 - tapOn: "Şifre"
 - inputText: "Test1234!"
-- hideKeyboard
 - tapOn:
     text: "Giriş Yap"
     index: -1

@@ -22,10 +22,31 @@ tags: [m4, employer, batch, validation]
 - extendedWaitUntil:
     visible: "Lütfen tüm pozisyon ve otel bilgilerini eksiksiz doldurun\\."
     timeout: 10000
+- scrollUntilVisible:
+    element: "Otel adı gereklidir"
+    direction: UP
 - assertVisible: "Otel adı gereklidir"
+- scrollUntilVisible:
+    element: "Konum gereklidir"
+    direction: DOWN
 - assertVisible: "Konum gereklidir"
+- scrollUntilVisible:
+    element: "Şehir seçmeniz gerekiyor"
+    direction: DOWN
 - assertVisible: "Şehir seçmeniz gerekiyor"
+- scrollUntilVisible:
+    element: "İletişim bilgisi gereklidir"
+    direction: DOWN
 - assertVisible: "İletişim bilgisi gereklidir"
+- scrollUntilVisible:
+    element: "Başlık gereklidir"
+    direction: DOWN
 - assertVisible: "Başlık gereklidir"
+- scrollUntilVisible:
+    element: "Maaş bilgisi gereklidir"
+    direction: DOWN
 - assertVisible: "Maaş bilgisi gereklidir"
+- scrollUntilVisible:
+    element: "Açıklama gereklidir"
+    direction: DOWN
 - assertVisible: "Açıklama gereklidir"

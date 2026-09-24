@@ -26,7 +26,9 @@ tags: [m3, listing-detail, guest]
 - assertVisible: ".*İlan Sahibi.*"
 - assertNotVisible: '.*ik\+L1@e2e\.test.*'
 - assertVisible: ".*İletişim bilgisini görmek için giriş yapın.*"
-- tapOn: ".*İletişim bilgisini görmek için giriş yapın.*"
+- tapOn:
+    text: "İletişim bilgisini görmek için giriş yapın"
+    index: 0
 - extendedWaitUntil:
     visible: "Giriş Yap"
     timeout: 10000

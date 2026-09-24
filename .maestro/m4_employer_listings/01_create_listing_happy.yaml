@@ -13,13 +13,11 @@ tags: [m4, employer, create]
     timeout: 10000
 - tapOn: ".*Bodrum Resort Resepsiyon Görevlisi.*"
 - inputText: "E2E Test İlanı"
-- hideKeyboard
 - scrollUntilVisible:
     element: ".*Örn\\. Muğla / Bodrum.*"
     direction: DOWN
 - tapOn: ".*Örn\\. Muğla / Bodrum.*"
 - inputText: "Antalya / Lara"
-- hideKeyboard
 - scrollUntilVisible:
     element: "Bölge seçin"
     direction: DOWN
@@ -37,19 +35,16 @@ tags: [m4, employer, create]
     direction: DOWN
 - tapOn: ".*Örn\\. 35\\.000₺ \\+ yemek.*"
 - inputText: "35.000 TL"
-- hideKeyboard
 - scrollUntilVisible:
     element: ".*0555 123 4567.*"
     direction: DOWN
 - tapOn: ".*0555 123 4567.*"
 - inputText: "ik+e2e@otel.test"
-- hideKeyboard
 - scrollUntilVisible:
     element: ".*İlanınızla ilgili tüm detayları açıklayın.*"
     direction: DOWN
 - tapOn: ".*İlanınızla ilgili tüm detayları açıklayın.*"
 - inputText: "E2E test ilanı için resepsiyon görevlisi açıklaması."
-- hideKeyboard
 - scrollUntilVisible:
     element: "İlanı Yayınla"
     direction: DOWN

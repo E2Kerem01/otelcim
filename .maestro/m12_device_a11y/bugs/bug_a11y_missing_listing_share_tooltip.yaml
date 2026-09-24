@@ -1,0 +1,21 @@
+# BUG-m12-02: İlan detay ekranı paylaş butonunda erişilebilirlik etiketi eksik
+# Beklenen: AppBar'daki paylaş ikon butonunda 'Paylaş' tooltip'i bulunmalı.
+# Gerçek: listing_detail_screen.dart:233 IconButton üzerinde tooltip atanmamış.
+appId: com.example.otelcim
+name: "bug - a11y missing listing share button tooltip"
+tags: [bug, m12, a11y, detail, share]
+---
+- runFlow: ../common/launch.yaml
+
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+
+# TAHMİN: Erişilebilirlik standardına göre 'Paylaş' veya 'İlanı Paylaş' tooltip'i beklenir
+- assertVisible:
+    text: ".*Paylaş.*"

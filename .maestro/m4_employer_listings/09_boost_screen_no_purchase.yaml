@@ -20,15 +20,15 @@ tags: [m4, employer, boost, safe]
     visible: "İlanı Öne Çıkar"
     timeout: 10000
 - scrollUntilVisible:
-    element: "Boost Paketini Seçin"
+    element: ".*Boost Paketini Seçin.*"
     direction: DOWN
-- assertVisible: "7 Günlük Öne Çıkarma"
-- assertVisible: "14 Günlük Öne Çıkarma"
-- assertVisible: "30 Günlük Öne Çıkarma"
-- assertVisible: "₺49,99"
-- assertVisible: "₺89,99"
-- assertVisible: "₺149,99"
-- assertVisible: "Satın Al ve Öne Çıkar"
+- assertVisible: ".*7 Günlük Öne Çıkarma.*"
+- assertVisible: ".*14 Günlük Öne Çıkarma.*"
+- assertVisible: ".*30 Günlük Öne Çıkarma.*"
+- assertVisible: ".*₺49,99.*"
+- assertVisible: ".*₺89,99.*"
+- assertVisible: ".*₺149,99.*"
+- assertVisible: ".*Satın Al ve Öne Çıkar.*"
 # Güvenlik: Satın alma düğmesine ve ücretsiz boost kullanma düğmesine basılmaz.
 - back
 - tapOn: ".*Hesabım.*"
@@ -36,4 +36,3 @@ tags: [m4, employer, boost, safe]
 - extendedWaitUntil:
     visible: "Henüz Öne Çıkarılmış İlanınız Yok"
     timeout: 10000
-

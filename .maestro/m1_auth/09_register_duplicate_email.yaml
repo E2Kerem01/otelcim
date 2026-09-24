@@ -15,18 +15,16 @@ tags: [m1_auth, register, negative]
 - scrollUntilVisible:
     element: ".*E-posta.*"
     direction: DOWN
-- tapOn: ".*E-posta.*"
+- tapOn: "E-posta"
 - inputText: seeker@e2e.test
-- tapOn: ".*Şifre.*"
+- tapOn: "Şifre"
 - inputText: Test1234!
-- tapOn: ".*Ad Soyad.*"
+- tapOn: "Ad Soyad"
 - inputText: Tekrar Kullanıcı
-- hideKeyboard
 - tapOn:
-    text: ".*Kayıt Ol.*"
+    text: "Kayıt Ol"
     index: -1
 - extendedWaitUntil:
     visible: ".*Bu e-posta adresi zaten kayıtlı.*"
     timeout: 10000
 - assertVisible: ".*Kayıt Ol.*"
-

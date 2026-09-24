@@ -23,7 +23,6 @@ tags: [chat, send-message]
 - tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
 - inputText: "   "
 - pressKey: Enter
-- hideKeyboard
 # TAHMİN: Gönder butonu (Icons.send_rounded) sağ altta (92%, 96%) yer alır
 - tapOn:
     point: "92%,96%"
@@ -33,7 +32,6 @@ tags: [chat, send-message]
 - tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
 - inputText: "Tabii ki, yarın saat 11:00 uygun mudur?"
 - pressKey: Enter
-- hideKeyboard
 - tapOn:
     point: "92%,96%"
     optional: true

@@ -10,8 +10,9 @@ tags: [chat, listing, template]
       EMAIL: seeker@e2e.test
 
 # 2. Ana sayfada henüz sohbet açılmamış olan L2 ilanına (Garson) gidilir
-- extendedWaitUntil:
-    visible: ".*Garson \\(Sezonluk\\).*"
+- scrollUntilVisible:
+    element: ".*Garson \\(Sezonluk\\).*"
+    direction: DOWN
     timeout: 10000
 - tapOn: ".*Garson \\(Sezonluk\\).*"
 
@@ -37,13 +38,10 @@ tags: [chat, listing, template]
     visible: ".*Sohbet.*"
     timeout: 10000
 
-# 7. Şablon mesajı gönderilir
-- pressKey: Enter
-- hideKeyboard
+# 7. Şablon mesajı gönderilir (şablon metni giriş alanına otomatik aktarılmıştır, gönder butonuna dokunulur)
 # TAHMİN: Gönder butonu (Icons.send_rounded) sağ altta (92%, 96%)
 - tapOn:
     point: "92%,96%"
-    optional: true
 
 # 8. Mesajın balonda görüntülendiği doğrulanır
 - extendedWaitUntil:

@@ -19,9 +19,12 @@ tags: [m4, employer, lifecycle]
 - extendedWaitUntil:
     visible: ".*Garson \\(Sezonluk\\).*Kapalı.*"
     timeout: 10000
+- back
+- extendedWaitUntil:
+    visible: ".*Hesabım.*"
+    timeout: 10000
 - tapOn: ".*Ana Sayfa.*"
 - extendedWaitUntil:
     visible: ".*6 sonuç.*"
     timeout: 15000
 - assertNotVisible: ".*Garson \\(Sezonluk\\).*"
-

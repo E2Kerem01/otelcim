@@ -1,0 +1,50 @@
+appId: com.example.otelcim
+name: "m12 - 13 arabic rtl listing detail and chat screens"
+tags: [m12, rtl, arabic, detail, chat]
+---
+# Launches app with Arabic RTL locale
+- runFlow: ../_helpers/launch_rtl.yaml
+
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 15000
+
+# Open listing detail in Arabic RTL
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+
+- takeScreenshot: m12_rtl_listing_detail
+
+# Back to feed
+- back
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 10000
+
+# Sign in as seeker using RTL login helper
+- runFlow:
+    file: ../_helpers/login_rtl.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# Open Messages tab in Arabic RTL
+- tapOn: ".*الرسائل.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+
+- takeScreenshot: m12_rtl_chat_list
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz?.*"
+
+# Open chat conversation detail
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Merhaba, ilan hâlâ aktif mi?.*"
+    timeout: 10000
+
+- takeScreenshot: m12_rtl_chat_detail
+- assertVisible: ".*Merhaba, ilan hâlâ aktif mi?.*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz?.*"

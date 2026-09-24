@@ -1,0 +1,42 @@
+appId: com.example.otelcim
+name: "m10 yeni işveren kaydı ve rol menüsü"
+tags: [m10, auth, registration]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- tapOn:
+    text: "Kayıt Ol"
+    index: -1
+- extendedWaitUntil:
+    visible: "Hesap türü"
+    timeout: 10000
+- tapOn: "Personel Arıyorum"
+- tapOn: "E-posta"
+- inputText: "new1@e2e.test"
+- tapOn: "Şifre"
+- inputText: "Test1234!"
+- tapOn: "Ad Soyad"
+- inputText: "Yeni İşveren"
+- scrollUntilVisible:
+    element: "Otel / İşletme Adı"
+    direction: DOWN
+- tapOn: "Otel / İşletme Adı"
+- inputText: "Yeni Otel"
+- scrollUntilVisible:
+    element: ".*Zaten hesabın var mı.*"
+    direction: DOWN
+- tapOn:
+    text: "Kayıt Ol"
+    index: -1
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "new1@e2e.test"
+    timeout: 10000
+- assertVisible: "Yetenek Havuzum"
+- assertVisible: "İlanlarım"

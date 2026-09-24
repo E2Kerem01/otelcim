@@ -1,0 +1,9 @@
+# Launches app when device is in Arabic (RTL) mode.
+# Waits for the localized home tab label 'الرئيسية' instead of Turkish 'Ana Sayfa'.
+appId: com.example.otelcim
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 20000

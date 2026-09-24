@@ -7,13 +7,12 @@ tags: [m2_discovery, filters]
 - extendedWaitUntil:
     visible: ".*Gelişmiş filtreler.*"
     timeout: 10000
-- tapOn: ".*En düşük maaş.*"
+- tapOn: "En düşük maaş"
 - inputText: "33000"
-- hideKeyboard
 - scrollUntilVisible:
-    element: ".*Sıralama.*"
+    element: "Sıralama"
     direction: DOWN
-- tapOn: ".*Sıralama.*"
+- tapOn: "Sıralama"
 - tapOn: ".*Maaş yüksekten düşüğe.*"
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:
@@ -22,4 +21,3 @@ tags: [m2_discovery, filters]
 - assertVisible: ".*Resepsiyonist Aranıyor.*"
 - assertVisible: ".*Spa Terapisti.*"
 - assertNotVisible: ".*Barmen - Boost.*"
-

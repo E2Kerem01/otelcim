@@ -23,9 +23,13 @@ tags: [m7, admin_trust, seasonal, delete]
     visible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
     timeout: 10000
 - assertVisible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
-# ListTile içindeki silme butonuna tıklanır (Icons.delete_outline)
+- scrollUntilVisible:
+    element: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+    direction: DOWN
+# TAHMİN: IconButton üzerinde tooltip olmadığı için kart başlığının sağındaki son etkileşimli öğe (silme butonu) hedeflenir
 - tapOn:
-    point: "92%,83%" # TAHMİN: Kart üzerindeki sağ alt silme butonu koordinatı
+    rightOf: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+    index: -1
 - extendedWaitUntil:
     visible: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
     timeout: 10000

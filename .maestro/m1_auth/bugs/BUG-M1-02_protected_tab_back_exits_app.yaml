@@ -1,0 +1,16 @@
+# BUG-M1-02: Oturum kapalıyken korumalı sekmeden login'e gidip geri dönmek uygulamayı kapatıyor — beklenen: Ana Sayfa'ya dönülmesi / gerçek: Android geri tuşu uygulamayı kapatıp ana ekrana düşürüyor.
+appId: com.example.otelcim
+name: "m1 auth known bug protected tab back exits app"
+tags: [m1_auth, access-control, bug]
+---
+- runFlow: ../../common/launch.yaml
+# TAHMİN: BottomNavigationBar etiketi, Flutter tarafından Tab bilgisiyle birleşir; regex kaynak label'ı hedefler.
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"

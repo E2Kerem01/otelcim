@@ -1,0 +1,25 @@
+appId: com.example.otelcim
+name: "m10 kayıt boş form doğrulaması"
+tags: [m10, auth, validation]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- tapOn:
+    text: "Kayıt Ol"
+    index: -1
+- extendedWaitUntil:
+    visible: "Kayıt Ol"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Zaten hesabın var mı.*"
+    direction: DOWN
+- tapOn:
+    text: "Kayıt Ol"
+    index: -1
+- assertVisible: "Geçerli bir e-posta girin"
+- assertVisible: "Şifre en az 8 karakter ve en az 1 rakam içermelidir"
+- assertVisible: "Ad soyad girin"
+- assertVisible: "Lütfen bir hesap türü seçin"

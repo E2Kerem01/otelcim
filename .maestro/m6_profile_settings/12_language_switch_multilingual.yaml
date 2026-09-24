@@ -12,17 +12,25 @@ tags: [m6, profile, localization, language]
     visible: ".*Ayşe Aday.*"
     timeout: 10000
 
-# Dil ayarlarına git
+# Dil ayarlarına git (Hesabım menüsünden)
 - scrollUntilVisible:
     element: ".*Uygulama Dili.*"
     direction: DOWN
 - tapOn: ".*Uygulama Dili.*"
 - extendedWaitUntil:
-    visible: ".*Uygulama Dili.*"
+    visible: "Uygulama Dili"
     timeout: 10000
 
 # 1. İngilizce (English) seçimi
 - tapOn: ".*English.*"
+- extendedWaitUntil:
+    visible: "App Language"
+    timeout: 10000
+- assertVisible: "App Language"
+- assertVisible: ".*Some text is not translated yet.*"
+
+# Geri dönüp alt navigasyon sekmelerinin İngilizce olduğunu doğrula
+- back
 - extendedWaitUntil:
     visible: ".*Home.*"
     timeout: 10000
@@ -32,30 +40,38 @@ tags: [m6, profile, localization, language]
 - assertVisible: ".*Messages.*"
 - assertVisible: ".*My Account.*"
 
+# Deep link ile dil ayarlarına tekrar gir
+- openLink: "otelcim-e2e://app/profile/language"
+- extendedWaitUntil:
+    visible: "App Language"
+    timeout: 10000
+
 # 2. Almanca (Deutsch) seçimi
 - tapOn: ".*Deutsch.*"
 - extendedWaitUntil:
-    visible: ".*Start.*"
+    visible: "App-Sprache"
     timeout: 10000
-- assertVisible: ".*Start.*"
-- assertVisible: ".*Kategorien.*"
-- assertVisible: ".*Inserieren.*"
-- assertVisible: ".*Nachrichten.*"
-- assertVisible: ".*Konto.*"
+- assertVisible: "App-Sprache"
+- assertVisible: ".*Einige Texte sind noch nicht übersetzt.*"
 
 # 3. Rusça (Русский) seçimi
 - tapOn: ".*Русский.*"
 - extendedWaitUntil:
-    visible: ".*Главная.*"
+    visible: ".*Язык приложения.*"
     timeout: 10000
-- assertVisible: ".*Главная.*"
-- assertVisible: ".*Категории.*"
-- assertVisible: ".*Разместить.*"
-- assertVisible: ".*Сообщения.*"
-- assertVisible: ".*Профиль.*"
+- assertVisible: ".*Язык приложения.*"
+- assertVisible: ".*Некоторые тексты ещё не переведены.*"
 
 # 4. Arapça (العربية - RTL) seçimi
 - tapOn: ".*العربية.*"
+- extendedWaitUntil:
+    visible: ".*لغة التطبيق.*"
+    timeout: 10000
+- assertVisible: ".*لغة التطبيق.*"
+- assertVisible: ".*بعض النصوص لم تُترجم بعد.*"
+
+# Geri dönüp alt navigasyon sekmelerinin Arapça (RTL) olduğunu doğrula
+- back
 - extendedWaitUntil:
     visible: ".*الرئيسية.*"
     timeout: 10000
@@ -65,8 +81,21 @@ tags: [m6, profile, localization, language]
 - assertVisible: ".*الرسائل.*"
 - assertVisible: ".*حسابي.*"
 
-# 5. Türkçe'ye geri dön
+# 5. Deep link ile dil ayarlarına gir ve Türkçe'ye geri dön
+- openLink: "otelcim-e2e://app/profile/language"
+- extendedWaitUntil:
+    visible: ".*لغة التطبيق.*"
+    timeout: 10000
+
 - tapOn: ".*Türkçe.*"
+- extendedWaitUntil:
+    visible: "Uygulama Dili"
+    timeout: 10000
+- assertVisible: "Uygulama Dili"
+- assertVisible: ".*Bazı metinler henüz çevrilmedi.*"
+
+# Geri dönüp Türkçe sekmeleri doğrula
+- back
 - extendedWaitUntil:
     visible: ".*Ana Sayfa.*"
     timeout: 10000

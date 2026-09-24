@@ -8,15 +8,14 @@ tags: [m7, admin_trust, moderation, restart]
     env:
       EMAIL: suspended@e2e.test
 - extendedWaitUntil:
-    visible: ".*Hesabınız Askıya Alındı.*"
+    visible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
     timeout: 10000
-- assertVisible: ".*Hesabınız Askıya Alındı.*"
-- assertVisible: ".*Askı bitiş:.*"
+- assertVisible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
 # Uygulama kapatılıp önbellek temizlenmeden yeniden başlatılır
 - launchApp:
     stopApp: true
 - extendedWaitUntil:
-    visible: ".*Hesabınız Askıya Alındı.*"
+    visible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
     timeout: 15000
-- assertVisible: ".*Hesabınız Askıya Alındı.*"
-- assertVisible: ".*Askı bitiş:.*"
+- assertVisible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"

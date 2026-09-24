@@ -20,5 +20,4 @@ tags: [m4, employer, restart]
 - extendedWaitUntil:
     visible: ".*Mehmet İşveren.*"
     timeout: 10000
-- assertVisible: "İşveren"
-
+- assertVisible: ".*İlanlarım.*"

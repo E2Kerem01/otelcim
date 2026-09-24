@@ -23,7 +23,6 @@ tags: [chat, emojis, long-text]
 - tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
 - inputText: "Harika! Çok sevindim 👍🏨✨ Görüşmek üzere!"
 - pressKey: Enter
-- hideKeyboard
 # TAHMİN: Gönder IconButton (Icons.send_rounded) sağ altta (92%, 96%)
 - tapOn:
     point: "92%,96%"
@@ -38,7 +37,6 @@ tags: [chat, emojis, long-text]
 - tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
 - inputText: "Merhabalar Mehmet Bey, yarınki görüşme için belirtilen adrese tam saatinde geleceğim. Ön büro operasyonları, Opera PMS ve Fidelio otel yönetim sistemleri konusunda 2 yıllık tecrübem bulunmaktadır. Ayrıca B2 seviyesinde İngilizce ve başlangıç seviyesinde Rusça konuşabiliyorum. CV ve referans belgelerim hazırdır."
 - pressKey: Enter
-- hideKeyboard
 - tapOn:
     point: "92%,96%"
     optional: true

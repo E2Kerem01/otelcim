@@ -10,17 +10,15 @@ tags: [m4, employer, batch]
 - tapOn: ".*İlan Ver.*"
 - tapOn: "Toplu İlan Ver"
 - extendedWaitUntil:
-    visible: "Otel / İşletme Bilgileri"
+    visible: ".*Otel / İşletme Bilgileri.*"
     timeout: 10000
 - tapOn: ".*Grand Deluxe Hotel.*"
 - inputText: "E2E Batch Otel"
-- hideKeyboard
 - scrollUntilVisible:
     element: ".*Muğla / Bodrum.*"
     direction: DOWN
 - tapOn: ".*Muğla / Bodrum.*"
 - inputText: "Antalya / Lara"
-- hideKeyboard
 - scrollUntilVisible:
     element: "Şehir seçin"
     direction: DOWN
@@ -31,16 +29,13 @@ tags: [m4, employer, batch]
     direction: DOWN
 - tapOn: ".*0555 123 4567 / ik@hotel\\.com.*"
 - inputText: "ik+batch@otel.test"
-- hideKeyboard
 - scrollUntilVisible:
     element: "Pozisyon #1"
     direction: DOWN
 - tapOn: ".*Resepsiyonist / Garson / Aşçı.*"
 - inputText: "E2E Batch Resepsiyon"
-- hideKeyboard
 - tapOn: ".*Pozisyon detayları ve aranan nitelikler.*"
 - inputText: "Birinci pozisyon için E2E açıklama."
-- hideKeyboard
 - scrollUntilVisible:
     element: "Pozisyon Ekle"
     direction: DOWN
@@ -52,12 +47,10 @@ tags: [m4, employer, batch]
     text: ".*Resepsiyonist / Garson / Aşçı.*"
     index: 1
 - inputText: "E2E Batch Garson"
-- hideKeyboard
 - tapOn:
     text: ".*Pozisyon detayları ve aranan nitelikler.*"
     index: 1
 - inputText: "İkinci pozisyon için E2E açıklama."
-- hideKeyboard
 - scrollUntilVisible:
     element: "2 İlanı Atomik Yayınla"
     direction: DOWN

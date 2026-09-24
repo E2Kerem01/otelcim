@@ -7,6 +7,9 @@ tags: [m2_discovery, region]
 - extendedWaitUntil:
     visible: ".*Bölgeler.*"
     timeout: 10000
+- scrollUntilVisible:
+    element: ".*Muğla.*"
+    direction: DOWN
 - tapOn: ".*Muğla.*"
 - extendedWaitUntil:
     visible: ".*Animatör.*"
@@ -14,4 +17,3 @@ tags: [m2_discovery, region]
 - assertVisible: ".*Muğla.*"
 - assertVisible: ".*1 sonuç.*"
 - assertNotVisible: ".*Resepsiyonist Aranıyor.*"
-

@@ -58,6 +58,8 @@ function profile(uid, email, displayName, userType, extra = {}) {
   };
 }
 
+// region is a tourism-region id (antalya, bodrum, cesme, kapadokya ...), as
+// the create/edit forms write it - not a province name.
 function listing(posterId, posterName, posterVerified, o) {
   return {
     posterId, posterName, posterVerified,
@@ -82,7 +84,7 @@ async function main() {
 
   const u = {};
   const users = [
-    ['seeker', 'seeker@e2e.test', 'Ayşe Aday', 'jobseeker', { preferredRegion: 'Antalya', availableImmediately: true, bio: 'Resepsiyon deneyimi 2 yıl' }],
+    ['seeker', 'seeker@e2e.test', 'Ayşe Aday', 'jobseeker', { preferredRegion: 'antalya', availableImmediately: true, bio: 'Resepsiyon deneyimi 2 yıl' }],
     ['employer', 'employer@e2e.test', 'Mehmet İşveren', 'employer', { hotelName: 'Deniz Otel', position: 'İK Müdürü', isVerified: true, verificationStatus: 'approved', verifiedAt: ts(now - 10 * DAY) }],
     ['employer2', 'employer2@e2e.test', 'Zeynep Otelci', 'employer', { hotelName: 'Kaya Butik Otel' }],
     ['admin', 'admin@e2e.test', 'Admin Yönetici', 'employer', { isAdmin: true, adminRole: 'super_admin' }],
@@ -91,7 +93,7 @@ async function main() {
     // Own the pending admin-review items below, so seeker/employer2 screens
     // keep their empty states.
     ['employer3', 'employer3@e2e.test', 'Can Başvuran', 'employer', { hotelName: 'Yeni Otel', verificationStatus: 'pending' }],
-    ['seeker2', 'seeker2@e2e.test', 'Ali Aday', 'jobseeker', { preferredRegion: 'Muğla' }],
+    ['seeker2', 'seeker2@e2e.test', 'Ali Aday', 'jobseeker', { preferredRegion: 'bodrum' }],
   ];
   for (const [key, email, name, type, extra] of users) {
     u[key] = await createUser(email, name);
@@ -101,14 +103,14 @@ async function main() {
   const E = [u.employer, 'Deniz Otel', true];
   const E2 = [u.employer2, 'Kaya Butik Otel', false];
   const listings = {
-    L1: listing(...E, { title: 'Resepsiyonist Aranıyor', description: 'Lara bölgesinde 5 yıldızlı otel için İngilizce bilen resepsiyonist.', category: 'resepsiyon', city: 'Antalya', region: 'Antalya', salary: '35.000 TL', minSalaryTl: 35000, maxSalaryTl: 40000, lat: 36.85, lng: 30.85, housingRoomType: 'shared', housingHasAc: true, housingHasWifi: true, housingMealsIncluded: 3, ageDays: 1 }),
-    L2: listing(...E, { title: 'Garson (Sezonluk)', description: 'Alakart restoran için deneyimli garson.', category: 'servisGarson', city: 'Antalya', region: 'Antalya', salary: '28.000 TL', minSalaryTl: 28000, maxSalaryTl: 30000, ageDays: 2 }),
-    L3: listing(...E, { title: 'Acil Aşçı Yardımcısı', description: 'Hemen başlayacak aşçı yardımcısı.', category: 'mutfakAsci', city: 'Antalya', region: 'Antalya', salary: '30.000 TL', minSalaryTl: 30000, maxSalaryTl: 32000, isUrgent: true, ageDays: 0 }),
-    L4: listing(...E, { title: 'Barmen - Boost', description: 'Havuz bar için barmen.', category: 'barBarmen', city: 'Antalya', region: 'Antalya', salary: '32.000 TL', minSalaryTl: 32000, maxSalaryTl: 36000, isBoosted: true, boostType: 'boost_7_days', boostExpiresAt: ts(now + 5 * DAY), ageDays: 3 }),
-    L5: listing(...E, { title: 'Kapanmış İlan Housekeeping', description: 'Bu ilan kapandı.', category: 'katHizmetleri', city: 'Antalya', region: 'Antalya', salary: '25.000 TL', status: 'closed', ageDays: 20 }),
-    L6: listing(...E2, { title: 'Animatör', description: 'Bodrum kulüp otel için animatör.', category: 'animasyon', city: 'Bodrum', region: 'Muğla', salary: '27.000 TL', minSalaryTl: 27000, maxSalaryTl: 29000, ageDays: 4 }),
-    L7: listing(...E2, { title: 'Spa Terapisti', description: 'Çeşme butik otel spa.', category: 'spaWellness', city: 'Çeşme', region: 'İzmir', salary: '33.000 TL', minSalaryTl: 33000, maxSalaryTl: 35000, ageDays: 5 }),
-    L8: listing(...E2, { title: 'Güvenlik Görevlisi', description: 'Gece vardiyası güvenlik.', category: 'guvenlik', city: 'Ürgüp', region: 'Nevşehir', salary: '26.000 TL', minSalaryTl: 26000, maxSalaryTl: 26000, employmentType: 'fullTime', ageDays: 6 }),
+    L1: listing(...E, { title: 'Resepsiyonist Aranıyor', description: 'Lara bölgesinde 5 yıldızlı otel için İngilizce bilen resepsiyonist.', category: 'resepsiyon', city: 'Antalya', region: 'antalya', salary: '35.000 TL', minSalaryTl: 35000, maxSalaryTl: 40000, lat: 36.85, lng: 30.85, housingRoomType: 'shared', housingHasAc: true, housingHasWifi: true, housingMealsIncluded: 3, ageDays: 1 }),
+    L2: listing(...E, { title: 'Garson (Sezonluk)', description: 'Alakart restoran için deneyimli garson.', category: 'servisGarson', city: 'Antalya', region: 'antalya', salary: '28.000 TL', minSalaryTl: 28000, maxSalaryTl: 30000, ageDays: 2 }),
+    L3: listing(...E, { title: 'Acil Aşçı Yardımcısı', description: 'Hemen başlayacak aşçı yardımcısı.', category: 'mutfakAsci', city: 'Antalya', region: 'antalya', salary: '30.000 TL', minSalaryTl: 30000, maxSalaryTl: 32000, isUrgent: true, ageDays: 0 }),
+    L4: listing(...E, { title: 'Barmen - Boost', description: 'Havuz bar için barmen.', category: 'barBarmen', city: 'Antalya', region: 'antalya', salary: '32.000 TL', minSalaryTl: 32000, maxSalaryTl: 36000, isBoosted: true, boostType: 'boost_7_days', boostExpiresAt: ts(now + 5 * DAY), ageDays: 3 }),
+    L5: listing(...E, { title: 'Kapanmış İlan Housekeeping', description: 'Bu ilan kapandı.', category: 'katHizmetleri', city: 'Antalya', region: 'antalya', salary: '25.000 TL', status: 'closed', ageDays: 20 }),
+    L6: listing(...E2, { title: 'Animatör', description: 'Bodrum kulüp otel için animatör.', category: 'animasyon', city: 'Bodrum', region: 'bodrum', salary: '27.000 TL', minSalaryTl: 27000, maxSalaryTl: 29000, ageDays: 4 }),
+    L7: listing(...E2, { title: 'Spa Terapisti', description: 'Çeşme butik otel spa.', category: 'spaWellness', city: 'Çeşme', region: 'cesme', salary: '33.000 TL', minSalaryTl: 33000, maxSalaryTl: 35000, ageDays: 5 }),
+    L8: listing(...E2, { title: 'Güvenlik Görevlisi', description: 'Gece vardiyası güvenlik.', category: 'guvenlik', city: 'Ürgüp', region: 'kapadokya', salary: '26.000 TL', minSalaryTl: 26000, maxSalaryTl: 26000, employmentType: 'fullTime', ageDays: 6 }),
   };
   // `node seed.mjs many` (a flow opts in with a `# seed: many` line): 30 extra
   // active listings P01..P30 so the feed needs more than one page.
@@ -118,7 +120,7 @@ async function main() {
       const n = String(i).padStart(2, '0');
       listings[`P${n}`] = listing(...E2, {
         title: `Sayfa İlanı ${n}`, description: `Sayfalama test ilanı ${n}.`,
-        category: cats[i % cats.length], city: 'Alanya', region: 'Antalya',
+        category: cats[i % cats.length], city: 'Alanya', region: 'antalya',
         salary: `${20000 + i * 100} TL`, minSalaryTl: 20000 + i * 100, maxSalaryTl: 20000 + i * 100,
         ageDays: 7 + i,
       });

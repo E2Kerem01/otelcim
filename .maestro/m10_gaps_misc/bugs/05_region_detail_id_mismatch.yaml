@@ -1,0 +1,15 @@
+# BUG-m10-05: Bölge detayı şehir/bölge ID eşleşmezliği nedeniyle L6'yı göstermiyor — beklenen: Bodrum/Muğla detayı Animatör ilanını gösterir / gerçek: Bodrum ID'si ile Muğla değerli ilan filtreleniyor.
+appId: com.example.otelcim
+name: "m10 bug bölge detayı L6 eşleşmiyor"
+tags: [m10, bug, regions]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../_helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- openLink: "otelcim-e2e://app/regions/bodrum"
+- extendedWaitUntil:
+    visible: "Bodrum"
+    timeout: 10000
+- assertVisible: "Animatör"

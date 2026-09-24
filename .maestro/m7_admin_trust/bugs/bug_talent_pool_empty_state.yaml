@@ -1,0 +1,29 @@
+# BUG-m7-02: Yetenek havuzu ekranı Firestore kural eksikliği (permission-denied) yüzünden boş durumda dahi yüklenemiyor — beklenen: İşveren Yetenek Havuzum ekranına girdiğinde "Henüz Yetenek Havuzunuzda Aday Yok" boş durumunu görmeli / gerçek: firestore.rules içinde user_profiles/{userId}/talent_pool izni bulunmadığı için StreamProvider hata/loading durumunda kalıyor, boş durum asla ekrana gelmiyor.
+appId: com.example.otelcim
+name: "m7 bug - employer talent pool empty state cannot load due to missing firestore rules"
+tags: [m7, bugs, employer, talent_pool]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Yetenek Havuzum.*"
+    direction: DOWN
+- assertVisible: ".*Yetenek Havuzum.*"
+- tapOn: ".*Yetenek Havuzum.*"
+- extendedWaitUntil:
+    visible: ".*Yetenek Havuzu.*"
+    timeout: 10000
+- assertVisible: ".*Henüz Yetenek Havuzunuzda Aday Yok.*"
+- assertVisible: ".*İş arayanlarla yaptığınız sohbetlerde detay menüsünden.*"
+- back
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+- assertVisible: ".*Mehmet İşveren.*"

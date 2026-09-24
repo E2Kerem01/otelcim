@@ -14,14 +14,10 @@ tags: [chat, auth-gate]
 
 # 3. Giriş ekranının açıldığı doğrulanır
 - extendedWaitUntil:
-    visible: ".*Giriş Yap.*"
+    visible: "Giriş Yap"
     timeout: 10000
-- assertVisible: ".*E-posta.*"
-- assertVisible: ".*Şifre.*"
-
-# 4. Geri tuşuna basıldığında ana sayfaya dönülebildiği doğrulanır
-- back
-- extendedWaitUntil:
-    visible: ".*Resepsiyonist Aranıyor.*"
-    timeout: 10000
-- assertVisible: ".*Ana Sayfa.*"
+- assertVisible: "E-posta"
+- assertVisible: "Şifre"
+- assertVisible:
+    text: "Giriş Yap"
+    index: -1

@@ -11,10 +11,16 @@ tags: [m4, employer, form]
 - extendedWaitUntil:
     visible: "Yeni İlan Aç"
     timeout: 10000
+- scrollUntilVisible:
+    element: "Lojman Bilgileri Ekle"
+    direction: DOWN
 - tapOn: "Lojman Bilgileri Ekle"
 - extendedWaitUntil:
     visible: "Oda tipi"
     timeout: 10000
+- scrollUntilVisible:
+    element: "Oda tipi"
+    direction: DOWN
 - assertVisible: "Klima"
 - assertVisible: "Wi-Fi"
 - assertVisible: "Günlük dahil öğün"
@@ -26,10 +32,9 @@ tags: [m4, employer, form]
 - assertVisible: "Çok kişilik oda"
 - scrollUntilVisible:
     element: "Acil İhtiyaç"
-    direction: UP
+    direction: DOWN
 - assertVisible: ".*Bölgedeki kullanıcılara anlık bildirim gönderilir\\..*"
 - tapOn: "Acil İhtiyaç"
 - assertVisible: ".*İlk acil ilanınız ücretsiz\\..*"
 - back
 - assertVisible: ".*Ana Sayfa.*"
-

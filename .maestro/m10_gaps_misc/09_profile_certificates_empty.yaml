@@ -1,0 +1,26 @@
+appId: com.example.otelcim
+name: "m10 profil sertifika cüzdanı boş durum"
+tags: [m10, profile, empty-state]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: _helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Ayşe Aday"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Belgelerim / Sertifika Cüzdanı.*"
+    direction: DOWN
+- tapOn: ".*Belgelerim / Sertifika Cüzdanı.*"
+- extendedWaitUntil:
+    visible: "Belge Cüzdanı"
+    timeout: 10000
+- assertVisible: "Yüklenen Belgeler"
+- assertVisible: "Henüz yüklenmiş belgeniz yok."
+- assertVisible: "Belge Yükle"
+# Belge yükleme ve dosya seçici güvenlik yasağı nedeniyle tetiklenmez.
+- back
+- assertVisible: ".*Hesabım.*"

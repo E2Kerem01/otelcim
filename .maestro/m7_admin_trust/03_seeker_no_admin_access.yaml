@@ -12,7 +12,8 @@ tags: [m7, admin_trust, profile, permissions]
     visible: ".*Ayşe Aday.*"
     timeout: 10000
 - assertVisible: ".*Ayşe Aday.*"
-- assertVisible: ".*İş Arayan.*"
+- assertVisible: ".*seeker@e2e.test.*"
+- assertVisible: ".*Hemen Başlayabilir.*"
 # TAHMİN: Admin paneli bağlantısı eklenseydi "Yönetim Paneli" veya "Admin Paneli" adını taşıyacaktı
 - assertNotVisible: ".*Yönetim Paneli.*"
 - assertNotVisible: ".*Admin Paneli.*"

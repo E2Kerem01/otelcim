@@ -7,6 +7,9 @@ tags: [m3, listing-detail, report]
     file: ../common/login.yaml
     env:
       EMAIL: seeker@e2e.test
+- scrollUntilVisible:
+    element: '.*Garson \(Sezonluk\).*'
+    direction: DOWN
 - tapOn: '.*Garson \(Sezonluk\).*'
 - extendedWaitUntil:
     visible: ".*İlan Detayı.*"

@@ -11,12 +11,11 @@ tags: [m1_auth, validation, safety]
 - extendedWaitUntil:
     visible: ".*Telefon Numarası.*"
     timeout: 5000
-- assertVisible: ".*5XX XXX XX XX.*"
+# TAHMİN: phoneHint ARB'de tanımlı olsa da Flutter'ın cihaz erişilebilirlik etiketinde
+# görünmediği cihaz sonucuyla doğrulandı; gerçek label'ı kullanıyoruz.
 - assertVisible: ".*Kod Gönder.*"
 - assertNotVisible: ".*SMS Doğrulama Kodu.*"
 # Kod Gönder'e basılmaz: SMS/telefon doğrulaması canlı bir dış entegrasyondur.
-- tapOn: ".*Telefon Numarası.*"
+- tapOn: "Telefon Numarası"
 - inputText: "123"
-- hideKeyboard
 - assertVisible: ".*Telefon Numarası.*"
-

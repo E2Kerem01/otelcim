@@ -13,6 +13,9 @@ tags: [m2_discovery, region, navigation]
     timeout: 10000
 # TAHMİN: SegmentedButton tooltip erişilebilir etiketi Flutter hiyerarşisinde görünür.
 - tapOn: ".*Liste.*"
+- scrollUntilVisible:
+    element: ".*Muğla.*"
+    direction: DOWN
 - extendedWaitUntil:
     visible: ".*Muğla.*"
     timeout: 10000
@@ -24,4 +27,3 @@ tags: [m2_discovery, region, navigation]
     visible: ".*7 sonuç.*"
     timeout: 10000
 - assertVisible: ".*Ana Sayfa.*"
-

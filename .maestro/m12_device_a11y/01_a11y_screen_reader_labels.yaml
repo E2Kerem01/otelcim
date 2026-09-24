@@ -1,0 +1,50 @@
+appId: com.example.otelcim
+name: "m12 - 01 home feed screen reader tooltips and semantics"
+tags: [m12, a11y, accessibility, tooltips]
+---
+- runFlow: ../common/launch.yaml
+
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+
+# 1. AppBar icon-only action tooltips (Screen Reader labels)
+- assertVisible:
+    text: ".*Sezon Takvimi.*"
+- assertVisible:
+    text: ".*Bölgeler.*"
+
+# 2. Advanced filters button tooltip
+- assertVisible:
+    text: ".*Filtreler.*"
+
+# 3. View mode toggle tooltips (grid columns and table view)
+- assertVisible:
+    text: ".*1 Sütun.*"
+- assertVisible:
+    text: ".*2 Sütun.*"
+- assertVisible:
+    text: ".*Tablo Görünümü.*"
+
+# 4. Favorite heart icon button tooltip on listing card
+- assertVisible:
+    text: ".*Favorilere ekle.*"
+
+# 5. Switch to Table view and verify accessible column header labels
+- tapOn:
+    text: ".*Tablo Görünümü.*"
+- extendedWaitUntil:
+    visible: ".*İlan Başlığı.*"
+    timeout: 10000
+- assertVisible: ".*İlan Başlığı.*"
+- assertVisible: ".*Kategori.*"
+- assertVisible: ".*Konum.*"
+- assertVisible: ".*Ücret.*"
+
+# 6. Switch back to 1 Column view
+- tapOn:
+    text: ".*1 Sütun.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*35\\.000 TL.*"

@@ -7,11 +7,14 @@ tags: [m3, listing-detail, chat]
     file: ../common/login.yaml
     env:
       EMAIL: seeker@e2e.test
+- scrollUntilVisible:
+    element: '.*Garson \(Sezonluk\).*'
+    direction: DOWN
 - tapOn: '.*Garson \(Sezonluk\).*'
 - extendedWaitUntil:
     visible: ".*İlan Detayı.*"
     timeout: 10000
-- tapOn: ".*Başvur / Mesaj Gönder.*"
+- tapOn: "Mesaj Gönder"
 - extendedWaitUntil:
     visible: ".*İlk mesajını hazırlayalım.*"
     timeout: 10000

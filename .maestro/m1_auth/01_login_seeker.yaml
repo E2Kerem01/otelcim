@@ -12,5 +12,4 @@ tags: [m1_auth, auth]
 - extendedWaitUntil:
     visible: ".*Ayşe Aday.*"
     timeout: 10000
-- assertVisible: ".*İş Arayan.*"
-
+- assertVisible: ".*Hemen Başlayabilir.*"

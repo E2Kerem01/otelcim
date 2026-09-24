@@ -8,12 +8,11 @@ tags: [m1_auth, persistence]
     visible: ".*Giriş Yap.*"
     timeout: 10000
 - tapOn: ".*Beni Hatırla.*"
-- tapOn: ".*E-posta.*"
+- tapOn: "E-posta"
 - inputText: seeker@e2e.test
-- tapOn: ".*Şifre.*"
+- tapOn: "Şifre"
 - inputText: Test1234!
-- hideKeyboard
-- tapOn: ".*Giriş Yap.*"
+- tapOn: "Giriş Yap"
 - extendedWaitUntil:
     visible: ".*Ana Sayfa.*"
     timeout: 15000
@@ -23,4 +22,3 @@ tags: [m1_auth, persistence]
     visible: ".*Giriş Yap.*"
     timeout: 15000
 - assertNotVisible: ".*Ayşe Aday.*"
-

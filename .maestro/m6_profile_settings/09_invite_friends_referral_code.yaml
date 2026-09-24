@@ -27,9 +27,8 @@ tags: [m6, profile, referral]
 - assertVisible: ".*Davet Ettiğin Kişi Sayısı.*"
 - assertVisible: ".*Ücretsiz Boost Hakkın.*"
 
-# Kodu Kopyala butonuna dokun (tooltip: Kodu Kopyala)
-- tapOn:
-    tooltip: "Kodu Kopyala"
+# Kodu Kopyala butonuna dokun (tooltip / Semantics: Kodu Kopyala)
+- tapOn: ".*Kodu Kopyala.*"
 
 # Kopyalama bildirimini doğrula
 - extendedWaitUntil:

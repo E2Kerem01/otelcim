@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+name: "m11 - many listings load the second page without duplicates"
+tags: [m11_resilience, pagination, many]
+---
+# seed: many
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*20 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Sayfa İlanı 01.*"
+- scrollUntilVisible:
+    element: ".*Sayfa İlanı 30.*"
+    direction: DOWN
+- extendedWaitUntil:
+    visible: ".*Sayfa İlanı 30.*"
+    timeout: 15000
+- assertVisible: ".*Sayfa İlanı 15.*"
+- assertVisible: ".*Sayfa İlanı 29.*"
+- takeScreenshot: m11_pagination_second_page

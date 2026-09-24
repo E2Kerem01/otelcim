@@ -13,11 +13,11 @@ tags: [m2_discovery, feed, navigation]
 - extendedWaitUntil:
     visible: ".*7 sonuç.*"
     timeout: 15000
-# TAHMİN: grid sütun tooltip'i semantik etiket olarak tapOn ile bulunur.
-- tapOn: ".*2 Sütun.*"
+- tapOn:
+    id: "grid_col_2"
 - assertVisible: ".*Resepsiyonist Aranıyor.*"
-# TAHMİN: tablo görünümü tooltip'i semantik etiket olarak tapOn ile bulunur.
-- tapOn: ".*Tablo Görünümü.*"
+- tapOn:
+    id: "grid_col_table"
 - assertVisible: ".*Resepsiyonist Aranıyor.*"
 - launchApp:
     stopApp: true
@@ -25,4 +25,3 @@ tags: [m2_discovery, feed, navigation]
     visible: ".*7 sonuç.*"
     timeout: 15000
 - assertNotVisible: ".*Kapanmış İlan Housekeeping.*"
-

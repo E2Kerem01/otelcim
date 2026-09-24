@@ -1,0 +1,11 @@
+# offline: true
+appId: com.example.otelcim
+name: "m11 - offline feed shows a recoverable retry state"
+tags: [m11_resilience, offline, skip]
+---
+- runFlow: ../../common/launch.yaml
+- extendedWaitUntil:
+    visible: "Tekrar dene"
+    timeout: 15000
+- assertVisible: ".*İnternet bağlantınızı kontrol edip tekrar deneyin.*"
+- assertVisible: ".*Ana Sayfa.*"

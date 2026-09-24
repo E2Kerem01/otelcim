@@ -1,0 +1,23 @@
+# BUG-M8-01: Yönetici kendini yasaklayabiliyor — beklenen: kendi hesabında Yasakla/Askıya Al aksiyonları olmamalı / gerçek: UserManagementScreen kullanıcı rolünü ayırmadan aksiyonları gösteriyor.
+appId: com.example.otelcim
+name: "m8 bug admin can see self-ban action"
+tags: [m8_admin_core, bug, permissions]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/users"
+- extendedWaitUntil:
+    visible: ".*E-posta veya isimle ara.*"
+    timeout: 15000
+- tapOn: "E-posta veya isimle ara"
+- inputText: "admin@e2e.test"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: ".*Admin Yönetici.*"
+    timeout: 10000
+- assertVisible: '.*admin@e2e\.test.*'
+- assertNotVisible: ".*Yasakla.*"
+- assertNotVisible: '.*Askıya Al \(7 gün\).*'

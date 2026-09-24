@@ -18,11 +18,31 @@ tags: [m4, employer, validation]
 - extendedWaitUntil:
     visible: "Lütfen kırmızı ile işaretli alanları doldurun\\."
     timeout: 10000
+- scrollUntilVisible:
+    element: "Başlık gerekli"
+    direction: UP
 - assertVisible: "Başlık gerekli"
+- scrollUntilVisible:
+    element: "Konum gerekli"
+    direction: DOWN
 - assertVisible: "Konum gerekli"
+- scrollUntilVisible:
+    element: "Bölge seçmeniz gerekiyor"
+    direction: DOWN
 - assertVisible: "Bölge seçmeniz gerekiyor"
+- scrollUntilVisible:
+    element: "Şehir seçmeniz gerekiyor"
+    direction: DOWN
 - assertVisible: "Şehir seçmeniz gerekiyor"
+- scrollUntilVisible:
+    element: "Maaş bilgisi gerekli"
+    direction: DOWN
 - assertVisible: "Maaş bilgisi gerekli"
+- scrollUntilVisible:
+    element: "İletişim bilgisi gerekli"
+    direction: DOWN
 - assertVisible: "İletişim bilgisi gerekli"
+- scrollUntilVisible:
+    element: "Açıklama gerekli"
+    direction: DOWN
 - assertVisible: "Açıklama gerekli"
-

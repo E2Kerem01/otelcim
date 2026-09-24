@@ -1,0 +1,29 @@
+appId: com.example.otelcim
+name: "admin approves pending employer verification"
+tags: [m9_admin_content, admin, verification]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/verifications"
+- extendedWaitUntil:
+    visible: "Doğrulama Talepleri"
+    timeout: 10000
+- assertVisible: "Yeni Otel"
+- assertVisible: 'Belgeler \(1\)'
+- assertVisible: "Belge 1"
+- tapOn: "Onayla"
+- extendedWaitUntil:
+    visible: "Doğrulamayı onayla"
+    timeout: 5000
+- tapOn:
+    text: "Onayla"
+    index: -1
+- extendedWaitUntil:
+    visible: "Doğrulama onaylandı."
+    timeout: 10000
+- extendedWaitUntil:
+    notVisible: "Yeni Otel"
+    timeout: 10000

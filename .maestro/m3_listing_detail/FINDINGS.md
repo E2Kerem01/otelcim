@@ -6,7 +6,7 @@
 - `lib/features/listings/presentation/widgets/listing_detail_widgets.dart:19-84` kategori, ilan tarihi, başlık ve şehir; `:87-120` maaş; `:219-313` lojman kartını render ediyor. Seed L1 için gerçek metinler `Çok kişilik oda`, `Klima`, `Wi-Fi`, `Günlük dahil öğün: 3`.
 - `lib/features/listings/presentation/widgets/listing_detail_widgets.dart:353-469` misafir için `İletişim bilgisini görmek için giriş yapın`, giriş yapmış kullanıcı için `İletişim Bilgisini Göster` ve contact bilgisini render ediyor.
 - `lib/features/listings/presentation/widgets/listing_detail_widgets.dart:472-522` güvenlik kartı ve ARB'den gelen `İlanı Şikâyet Et` aksiyonunu render ediyor.
-- `lib/features/listings/presentation/widgets/listing_detail_widgets.dart:654-939` sahip için `İlan Yönetimi`, `İlanı Öne Çıkar`, `QR Poster Oluştur`; sahip olmayan kullanıcı için `Başvur / Mesaj Gönder` aksiyonlarını render ediyor.
+- `lib/features/listings/presentation/widgets/listing_detail_widgets.dart:654-939` geniş ekran sahip kartında `İlan Yönetimi`, `İlanı Öne Çıkar`, `QR Poster Oluştur`; sahip olmayan kullanıcı için `Başvur / Mesaj Gönder` aksiyonlarını render ediyor. Mobil dal `listing_detail_screen.dart:420-515` başlık göstermeden sahip için `İlanı Öne Çıkar` ve `QR Poster Oluştur`, sahip olmayan için `Mesaj Gönder` render ediyor.
 - `lib/features/listings/presentation/listing_qr_poster_screen.dart:35-164` QR poster başlığı, ilan başlığı, işveren, şehir/maaş rozetleri ve tarama talimatı mevcut.
 
 ## Koddan görülen bug'lar
@@ -52,3 +52,9 @@
 - Fotoğraf/dosya yükleme ve örnek ilan seed butonu kullanılmadı.
 - Seed tarihleri dinamik olduğu için kesin sözleşme tarihleri normal akışlarda assert edilmedi; eksik metadata için beklenen değerler ayrı bug akışına kondu.
 - Cihaz, emulator, Maestro ve adb çalıştırılmadı; bu teslimat kaynak okuma ve YAML yazımıyla sınırlıdır.
+
+## Düzeltme turu gözlemi
+
+- Mobil detaydaki eylem seçicileri responsive dala göre ayrıldı: mobilde `Mesaj Gönder` ve sahipte `İlanı Öne Çıkar` / `QR Poster Oluştur`; geniş ekran başlığı `İlan Yönetimi` mobilde beklenmiyor.
+- L2 ve L6 açılışları liste sırasına ve görünür viewport'a bağlı kalmaması için L2'de görünür olana kadar kaydırma, L6'da deep link kullanıyor.
+- Geniş regex'in yanlış/örtüşen öğeye dokunma riskini azaltmak için misafir iletişim CTA'sı tam metin + `index: 0` ile hedeflendi.

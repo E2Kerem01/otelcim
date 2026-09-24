@@ -29,7 +29,7 @@ tags: [chat, report]
 
 # 4. Şikayet / bildirim diyaloğunun açıldığı doğrulanır
 - extendedWaitUntil:
-    visible: ".*Açıklama \\(opsiyonel\\).*"
+    visible: ".*Açıklama \\(İsteğe Bağlı\\).*"
     timeout: 5000
 - assertVisible: ".*İptal.*"
 - assertVisible: ".*Gönder.*"
@@ -39,4 +39,4 @@ tags: [chat, report]
 - extendedWaitUntil:
     visible: ".*Sohbet.*"
     timeout: 5000
-- assertNotVisible: ".*Açıklama \\(opsiyonel\\).*"
+- assertNotVisible: ".*Açıklama \\(İsteğe Bağlı\\).*"

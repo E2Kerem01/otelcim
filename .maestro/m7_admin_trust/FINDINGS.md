@@ -63,6 +63,30 @@ Bu doküman, Otelcim mobil uygulamasının Admin Paneli, Güven ve Moderasyon, Y
 
 ---
 
+### BUG-m7-06: `AccountSuspendedScreen` build() İçinde Inline `FutureProvider` Kullanımı Nedeniyle Ekran Kalıcı Loading Döngüsünde Kalıyor
+- **Dosya & Satır**: `lib/features/auth/presentation/account_suspended_screen.dart:22-25`
+- **Önem**: **Kritik**
+- **Tekrar Üretme Adımları**:
+  1. `suspended@e2e.test` veya `banned@e2e.test` hesabı ile giriş yap.
+  2. Router redirect ile `/account-suspended` ekranı açılır.
+  3. Ekran içeriğini incele.
+- **Beklenen Davranış**: Kullanıcı profilindeki kısıtlama durumuna göre "Hesabınız Askıya Alındı" (ve askı bitiş tarihi/sebebi) veya "Hesabınız Yasaklandı" (ve yasak sebebi) başlığı görüntülenmelidir.
+- **Gerçek Davranış**: `account_suspended_screen.dart:22-25` içerisinde:
+  ```dart
+  final profileAsync = uid == null
+      ? null
+      : ref.watch(
+          FutureProvider(
+            (ref) => ref.watch(adminServiceProvider).getUserProfile(uid),
+          ),
+        );
+  ```
+  `build()` metodu her çalıştığında Riverpod'a ait yeni bir `FutureProvider` nesnesi dinamik olarak türetilmektedir. Yeni türetilen provider'ın başlangıç durumu daima `AsyncLoading()` olduğundan ve asenkron veri geldiğinde tetiklenen rebuild yeni bir provider instance'ı oluşturduğundan widget asla `profileAsync.when(data: ...)` dalına geçememekte; ekranda süresiz olarak `CircularProgressIndicator` yükleme animasyonu dönmektedir. Kullanıcı hesabının neden veya ne zamana kadar askıya alındığını/yasaklandığını görememektedir.
+- **İlgili Testler**: `.maestro/m7_admin_trust/bugs/bug_suspended_user_lockout.yaml`, `.maestro/m7_admin_trust/bugs/bug_banned_user_lockout.yaml`, `.maestro/m7_admin_trust/bugs/bug_suspended_user_relaunch_lockout.yaml`
+
+---
+
+
 ## 2. UX ve Erişilebilirlik (Accessibility) Bulguları
 
 1. **Erişilebilirlik Etiketi Olmayan Butonlar**:

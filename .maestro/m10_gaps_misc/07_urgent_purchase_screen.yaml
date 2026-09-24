@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "m10 acil ilan satın alma ekranı güvenli görüntüleme"
+tags: [m10, urgent, no-purchase]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: _helpers/login_no_hide.yaml
+    env:
+      EMAIL: employer@e2e.test
+- openLink: "otelcim-e2e://app/listing/L2/urgent"
+- extendedWaitUntil:
+    visible: "Acil İlan"
+    timeout: 10000
+- assertVisible: "Garson (Sezonluk)"
+- assertVisible: "Ücretsiz acil ilan hakkınızı daha önce kullandınız"
+- assertVisible: "Acil İlan (tek seferlik)"
+- assertVisible: "₺149,99"
+- assertVisible: "Şimdilik acil yapmadan devam et"
+- assertVisible: "Satın Al ve Acil Yap"
+# Satın alma mağazasını ve callable fonksiyonu tetiklememek için satın alma düğmesine basılmaz.

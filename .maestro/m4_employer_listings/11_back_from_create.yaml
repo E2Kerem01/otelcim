@@ -11,7 +11,7 @@ tags: [m4, employer, navigation]
 - extendedWaitUntil:
     visible: "Yeni İlan Aç"
     timeout: 10000
-- assertVisible: ".*\\* işaretli alanlar zorunludur.*"
+- assertVisible: ".*işaretli alanlar zorunludur.*"
 - back
 - extendedWaitUntil:
     visible: ".*Ana Sayfa.*"

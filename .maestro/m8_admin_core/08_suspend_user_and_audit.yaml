@@ -1,0 +1,36 @@
+appId: com.example.otelcim
+name: "m8 admin suspends seeker for seven days and logs action"
+tags: [m8_admin_core, users, suspension, audit]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/users"
+- extendedWaitUntil:
+    visible: ".*E-posta veya isimle ara.*"
+    timeout: 15000
+- tapOn: "E-posta veya isimle ara"
+- inputText: "Ayşe"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- tapOn: '.*Askıya Al \(7 gün\).*'
+- extendedWaitUntil:
+    visible: ".*Kullanıcıyı Askıya Al.*"
+    timeout: 5000
+- assertVisible: '.*7 gün süreyle askıya alınacak\..*'
+- tapOn: ".*Onayla.*"
+- extendedWaitUntil:
+    visible: '.*İşlem tamamlandı\..*'
+    timeout: 10000
+- assertVisible: '.*Askıda \(.* kadar\).*'
+- openLink: "otelcim-e2e://app/admin/audit-log"
+- extendedWaitUntil:
+    visible: ".*İşlem Geçmişi.*"
+    timeout: 10000
+- assertVisible: ".*Kullanıcıyı Askıya Al.*"
+- assertVisible: ".*Kullanıcı:.*"
+- assertVisible: ".*Admin panelinden askıya alındı.*"

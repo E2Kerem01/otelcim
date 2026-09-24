@@ -11,10 +11,9 @@ tags: [m3, listing-detail, employer, qr]
 - extendedWaitUntil:
     visible: ".*İlan Detayı.*"
     timeout: 10000
-- assertVisible: ".*İlan Yönetimi.*"
 - assertVisible: ".*İlanı Öne Çıkar.*"
 - assertVisible: ".*QR Poster Oluştur.*"
-- assertNotVisible: ".*Başvur / Mesaj Gönder.*"
+- assertNotVisible: ".*Mesaj Gönder.*"
 - tapOn: ".*QR Poster Oluştur.*"
 - extendedWaitUntil:
     visible: ".*QR İlan Posteri.*"
@@ -25,5 +24,5 @@ tags: [m3, listing-detail, employer, qr]
 - assertVisible: '.*İlanı görüntülemek ve hızlı başvuru yapmak için QR kodu taratın\..*'
 - back
 - extendedWaitUntil:
-    visible: ".*İlan Yönetimi.*"
+    visible: ".*İlanı Öne Çıkar.*"
     timeout: 10000

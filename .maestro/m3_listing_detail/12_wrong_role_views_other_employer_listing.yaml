@@ -7,14 +7,12 @@ tags: [m3, listing-detail, wrong-role]
     file: ../common/login.yaml
     env:
       EMAIL: employer@e2e.test
-- scrollUntilVisible:
-    element: ".*Animatör.*"
-    direction: DOWN
-- tapOn: ".*Animatör.*"
+- openLink: "otelcim-e2e://app/listing/L6"
 - extendedWaitUntil:
     visible: ".*İlan Detayı.*"
     timeout: 10000
 - assertVisible: ".*Animatör.*"
 - assertVisible: ".*Kaya Butik Otel.*"
+- assertVisible: ".*Mesaj Gönder.*"
 - assertNotVisible: ".*İlan Yönetimi.*"
 - assertNotVisible: ".*QR Poster Oluştur.*"

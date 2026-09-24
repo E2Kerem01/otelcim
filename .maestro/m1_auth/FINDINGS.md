@@ -9,6 +9,13 @@
 - Beklenen: Yeni e-posta kaydı, plan gereği onboarding/rol ekranına (`Otelcim'e Hoş Geldiniz!`, `Devam Et`) gider.
 - Gerçek: `RegisterScreen` rolü zaten kayıt formunda alıyor; kayıt sonrası oturum açılmış `/register` konumu router tarafından `/` konumuna yönlendiriliyor. `consumeJustRegistered()` tanımlı olsa da router tarafından kullanılmıyor.
 
+### BUG-M1-02 — Yüksek
+
+- Kaynak: `lib/app/router.dart:111-114` korumalı rota için oturum kapalıyken `/login` yönlendirmesi; cihaz sonucu ile birlikte login ekranından Android `back` sonrası navigator yığını boş kalıyor.
+- Tekrar: `bugs/BUG-M1-02_protected_tab_back_exits_app.yaml` akışını çalıştır.
+- Beklenen: Korumalı sekmeden login'e yönlenen kullanıcı geri ile ana sayfaya döner.
+- Gerçek: Login ekranından `back` uygulamayı kapatıp Android ana ekranına düşürüyor; akış ana sayfa assert'inde kırılıyor.
+
 ## UX / erişilebilirlik
 
 - `lib/features/auth/presentation/register_screen.dart:375-390` rol kartları `InkWell` ile oluşturuluyor, ayrı `Semantics` veya key yok. Maestro seçicisi görünür başlık metninin Flutter erişilebilirlik etiketine birleşmesini varsayar; akışlarda bu nedenle ilgili satırlarda `# TAHMİN:` notu vardır.
@@ -22,3 +29,10 @@
 - Fotoğraf/dosya yükleme, satın alma/boost/redeem, Firebase dışı canlı entegrasyonlar ve Maestro/ADB cihaz çalıştırması yapılmadı.
 - `account-suspended` ekranında geri tuşu testleri, router'ın her hedefte askıya alınmış profili tekrar `/account-suspended` konumuna yönlendirmesi beklentisiyle yazıldı.
 
+## Düzeltme turu notları
+
+- Cihaz görüntüsünde mobil Hesabım ekranı rol etiketini göstermiyor; `01_login_seeker.yaml` artık `Hemen Başlayabilir` kartını doğruluyor.
+- Kırılan login/kayıt alanlarında birleşik sekme etiketiyle çakışan regex seçiciler kaldırıldı; `E-posta` ve `Şifre` tam metinle seçiliyor. Düzeltilen auth akışlarında `hideKeyboard` kullanılmıyor.
+- `phoneHint` (`5XX XXX XX XX`) kaynak ARB'de olsa da cihaz etiketinde görünmedi; telefon akışı gerçek `Telefon Numarası` label'ına indirgenerek SMS tetiklemeden formu doğruluyor.
+- D7 geri tuşu davranışı gerçek uygulama bug'ı olarak `bugs/BUG-M1-02_protected_tab_back_exits_app.yaml` dosyasına taşındı: login'den `back` uygulamayı ana ekrana kapatıyor.
+- Ban/askı ekranlarında profil başlığı ayrı Firestore sorgusuyla yüklendiği için spinner görülebiliyor; akışlar kalıcı destek açıklamasını bekleyip başlık için 30 saniyelik timeout kullanıyor.
