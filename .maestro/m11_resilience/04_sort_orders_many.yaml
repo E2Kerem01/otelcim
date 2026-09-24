@@ -9,9 +9,9 @@ tags: [m11_resilience, filters, sort, many]
     visible: ".*Gelişmiş filtreler.*"
     timeout: 10000
 - scrollUntilVisible:
-    element: "Sıralama"
+    element: ".*Sıralama.*"
     direction: DOWN
-- tapOn: "Sıralama"
+- tapOn: ".*Sıralama.*"
 - tapOn: ".*Maaş yüksekten düşüğe.*"
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:
@@ -24,9 +24,9 @@ tags: [m11_resilience, filters, sort, many]
     direction: UP
 - tapOn: ".*Filtreler.*"
 - scrollUntilVisible:
-    element: "Sıralama"
+    element: ".*Sıralama.*"
     direction: DOWN
-- tapOn: "Sıralama"
+- tapOn: ".*Sıralama.*"
 - tapOn: ".*Maaş düşükten yükseğe.*"
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:
@@ -39,9 +39,9 @@ tags: [m11_resilience, filters, sort, many]
     direction: UP
 - tapOn: ".*Filtreler.*"
 - scrollUntilVisible:
-    element: "Sıralama"
+    element: ".*Sıralama.*"
     direction: DOWN
-- tapOn: "Sıralama"
+- tapOn: ".*Sıralama.*"
 - tapOn: "En yeni"
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:

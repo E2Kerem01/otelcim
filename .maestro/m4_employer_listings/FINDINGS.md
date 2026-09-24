@@ -34,13 +34,29 @@
 
 | FAIL | Karar | Yapılan işlem |
 |---|---|---|
-| 01_create_listing_happy | (a) test hatası | Hata ekranında uygulamanın ana ekranda olduğu görüldü; create formundaki `hideKeyboard` çağrıları Android geri davranışı nedeniyle uygulamayı kapatıyordu. Akıştan tüm `hideKeyboard` adımları kaldırıldı. |
+| 01_create_listing_happy | (a) test hatası | Kaynakta `Bölge seçin` mevcut; birleşik Flutter form semantiği için `.*Bölge seçin.*` seçicileri kullanıldı. |
 | 02_create_listing_required_validation | (a) test hatası | Hata metinleri formda mevcut, ancak ekran görüntüsünde yalnızca alt bölüm viewport’ta. Her hata öncesine kaynak metniyle `scrollUntilVisible` eklendi. |
-| 03_housing_and_urgent_options | (a) test hatası | `Lojman Bilgileri Ekle` formun başlangıç viewport’unda değil. Satıra önce aşağı kaydırma eklendi; acil alanı için de aşağı kaydırma yönü düzeltildi. |
+| 03_housing_and_urgent_options | (a) test hatası | Görüntüde lojman satırı mevcut; `Lojman Bilgileri Ekle` ve `Oda tipi` seçicileri birleşik semantiğe uygun regex’e çevrildi. |
 | 04_batch_listing_required_validation | (a) test hatası | Doğrulamalar ekran görüntüsünde var fakat farklı form bölümlerinde. Kaynakta bulunan yedi hata metninin her biri öncesi viewport’a kaydırılıyor. |
-| 05_batch_two_positions | (a) test hatası | `Otel / İşletme Bilgileri` görselde mevcut; birleşik Flutter semantiği için bekleme seçicisi `.*...*` biçimine çevrildi. Formdaki `hideKeyboard` çağrıları da kaldırıldı. |
+| 05_batch_two_positions | (a) test hatası | `Şehir seçin` gerçek hardcoded hint; birleşik Flutter semantiği için `.*Şehir seçin.*` seçicileri kullanıldı. |
 | 06_edit_l2_title | (b) uygulama bug’ı | Ekran görüntüsünde kırmızı Flutter `DropdownButton` assertion’ı doğrulandı. Kaynak/seed uyumsuzluğu teyit edilerek akış `bugs/BUG-M4-04_edit_l2_region_assertion.yaml` altına taşındı; normal akış listesinde artık yok. |
-| 07_close_l2_listing | (a) test hatası | “Ana Sayfa” bu ekranın AppBar’ında yok; ekran görüntüsü hâlâ `İlanlarım`ı gösteriyor. Önce `back` ile Hesabım’a, sonra Ana Sayfa sekmesine dönülecek şekilde düzeltildi. |
-| 09_boost_screen_no_purchase | (a) test hatası | Paket ve fiyat metinleri ekran görüntüsünde mevcut; kart semantiği birleşik olduğundan tüm paket/fiyat/assert seçicileri `.*...*` yapıldı. Satın alma düğmesine basılmadı. |
+| 07_close_l2_listing | (b) uygulama bug’ı | L2 kapanmasına rağmen ana sayfa provider’ı refresh edilmediği için 7 sonuç kalıyor; akış `bugs/BUG-M4-05_close_l2_stale_home.yaml` olarak taşındı. |
+| 09_boost_screen_no_purchase | (a) test hatası | Görüntü `İlanlarım` root ekranını gösteriyor; ikinci `back` ile profil satırına dönülecek şekilde düzeltildi. Satın alma düğmesine basılmadı. |
 | 10_restart_keeps_employer_session | (a) test hatası | Yeni cihaz kuralı gereği employer profilinde “İşveren” rol etiketi görünmüyor. Yanlış assert kaldırıldı, görünür `İlanlarım` satırıyla oturum doğrulanıyor. |
-| 11_back_from_create | (a) test hatası | Kaynakta legend iki ayrı `Text` olarak oluşturuluyor; yıldızı seçiciye dahil etmek semantik boşluk/satır ayrımı nedeniyle eşleşmiyordu. Assert yıldız olmadan gerçek metne daraltıldı. |
+| 11_back_from_create | (b) uygulama bug’ı | Görüntü launcher’ı gösteriyor; create branch kökünde Android geri tuşu uygulamadan çıkıyor. Akış `bugs/BUG-M4-06_back_from_create_exits_app.yaml` olarak taşındı. |
+
+## Düzeltme turu (tur 1 cihaz sonuçları)
+
+- `01_create_listing_happy`: (a) test hatası. `regionSelectHint` kaynakta `Bölge seçin`; birleşik form semantiği için seçiciler `.*Bölge seçin.*` yapıldı.
+- `03_housing_and_urgent_options`: (a) test hatası. Görüntüde lojman satırı mevcut; `Lojman Bilgileri Ekle` ve `Oda tipi` seçicileri birleşik semantiğe uygun regex’e çevrildi.
+- `05_batch_two_positions`: (a) test hatası. `Şehir seçin` gerçek hardcoded hint; şehir seçicileri `.*Şehir seçin.*` yapıldı.
+- `07_close_l2_listing`: (b) uygulama bug’ı. `closeListing` yazımı sonrası ana sayfa provider’ı refresh edilmediği için 7 sonuç kalıyor; akış `bugs/BUG-M4-05_close_l2_stale_home.yaml` olarak taşındı.
+- `09_boost_screen_no_purchase`: (a) test hatası. Görüntü `İlanlarım` root ekranını gösteriyor; ikinci `back` ile profil satırına dönülecek şekilde düzeltildi.
+- `11_back_from_create`: (b) uygulama bug’ı. Görüntü launcher; create branch kökünde Android geri tuşu uygulamadan çıkıyor. Akış `bugs/BUG-M4-06_back_from_create_exits_app.yaml` olarak taşındı.
+
+## Tur 1’de teyit edilen yeni uygulama bug’ları
+
+| Önem | Kaynak | Beklenen / gerçek | Yeniden üretme |
+|---|---|---|---|
+| Yüksek | `lib/features/home/presentation/home_screen.dart:175-185,425`; `lib/shared/providers/paginated_listings_provider.dart:128-136` | L2 kapatıldıktan sonra feed 6 aktif sonuç ve L2’siz görünmeli; ana sayfa `paginationState.listings.length` değerini refresh edilmeden koruduğu için 7 sonuç gösteriyor. | `bugs/BUG-M4-05_close_l2_stale_home.yaml` |
+| Yüksek | `lib/app/router.dart:204-322`; `lib/features/listings/presentation/create_listing_screen.dart:300-305` | İlan Ver ekranında Android geri tuşu feed’e dönmeli; create StatefulShell branch kökünde olduğundan launcher’a düşüyor. | `bugs/BUG-M4-06_back_from_create_exits_app.yaml` |

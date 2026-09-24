@@ -22,6 +22,7 @@
 
 - `home_screen.dart:242-249` arama alanının temizleme `IconButton`'ında `tooltip` yok. Akış 02 bu nedenle clear ikonunu seçmeye çalışmak yerine odaktaki alanı `eraseText` ile temizliyor; ikon düğmesi erişilebilir seçiciyle bağımsız doğrulanamıyor.
 - Feed görünüm düğmeleri ve bölge/yakındaki segmented düğmeleri tooltip ile etiketlenmiş; akışlarda tooltip tabanlı seçiciler için `# TAHMİN` notları bırakıldı.
+- Feed görünüm düğmelerindeki Flutter `Key` değerleri (`grid_col_2`, `grid_col_table`) cihaz hiyerarşisinde seçilebilir görünmedi; Maestro akışlarında kaynak tooltip metinleri (`2 Sütun`, `Tablo Görünümü`) kullanılmalıdır.
 - Sezon takvimi ekranında bazı Türkçe metinler doğrudan widget içinde hardcoded (`seasonal_calendar_screen.dart:42-121,155-276`); mevcut `tr` akışını bozmadığı için bug klasörüne alınmadı.
 
 ## Test edilemeyen / özellikle dokunulmayanlar

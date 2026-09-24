@@ -20,9 +20,9 @@ tags: [m4, employer, batch]
 - tapOn: ".*Muğla / Bodrum.*"
 - inputText: "Antalya / Lara"
 - scrollUntilVisible:
-    element: "Şehir seçin"
+    element: ".*Şehir seçin.*"
     direction: DOWN
-- tapOn: "Şehir seçin"
+- tapOn: ".*Şehir seçin.*"
 - tapOn: "Antalya"
 - scrollUntilVisible:
     element: ".*0555 123 4567 / ik@hotel\\.com.*"

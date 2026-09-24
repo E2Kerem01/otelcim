@@ -18,13 +18,13 @@ tags: [m12, a11y, accessibility, tooltips]
 - assertVisible:
     text: ".*Filtreler.*"
 
-# 3. View mode toggle tooltips (grid columns and table view)
+# 3. View mode toggles (grid columns and table view)
 - assertVisible:
-    text: ".*1 Sütun.*"
+    id: "grid_col_1"
 - assertVisible:
-    text: ".*2 Sütun.*"
+    id: "grid_col_2"
 - assertVisible:
-    text: ".*Tablo Görünümü.*"
+    id: "grid_col_table"
 
 # 4. Favorite heart icon button tooltip on listing card
 - assertVisible:
@@ -32,7 +32,7 @@ tags: [m12, a11y, accessibility, tooltips]
 
 # 5. Switch to Table view and verify accessible column header labels
 - tapOn:
-    text: ".*Tablo Görünümü.*"
+    id: "grid_col_table"
 - extendedWaitUntil:
     visible: ".*İlan Başlığı.*"
     timeout: 10000
@@ -43,7 +43,7 @@ tags: [m12, a11y, accessibility, tooltips]
 
 # 6. Switch back to 1 Column view
 - tapOn:
-    text: ".*1 Sütun.*"
+    id: "grid_col_1"
 - extendedWaitUntil:
     visible: ".*Resepsiyonist Aranıyor.*"
     timeout: 10000

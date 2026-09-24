@@ -2,6 +2,7 @@
 # Waits for the localized home tab label 'الرئيسية' instead of Turkish 'Ana Sayfa'.
 appId: com.example.otelcim
 ---
+- setOrientation: PORTRAIT
 - launchApp:
     stopApp: true
 - extendedWaitUntil:

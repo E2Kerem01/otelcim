@@ -31,8 +31,11 @@ tags: [m4, employer, boost, safe]
 - assertVisible: ".*Satın Al ve Öne Çıkar.*"
 # Güvenlik: Satın alma düğmesine ve ücretsiz boost kullanma düğmesine basılmaz.
 - back
-- tapOn: ".*Hesabım.*"
-- tapOn: "Öne Çıkarılan İlanlarım"
+- back
+- scrollUntilVisible:
+    element: ".*Öne Çıkarılan İlanlarım.*"
+    direction: DOWN
+- tapOn: ".*Öne Çıkarılan İlanlarım.*"
 - extendedWaitUntil:
     visible: "Henüz Öne Çıkarılmış İlanınız Yok"
     timeout: 10000

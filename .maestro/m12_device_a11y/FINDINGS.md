@@ -58,6 +58,15 @@
 - **Beklenen Davranış:** Tüm profil satır başlıkları (`AppLocalizations`) üzerinden çevrilmelidir.
 - **Gerçek Davranış:** "Profili Düzenle", "Belgelerim / Sertifika Cüzdanı", "Favorilerim", "İlanlarım", "Öne Çıkarılan İlanlarım", "Bildirim Ayarları", "Gizlilik ve Veri Ayarları", "Arkadaşını Davet Et", "Uygulama Dili", "Çıkış Yap" ve mesaj giriş ipucu ("Mesajınızı yazın...") tamamen hardcoded Türkçe olarak kalmaktadır.
 
+### BUG-m12-05: Büyük Yazı Boyutunda (Font Scale 2.0) İlan Kartı Üst Satırında Taşma (D31)
+- **Dosya / Satır:** `lib/features/home/presentation/widgets/home_screen_widgets.dart:860-968`
+- **Önem Derecesi:** Yüksek
+- **Tekrar Üretme Adımları:**
+  1. Erişilebilirlik ayarlarından yazı boyutunu 2.0 (Accessibility Font Scale 2.0) yapın.
+  2. Ana sayfadaki ilan kartlarına bakın.
+- **Beklenen Davranış:** Rozetler, favori butonu ve tarih wrap edilmeli; favori butonu ("Favorilere ekle") ve tarih ekranda tam görünür olmalıdır.
+- **Gerçek Davranış:** Tek bir yatay `Row` içine dizilen rozetler, favori butonu ve tarih font scale 2.0 olduğunda sağdan 18–116 px taşar (RenderFlex overflowed). Favori butonu ve tarih kart sınırları dışına itilir ve kesilir.
+
 ---
 
 ## 2. Yazı Boyutu 2.0 (Font Scale 2.0) ve Taşma (Overflow) Riskleri

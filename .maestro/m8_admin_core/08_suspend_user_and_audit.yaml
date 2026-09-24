@@ -26,7 +26,13 @@ tags: [m8_admin_core, users, suspension, audit]
 - extendedWaitUntil:
     visible: '.*İşlem tamamlandı\..*'
     timeout: 10000
-- assertVisible: '.*Askıda \(.* kadar\).*'
+- tapOn: "E-posta veya isimle ara"
+- eraseText: 50
+- inputText: "Ayşe"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: '.*Askıda \(.* kadar\).*'
+    timeout: 10000
 - openLink: "otelcim-e2e://app/admin/audit-log"
 - extendedWaitUntil:
     visible: ".*İşlem Geçmişi.*"

@@ -19,11 +19,11 @@ tags: [m4, employer, create]
 - tapOn: ".*Örn\\. Muğla / Bodrum.*"
 - inputText: "Antalya / Lara"
 - scrollUntilVisible:
-    element: "Bölge seçin"
+    element: ".*Bölge seçin.*"
     direction: DOWN
-- tapOn: "Bölge seçin"
+- tapOn: ".*Bölge seçin.*"
 - tapOn: "Antalya"
-- tapOn: "Şehir seçin"
+- tapOn: ".*Şehir seçin.*"
 - tapOn: "Antalya"
 - scrollUntilVisible:
     element: "Sezon seçilmedi"

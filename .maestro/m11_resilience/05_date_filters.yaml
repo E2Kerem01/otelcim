@@ -8,7 +8,7 @@ tags: [m11_resilience, filters, dates, many]
 - extendedWaitUntil:
     visible: ".*Gelişmiş filtreler.*"
     timeout: 10000
-- tapOn: "İlan tarihi"
+- tapOn: ".*İlan tarihi.*"
 - tapOn: "Son 24 saat"
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:
@@ -20,7 +20,7 @@ tags: [m11_resilience, filters, dates, many]
     element: ".*Filtreler.*"
     direction: UP
 - tapOn: ".*Filtreler.*"
-- tapOn: "İlan tarihi"
+- tapOn: ".*İlan tarihi.*"
 - tapOn: "Son hafta"
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:
@@ -32,7 +32,7 @@ tags: [m11_resilience, filters, dates, many]
     element: ".*Filtreler.*"
     direction: UP
 - tapOn: ".*Filtreler.*"
-- tapOn: "İlan tarihi"
+- tapOn: ".*İlan tarihi.*"
 - tapOn: "Son ay"
 - tapOn: ".*Filtreleri uygula.*"
 - scrollUntilVisible:

@@ -10,9 +10,9 @@ tags: [m2_discovery, filters]
 - tapOn: "En düşük maaş"
 - inputText: "33000"
 - scrollUntilVisible:
-    element: "Sıralama"
+    element: ".*Sıralama.*"
     direction: DOWN
-- tapOn: "Sıralama"
+- tapOn: ".*Sıralama.*"
 - tapOn: ".*Maaş yüksekten düşüğe.*"
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:

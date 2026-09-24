@@ -33,7 +33,11 @@ tags: [chat, cross-user]
     visible: ".*CV belgelerimi hazırladım, yarın getiriyorum\\..*"
     timeout: 10000
 
-# 5. Seeker oturumu kapatılır (Hesabım -> Çıkış Yap)
+# 5. Sohbet detayından çıkılarak alt sekmelere dönülür ve Seeker oturumu kapatılır
+- back
+- extendedWaitUntil:
+    visible: ".*Hesabım.*"
+    timeout: 10000
 - runFlow: _helpers/logout.yaml
 
 # 6. Employer (Mehmet İşveren) ile giriş yapılır (şu an login ekranındayız)

@@ -1,10 +1,11 @@
+# BUG-m9-06: Sertifika reddi sonrası bekleyen kart kuyruktan kalkmıyor — beklenen: sebep ile red sonrası "Hijyen Eğitimi Sertifikası" kartının kalkması / gerçek: başarı bildirimi görünmesine rağmen kart ekranda kalıyor
 appId: com.example.otelcim
-name: "admin certificate rejection requires a reason"
-tags: [m9_admin_content, admin, certificate, validation]
+name: "BUG rejected certificate remains in queue"
+tags: [m9_admin_content, bug, admin, certificate, validation]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: admin@e2e.test
 - openLink: "otelcim-e2e://app/admin/certificates"
@@ -26,4 +27,7 @@ tags: [m9_admin_content, admin, certificate, validation]
     index: -1
 - extendedWaitUntil:
     visible: "Belge reddedildi."
+    timeout: 10000
+- extendedWaitUntil:
+    notVisible: "Hijyen Eğitimi Sertifikası"
     timeout: 10000

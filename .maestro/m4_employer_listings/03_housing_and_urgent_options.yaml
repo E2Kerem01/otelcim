@@ -12,29 +12,29 @@ tags: [m4, employer, form]
     visible: "Yeni İlan Aç"
     timeout: 10000
 - scrollUntilVisible:
-    element: "Lojman Bilgileri Ekle"
+    element: ".*Lojman Bilgileri Ekle.*"
     direction: DOWN
-- tapOn: "Lojman Bilgileri Ekle"
+- tapOn: ".*Lojman Bilgileri Ekle.*"
 - extendedWaitUntil:
-    visible: "Oda tipi"
+    visible: ".*Oda tipi.*"
     timeout: 10000
 - scrollUntilVisible:
-    element: "Oda tipi"
+    element: ".*Oda tipi.*"
     direction: DOWN
 - assertVisible: "Klima"
 - assertVisible: "Wi-Fi"
 - assertVisible: "Günlük dahil öğün"
 - assertVisible: "Lojman fotoğrafları"
-- tapOn: "Oda tipi"
+- tapOn: ".*Oda tipi.*"
 - tapOn: "Çok kişilik oda"
 - tapOn: "Klima"
 - tapOn: "Wi-Fi"
 - assertVisible: "Çok kişilik oda"
 - scrollUntilVisible:
-    element: "Acil İhtiyaç"
+    element: ".*Acil İhtiyaç.*"
     direction: DOWN
 - assertVisible: ".*Bölgedeki kullanıcılara anlık bildirim gönderilir\\..*"
-- tapOn: "Acil İhtiyaç"
+- tapOn: ".*Acil İhtiyaç.*"
 - assertVisible: ".*İlk acil ilanınız ücretsiz\\..*"
 - back
 - assertVisible: ".*Ana Sayfa.*"

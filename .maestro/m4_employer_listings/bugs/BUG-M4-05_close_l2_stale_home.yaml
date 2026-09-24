@@ -1,10 +1,11 @@
+# BUG-M4-05: L2 kapatıldıktan sonra ana sayfa eski sayfalama state'ini gösteriyor — beklenen: "6 sonuç" ve L2'nin feed'den kalkması / gerçek: StatefulShell'de korunan ana sayfa "7 sonuç" gösteriyor.
 appId: com.example.otelcim
-name: "m4 - employer closes an active listing"
-tags: [m4, employer, lifecycle]
+name: "m4 bug - closing L2 leaves stale home results"
+tags: [m4, bug, employer, lifecycle]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: employer@e2e.test
 - tapOn: ".*Hesabım.*"

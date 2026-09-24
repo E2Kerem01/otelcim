@@ -1,10 +1,11 @@
+# BUG-M1-05: Askıya alınmış hesap ekranı başlığı spinner'da kalıyor — beklenen: "Hesabınız Askıya Alındı" ve askı bitişi; gerçek: profil başlığı yerine sonsuz yükleme spinner'ı.
 appId: com.example.otelcim
-name: "m1 auth suspended account is blocked"
-tags: [m1_auth, access-control, negative]
+name: "BUG M1 suspended account message should load"
+tags: [m1_auth, access-control, bug, expected-failure]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: suspended@e2e.test
 - extendedWaitUntil:
@@ -20,3 +21,4 @@ tags: [m1_auth, access-control, negative]
     visible: ".*Hesabınız Askıya Alındı.*"
     timeout: 10000
 - assertNotVisible: ".*Ana Sayfa.*"
+

@@ -36,8 +36,8 @@ tags: [m6, profile, delete_account, auth]
 - tapOn: "Şifreniz"
 - inputText: "Test1234!"
 
-# Onay metnini gir (SİL)
-- tapOn: "SİL"
+# Onay metnini gir (SİL) - Başlık veya butonla ("Hesabınızı Silin", "Hesabımı Kalıcı Olarak Sil") çakışmaması için tam regex
+- tapOn: "^S[İiIı]L$"
 - inputText: "SİL"
 
 # Kalıcı olarak sil butonuna bas
@@ -59,6 +59,6 @@ tags: [m6, profile, delete_account, auth]
 
 # Girişin başarısız olduğunu ve oturum açılmadığını doğrula
 - extendedWaitUntil:
-    visible: ".*Hata.*|.*Geçersiz.*|.*bulunamadı.*|.*user-not-found.*|.*Yanlış.*"
+    visible: ".*Hata.*|.*Geçersiz.*|.*bulunamadı.*|.*user-not-found.*|.*Yanlış.*|.*hatalı.*"
     timeout: 10000
 - assertVisible: "Şifre"

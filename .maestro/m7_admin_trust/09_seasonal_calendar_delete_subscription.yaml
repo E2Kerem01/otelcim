@@ -26,10 +26,9 @@ tags: [m7, admin_trust, seasonal, delete]
 - scrollUntilVisible:
     element: ".*Tüm Bölgeler - Tüm Kategoriler.*"
     direction: DOWN
-# TAHMİN: IconButton üzerinde tooltip olmadığı için kart başlığının sağındaki son etkileşimli öğe (silme butonu) hedeflenir
+# TAHMİN: IconButton üzerinde tooltip ve Semantics etiketi olmadığı için (D6), scroll sonrası kartın sağındaki silme ikonu tahmini ekran koordinatıyla (%85, %93) tıklanır
 - tapOn:
-    rightOf: ".*Tüm Bölgeler - Tüm Kategoriler.*"
-    index: -1
+    point: "85%,93%"
 - extendedWaitUntil:
     visible: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
     timeout: 10000

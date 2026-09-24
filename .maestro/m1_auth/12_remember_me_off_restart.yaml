@@ -7,7 +7,11 @@ tags: [m1_auth, persistence]
 - extendedWaitUntil:
     visible: ".*Giriş Yap.*"
     timeout: 10000
-- tapOn: ".*Beni Hatırla.*"
+# TAHMİN: Checkbox ve metni aynı Flutter semantik düğümünde birleşiyor;
+# metin seçicisi düğümün geniş bounds merkezine dokunduğu için kutuyu değiştirmiyor.
+# Kaynak yerleşime göre kutunun gerçek görsel konumu yaklaşık %13 x / %69 y'dir.
+- tapOn:
+    point: "13%,69%"
 - tapOn: "E-posta"
 - inputText: seeker@e2e.test
 - tapOn: "Şifre"

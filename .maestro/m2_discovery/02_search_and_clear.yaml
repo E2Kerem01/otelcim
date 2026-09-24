@@ -14,4 +14,7 @@ tags: [m2_discovery, search]
 - extendedWaitUntil:
     visible: ".*7 sonuç.*"
     timeout: 10000
-- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist.*"
+    timeout: 10000
+- assertVisible: ".*Resepsiyonist.*"

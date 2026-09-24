@@ -13,6 +13,7 @@ LOCALE=${E2E_LOCALE:-tr}
 reset_app() {  # fresh install state, fixed locale, no permission dialogs
   adb shell input keyevent KEYCODE_WAKEUP  # a locked/asleep screen fails every flow
   adb shell wm dismiss-keyguard
+  adb shell cmd statusbar collapse  # e.g. a monkey run can leave the shade open
   adb shell pm clear $APP >/dev/null
   adb shell cmd locale set-app-locales $APP --locales "$LOCALE" >/dev/null
   for perm in POST_NOTIFICATIONS ACCESS_FINE_LOCATION ACCESS_COARSE_LOCATION; do

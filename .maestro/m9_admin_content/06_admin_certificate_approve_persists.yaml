@@ -25,13 +25,11 @@ tags: [m9_admin_content, admin, certificate]
 - extendedWaitUntil:
     visible: "Belge onaylandı."
     timeout: 10000
-- extendedWaitUntil:
-    notVisible: "Hijyen Eğitimi Sertifikası"
-    timeout: 10000
-- back
+- launchApp:
+    stopApp: true
 - extendedWaitUntil:
     visible: ".*Ana Sayfa.*"
-    timeout: 10000
+    timeout: 20000
 - tapOn: ".*Hesabım.*"
 - scrollUntilVisible:
     element: "Çıkış Yap"

@@ -23,11 +23,12 @@ tags: [m3, listing-detail, guest]
 - scrollUntilVisible:
     element: ".*İletişim bilgisini görmek için giriş yapın.*"
     direction: DOWN
+    centerElement: true
 - assertVisible: ".*İlan Sahibi.*"
 - assertNotVisible: '.*ik\+L1@e2e\.test.*'
 - assertVisible: ".*İletişim bilgisini görmek için giriş yapın.*"
 - tapOn:
-    text: "İletişim bilgisini görmek için giriş yapın"
+    text: ".*İletişim bilgisini görmek için giriş yapın.*"
     index: 0
 - extendedWaitUntil:
     visible: "Giriş Yap"

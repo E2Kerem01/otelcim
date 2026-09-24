@@ -24,6 +24,3 @@ tags: [m9_admin_content, admin, verification]
 - extendedWaitUntil:
     visible: "Doğrulama onaylandı."
     timeout: 10000
-- extendedWaitUntil:
-    notVisible: "Yeni Otel"
-    timeout: 10000

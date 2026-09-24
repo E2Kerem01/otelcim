@@ -2,13 +2,14 @@ appId: com.example.otelcim
 name: "m12 - 10 landscape unauthorized redirect and responsive login form"
 tags: [m12, landscape, auth, redirect, responsive]
 ---
+- setOrientation: PORTRAIT
 - runFlow: ../../common/launch.yaml
 
 # Switch to landscape mode
 - setOrientation: LANDSCAPE_LEFT
 
 - extendedWaitUntil:
-    visible: ".*Ana Sayfa.*"
+    visible: ".*7 sonuç.*"
     timeout: 10000
 
 # Edge case: Unauthorized user accesses protected route via deep link

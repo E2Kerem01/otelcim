@@ -8,12 +8,12 @@ tags: [m2_discovery, region]
     visible: ".*Bölgeler.*"
     timeout: 10000
 - scrollUntilVisible:
-    element: ".*Muğla.*"
+    element: ".*Bodrum.*"
     direction: DOWN
-- tapOn: ".*Muğla.*"
+- tapOn: ".*Bodrum.*"
 - extendedWaitUntil:
     visible: ".*Animatör.*"
     timeout: 10000
-- assertVisible: ".*Muğla.*"
+- assertVisible: ".*Bodrum.*"
 - assertVisible: ".*1 sonuç.*"
 - assertNotVisible: ".*Resepsiyonist Aranıyor.*"

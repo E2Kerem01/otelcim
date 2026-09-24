@@ -14,10 +14,10 @@ tags: [m2_discovery, region, navigation]
 # TAHMİN: SegmentedButton tooltip erişilebilir etiketi Flutter hiyerarşisinde görünür.
 - tapOn: ".*Liste.*"
 - scrollUntilVisible:
-    element: ".*Muğla.*"
+    element: ".*Bodrum.*"
     direction: DOWN
 - extendedWaitUntil:
-    visible: ".*Muğla.*"
+    visible: ".*Bodrum.*"
     timeout: 10000
 - assertVisible: ".*aktif ilan.*"
 - back

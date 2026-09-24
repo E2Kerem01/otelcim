@@ -27,6 +27,6 @@ tags: [m8_admin_core, users, validation]
 - extendedWaitUntil:
     visible: '.*Sebep girmeniz gerekiyor\..*'
     timeout: 5000
-- assertVisible: ".*Ayşe Aday.*"
 - tapOn: ".*Vazgeç.*"
 - assertVisible: ".*Kullanıcı Yönetimi.*"
+- assertVisible: ".*Ayşe Aday.*"

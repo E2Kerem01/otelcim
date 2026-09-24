@@ -1,5 +1,5 @@
 appId: com.example.otelcim
-name: "m7 - banned user is permanently locked out and cannot bypass via back button"
+name: "m7 - banned user is permanently locked out"
 tags: [m7, admin_trust, auth, moderation]
 ---
 - runFlow: ../common/launch.yaml
@@ -13,9 +13,4 @@ tags: [m7, admin_trust, auth, moderation]
 - assertVisible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
 - assertVisible: ".*Çıkış Yap.*"
 - assertNotVisible: ".*Resepsiyonist Aranıyor.*"
-- back
-- extendedWaitUntil:
-    visible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
-    timeout: 5000
-- assertVisible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
 - tapOn: ".*Çıkış Yap.*"

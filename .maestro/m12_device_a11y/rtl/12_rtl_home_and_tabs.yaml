@@ -2,6 +2,8 @@ appId: com.example.otelcim
 name: "m12 - 12 arabic rtl home feed and bottom navigation tabs"
 tags: [m12, rtl, arabic, i18n, navigation]
 ---
+- setOrientation: PORTRAIT
+
 # Launches app with Arabic RTL locale
 - runFlow: ../_helpers/launch_rtl.yaml
 

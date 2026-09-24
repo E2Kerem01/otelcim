@@ -19,14 +19,13 @@ tags: [chat, send-message]
     visible: ".*Sohbet.*"
     timeout: 10000
 
-# 3. Boş / sadece boşluktan oluşan mesaj gönderme denemesi (boş mesaj engellenmeli)
-- tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
-- inputText: "   "
-- pressKey: Enter
+# 3. Boş mesaj gönderme denemesi (giriş kutusu boşken gönder butonuna basılır; boş mesaj gönderilemez)
+- assertVisible: ".*Mesajınızı yazın\\.\\.\\..*"
 # TAHMİN: Gönder butonu (Icons.send_rounded) sağ altta (92%, 96%) yer alır
 - tapOn:
     point: "92%,96%"
-    optional: true
+- assertVisible: ".*Mesajınızı yazın\\.\\.\\..*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz\\?.*"
 
 # 4. Geçerli metin yazılır ve gönderilir
 - tapOn: ".*Mesajınızı yazın\\.\\.\\..*"

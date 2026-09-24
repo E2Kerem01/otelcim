@@ -33,13 +33,17 @@ tags: [m6, profile, validation]
 - assertVisible: ".*Telefon numarası en az 10 haneli olmalıdır.*"
 
 # Hatalı telefon formatı (harf ve geçersiz karakter)
-- tapOn: "Telefon Numarası"
+# Telefon alanındaki mevcut 0555 değerine dokunarak hata metniyle çakışmayı önle
+- tapOn: "0555"
 - eraseText: 10
 - inputText: "abc?!"
 - tapOn: "Kaydet"
 - assertVisible: ".*Geçerli bir telefon numarası giriniz.*"
 
 # Zorunlu Otel Adı alanını temizle (işveren doğrulaması)
+- scrollUntilVisible:
+    element: "Otel Adı"
+    direction: DOWN
 - tapOn: "Otel Adı"
 - eraseText: 30
 - tapOn: "Kaydet"

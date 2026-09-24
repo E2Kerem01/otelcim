@@ -9,7 +9,7 @@ tags: [m10, profile, empty-state]
       EMAIL: seeker@e2e.test
 - tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
-    visible: "Ayşe Aday"
+    visible: ".*Ayşe Aday.*"
     timeout: 10000
 - scrollUntilVisible:
     element: ".*Belgelerim / Sertifika Cüzdanı.*"

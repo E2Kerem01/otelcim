@@ -9,7 +9,7 @@ tags: [m10, profile, navigation]
       EMAIL: seeker@e2e.test
 - tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
-    visible: "Ayşe Aday"
+    visible: ".*Ayşe Aday.*"
     timeout: 10000
 - scrollUntilVisible:
     element: ".*Gizlilik ve Veri Ayarları.*"
@@ -30,4 +30,4 @@ tags: [m10, profile, navigation]
 - extendedWaitUntil:
     visible: ".*Hesabım.*"
     timeout: 10000
-- assertVisible: "Ayşe Aday"
+- assertVisible: ".*Ayşe Aday.*"

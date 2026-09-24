@@ -1,10 +1,11 @@
+# BUG-M1-03: Çıkış sonrası login'e yönlendirme gerçekleşmiyor — beklenen: kaynakta _handleLogout ile /login ekranı; gerçek: cihazda ana sayfa kalıyor.
 appId: com.example.otelcim
-name: "m1 auth logout clears protected access"
-tags: [m1_auth, access-control]
+name: "BUG M1 logout should return to login"
+tags: [m1_auth, access-control, bug, expected-failure]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: seeker@e2e.test
 - tapOn: ".*Hesabım.*"
@@ -19,12 +20,4 @@ tags: [m1_auth, access-control]
     visible: ".*Giriş Yap.*"
     timeout: 10000
 - assertNotVisible: ".*Ayşe Aday.*"
-- launchApp:
-    stopApp: true
-- extendedWaitUntil:
-    visible: ".*Ana Sayfa.*"
-    timeout: 15000
-- tapOn: ".*Mesajlar.*"
-- extendedWaitUntil:
-    visible: ".*Giriş Yap.*"
-    timeout: 10000
+

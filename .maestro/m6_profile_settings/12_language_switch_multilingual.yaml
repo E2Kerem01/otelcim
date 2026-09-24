@@ -40,8 +40,11 @@ tags: [m6, profile, localization, language]
 - assertVisible: ".*Messages.*"
 - assertVisible: ".*My Account.*"
 
-# Deep link ile dil ayarlarına tekrar gir
-- openLink: "otelcim-e2e://app/profile/language"
+# Dil ayarlarına tekrar git (Hesabım menüsünden - back stack korunur)
+- scrollUntilVisible:
+    element: ".*Uygulama Dili.*"
+    direction: DOWN
+- tapOn: ".*Uygulama Dili.*"
 - extendedWaitUntil:
     visible: "App Language"
     timeout: 10000
@@ -81,8 +84,11 @@ tags: [m6, profile, localization, language]
 - assertVisible: ".*الرسائل.*"
 - assertVisible: ".*حسابي.*"
 
-# 5. Deep link ile dil ayarlarına gir ve Türkçe'ye geri dön
-- openLink: "otelcim-e2e://app/profile/language"
+# 5. Dil ayarlarına tekrar girip Türkçe'ye geri dön (Hesabım menüsünden)
+- scrollUntilVisible:
+    element: ".*Uygulama Dili.*"
+    direction: DOWN
+- tapOn: ".*Uygulama Dili.*"
 - extendedWaitUntil:
     visible: ".*لغة التطبيق.*"
     timeout: 10000

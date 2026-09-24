@@ -89,10 +89,12 @@ Bu doküman, Otelcim mobil uygulamasının Admin Paneli, Güven ve Moderasyon, Y
 
 ## 2. UX ve Erişilebilirlik (Accessibility) Bulguları
 
-1. **Erişilebilirlik Etiketi Olmayan Butonlar**:
+1. **Erişilebilirlik Etiketi Olmayan Butonlar (D6)**:
    - `chat_detail_screen.dart:342`: Sohbet detay ekranındaki sağ üst menü butonu (`PopupMenuButton`) herhangi bir `tooltip` veya `semanticsLabel` içermemektedir.
-   - `seasonal_calendar_screen.dart:408`: Sezonluk hatırlatıcı silme ikonu (`Icons.delete_outline`) `tooltip` içermemektedir.
-2. **Hardcoded Türkçe ve Yerelleştirme Eksikliği**:
+   - `seasonal_calendar_screen.dart:408`: Sezonluk hatırlatıcı silme ikonu (`Icons.delete_outline`) `tooltip` içermemektedir. Bu nedenle TalkBack ekran okuyucu bu butonu "etiketlenmemiş düğme" olarak okumakta ve E2E test otomasyonunda dinamik semantik seçicilerle (`tapOn: "Sil"`) hedeflenememektedir; testte ekran koordinatı (`point: 85%,93%`) kullanılması gerekmiştir.
+2. **Kilit Ekranında Geri Tuşu Davranışı (PopScope Eksikliği)**:
+   - `account_suspended_screen.dart`: Kilit ekranı `PopScope(canPop: false)` ile sarmalanmamıştır. `/account-suspended` rotası navigasyon yığınının kökü olduğundan, kullanıcı Android geri tuşuna bastığında uygulama doğrudan kapanmakta (launcher'a düşmekte) veya arka plana atılmaktadır. Kullanıcının kilit ekranında bilgilendirici metni görmeye devam etmesi için geri tuşunun `PopScope` ile yakalanması önerilir.
+3. **Hardcoded Türkçe ve Yerelleştirme Eksikliği**:
    - `account_suspended_screen.dart:43,49,63,71`: Başlıklar, sebepler ve buton metinleri `AppLocalizations` (`app_tr.arb`) kullanılmadan doğrudan hardcoded yazılmıştır.
    - `admin_dashboard_screen.dart`: Yönetim paneli başlıkları ve açıklamalarının tamamı hardcoded Türkçedir; çok dilli desteğe uyumlu değildir.
    - `user_management_screen.dart` ve `reports_moderation_screen.dart`: Moderasyon dialog metinleri ve hata mesajları hardcoded Türkçedir.

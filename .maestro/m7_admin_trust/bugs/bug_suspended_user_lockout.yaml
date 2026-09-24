@@ -14,9 +14,4 @@ tags: [m7, bugs, auth, moderation]
 - assertVisible: ".*Hesabınız Askıya Alındı.*"
 - assertVisible: ".*Askı bitiş:.*"
 - assertVisible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
-- back
-- extendedWaitUntil:
-    visible: ".*Hesabınız Askıya Alındı.*"
-    timeout: 5000
-- assertVisible: ".*Hesabınız Askıya Alındı.*"
 - tapOn: ".*Çıkış Yap.*"

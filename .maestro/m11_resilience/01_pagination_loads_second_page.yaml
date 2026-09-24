@@ -7,6 +7,9 @@ tags: [m11_resilience, pagination, many]
 - extendedWaitUntil:
     visible: ".*20 sonuç.*"
     timeout: 15000
+- scrollUntilVisible:
+    element: ".*Sayfa İlanı 01.*"
+    direction: DOWN
 - assertVisible: ".*Sayfa İlanı 01.*"
 - scrollUntilVisible:
     element: ".*Sayfa İlanı 30.*"
@@ -14,6 +17,12 @@ tags: [m11_resilience, pagination, many]
 - extendedWaitUntil:
     visible: ".*Sayfa İlanı 30.*"
     timeout: 15000
+- scrollUntilVisible:
+    element: ".*Sayfa İlanı 15.*"
+    direction: UP
 - assertVisible: ".*Sayfa İlanı 15.*"
+- scrollUntilVisible:
+    element: ".*Sayfa İlanı 29.*"
+    direction: DOWN
 - assertVisible: ".*Sayfa İlanı 29.*"
 - takeScreenshot: m11_pagination_second_page

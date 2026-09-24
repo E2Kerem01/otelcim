@@ -21,6 +21,9 @@ tags: [m1_auth, register, negative]
 - inputText: Test1234!
 - tapOn: "Ad Soyad"
 - inputText: Tekrar Kullanıcı
+- scrollUntilVisible:
+    element: "Kayıt Ol"
+    direction: DOWN
 - tapOn:
     text: "Kayıt Ol"
     index: -1

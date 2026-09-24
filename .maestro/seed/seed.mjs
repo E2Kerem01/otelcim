@@ -128,7 +128,8 @@ async function main() {
   }
   for (const [id, data] of Object.entries(listings)) {
     await setDoc(`listings/${id}`, data);
-    await setDoc(`listings/${id}/private/contact`, { contactInfo: `ik+${id}@e2e.test - 0242 555 00 00` });
+    // Same shape ListingService writes: { value } (not contactInfo).
+    await setDoc(`listings/${id}/private/contact`, { value: `ik+${id}@e2e.test - 0242 555 00 00` });
   }
 
   const convId = `L1_${u.seeker}`;

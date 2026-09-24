@@ -10,7 +10,7 @@ tags: [m11_resilience, guest, empty, back]
     timeout: 15000
 - assertVisible: ".*Henüz İlan Bulunmuyor.*"
 - assertVisible: ".*Sistemde aktif ilan bulunmamaktadır.*"
-- tapOn: '.*İş ilanı ara\.\.\..*'
+- tapOn: ".*BuAramaKesinlikleEşleşmiyor.*"
 - eraseText: 50
 - extendedWaitUntil:
     visible: ".*7 sonuç.*"

@@ -11,7 +11,7 @@ tags: [m10, urgent, no-purchase]
 - extendedWaitUntil:
     visible: "Acil İlan"
     timeout: 10000
-- assertVisible: "Garson (Sezonluk)"
+- assertVisible: ".*Garson.*Sezonluk.*"
 - assertVisible: "Ücretsiz acil ilan hakkınızı daha önce kullandınız"
 - assertVisible: "Acil İlan (tek seferlik)"
 - assertVisible: "₺149,99"

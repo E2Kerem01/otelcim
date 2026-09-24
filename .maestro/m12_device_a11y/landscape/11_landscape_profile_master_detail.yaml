@@ -2,17 +2,22 @@ appId: com.example.otelcim
 name: "m12 - 11 landscape master detail profile layout"
 tags: [m12, landscape, profile, responsive]
 ---
+- setOrientation: PORTRAIT
 - runFlow: ../../common/launch.yaml
 - runFlow:
     file: ../../common/login.yaml
     env:
       EMAIL: seeker@e2e.test
 
+# Open profile in portrait first
+- openLink: "otelcim-e2e://app/profile"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
 # Switch orientation to landscape
 - setOrientation: LANDSCAPE_LEFT
 
-# Open profile in landscape mode
-- tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
     visible: ".*Genel Bakış.*"
     timeout: 10000

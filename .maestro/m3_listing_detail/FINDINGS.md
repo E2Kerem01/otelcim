@@ -33,6 +33,14 @@
 - Beklenen: kendi ilanında `Düzenle` ile birlikte boost/QR aksiyonları.
 - Akış: `bugs/03_owner_edit_action.yaml`.
 
+### BUG-m3-04 — Yüksek: giriş yapmış kullanıcıda iletişim bilgisi boş kalıyor
+
+- Kaynak: `lib/shared/services/listing_service.dart:267-273` iletişim alt dokümanından yalnızca `value` alanını okuyor; `lib/features/listings/presentation/widgets/listing_detail_widgets.dart:432-434` ve `:879-880` okunan değeri doğrudan gösteriyor.
+- Seed sözleşmesi: `.maestro/seed/seed.mjs` L1 iletişim dokümanına `contactInfo` alanını yazıyor; uygulamanın beklediği `value` alanı yok.
+- Tekrar üretme: seeker ile L1 detayını aç, `İletişim Bilgisini Göster` seç, `ik+L1@e2e.test` metnini bekle.
+- Beklenen: `ik+L1@e2e.test - 0242 555 00 00` görünür.
+- Gerçek: `listing.contactInfo` boş kaldığı için iletişim satırı boş görünür; mevcut akış `bugs/04_seeker_l1_contact_field_mismatch.yaml` altında tutuluyor.
+
 ### Kod riski — Orta: rapor hedef tipi duplicate sorgusunda yok sayılıyor
 
 - `ReportService.hasUserReportedTarget` (`lib/shared/services/report_service.dart:57-64`) aldığı `targetType` parametresini `hasAlreadyReported` çağrısına aktarmıyor; sorgu yalnızca `reporterId` ve `targetId` ile yapılıyor.
@@ -58,3 +66,8 @@
 - Mobil detaydaki eylem seçicileri responsive dala göre ayrıldı: mobilde `Mesaj Gönder` ve sahipte `İlanı Öne Çıkar` / `QR Poster Oluştur`; geniş ekran başlığı `İlan Yönetimi` mobilde beklenmiyor.
 - L2 ve L6 açılışları liste sırasına ve görünür viewport'a bağlı kalmaması için L2'de görünür olana kadar kaydırma, L6'da deep link kullanıyor.
 - Geniş regex'in yanlış/örtüşen öğeye dokunma riskini azaltmak için misafir iletişim CTA'sı tam metin + `index: 0` ile hedeflendi.
+
+## Düzeltme turu 2
+
+- `01_guest_l1_detail.yaml`: (a) test hatası. Ekran görüntüsü iletişim düğmesinin sticky alt aksiyon altında kaldığını gösterdi; `centerElement: true` eklendi ve tap seçicisi birleşik erişilebilirlik etiketine uyacak özgül regex'e güncellendi.
+- `02_seeker_l1_contact_existing_chat.yaml`: (b) uygulama/seed veri sözleşmesi hatası. Kaynakta uygulama `private/contact.value` okurken seed `private/contact.contactInfo` yazıyor; akış `bugs/04_seeker_l1_contact_field_mismatch.yaml` altına taşındı.

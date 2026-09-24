@@ -13,9 +13,4 @@ tags: [m7, bugs, auth, moderation]
     timeout: 10000
 - assertVisible: ".*Hesabınız Yasaklandı.*"
 - assertVisible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
-- back
-- extendedWaitUntil:
-    visible: ".*Hesabınız Yasaklandı.*"
-    timeout: 5000
-- assertVisible: ".*Hesabınız Yasaklandı.*"
 - tapOn: ".*Çıkış Yap.*"

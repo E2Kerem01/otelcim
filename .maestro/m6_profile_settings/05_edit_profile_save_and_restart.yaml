@@ -27,6 +27,14 @@ tags: [m6, profile]
 - eraseText: 50
 - inputText: "Butik otel işletmecisi"
 
+# Pozisyon alanını doldur (işveren için zorunlu alan)
+- scrollUntilVisible:
+    element: "Pozisyon"
+    direction: DOWN
+- tapOn: "Pozisyon"
+- eraseText: 30
+- inputText: "Otel Müdürü"
+
 # AppBar'daki Kaydet butonuna dokun (tooltip: Kaydet)
 - tapOn: "Kaydet"
 
@@ -61,3 +69,7 @@ tags: [m6, profile]
     timeout: 10000
 - assertVisible: ".*Zeynep Güncellendi.*"
 - assertVisible: ".*Butik otel işletmecisi.*"
+- scrollUntilVisible:
+    element: ".*Otel Müdürü.*"
+    direction: DOWN
+- assertVisible: ".*Otel Müdürü.*"

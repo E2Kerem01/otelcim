@@ -11,6 +11,9 @@ tags: [m2_discovery, filters, edge]
 - inputText: "40000"
 - tapOn: "En yüksek maaş"
 - inputText: "30000"
+- scrollUntilVisible:
+    element: ".*Filtreleri uygula.*"
+    direction: DOWN
 - tapOn: ".*Filtreleri uygula.*"
 - extendedWaitUntil:
     visible: '.*Maaş aralığını kontrol edin\..*'

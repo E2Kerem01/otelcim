@@ -1,10 +1,11 @@
+# BUG-M8-03: Raporlanan ilanı kaldırma sonrası Flutter assertion ile uygulama çöküyor — beklenen: 'İlanı Kaldır işlemi tamamlandı.' ve L8'in feed'den kalkması / gerçek: kırmızı Flutter hata ekranı.
 appId: com.example.otelcim
-name: "m8 admin removes reported listing from feed"
-tags: [m8_admin_core, reports, listing-moderation]
+name: "BUG m8 removing reported listing crashes after applying action"
+tags: [m8_admin_core, bug, reports, listing-moderation, crash]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: admin@e2e.test
 - openLink: "otelcim-e2e://app/admin/reports"

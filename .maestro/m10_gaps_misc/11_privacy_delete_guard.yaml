@@ -9,7 +9,7 @@ tags: [m10, profile, privacy, validation]
       EMAIL: seeker@e2e.test
 - tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
-    visible: "Ayşe Aday"
+    visible: ".*Ayşe Aday.*"
     timeout: 10000
 - scrollUntilVisible:
     element: ".*Gizlilik ve Veri Ayarları.*"

@@ -28,5 +28,12 @@ tags: [m8_admin_core, users, ban, recovery]
 - extendedWaitUntil:
     visible: '.*İşlem tamamlandı\..*'
     timeout: 10000
-- assertNotVisible: ".*Yasaklı.*"
+- tapOn: "E-posta veya isimle ara"
+- eraseText: 50
+- inputText: "banned@e2e.test"
+- pressKey: Enter
+- extendedWaitUntil:
+    notVisible: ".*Yasaklı.*"
+    timeout: 10000
+- assertVisible: ".*Banlı Kullanıcı.*"
 - assertVisible: ".*Yasakla.*"

@@ -8,10 +8,11 @@ tags: [m12, dark, home, detail]
     visible: ".*Resepsiyonist Aranıyor.*"
     timeout: 15000
 
-# Home feed verification in dark mode
+# Home feed verification in dark mode (asserting listings in current viewport)
 - assertVisible: ".*7 sonuç.*"
-- assertVisible: ".*Garson \\(Sezonluk\\).*"
+- assertVisible: ".*Barmen - Boost.*"
 - assertVisible: ".*Acil Aşçı Yardımcısı.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
 - takeScreenshot: m12_dark_home
 
 # Open listing detail L1

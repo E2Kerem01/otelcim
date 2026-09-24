@@ -7,8 +7,8 @@ tags: [m10, regions, navigation]
 - extendedWaitUntil:
     visible: "Bölgeler"
     timeout: 10000
-- assertVisible: "Antalya"
-- assertVisible: "Bodrum"
+- assertVisible: ".*Antalya.*"
+- assertVisible: ".*Bodrum.*"
 - assertVisible: "Bölge haritası"
 - tapOn: "Bölge haritası"
 - extendedWaitUntil:

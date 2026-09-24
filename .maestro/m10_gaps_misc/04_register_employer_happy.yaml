@@ -13,7 +13,7 @@ tags: [m10, auth, registration]
 - extendedWaitUntil:
     visible: "Hesap türü"
     timeout: 10000
-- tapOn: "Personel Arıyorum"
+- tapOn: ".*Personel Arıyorum.*"
 - tapOn: "E-posta"
 - inputText: "new1@e2e.test"
 - tapOn: "Şifre"

@@ -1,10 +1,11 @@
+# BUG-M4-06: İlan Ver branch kökünde Android geri tuşu uygulamayı kapatıyor — beklenen: ana feed'e dönmesi / gerçek: uygulama launcher'a düşüyor.
 appId: com.example.otelcim
-name: "m4 - back from create listing returns to the feed"
-tags: [m4, employer, navigation]
+name: "m4 bug - back from create listing exits app"
+tags: [m4, bug, employer, navigation]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: employer@e2e.test
 - tapOn: ".*İlan Ver.*"

@@ -52,7 +52,9 @@ tags: [m9_admin_content, admin, banners]
 - extendedWaitUntil:
     visible: "Banner güncellendi."
     timeout: 10000
-- back
+- launchApp:
+    stopApp: true
 - extendedWaitUntil:
-    notVisible: "E2E Test Reklamı"
-    timeout: 10000
+    visible: ".*Ana Sayfa.*"
+    timeout: 20000
+- assertNotVisible: "E2E Test Reklamı"
