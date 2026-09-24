@@ -1,0 +1,10 @@
+{
+  "name": "otelcim-t2-security-rules",
+  "private": true,
+  "description": "firestore.rules + storage.rules tests against the local Firebase emulators. Zero npm dependencies: node:test + fetch + TypeScript type stripping (Node >= 22.6).",
+  "type": "module",
+  "scripts": {
+    "test": "node run.mjs",
+    "test:bugs": "node run.mjs --bugs"
+  }
+}
