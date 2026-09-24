@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../services/analytics_service.dart';
+import 'widgets/admin_shell.dart';
 
 final _overviewProvider = FutureProvider.autoDispose<AdminOverview>(
   (ref) => ref.watch(adminAnalyticsServiceProvider).getOverview(),
@@ -16,7 +17,10 @@ class AdminDashboardScreen extends ConsumerWidget {
     final overview = ref.watch(_overviewProvider);
     final counts = overview.valueOrNull;
     return Scaffold(
-      appBar: AppBar(title: const Text('Yönetim Paneli')),
+      appBar: AppBar(
+        title: const Text('Yönetim Paneli'),
+        actions: const [AdminThemeToggle()],
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(_overviewProvider);
