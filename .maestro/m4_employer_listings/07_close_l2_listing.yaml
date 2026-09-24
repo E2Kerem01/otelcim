@@ -1,0 +1,27 @@
+appId: com.example.otelcim
+name: "m4 - employer closes an active listing"
+tags: [m4, employer, lifecycle]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- tapOn: "İlanlarım"
+- extendedWaitUntil:
+    visible: ".*Garson \\(Sezonluk\\).*"
+    timeout: 10000
+# TAHMİN: Aktif ilanlar L3, L1, L2, L4 sırasındadır; L2'nin üçüncü Kapat düğmesi seçilir.
+- tapOn:
+    text: "Kapat"
+    index: 2
+- extendedWaitUntil:
+    visible: ".*Garson \\(Sezonluk\\).*Kapalı.*"
+    timeout: 10000
+- tapOn: ".*Ana Sayfa.*"
+- extendedWaitUntil:
+    visible: ".*6 sonuç.*"
+    timeout: 15000
+- assertNotVisible: ".*Garson \\(Sezonluk\\).*"
+

@@ -1,0 +1,62 @@
+appId: com.example.otelcim
+name: "m6 - 07 notification settings toggle and persistence"
+tags: [m6, profile, settings]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- scrollUntilVisible:
+    element: ".*Bildirim Ayarları.*"
+    direction: DOWN
+- tapOn: ".*Bildirim Ayarları.*"
+- extendedWaitUntil:
+    visible: "Bildirim Ayarları"
+    timeout: 10000
+
+# Tercih kategorilerini doğrula
+- assertVisible: ".*Bildirim Tercihleri.*"
+- assertVisible: ".*Mesajlar.*"
+- assertVisible: ".*İlan Bildirimleri.*"
+- assertVisible: ".*Sezonluk Hatırlatıcılar.*"
+- assertVisible: ".*Acil İlan Bildirimleri.*"
+
+- scrollUntilVisible:
+    element: ".*Sessiz Saat Başlangıcı.*"
+    direction: DOWN
+- assertVisible: ".*Sessiz Saat Başlangıcı.*"
+- assertVisible: ".*Sessiz Saat Bitişi.*"
+
+# Mesajlar bildirim tercihini değiştir
+- scrollUntilVisible:
+    element: ".*Mesajlar.*"
+    direction: UP
+- tapOn: ".*Mesajlar.*"
+
+# Güncelleme bildirimini bekle
+- extendedWaitUntil:
+    visible: ".*Bildirim tercihleri güncellendi.*"
+    timeout: 10000
+
+# Ekrandan çık ve geri dönerek tercihin kalıcılığını doğrula
+- back
+- extendedWaitUntil:
+    visible: ".*Hesabım.*"
+    timeout: 10000
+
+- scrollUntilVisible:
+    element: ".*Bildirim Ayarları.*"
+    direction: DOWN
+- tapOn: ".*Bildirim Ayarları.*"
+- extendedWaitUntil:
+    visible: "Bildirim Ayarları"
+    timeout: 10000
+
+- assertVisible: ".*Mesajlar.*"
+- assertVisible: ".*İlan Bildirimleri.*"

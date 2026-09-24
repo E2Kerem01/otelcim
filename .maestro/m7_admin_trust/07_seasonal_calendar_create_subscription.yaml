@@ -1,0 +1,30 @@
+appId: com.example.otelcim
+name: "m7 - signed in employer creates a seasonal reminder subscription"
+tags: [m7, admin_trust, seasonal, subscription]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Sezon Takvimi.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk İşe Alım Takvimi.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
+    direction: DOWN
+- assertVisible: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
+- tapOn: ".*İlk Hatırlatıcıyı Oluştur.*"
+- extendedWaitUntil:
+    visible: ".*Sezon İlanı Hatırlatıcı Ekle.*"
+    timeout: 10000
+- assertVisible: ".*Bölge / Şehir.*"
+- assertVisible: ".*Kategori.*"
+- assertVisible: ".*Hedef Sezon.*"
+- tapOn: ".*Hatırlatıcı Oluştur.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk hatırlatıcı başarıyla oluşturuldu\\..*"
+    timeout: 10000
+- assertVisible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+- assertVisible: ".*Sezon: Yaz 2025.*"

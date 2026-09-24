@@ -1,0 +1,34 @@
+appId: com.example.otelcim
+name: "m4 - employer edits an owned listing title"
+tags: [m4, employer, edit]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- tapOn: "İlanlarım"
+- extendedWaitUntil:
+    visible: ".*Garson \\(Sezonluk\\).*"
+    timeout: 10000
+# TAHMİN: MyListingsScreen aynı tooltip'i her satırda üretir; createdAt sırasındaki L2 için üçüncü "Düzenle" düğmesi seçilir.
+- tapOn:
+    text: "Düzenle"
+    index: 2
+- extendedWaitUntil:
+    visible: "Değişiklikleri Kaydet"
+    timeout: 10000
+# TAHMİN: EditListingScreen başlık TextFormField'ında label/hint yok; mevcut controller değeri erişilebilir alan etiketi olarak kullanılır.
+- tapOn: ".*Garson \\(Sezonluk\\).*"
+- eraseText: 100
+- inputText: "Garson Güncellendi"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Değişiklikleri Kaydet"
+    direction: DOWN
+- tapOn: "Değişiklikleri Kaydet"
+- extendedWaitUntil:
+    visible: "İlan güncellendi\\."
+    timeout: 15000
+- assertVisible: ".*Garson Güncellendi.*"

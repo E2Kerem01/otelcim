@@ -1,0 +1,17 @@
+# seed: many
+appId: com.example.otelcim
+name: "smoke - deep link opens admin panel, seed many"
+tags: [smoke]
+---
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*Sayfa İlanı.*|.*20 sonuç.*"
+    timeout: 15000
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin"
+- extendedWaitUntil:
+    visible: ".*Şikâyetler.*"
+    timeout: 15000

@@ -1,0 +1,24 @@
+appId: com.example.otelcim
+name: "m4 - app restart keeps the employer session"
+tags: [m4, employer, restart]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+- assertVisible: "İşveren"
+

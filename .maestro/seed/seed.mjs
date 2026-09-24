@@ -88,6 +88,10 @@ async function main() {
     ['admin', 'admin@e2e.test', 'Admin Yönetici', 'employer', { isAdmin: true, adminRole: 'super_admin' }],
     ['banned', 'banned@e2e.test', 'Banlı Kullanıcı', 'jobseeker', { isBanned: true, warnings: [{ reason: 'spam' }] }],
     ['suspended', 'suspended@e2e.test', 'Askıda Kullanıcı', 'jobseeker', { isSuspended: true, suspensionEnd: ts(now + 365 * DAY) }],
+    // Own the pending admin-review items below, so seeker/employer2 screens
+    // keep their empty states.
+    ['employer3', 'employer3@e2e.test', 'Can Başvuran', 'employer', { hotelName: 'Yeni Otel', verificationStatus: 'pending' }],
+    ['seeker2', 'seeker2@e2e.test', 'Ali Aday', 'jobseeker', { preferredRegion: 'Muğla' }],
   ];
   for (const [key, email, name, type, extra] of users) {
     u[key] = await createUser(email, name);
@@ -106,6 +110,20 @@ async function main() {
     L7: listing(...E2, { title: 'Spa Terapisti', description: 'Çeşme butik otel spa.', category: 'spaWellness', city: 'Çeşme', region: 'İzmir', salary: '33.000 TL', minSalaryTl: 33000, maxSalaryTl: 35000, ageDays: 5 }),
     L8: listing(...E2, { title: 'Güvenlik Görevlisi', description: 'Gece vardiyası güvenlik.', category: 'guvenlik', city: 'Ürgüp', region: 'Nevşehir', salary: '26.000 TL', minSalaryTl: 26000, maxSalaryTl: 26000, employmentType: 'fullTime', ageDays: 6 }),
   };
+  // `node seed.mjs many` (a flow opts in with a `# seed: many` line): 30 extra
+  // active listings P01..P30 so the feed needs more than one page.
+  if (process.argv[2] === 'many') {
+    const cats = ['resepsiyon', 'servisGarson', 'mutfakAsci', 'katHizmetleri', 'barBarmen', 'animasyon'];
+    for (let i = 1; i <= 30; i++) {
+      const n = String(i).padStart(2, '0');
+      listings[`P${n}`] = listing(...E2, {
+        title: `Sayfa İlanı ${n}`, description: `Sayfalama test ilanı ${n}.`,
+        category: cats[i % cats.length], city: 'Alanya', region: 'Antalya',
+        salary: `${20000 + i * 100} TL`, minSalaryTl: 20000 + i * 100, maxSalaryTl: 20000 + i * 100,
+        ageDays: 7 + i,
+      });
+    }
+  }
   for (const [id, data] of Object.entries(listings)) {
     await setDoc(`listings/${id}`, data);
     await setDoc(`listings/${id}/private/contact`, { contactInfo: `ik+${id}@e2e.test - 0242 555 00 00` });
@@ -126,6 +144,35 @@ async function main() {
   await setDoc('reports/R1', {
     reporterId: u.seeker, targetType: 'listing', targetId: 'L8',
     reason: 'spam', description: 'Şüpheli ilan', status: 'pending', createdAt: ts(now - DAY),
+  });
+
+  // L4's boost as the purchase Cloud Function writes it (durationType is the
+  // server's 'daysN' form).
+  await setDoc('boosts/B1', {
+    listingId: 'L4', userId: u.employer, durationType: 'days14', durationDays: 14,
+    price: 249.99, purchasedAt: ts(now - 9 * DAY), expiresAt: ts(now + 5 * DAY),
+    platform: 'google_play', transactionId: 'GPA.E2E-0001', status: 'active',
+  });
+
+  // Pending items for the admin review screens. fileUrl/documentUrls point
+  // nowhere real on purpose - never fetch them.
+  await setDoc('verification_requests/V1', {
+    employerId: u.employer3, userId: u.employer3, hotelName: 'Yeni Otel',
+    documentUrls: ['https://example.invalid/e2e/vergi-levhasi.pdf'], status: 'pending',
+    submittedAt: ts(now - DAY), requestedAt: ts(now - DAY),
+    reviewedBy: null, reviewedAt: null, rejectionReason: null,
+  });
+  await setDoc('certificates/C1', {
+    userId: u.seeker2, userName: 'Ali Aday', userEmail: 'seeker2@e2e.test',
+    type: 'hijyen', title: 'Hijyen Eğitimi Sertifikası',
+    fileUrl: 'https://example.invalid/e2e/hijyen.pdf', status: 'pending',
+    createdAt: ts(now - DAY), reviewedBy: null, reviewedAt: null, rejectionReason: null,
+  });
+  // Inactive so it never shows in the home feed; admin banners screen lists it.
+  await setDoc('banner_ads/A1', {
+    title: 'E2E Test Reklamı', advertiserName: 'E2E Reklamcı',
+    imageUrl: 'https://example.invalid/e2e/banner.png', targetUrl: 'https://example.invalid',
+    order: 1, isActive: false, startDate: null, endDate: null, createdAt: ts(now - DAY),
   });
 
   console.log(JSON.stringify({ ok: true, uids: u, listings: Object.keys(listings), conversation: convId }));

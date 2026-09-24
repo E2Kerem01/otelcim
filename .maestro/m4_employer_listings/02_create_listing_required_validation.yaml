@@ -1,0 +1,28 @@
+appId: com.example.otelcim
+name: "m4 - empty listing form shows required-field validation"
+tags: [m4, employer, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: "Yeni İlan Aç"
+    timeout: 10000
+- scrollUntilVisible:
+    element: "İlanı Yayınla"
+    direction: DOWN
+- tapOn: "İlanı Yayınla"
+- extendedWaitUntil:
+    visible: "Lütfen kırmızı ile işaretli alanları doldurun\\."
+    timeout: 10000
+- assertVisible: "Başlık gerekli"
+- assertVisible: "Konum gerekli"
+- assertVisible: "Bölge seçmeniz gerekiyor"
+- assertVisible: "Şehir seçmeniz gerekiyor"
+- assertVisible: "Maaş bilgisi gerekli"
+- assertVisible: "İletişim bilgisi gerekli"
+- assertVisible: "Açıklama gerekli"
+

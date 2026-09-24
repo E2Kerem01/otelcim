@@ -1,0 +1,50 @@
+appId: com.example.otelcim
+name: "05 m5_chat - send long message and emojis in chat"
+tags: [chat, emojis, long-text]
+---
+# 1. Uygulama başlatılır ve seeker girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Emoji içeren mesaj gönderilir
+- tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
+- inputText: "Harika! Çok sevindim 👍🏨✨ Görüşmek üzere!"
+- pressKey: Enter
+- hideKeyboard
+# TAHMİN: Gönder IconButton (Icons.send_rounded) sağ altta (92%, 96%)
+- tapOn:
+    point: "92%,96%"
+    optional: true
+
+# 4. Emoji mesajının balonda görüntülendiği doğrulanır
+- extendedWaitUntil:
+    visible: ".*Harika! Çok sevindim.*"
+    timeout: 10000
+
+# 5. 300+ karakterlik uzun mesaj gönderilir (322 karakter)
+- tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
+- inputText: "Merhabalar Mehmet Bey, yarınki görüşme için belirtilen adrese tam saatinde geleceğim. Ön büro operasyonları, Opera PMS ve Fidelio otel yönetim sistemleri konusunda 2 yıllık tecrübem bulunmaktadır. Ayrıca B2 seviyesinde İngilizce ve başlangıç seviyesinde Rusça konuşabiliyorum. CV ve referans belgelerim hazırdır."
+- pressKey: Enter
+- hideKeyboard
+- tapOn:
+    point: "92%,96%"
+    optional: true
+
+# 6. Uzun mesajın balonda kesilmeden görüntülendiği doğrulanır
+- extendedWaitUntil:
+    visible: ".*Merhabalar Mehmet Bey, yarınki görüşme için.*"
+    timeout: 10000
+- assertVisible: ".*CV ve referans belgelerim hazırdır\\..*"

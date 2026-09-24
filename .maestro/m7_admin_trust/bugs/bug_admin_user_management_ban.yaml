@@ -1,0 +1,64 @@
+# BUG-m7-05: Admin kullanıcı yönetimi, arama ve yasaklama akışı — beklenen: Admin kullanıcısı Hesabım > Yönetim Paneli > Kullanıcı Yönetimi ekranında "Ayşe" arayıp bulabilmeli ve yasaklayabilmeli; ardından seeker hesabı kilitlenmeli / gerçek: Hesabım menüsünde Yönetim Paneli girişi bulunmadığı için admin kullanıcı kullanıcı yönetimi ekranına erişemiyor.
+appId: com.example.otelcim
+name: "m7 bug - admin searches user bans seeker and verifies lockout"
+tags: [m7, bugs, admin, users, moderation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Admin Yönetici.*"
+    timeout: 10000
+# TAHMİN: profile_screen.dart içerisine admin paneli eklendiğinde
+- scrollUntilVisible:
+    element: ".*Yönetim Paneli.*"
+    direction: DOWN
+- tapOn: ".*Yönetim Paneli.*"
+- extendedWaitUntil:
+    visible: ".*Kullanıcı Yönetimi.*"
+    timeout: 10000
+- tapOn: ".*Kullanıcı Yönetimi.*"
+- extendedWaitUntil:
+    visible: ".*E-posta veya isimle ara.*"
+    timeout: 10000
+- tapOn: ".*E-posta veya isimle ara.*"
+- inputText: "Ayşe"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*seeker@e2e.test.*"
+- tapOn: ".*Yasakla.*"
+- extendedWaitUntil:
+    visible: ".*Kullanıcıyı Yasakla.*"
+    timeout: 5000
+- tapOn: ".*Sebep \\(zorunlu\\).*"
+- inputText: "Kural ihlali"
+- hideKeyboard
+- tapOn: ".*Onayla.*"
+- extendedWaitUntil:
+    visible: ".*İşlem tamamlandı\\..*"
+    timeout: 10000
+- assertVisible: ".*Yasaklı.*"
+# Yönetici çıkış yapar ve yasaklanan Ayşe Aday ile giriş denenir
+- back
+- back
+- scrollUntilVisible:
+    element: ".*Çıkış Yap.*"
+    direction: DOWN
+- tapOn: ".*Çıkış Yap.*"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- extendedWaitUntil:
+    visible: ".*Hesabınız Yasaklandı.*"
+    timeout: 10000
+- assertVisible: ".*Hesabınız Yasaklandı.*"

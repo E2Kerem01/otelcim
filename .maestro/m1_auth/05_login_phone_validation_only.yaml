@@ -1,0 +1,22 @@
+appId: com.example.otelcim
+name: "m1 auth phone login form without SMS"
+tags: [m1_auth, validation, safety]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- tapOn: ".*Telefon ile Giriş.*"
+- extendedWaitUntil:
+    visible: ".*Telefon Numarası.*"
+    timeout: 5000
+- assertVisible: ".*5XX XXX XX XX.*"
+- assertVisible: ".*Kod Gönder.*"
+- assertNotVisible: ".*SMS Doğrulama Kodu.*"
+# Kod Gönder'e basılmaz: SMS/telefon doğrulaması canlı bir dış entegrasyondur.
+- tapOn: ".*Telefon Numarası.*"
+- inputText: "123"
+- hideKeyboard
+- assertVisible: ".*Telefon Numarası.*"
+

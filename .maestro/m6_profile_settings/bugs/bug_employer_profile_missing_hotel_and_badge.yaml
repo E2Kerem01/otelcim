@@ -1,0 +1,25 @@
+# BUG-m6-01: Employer profile screen does not display hotel name or verification badge on mobile layout.
+# Beklenen: İşveren Hesabım ekranında otel adı "Deniz Otel" ve doğrulanmış rozeti ("Doğrulanmış" / Icons.verified) görünmeli.
+# Gerçek: lib/features/profile/presentation/profile_screen.dart mobil Card bileşeninde hotelName ve isVerified alanları render edilmiyor, yalnızca displayName ve email görünüyor.
+appId: com.example.otelcim
+name: "m6 - bug employer profile missing hotel name and verified badge"
+tags: [m6, bugs, profile, employer]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+
+# İşveren adı ve e-postası görünür
+- assertVisible: ".*Mehmet İşveren.*"
+- assertVisible: ".*employer@e2e\\.test.*"
+
+# BUG: Beklenen davranış - Otel adı ve doğrulama rozeti görünmeli (bugün kırılır)
+- assertVisible: ".*Deniz Otel.*"
+# TAHMİN: Doğrulanmış rozeti metni veya erişilebilirlik etiketi
+- assertVisible: ".*Doğrulanmış.*"

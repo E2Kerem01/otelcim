@@ -1,0 +1,39 @@
+appId: com.example.otelcim
+name: "m4 - boost packages are visible without purchasing"
+tags: [m4, employer, boost, safe]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- tapOn: "İlanlarım"
+- extendedWaitUntil:
+    visible: ".*Garson \\(Sezonluk\\).*"
+    timeout: 10000
+# TAHMİN: L2, createdAt sıralamasındaki üçüncü aktif ilandır; satın alma dışı ekranı açmak için üçüncü Öne Çıkar düğmesi seçilir.
+- tapOn:
+    text: "Öne Çıkar"
+    index: 2
+- extendedWaitUntil:
+    visible: "İlanı Öne Çıkar"
+    timeout: 10000
+- scrollUntilVisible:
+    element: "Boost Paketini Seçin"
+    direction: DOWN
+- assertVisible: "7 Günlük Öne Çıkarma"
+- assertVisible: "14 Günlük Öne Çıkarma"
+- assertVisible: "30 Günlük Öne Çıkarma"
+- assertVisible: "₺49,99"
+- assertVisible: "₺89,99"
+- assertVisible: "₺149,99"
+- assertVisible: "Satın Al ve Öne Çıkar"
+# Güvenlik: Satın alma düğmesine ve ücretsiz boost kullanma düğmesine basılmaz.
+- back
+- tapOn: ".*Hesabım.*"
+- tapOn: "Öne Çıkarılan İlanlarım"
+- extendedWaitUntil:
+    visible: "Henüz Öne Çıkarılmış İlanınız Yok"
+    timeout: 10000
+

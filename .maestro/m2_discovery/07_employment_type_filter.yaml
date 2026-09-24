@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "m2 discovery - full time employment filter"
+tags: [m2_discovery, filters]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Filtreler.*"
+- extendedWaitUntil:
+    visible: ".*Gelişmiş filtreler.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Çalışma tipi.*"
+    direction: DOWN
+- tapOn: ".*Çalışma tipi.*"
+- tapOn: ".*Tam zamanlı.*"
+- tapOn: ".*Filtreleri uygula.*"
+- extendedWaitUntil:
+    visible: ".*1 sonuç.*"
+    timeout: 10000
+- assertVisible: ".*Güvenlik Görevlisi.*"
+- assertNotVisible: '.*Garson \(Sezonluk\).*'

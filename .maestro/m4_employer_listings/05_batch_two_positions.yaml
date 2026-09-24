@@ -1,0 +1,72 @@
+appId: com.example.otelcim
+name: "m4 - employer publishes two positions atomically"
+tags: [m4, employer, batch]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*İlan Ver.*"
+- tapOn: "Toplu İlan Ver"
+- extendedWaitUntil:
+    visible: "Otel / İşletme Bilgileri"
+    timeout: 10000
+- tapOn: ".*Grand Deluxe Hotel.*"
+- inputText: "E2E Batch Otel"
+- hideKeyboard
+- scrollUntilVisible:
+    element: ".*Muğla / Bodrum.*"
+    direction: DOWN
+- tapOn: ".*Muğla / Bodrum.*"
+- inputText: "Antalya / Lara"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Şehir seçin"
+    direction: DOWN
+- tapOn: "Şehir seçin"
+- tapOn: "Antalya"
+- scrollUntilVisible:
+    element: ".*0555 123 4567 / ik@hotel\\.com.*"
+    direction: DOWN
+- tapOn: ".*0555 123 4567 / ik@hotel\\.com.*"
+- inputText: "ik+batch@otel.test"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Pozisyon #1"
+    direction: DOWN
+- tapOn: ".*Resepsiyonist / Garson / Aşçı.*"
+- inputText: "E2E Batch Resepsiyon"
+- hideKeyboard
+- tapOn: ".*Pozisyon detayları ve aranan nitelikler.*"
+- inputText: "Birinci pozisyon için E2E açıklama."
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Pozisyon Ekle"
+    direction: DOWN
+- tapOn: "Pozisyon Ekle"
+- extendedWaitUntil:
+    visible: "Pozisyon #2"
+    timeout: 10000
+- tapOn:
+    text: ".*Resepsiyonist / Garson / Aşçı.*"
+    index: 1
+- inputText: "E2E Batch Garson"
+- hideKeyboard
+- tapOn:
+    text: ".*Pozisyon detayları ve aranan nitelikler.*"
+    index: 1
+- inputText: "İkinci pozisyon için E2E açıklama."
+- hideKeyboard
+- scrollUntilVisible:
+    element: "2 İlanı Atomik Yayınla"
+    direction: DOWN
+- tapOn: "2 İlanı Atomik Yayınla"
+- extendedWaitUntil:
+    visible: ".*2 adet ilan başarıyla yayınlandı!.*"
+    timeout: 15000
+- tapOn: ".*Ana Sayfa.*"
+- extendedWaitUntil:
+    visible: ".*E2E Batch Resepsiyon.*"
+    timeout: 15000
+- assertVisible: ".*E2E Batch Garson.*"

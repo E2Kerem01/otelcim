@@ -1,0 +1,60 @@
+appId: com.example.otelcim
+name: "m4 - employer creates a complete listing"
+tags: [m4, employer, create]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: "Yeni İlan Aç"
+    timeout: 10000
+- tapOn: ".*Bodrum Resort Resepsiyon Görevlisi.*"
+- inputText: "E2E Test İlanı"
+- hideKeyboard
+- scrollUntilVisible:
+    element: ".*Örn\\. Muğla / Bodrum.*"
+    direction: DOWN
+- tapOn: ".*Örn\\. Muğla / Bodrum.*"
+- inputText: "Antalya / Lara"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Bölge seçin"
+    direction: DOWN
+- tapOn: "Bölge seçin"
+- tapOn: "Antalya"
+- tapOn: "Şehir seçin"
+- tapOn: "Antalya"
+- scrollUntilVisible:
+    element: "Sezon seçilmedi"
+    direction: DOWN
+- tapOn: "Sezon seçilmedi"
+- tapOn: "Tüm Yıl"
+- scrollUntilVisible:
+    element: ".*Örn\\. 35\\.000₺ \\+ yemek.*"
+    direction: DOWN
+- tapOn: ".*Örn\\. 35\\.000₺ \\+ yemek.*"
+- inputText: "35.000 TL"
+- hideKeyboard
+- scrollUntilVisible:
+    element: ".*0555 123 4567.*"
+    direction: DOWN
+- tapOn: ".*0555 123 4567.*"
+- inputText: "ik+e2e@otel.test"
+- hideKeyboard
+- scrollUntilVisible:
+    element: ".*İlanınızla ilgili tüm detayları açıklayın.*"
+    direction: DOWN
+- tapOn: ".*İlanınızla ilgili tüm detayları açıklayın.*"
+- inputText: "E2E test ilanı için resepsiyon görevlisi açıklaması."
+- hideKeyboard
+- scrollUntilVisible:
+    element: "İlanı Yayınla"
+    direction: DOWN
+- tapOn: "İlanı Yayınla"
+- extendedWaitUntil:
+    visible: ".*E2E Test İlanı.*"
+    timeout: 15000
+- assertVisible: ".*8 sonuç.*"

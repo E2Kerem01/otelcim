@@ -1,0 +1,45 @@
+appId: com.example.otelcim
+name: "04 m5_chat - send message happy path and empty message validation"
+tags: [chat, send-message]
+---
+# 1. Uygulama başlatılır ve seeker girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# 2. Mesajlar sekmesine gidilir ve L1 sohbeti açılır
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Boş / sadece boşluktan oluşan mesaj gönderme denemesi (boş mesaj engellenmeli)
+- tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
+- inputText: "   "
+- pressKey: Enter
+- hideKeyboard
+# TAHMİN: Gönder butonu (Icons.send_rounded) sağ altta (92%, 96%) yer alır
+- tapOn:
+    point: "92%,96%"
+    optional: true
+
+# 4. Geçerli metin yazılır ve gönderilir
+- tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
+- inputText: "Tabii ki, yarın saat 11:00 uygun mudur?"
+- pressKey: Enter
+- hideKeyboard
+- tapOn:
+    point: "92%,96%"
+    optional: true
+
+# 5. Yeni mesajın balonda belirdiği ve giriş kutusunun temizlendiği doğrulanır
+- extendedWaitUntil:
+    visible: ".*Tabii ki, yarın saat 11:00 uygun mudur\\?.*"
+    timeout: 10000
+- assertVisible: ".*Mesajınızı yazın\\.\\.\\..*"

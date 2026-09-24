@@ -1,0 +1,23 @@
+appId: com.example.otelcim
+name: "m6 - 03 unauthorized profile access redirects to login"
+tags: [m6, auth, profile]
+---
+- runFlow: ../common/launch.yaml
+
+# Oturum kapalıyken Hesabım sekmesine dokunma
+- tapOn: ".*Hesabım.*"
+
+# Router guard checks isProtectedRoute and redirects to /login
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+
+- assertVisible: "E-posta"
+- assertVisible: "Şifre"
+- assertVisible:
+    text: "Giriş Yap"
+    index: -1
+
+# Verify we cannot bypass login to view profile data
+- assertNotVisible: ".*Profili Düzenle.*"
+- assertNotVisible: ".*Çıkış Yap.*"

@@ -1,0 +1,67 @@
+appId: com.example.otelcim
+name: "m6 - 13 delete account and verify subsequent login failure"
+tags: [m6, profile, delete_account, auth]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- scrollUntilVisible:
+    element: ".*Gizlilik ve Veri Ayarları.*"
+    direction: DOWN
+- tapOn: ".*Gizlilik ve Veri Ayarları.*"
+- extendedWaitUntil:
+    visible: "Gizlilik ve Veri Ayarları"
+    timeout: 10000
+
+# Hesabımı Sil alanına kaydır ve silme diyaloğunu aç
+- scrollUntilVisible:
+    element: ".*Hesabımı Sil.*"
+    direction: DOWN
+- tapOn: ".*Hesabımı Sil.*"
+
+- extendedWaitUntil:
+    visible: "Hesabınızı Silin"
+    timeout: 10000
+
+- assertVisible: ".*BU İŞLEM GERİ ALINAMAZ.*"
+
+# Şifreyi gir
+- tapOn: ".*Şifreniz.*"
+- inputText: "Test1234!"
+- hideKeyboard
+
+# Onay metnini gir (SİL)
+- tapOn: ".*SİL.*"
+- inputText: "SİL"
+- hideKeyboard
+
+# Kalıcı olarak sil butonuna bas
+- tapOn: ".*Hesabımı Kalıcı Olarak Sil.*"
+
+# Silme tamamlanınca /login sayfasına dönmeli
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 20000
+
+# Silinen hesap ile tekrar giriş yapmayı dene
+- tapOn: "E-posta"
+- inputText: "seeker@e2e.test"
+- tapOn: "Şifre"
+- inputText: "Test1234!"
+- hideKeyboard
+- tapOn:
+    text: "Giriş Yap"
+    index: -1
+
+# Girişin başarısız olduğunu ve oturum açılmadığını doğrula
+- extendedWaitUntil:
+    visible: ".*Hata.*|.*Geçersiz.*|.*bulunamadı.*|.*user-not-found.*|.*Yanlış.*"
+    timeout: 10000
+- assertVisible: "Şifre"

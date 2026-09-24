@@ -1,0 +1,27 @@
+appId: com.example.otelcim
+name: "01 m5_chat - unauthenticated user tapping messages tab redirects to login gate"
+tags: [chat, auth-gate]
+---
+# 1. Uygulama açılır (oturum kapalı)
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+
+# 2. Alt sekmelerden Mesajlar'a dokunulur
+# TAHMİN: router.dart korumalı rota (/chat) kuralı nedeniyle doğrudan /login ekranına yönlendirir
+- tapOn: ".*Mesajlar.*"
+
+# 3. Giriş ekranının açıldığı doğrulanır
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- assertVisible: ".*E-posta.*"
+- assertVisible: ".*Şifre.*"
+
+# 4. Geri tuşuna basıldığında ana sayfaya dönülebildiği doğrulanır
+- back
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"

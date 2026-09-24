@@ -1,0 +1,28 @@
+appId: com.example.otelcim
+name: "m2 discovery - refresh view modes and restart"
+tags: [m2_discovery, feed, navigation]
+---
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- swipe:
+    start: 50%, 55%
+    end: 50%, 90%
+    duration: 500
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+# TAHMİN: grid sütun tooltip'i semantik etiket olarak tapOn ile bulunur.
+- tapOn: ".*2 Sütun.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+# TAHMİN: tablo görünümü tooltip'i semantik etiket olarak tapOn ile bulunur.
+- tapOn: ".*Tablo Görünümü.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- assertNotVisible: ".*Kapanmış İlan Housekeeping.*"
+

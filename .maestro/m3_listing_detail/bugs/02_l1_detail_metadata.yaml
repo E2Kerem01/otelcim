@@ -1,0 +1,15 @@
+# BUG-m3-02: L1 detayında season/sözleşme/işveren doğrulama metadatası yok — beklenen: Yaz 2026, sözleşme başlangıç/bitiş tarihleri ve doğrulanmış işveren rozeti / gerçek: detail widget'ları bu alanları hiç render etmiyor.
+appId: com.example.otelcim
+name: "BUG m3 L1 detail renders seasonal contract and verified metadata"
+tags: [m3, bug, listing-detail]
+---
+- runFlow: ../../common/launch.yaml
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+# TAHMİN: PLAN'daki beklenen ama mevcut detail widget'ında bulunmayan sezon/işveren rozeti metinleri.
+- assertVisible: ".*Yaz 2026.*"
+- assertVisible: ".*Sözleşme başlangıcı.*"
+- assertVisible: ".*Sözleşme bitişi.*"
+- assertVisible: ".*Doğrulanmış.*"

@@ -22,8 +22,9 @@ pass=0; fail=0
 for f in "${flows[@]}"; do
   [ -d "$f" ] && { set -- "$f"/*.yaml; } || set -- "$f"
   for flow in "$@"; do
-    case "$flow" in */common/*|*/seed/*) continue;; esac
-    node .maestro/seed/seed.mjs >/dev/null || { echo "SEED FAILED"; exit 2; }
+    case "$flow" in */common/*|*/seed/*|*/_*) continue;; esac
+    profile=$(sed -n 's/^# seed: *\([a-z]*\).*/\1/p' "$flow" | head -1)  # e.g. "# seed: many"
+    node .maestro/seed/seed.mjs $profile >/dev/null || { echo "SEED FAILED"; exit 2; }
     reset_app
     name=$(basename "$flow" .yaml)
     if maestro test "$flow" --format junit --output "$OUT/$name.xml" \

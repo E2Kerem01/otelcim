@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "m4 - back from create listing returns to the feed"
+tags: [m4, employer, navigation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: "Yeni İlan Aç"
+    timeout: 10000
+- assertVisible: ".*\\* işaretli alanlar zorunludur.*"
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertNotVisible: "Yeni İlan Aç"

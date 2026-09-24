@@ -1,0 +1,39 @@
+appId: com.example.otelcim
+name: "m7 - seasonal subscription persists when leaving and re-entering screen"
+tags: [m7, admin_trust, seasonal, persistence]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Sezon Takvimi.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk İşe Alım Takvimi.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*İlk Hatırlatıcıyı Oluştur.*"
+    direction: DOWN
+- tapOn: ".*İlk Hatırlatıcıyı Oluştur.*"
+- extendedWaitUntil:
+    visible: ".*Sezon İlanı Hatırlatıcı Ekle.*"
+    timeout: 10000
+- tapOn: ".*Hatırlatıcı Oluştur.*"
+- extendedWaitUntil:
+    visible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+    timeout: 10000
+- assertVisible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+# Ekrandan çıkıp tekrar girildiğinde Firestore'dan kalıcılık doğrulanır
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- tapOn: ".*Sezon Takvimi.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk İşe Alım Takvimi.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+    direction: DOWN
+- assertVisible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+- assertVisible: ".*Sezon: Yaz 2025.*"

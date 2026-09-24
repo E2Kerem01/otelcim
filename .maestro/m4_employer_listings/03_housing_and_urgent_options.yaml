@@ -1,0 +1,35 @@
+appId: com.example.otelcim
+name: "m4 - housing and urgent options are exposed without uploading files"
+tags: [m4, employer, form]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: "Yeni İlan Aç"
+    timeout: 10000
+- tapOn: "Lojman Bilgileri Ekle"
+- extendedWaitUntil:
+    visible: "Oda tipi"
+    timeout: 10000
+- assertVisible: "Klima"
+- assertVisible: "Wi-Fi"
+- assertVisible: "Günlük dahil öğün"
+- assertVisible: "Lojman fotoğrafları"
+- tapOn: "Oda tipi"
+- tapOn: "Çok kişilik oda"
+- tapOn: "Klima"
+- tapOn: "Wi-Fi"
+- assertVisible: "Çok kişilik oda"
+- scrollUntilVisible:
+    element: "Acil İhtiyaç"
+    direction: UP
+- assertVisible: ".*Bölgedeki kullanıcılara anlık bildirim gönderilir\\..*"
+- tapOn: "Acil İhtiyaç"
+- assertVisible: ".*İlk acil ilanınız ücretsiz\\..*"
+- back
+- assertVisible: ".*Ana Sayfa.*"
+

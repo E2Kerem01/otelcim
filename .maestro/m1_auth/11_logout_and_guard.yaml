@@ -1,0 +1,28 @@
+appId: com.example.otelcim
+name: "m1 auth logout clears protected access"
+tags: [m1_auth, access-control]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- tapOn: ".*Çıkış Yap.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- assertNotVisible: ".*Ayşe Aday.*"
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+

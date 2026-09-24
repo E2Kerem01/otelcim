@@ -1,0 +1,77 @@
+appId: com.example.otelcim
+name: "m6 - 12 language switch en de ru ar and return to tr"
+tags: [m6, profile, localization, language]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+# Dil ayarlarına git
+- scrollUntilVisible:
+    element: ".*Uygulama Dili.*"
+    direction: DOWN
+- tapOn: ".*Uygulama Dili.*"
+- extendedWaitUntil:
+    visible: ".*Uygulama Dili.*"
+    timeout: 10000
+
+# 1. İngilizce (English) seçimi
+- tapOn: ".*English.*"
+- extendedWaitUntil:
+    visible: ".*Home.*"
+    timeout: 10000
+- assertVisible: ".*Home.*"
+- assertVisible: ".*Categories.*"
+- assertVisible: ".*Post Listing.*"
+- assertVisible: ".*Messages.*"
+- assertVisible: ".*My Account.*"
+
+# 2. Almanca (Deutsch) seçimi
+- tapOn: ".*Deutsch.*"
+- extendedWaitUntil:
+    visible: ".*Start.*"
+    timeout: 10000
+- assertVisible: ".*Start.*"
+- assertVisible: ".*Kategorien.*"
+- assertVisible: ".*Inserieren.*"
+- assertVisible: ".*Nachrichten.*"
+- assertVisible: ".*Konto.*"
+
+# 3. Rusça (Русский) seçimi
+- tapOn: ".*Русский.*"
+- extendedWaitUntil:
+    visible: ".*Главная.*"
+    timeout: 10000
+- assertVisible: ".*Главная.*"
+- assertVisible: ".*Категории.*"
+- assertVisible: ".*Разместить.*"
+- assertVisible: ".*Сообщения.*"
+- assertVisible: ".*Профиль.*"
+
+# 4. Arapça (العربية - RTL) seçimi
+- tapOn: ".*العربية.*"
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 10000
+- assertVisible: ".*الرئيسية.*"
+- assertVisible: ".*الفئات.*"
+- assertVisible: ".*نشر إعلان.*"
+- assertVisible: ".*الرسائل.*"
+- assertVisible: ".*حسابي.*"
+
+# 5. Türkçe'ye geri dön
+- tapOn: ".*Türkçe.*"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"
+- assertVisible: ".*Kategoriler.*"
+- assertVisible: ".*İlan Ver.*"
+- assertVisible: ".*Mesajlar.*"
+- assertVisible: ".*Hesabım.*"

@@ -1,0 +1,70 @@
+appId: com.example.otelcim
+name: "06 m5_chat - cross-user messaging from seeker to employer in single flow"
+tags: [chat, cross-user]
+---
+# 1. Uygulama başlatılır ve seeker girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Seeker tarafından ayırt edici bir mesaj gönderilir
+- tapOn: ".*Mesajınızı yazın\\.\\.\\..*"
+- inputText: "CV belgelerimi hazırladım, yarın getiriyorum."
+- pressKey: Enter
+- hideKeyboard
+# TAHMİN: Gönder butonu (Icons.send_rounded) sağ altta (92%, 96%)
+- tapOn:
+    point: "92%,96%"
+    optional: true
+
+# 4. Mesajın balonda görüntülendiği doğrulanır
+- extendedWaitUntil:
+    visible: ".*CV belgelerimi hazırladım, yarın getiriyorum\\..*"
+    timeout: 10000
+
+# 5. Seeker oturumu kapatılır (Hesabım -> Çıkış Yap)
+- runFlow: _helpers/logout.yaml
+
+# 6. Employer (Mehmet İşveren) ile giriş yapılır (şu an login ekranındayız)
+- tapOn: "E-posta"
+- inputText: employer@e2e.test
+- tapOn: "Şifre"
+- inputText: "Test1234!"
+- hideKeyboard
+- tapOn:
+    text: "Giriş Yap"
+    index: -1
+- extendedWaitUntil:
+    notVisible: "Şifre"
+    timeout: 15000
+
+# 7. Employer Mesajlar sekmesine gider
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- tapOn: ".*Mesajlar.*"
+
+# 8. Mesaj listesinde seeker'ın son mesajı önizleme olarak doğrulanır
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*CV belgelerimi hazırladım.*"
+
+# 9. Sohbete girilir ve seeker mesajının mesaj balonunda olduğu doğrulanır
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+- assertVisible: ".*CV belgelerimi hazırladım, yarın getiriyorum\\..*"

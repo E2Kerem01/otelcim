@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+name: "m1 auth banned account is blocked"
+tags: [m1_auth, access-control, negative]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: banned@e2e.test
+- extendedWaitUntil:
+    visible: ".*Hesabınız Yasaklandı.*"
+    timeout: 15000
+- assertVisible: ".*Çıkış Yap.*"
+- back
+- extendedWaitUntil:
+    visible: ".*Hesabınız Yasaklandı.*"
+    timeout: 10000
+- assertNotVisible: ".*Ana Sayfa.*"
+

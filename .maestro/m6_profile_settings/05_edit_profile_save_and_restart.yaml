@@ -1,0 +1,68 @@
+appId: com.example.otelcim
+name: "m6 - 05 edit profile save and persist across app restart"
+tags: [m6, profile]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: "Profil"
+    timeout: 10000
+
+# Ad Soyad alanını güncelle
+- tapOn: ".*Ad Soyad.*"
+- eraseText: 30
+- inputText: "Ayşe Güncellendi"
+- hideKeyboard
+
+# Hakkında alanını güncelle
+- tapOn: ".*Hakkında.*"
+- eraseText: 50
+- inputText: "Deneyimli resepsiyonist"
+- hideKeyboard
+
+# Profili Kaydet butonuna dokun
+- scrollUntilVisible:
+    element: ".*Profili Kaydet.*"
+    direction: DOWN
+- tapOn: ".*Profili Kaydet.*"
+
+# Kayıt onay mesajını ve profil ekranına dönüşü bekle
+- extendedWaitUntil:
+    visible: ".*Profil başarıyla kaydedildi.*"
+    timeout: 10000
+
+- extendedWaitUntil:
+    visible: ".*Ayşe Güncellendi.*"
+    timeout: 10000
+- assertVisible: ".*Ayşe Güncellendi.*"
+
+# Uygulamayı yeniden başlat (oturum ve veriler korunmalı)
+- launchApp:
+    stopApp: true
+
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 20000
+
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Güncellendi.*"
+    timeout: 10000
+- assertVisible: ".*Ayşe Güncellendi.*"
+
+# Düzenleme ekranına tekrar girip bio alanının da kalıcı olduğunu doğrula
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: "Profil"
+    timeout: 10000
+- assertVisible: ".*Ayşe Güncellendi.*"
+- assertVisible: ".*Deneyimli resepsiyonist.*"

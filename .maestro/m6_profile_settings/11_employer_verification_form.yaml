@@ -1,0 +1,41 @@
+appId: com.example.otelcim
+name: "m6 - 11 unverified employer opens verification request form"
+tags: [m6, profile, employer, verification]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer2@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Zeynep Otelci.*"
+    timeout: 10000
+
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: "Profil"
+    timeout: 10000
+
+# Oteli doğrula butonuna kaydır ve dokun
+- scrollUntilVisible:
+    element: ".*Otelinizi Doğrulayın.*"
+    direction: DOWN
+- tapOn: ".*Otelinizi Doğrulayın.*"
+
+# Otel Doğrulama formunun açıldığını doğrula
+- extendedWaitUntil:
+    visible: "Otel Doğrulama"
+    timeout: 10000
+
+- assertVisible: ".*Doğrulama Hakkında.*"
+# Profildeki otel adı otomatik doldurulmuş olmalı (Kaya Butik Otel)
+- assertVisible: ".*Kaya Butik Otel.*"
+- assertVisible: ".*Otel Adresi.*"
+- assertVisible: ".*Doğrulama Belgeleri.*"
+- assertVisible: ".*Belge Ekle.*"
+- assertVisible: ".*Doğrulama Talebini Gönder.*"
+
+# Formu eksik adresle göndermeyi dene ve doğrulamayı assert et
+- tapOn: ".*Doğrulama Talebini Gönder.*"
+- assertVisible: ".*Otel adresi gereklidir.*"

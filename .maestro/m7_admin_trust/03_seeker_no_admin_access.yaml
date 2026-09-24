@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+name: "m7 - seeker cannot see admin panel or employer extras in profile"
+tags: [m7, admin_trust, profile, permissions]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*İş Arayan.*"
+# TAHMİN: Admin paneli bağlantısı eklenseydi "Yönetim Paneli" veya "Admin Paneli" adını taşıyacaktı
+- assertNotVisible: ".*Yönetim Paneli.*"
+- assertNotVisible: ".*Admin Paneli.*"
+- assertNotVisible: ".*Yetenek Havuzum.*"

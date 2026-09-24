@@ -1,0 +1,70 @@
+appId: com.example.otelcim
+name: "09 m5_chat - mark hired and submit candidate rating"
+tags: [chat, hired, rating]
+---
+# 1. Uygulama başlatılır ve employer girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Menü açılır ve "İşe Alındı Olarak İşaretle" seçilir
+# TAHMİN: Flutter PopupMenuButton varsayılan Türkçe MaterialLocalizations tooltip'i "Menüyü göster"
+- tapOn: ".*Menüyü göster.*"
+- extendedWaitUntil:
+    visible: ".*İşe Alındı Olarak İşaretle.*"
+    timeout: 5000
+- tapOn: ".*İşe Alındı Olarak İşaretle.*"
+
+# 4. Onay diyaloğunda "Onayla"ya basılır
+- extendedWaitUntil:
+    visible: ".*Bu görüşmede işe alımın gerçekleştiğini onaylıyor musunuz\\?.*"
+    timeout: 5000
+- tapOn: ".*Onayla.*"
+
+# 5. İşe alım onay banner'ı ve değerlendirme butonu doğrulanır
+- extendedWaitUntil:
+    visible: ".*Bu görüşmede işe alım gerçekleşti\\..*"
+    timeout: 10000
+- assertVisible: ".*Deneyimini Değerlendir.*"
+
+# 6. "Deneyimini Değerlendir" butonuna dokunulup puanlama ekranına geçilir
+- tapOn: ".*Deneyimini Değerlendir.*"
+- extendedWaitUntil:
+    visible: ".*Deneyimin nasıldı\\?.*"
+    timeout: 10000
+- assertVisible: ".*1 ile 5 arasında bir puan seçin\\..*"
+
+# 7. Yıldız seçilmeden gönderme denemesi (doğrulama hatası beklenir)
+- tapOn: ".*Değerlendirmeyi Gönder.*"
+- extendedWaitUntil:
+    visible: ".*Lütfen bir yıldız puanı seçin\\..*"
+    timeout: 5000
+
+# 8. 5 yıldız seçilir (tooltip: "5 yıldız") ve yorum yazılır
+- tapOn: ".*5 yıldız.*"
+- tapOn: ".*Yorum.*"
+- inputText: "Çok ilgili ve başarılı bir aday, teşekkürler."
+- hideKeyboard
+
+# 9. Değerlendirme gönderilir ve başarı bildirimi doğrulanır
+- tapOn: ".*Değerlendirmeyi Gönder.*"
+- extendedWaitUntil:
+    visible: ".*Değerlendirmeniz kaydedildi\\..*"
+    timeout: 10000
+
+# 10. Sohbet ekranına geri dönüldüğü doğrulanır
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000

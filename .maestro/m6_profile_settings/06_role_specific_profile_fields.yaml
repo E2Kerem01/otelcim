@@ -1,0 +1,62 @@
+appId: com.example.otelcim
+name: "m6 - 06 role specific profile form fields for seeker vs employer"
+tags: [m6, profile, roles]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: "Profil"
+    timeout: 10000
+
+# İş arayan alanlarının görünürlüğü
+- scrollUntilVisible:
+    element: ".*Şu An Boşta / Hemen Başlayabilir.*"
+    direction: DOWN
+- assertVisible: ".*Şu An Boşta / Hemen Başlayabilir.*"
+
+# İş arayan ekranında işveren alanları OLMAMALI
+- assertNotVisible: ".*Otel Adı.*"
+- assertNotVisible: ".*Pozisyon.*"
+- assertNotVisible: ".*Otelinizi Doğrulayın.*"
+
+# Çıkış yap ve işveren olarak gir
+- back
+- scrollUntilVisible:
+    element: ".*Çıkış Yap.*"
+    direction: DOWN
+- tapOn: ".*Çıkış Yap.*"
+
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: "Profil"
+    timeout: 10000
+
+# İşveren alanlarının görünürlüğü
+- assertVisible: ".*Otel Adı.*"
+- assertVisible: ".*Pozisyon.*"
+
+- scrollUntilVisible:
+    element: ".*Otelinizi Doğrulayın.*"
+    direction: DOWN
+- assertVisible: ".*Otelinizi Doğrulayın.*"
+
+# İşveren ekranında iş arayan "Hemen Başlayabilir" switch'i OLMAMALI
+- assertNotVisible: ".*Şu An Boşta / Hemen Başlayabilir.*"

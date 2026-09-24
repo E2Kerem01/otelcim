@@ -1,0 +1,39 @@
+appId: com.example.otelcim
+name: "m1 auth register required and weak password validation"
+tags: [m1_auth, register, validation]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- tapOn: ".*Kayıt Ol.*"
+- extendedWaitUntil:
+    visible: ".*Hesap türü.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Kayıt Ol.*"
+    index: -1
+- extendedWaitUntil:
+    visible: ".*Lütfen bir hesap türü seçin.*"
+    timeout: 5000
+- assertVisible: ".*Geçerli bir e-posta girin.*"
+- assertVisible: ".*Ad soyad girin.*"
+- tapOn: ".*İş Arıyorum.*"
+- scrollUntilVisible:
+    element: ".*E-posta.*"
+    direction: DOWN
+- tapOn: ".*E-posta.*"
+- inputText: invalid-e2e-email
+- tapOn: ".*Şifre.*"
+- inputText: abc
+- tapOn: ".*Ad Soyad.*"
+- inputText: Ab
+- hideKeyboard
+- tapOn:
+    text: ".*Kayıt Ol.*"
+    index: -1
+- assertVisible: ".*Geçerli bir e-posta girin.*"
+- assertVisible: ".*Şifre en az 8 karakter ve en az 1 rakam içermelidir.*"
+- assertVisible: ".*Geçerli bir ad soyad girin.*"
+

@@ -1,0 +1,32 @@
+appId: com.example.otelcim
+name: "m3 guest opens L1 detail and sees contact gate"
+tags: [m3, listing-detail, guest]
+---
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: '.*35\.000 TL.*'
+- assertVisible: ".*Antalya.*"
+- scrollUntilVisible:
+    element: ".*Lojman & Sosyal İmkanlar.*"
+    direction: DOWN
+- assertVisible: ".*Çok kişilik oda.*"
+- assertVisible: ".*Klima.*"
+- assertVisible: ".*Wi-Fi.*"
+- assertVisible: ".*Günlük dahil öğün: 3.*"
+- scrollUntilVisible:
+    element: ".*İletişim bilgisini görmek için giriş yapın.*"
+    direction: DOWN
+- assertVisible: ".*İlan Sahibi.*"
+- assertNotVisible: '.*ik\+L1@e2e\.test.*'
+- assertVisible: ".*İletişim bilgisini görmek için giriş yapın.*"
+- tapOn: ".*İletişim bilgisini görmek için giriş yapın.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000

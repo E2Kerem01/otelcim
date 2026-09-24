@@ -1,0 +1,51 @@
+appId: com.example.otelcim
+name: "10 m5_chat - start new chat from listing detail using message template"
+tags: [chat, listing, template]
+---
+# 1. Uygulama başlatılır ve seeker girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# 2. Ana sayfada henüz sohbet açılmamış olan L2 ilanına (Garson) gidilir
+- extendedWaitUntil:
+    visible: ".*Garson \\(Sezonluk\\).*"
+    timeout: 10000
+- tapOn: ".*Garson \\(Sezonluk\\).*"
+
+# 3. İlan detayında "Mesaj Gönder" butonuna dokunulur
+- extendedWaitUntil:
+    visible: ".*Mesaj Gönder.*"
+    timeout: 10000
+- tapOn: ".*Mesaj Gönder.*"
+
+# 4. İlk mesaj şablon seçimi alt sayfasının (MessageTemplateSheet) açıldığı doğrulanır
+- extendedWaitUntil:
+    visible: ".*İlk mesajını hazırlayalım.*"
+    timeout: 10000
+- assertVisible: ".*Bir şablon seç, göndermeden önce düzenleyebilirsin\\..*"
+- assertVisible: ".*Kendimi Tanıtayım.*"
+- assertVisible: ".*Müsaitlik Bildireyim.*"
+
+# 5. "Kendimi Tanıtayım" şablonuna dokunulur
+- tapOn: ".*Kendimi Tanıtayım.*"
+
+# 6. Sohbet ekranının açıldığı ve şablon metninin giriş alanına aktarıldığı doğrulanır
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 7. Şablon mesajı gönderilir
+- pressKey: Enter
+- hideKeyboard
+# TAHMİN: Gönder butonu (Icons.send_rounded) sağ altta (92%, 96%)
+- tapOn:
+    point: "92%,96%"
+    optional: true
+
+# 8. Mesajın balonda görüntülendiği doğrulanır
+- extendedWaitUntil:
+    visible: ".*Merhaba, \"Garson \\(Sezonluk\\)\" ilanınız için yazıyorum\\..*"
+    timeout: 10000

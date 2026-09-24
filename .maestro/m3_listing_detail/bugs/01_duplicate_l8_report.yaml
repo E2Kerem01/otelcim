@@ -1,0 +1,29 @@
+# BUG-m3-01: L8 için mevcut R1 raporu tekrar gönderilebilir — beklenen: "Bu bildirimi daha önce gönderdiniz." / gerçek: önceki turda hasAlreadyReported sorgusu false dönüp yeni rapor oluşturuyor.
+appId: com.example.otelcim
+name: "BUG m3 duplicate L8 report is rejected"
+tags: [m3, bug, report]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- scrollUntilVisible:
+    element: ".*Güvenlik Görevlisi.*"
+    direction: DOWN
+- tapOn: ".*Güvenlik Görevlisi.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- assertVisible: ".*Güvenlik Görevlisi.*"
+- scrollUntilVisible:
+    element: ".*İlanı Şikâyet Et.*"
+    direction: DOWN
+- tapOn: ".*İlanı Şikâyet Et.*"
+- extendedWaitUntil:
+    visible: ".*İlanı Bildir.*"
+    timeout: 10000
+- tapOn: ".*Gönder.*"
+- extendedWaitUntil:
+    visible: '.*Bu bildirimi daha önce gönderdiniz\..*'
+    timeout: 15000

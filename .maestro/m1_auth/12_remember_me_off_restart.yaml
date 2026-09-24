@@ -1,0 +1,26 @@
+appId: com.example.otelcim
+name: "m1 auth remember me off signs out on restart"
+tags: [m1_auth, persistence]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- tapOn: ".*Beni Hatırla.*"
+- tapOn: ".*E-posta.*"
+- inputText: seeker@e2e.test
+- tapOn: ".*Şifre.*"
+- inputText: Test1234!
+- hideKeyboard
+- tapOn: ".*Giriş Yap.*"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 15000
+- assertNotVisible: ".*Ayşe Aday.*"
+

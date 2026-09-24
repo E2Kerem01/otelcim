@@ -1,0 +1,29 @@
+appId: com.example.otelcim
+name: "m3 employer sees L1 management actions and QR poster"
+tags: [m3, listing-detail, employer, qr]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- assertVisible: ".*İlan Yönetimi.*"
+- assertVisible: ".*İlanı Öne Çıkar.*"
+- assertVisible: ".*QR Poster Oluştur.*"
+- assertNotVisible: ".*Başvur / Mesaj Gönder.*"
+- tapOn: ".*QR Poster Oluştur.*"
+- extendedWaitUntil:
+    visible: ".*QR İlan Posteri.*"
+    timeout: 15000
+- assertVisible: ".*OTELCİM İŞ İLANI.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*Deniz Otel.*"
+- assertVisible: '.*İlanı görüntülemek ve hızlı başvuru yapmak için QR kodu taratın\..*'
+- back
+- extendedWaitUntil:
+    visible: ".*İlan Yönetimi.*"
+    timeout: 10000

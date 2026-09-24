@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "m3 employer viewing another employer listing has no owner controls"
+tags: [m3, listing-detail, wrong-role]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- scrollUntilVisible:
+    element: ".*Animatör.*"
+    direction: DOWN
+- tapOn: ".*Animatör.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- assertVisible: ".*Animatör.*"
+- assertVisible: ".*Kaya Butik Otel.*"
+- assertNotVisible: ".*İlan Yönetimi.*"
+- assertNotVisible: ".*QR Poster Oluştur.*"

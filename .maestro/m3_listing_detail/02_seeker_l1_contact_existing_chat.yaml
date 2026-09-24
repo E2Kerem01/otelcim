@@ -1,0 +1,29 @@
+appId: com.example.otelcim
+name: "m3 seeker reveals L1 contact and opens existing chat"
+tags: [m3, listing-detail, contact, chat]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*İletişim Bilgisini Göster.*"
+    direction: DOWN
+- assertVisible: ".*Deniz Otel.*"
+- tapOn: ".*İletişim Bilgisini Göster.*"
+- extendedWaitUntil:
+    visible: '.*ik\+L1@e2e\.test.*'
+    timeout: 10000
+- assertVisible: ".*0242 555 00 00.*"
+- tapOn: ".*Başvur / Mesaj Gönder.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 15000
+- assertVisible: '.*Merhaba, ilan hâlâ aktif mi\?.*'
+- assertVisible: '.*Yarın görüşmeye gelebilir misiniz\?.*'
+- assertVisible: '.*Mesajınızı yazın\.\.\..*'

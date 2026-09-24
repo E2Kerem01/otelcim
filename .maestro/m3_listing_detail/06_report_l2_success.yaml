@@ -1,0 +1,28 @@
+appId: com.example.otelcim
+name: "m3 seeker reports L2 with a selected reason"
+tags: [m3, listing-detail, report]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: '.*Garson \(Sezonluk\).*'
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*İlanı Şikâyet Et.*"
+    direction: DOWN
+- tapOn: ".*İlanı Şikâyet Et.*"
+- extendedWaitUntil:
+    visible: ".*İlanı Bildir.*"
+    timeout: 10000
+- assertVisible: '.*Bildireceğiniz: Garson \(Sezonluk\).*'
+- assertVisible: ".*Bildirim Nedeni.*"
+- tapOn: ".*Dolandırıcılık / Sahtekarlık.*"
+- tapOn: ".*Spam.*"
+- tapOn: ".*Gönder.*"
+- extendedWaitUntil:
+    visible: '.*Bildiriminiz başarıyla gönderildi\. Teşekkür ederiz\..*'
+    timeout: 15000

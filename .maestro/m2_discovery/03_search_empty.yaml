@@ -1,0 +1,14 @@
+appId: com.example.otelcim
+name: "m2 discovery - unmatched search shows empty state"
+tags: [m2_discovery, search, edge]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: '.*İş ilanı ara\.\.\..*'
+- inputText: "KesinlikleYokXYZ"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: ".*0 sonuç.*"
+    timeout: 10000
+- assertVisible: ".*Henüz İlan Bulunmuyor.*"
+- assertVisible: ".*Sistemde aktif ilan bulunmamaktadır.*"
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"
