@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme.dart';
+import 'admin_global_search.dart';
 
 /// Light/dark switch for the admin area only (the public app has no dark
 /// theme yet - see QA D27).
@@ -64,37 +68,53 @@ class AdminShell extends ConsumerWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth < sideMenuBreakpoint) return child;
-          return Scaffold(
-            body: Row(
-              children: [
-                NavigationRail(
-                  extended: constraints.maxWidth >= 1200,
-                  selectedIndex: _selectedIndex,
-                  onDestinationSelected: (i) => context.go(_destinations[i].path),
-                  leading: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Icon(Icons.admin_panel_settings_outlined, size: 32),
-                  ),
-                  trailing: const Expanded(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: 16),
-                        child: AdminThemeToggle(),
+          return CallbackShortcuts(
+            bindings: <ShortcutActivator, VoidCallback>{
+              const SingleActivator(LogicalKeyboardKey.keyK, control: true):
+                  () => unawaited(showAdminGlobalSearch(context)),
+            },
+            child: Focus(
+              autofocus: true,
+              child: Scaffold(
+                body: Row(
+                  children: [
+                    NavigationRail(
+                      extended: constraints.maxWidth >= 1200,
+                      selectedIndex: _selectedIndex,
+                      onDestinationSelected: (i) => context.go(_destinations[i].path),
+                      leading: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AdminGlobalSearchButton(),
+                            SizedBox(height: 8),
+                            Icon(Icons.admin_panel_settings_outlined, size: 32),
+                          ],
+                        ),
                       ),
+                      trailing: const Expanded(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 16),
+                            child: AdminThemeToggle(),
+                          ),
+                        ),
+                      ),
+                      destinations: [
+                        for (final d in _destinations)
+                          NavigationRailDestination(
+                            icon: Icon(d.icon),
+                            label: Text(d.label),
+                          ),
+                      ],
                     ),
-                  ),
-                  destinations: [
-                    for (final d in _destinations)
-                      NavigationRailDestination(
-                        icon: Icon(d.icon),
-                        label: Text(d.label),
-                      ),
+                    const VerticalDivider(width: 1),
+                    Expanded(child: child),
                   ],
                 ),
-                const VerticalDivider(width: 1),
-                Expanded(child: child),
-              ],
+              ),
             ),
           );
         },

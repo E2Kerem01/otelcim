@@ -4,6 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/banner_ad_model.dart';
 
+/// Ordered query used by the paged admin banner list.
+Query<Map<String, dynamic>> adminBannerAdsQuery(
+  FirebaseFirestore db, {
+  required String filter,
+}) {
+  Query<Map<String, dynamic>> query = db.collection('banner_ads');
+  if (filter == 'active') {
+    query = query.where('isActive', isEqualTo: true);
+  } else if (filter == 'inactive') {
+    query = query.where('isActive', isEqualTo: false);
+  }
+  return query.orderBy('order').orderBy('createdAt', descending: true);
+}
+
 class BannerAdService {
   BannerAdService(this._db);
 

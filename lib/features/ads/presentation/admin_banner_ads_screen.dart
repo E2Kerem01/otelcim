@@ -1,15 +1,25 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/storage_service.dart';
+import '../../admin/presentation/widgets/admin_paged_controller.dart';
+import '../../admin/presentation/widgets/admin_paged_view.dart';
 import '../domain/banner_ad_model.dart';
 import '../services/banner_ad_service.dart';
+
+const _bannerFilters = <AdminFilter>[
+  AdminFilter('active', 'Aktif', icon: Icons.visibility_outlined),
+  AdminFilter('inactive', 'Pasif', icon: Icons.visibility_off_outlined),
+  AdminFilter('all', 'Tümü'),
+];
 
 class AdminBannerAdsScreen extends ConsumerWidget {
   const AdminBannerAdsScreen({super.key});
@@ -25,12 +35,12 @@ class AdminBannerAdsScreen extends ConsumerWidget {
     ));
   }
 
-  Future<void> _deleteBanner(BuildContext context, WidgetRef ref, BannerAd ad) async {
+  Future<bool> _deleteBanner(BuildContext context, WidgetRef ref, BannerAd ad) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Banner Silinsin mi?'),
-        content: Text('"${ad.title}" reklam banner\'ı tamamen silinecek.'),
+        title: const Text('Banner silinsin mi?'),
+        content: Text('"${ad.title}" reklam bannerı tamamen silinecek.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -45,99 +55,156 @@ class AdminBannerAdsScreen extends ConsumerWidget {
       ),
     );
 
-    if (confirmed == true) {
-      try {
-        await ref.read(bannerAdServiceProvider).deleteBannerAd(ad.id);
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Banner silindi.')),
-          );
-        }
-      } catch (error, stackTrace) {
-        logError(
-          error,
-          stackTrace,
-          context: 'AdminBannerAdsScreen._deleteBanner',
+    if (confirmed != true) return false;
+    try {
+      await ref.read(bannerAdServiceProvider).deleteBannerAd(ad.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Banner silindi.')),
         );
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(mapToFailure(error).message)),
-          );
-        }
       }
+      return true;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminBannerAdsScreen._deleteBanner');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mapToFailure(error).message)),
+        );
+      }
+      return false;
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bannersAsync = ref.watch(allBannerAdsProvider);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Banner Reklam Yönetimi'),
-      ),
+      appBar: AppBar(title: const Text('Banner Reklam Yönetimi')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showBannerForm(context, ref),
         icon: const Icon(Icons.add),
         label: const Text('Yeni Banner'),
       ),
-      body: bannersAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Hata: $err')),
-        data: (banners) {
-          if (banners.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.campaign_outlined,
-                      size: 64,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Henüz Reklam Banner\'ı Yok',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Anasayfada gösterilecek sponsorlu reklam banner\'larını buradan ekleyebilirsiniz.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => _showBannerForm(context, ref),
-                      icon: const Icon(Icons.add),
-                      label: const Text('İlk Banner\'ı Ekle'),
-                    ),
-                  ],
+      body: _AdminBannerAdsBody(
+        onEdit: (banner) => _showBannerForm(context, ref, banner),
+        onDelete: (banner) => _deleteBanner(context, ref, banner),
+      ),
+    );
+  }
+}
+
+class _AdminBannerAdsBody extends StatefulWidget {
+  const _AdminBannerAdsBody({
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final ValueChanged<BannerAd> onEdit;
+  final Future<bool> Function(BannerAd) onDelete;
+
+  @override
+  State<_AdminBannerAdsBody> createState() => _AdminBannerAdsBodyState();
+}
+
+class _AdminBannerAdsBodyState extends State<_AdminBannerAdsBody> {
+  late final AdminPagedController<BannerAd> _controller =
+      AdminPagedController<BannerAd>(
+        fromDoc: (doc) => BannerAd.fromDoc(doc),
+        idOf: (banner) => banner.id,
+      );
+  String _filter = 'active';
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _reload() {
+    unawaited(_controller.setQuery(adminBannerAdsQuery(
+      FirebaseFirestore.instance,
+      filter: _filter,
+    )));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        AdminFilterBar(
+          filters: _bannerFilters,
+          selectedId: _filter,
+          onSelected: (id) {
+            setState(() => _filter = id);
+            _reload();
+          },
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: AdminPagedView<BannerAd>(
+            controller: _controller,
+            emptyText: 'Bu filtreyle banner bulunamadı.',
+            cardBuilder: (_, banner) => _AdminBannerCard(
+              banner: banner,
+              onEdit: () => widget.onEdit(banner),
+              onDelete: () {
+                unawaited(widget.onDelete(banner).then((deleted) {
+                  if (deleted) {
+                    _controller.removeWhere((item) => item.id == banner.id);
+                  }
+                }));
+              },
+              onToggleActive: (value) {
+                unawaited(
+                  BannerAdService(FirebaseFirestore.instance)
+                      .toggleActive(banner.id, value)
+                      .then((_) => _controller.refresh()),
+                );
+              },
+            ),
+            columns: [
+              AdminColumn(
+                label: 'Banner',
+                flex: 3,
+                cell: (_, banner) => Text(
+                  banner.title,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: banners.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final banner = banners[index];
-              return _AdminBannerCard(
-                banner: banner,
-                onEdit: () => _showBannerForm(context, ref, banner),
-                onDelete: () => _deleteBanner(context, ref, banner),
-                onToggleActive: (val) {
-                  unawaited(ref.read(bannerAdServiceProvider).toggleActive(banner.id, val));
-                },
-              );
-            },
-          );
-        },
-      ),
+              AdminColumn(
+                label: 'Reklamveren',
+                flex: 2,
+                cell: (_, banner) => Text(
+                  banner.advertiserName,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              AdminColumn(
+                label: 'Sıra',
+                cell: (_, banner) => Text(banner.order.toString()),
+              ),
+              AdminColumn(
+                label: 'Durum',
+                cell: (_, banner) => Text(banner.isActive ? 'Aktif' : 'Pasif'),
+              ),
+              AdminColumn(
+                label: 'Oluşturma',
+                flex: 2,
+                cell: (_, banner) => Text(
+                  banner.createdAt == null
+                      ? '—'
+                      : DateFormat('dd.MM.yyyy HH:mm').format(banner.createdAt!),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -228,25 +295,25 @@ class _AdminBannerCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    'Sıra: ${banner.order}',
+                    'SÄ±ra: ${banner.order}',
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(width: 8),
                 if (banner.endDate != null)
                   Text(
-                    'Bitiş: ${banner.endDate!.day}.${banner.endDate!.month}.${banner.endDate!.year}',
+                    'BitiÅŸ: ${banner.endDate!.day}.${banner.endDate!.month}.${banner.endDate!.year}',
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   )
                 else
                   Text(
-                    'Süresiz',
+                    'SÃ¼resiz',
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   ),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.edit_outlined, size: 20),
-                  tooltip: 'Düzenle',
+                  tooltip: 'DÃ¼zenle',
                   onPressed: onEdit,
                 ),
                 IconButton(
@@ -324,7 +391,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Görsel yüklendi.')),
+          const SnackBar(content: Text('GÃ¶rsel yÃ¼klendi.')),
         );
       }
     } catch (error, stackTrace) {
@@ -366,7 +433,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
     if (!_formKey.currentState!.validate()) return;
     if (_imageUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen bir banner görseli yükleyin veya URL girin.')),
+        const SnackBar(content: Text('LÃ¼tfen bir banner gÃ¶rseli yÃ¼kleyin veya URL girin.')),
       );
       return;
     }
@@ -406,7 +473,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.existingAd != null ? 'Banner güncellendi.' : 'Banner eklendi.')),
+          SnackBar(content: Text(widget.existingAd != null ? 'Banner gÃ¼ncellendi.' : 'Banner eklendi.')),
         );
         Navigator.of(context).pop();
       }
@@ -444,7 +511,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.existingAd != null ? 'Banner Düzenle' : 'Yeni Banner Ekle',
+                    widget.existingAd != null ? 'Banner DÃ¼zenle' : 'Yeni Banner Ekle',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -474,7 +541,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                               CachedNetworkImage(
                                 imageUrl: _imageUrl,
                                 fit: BoxFit.cover,
-                                errorWidget: (_, _, _) => const Center(child: Text('Görsel yüklenemedi')),
+                                errorWidget: (_, _, _) => const Center(child: Text('GÃ¶rsel yÃ¼klenemedi')),
                               ),
                               Positioned(
                                 right: 8,
@@ -497,7 +564,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                               ElevatedButton.icon(
                                 onPressed: _pickAndUploadImage,
                                 icon: const Icon(Icons.upload_rounded),
-                                label: const Text('Görsel Yükle'),
+                                label: const Text('GÃ¶rsel YÃ¼kle'),
                               ),
                             ],
                           ),
@@ -509,10 +576,10 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: 'Banner Başlığı *',
-                  hintText: 'Örn. Jolly Tur ile Yaz Fırsatları',
+                  labelText: 'Banner BaÅŸlÄ±ÄŸÄ± *',
+                  hintText: 'Ã–rn. Jolly Tur ile Yaz FÄ±rsatlarÄ±',
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Başlık gerekli' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'BaÅŸlÄ±k gerekli' : null,
               ),
 
               const SizedBox(height: 12),
@@ -521,10 +588,10 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
               TextFormField(
                 controller: _advertiserController,
                 decoration: const InputDecoration(
-                  labelText: 'Reklamveren Firma Adı *',
-                  hintText: 'Örn. Jolly Tur',
+                  labelText: 'Reklamveren Firma AdÄ± *',
+                  hintText: 'Ã–rn. Jolly Tur',
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Reklamveren adı gerekli' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Reklamveren adÄ± gerekli' : null,
               ),
 
               const SizedBox(height: 12),
@@ -534,7 +601,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                 controller: _targetUrlController,
                 keyboardType: TextInputType.url,
                 decoration: const InputDecoration(
-                  labelText: 'Hedef Bağlantı (URL) *',
+                  labelText: 'Hedef BaÄŸlantÄ± (URL) *',
                   hintText: 'https://www.jollytur.com',
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Hedef URL gerekli' : null,
@@ -547,8 +614,8 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                 controller: _orderController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  labelText: 'Sıralama Önceliği (0, 1, 2...)',
-                  hintText: 'Küçük olan ilk gösterilir',
+                  labelText: 'SÄ±ralama Ã–nceliÄŸi (0, 1, 2...)',
+                  hintText: 'KÃ¼Ã§Ã¼k olan ilk gÃ¶sterilir',
                 ),
               ),
 
@@ -563,7 +630,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                       icon: const Icon(Icons.calendar_today, size: 16),
                       label: Text(
                         _startDate == null
-                            ? 'Başlangıç Tarihi'
+                            ? 'BaÅŸlangÄ±Ã§ Tarihi'
                             : '${_startDate!.day}.${_startDate!.month}.${_startDate!.year}',
                         style: const TextStyle(fontSize: 12),
                       ),
@@ -576,7 +643,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                       icon: const Icon(Icons.event, size: 16),
                       label: Text(
                         _endDate == null
-                            ? 'Bitiş Tarihi (Süresiz)'
+                            ? 'BitiÅŸ Tarihi (SÃ¼resiz)'
                             : '${_endDate!.day}.${_endDate!.month}.${_endDate!.year}',
                         style: const TextStyle(fontSize: 12),
                       ),
@@ -590,8 +657,8 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
               // Active Switch Row
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Aktif Yayın Lansmanı'),
-                subtitle: const Text('Pasif yapılırsa anasayfada gizlenir'),
+                title: const Text('Aktif YayÄ±n LansmanÄ±'),
+                subtitle: const Text('Pasif yapÄ±lÄ±rsa anasayfada gizlenir'),
                 value: _isActive,
                 onChanged: (val) => setState(() => _isActive = val),
               ),
@@ -614,7 +681,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : Text(widget.existingAd != null ? 'Değişiklikleri Kaydet' : 'Banner\'ı Kaydet'),
+                      : Text(widget.existingAd != null ? 'DeÄŸiÅŸiklikleri Kaydet' : 'Banner\'Ä± Kaydet'),
                 ),
               ),
             ],

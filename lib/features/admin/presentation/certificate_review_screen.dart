@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -10,65 +13,132 @@ import '../../profile/domain/certificate_model.dart';
 import '../../profile/services/certificate_service.dart';
 import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
+import 'widgets/admin_paged_controller.dart';
+import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
 
-class CertificateReviewScreen extends ConsumerWidget {
+const _certificateFilters = <AdminFilter>[
+  AdminFilter('pending', 'Bekleyen', icon: Icons.hourglass_top_outlined),
+  AdminFilter('approved', 'Onaylanan', icon: Icons.verified_outlined),
+  AdminFilter('rejected', 'Reddedilen', icon: Icons.gpp_bad_outlined),
+  AdminFilter('all', 'Tümü'),
+];
+
+class CertificateReviewScreen extends ConsumerStatefulWidget {
   const CertificateReviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pendingCertificatesAsync = ref.watch(pendingCertificatesProvider);
+  ConsumerState<CertificateReviewScreen> createState() =>
+      _CertificateReviewScreenState();
+}
 
+class _CertificateReviewScreenState
+    extends ConsumerState<CertificateReviewScreen> {
+  late final AdminPagedController<Certificate> _controller =
+      AdminPagedController<Certificate>(
+        fromDoc: (doc) => Certificate.fromDoc(doc),
+        idOf: (certificate) => certificate.id,
+      );
+  String _filter = 'pending';
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _reload() {
+    unawaited(_controller.setQuery(adminCertificatesQuery(
+      FirebaseFirestore.instance,
+      filter: _filter,
+    )));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Belge Onay Kuyruğu'),
-      ),
-      body: pendingCertificatesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(
-          child: Text('Bekleyen belgeler yüklenemedi: $err'),
-        ),
-        data: (items) {
-          if (items.isEmpty) {
-            return const Center(
-              child: Text('Bekleyen belge / sertifika bulunmuyor.'),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: items.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              return _AdminCertificateCard(cert: items[index]);
+      appBar: AppBar(title: const Text('Belge Onay Kuyruğu')),
+      body: Column(
+        children: [
+          AdminFilterBar(
+            filters: _certificateFilters,
+            selectedId: _filter,
+            onSelected: (id) {
+              setState(() => _filter = id);
+              _reload();
             },
-          );
-        },
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: AdminPagedView<Certificate>(
+              controller: _controller,
+              emptyText: 'Bu filtreyle belge / sertifika bulunamadı.',
+              cardBuilder: (_, certificate) => _AdminCertificateCard(
+                cert: certificate,
+                onCompleted: () => _controller.removeWhere(
+                  (item) => item.id == certificate.id,
+                ),
+              ),
+              columns: [
+                AdminColumn(
+                  label: 'Otel / Kişi',
+                  flex: 2,
+                  cell: (_, certificate) => Text(
+                    '${certificate.userName ?? certificate.userEmail ?? certificate.userId}\n${certificate.title ?? certificate.type.label}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                AdminColumn(
+                  label: 'Belge sayısı',
+                  cell: (_, _) => const Text('1'),
+                ),
+                AdminColumn(
+                  label: 'Gönderim',
+                  cell: (_, certificate) => Text(
+                    DateFormat('dd.MM.yyyy HH:mm').format(certificate.createdAt),
+                  ),
+                ),
+                AdminColumn(
+                  label: 'Durum',
+                  cell: (_, certificate) => Text(certificate.status.label),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _AdminCertificateCard extends ConsumerStatefulWidget {
-  const _AdminCertificateCard({required this.cert});
+  const _AdminCertificateCard({required this.cert, required this.onCompleted});
 
   final Certificate cert;
+  final VoidCallback onCompleted;
 
   @override
   ConsumerState<_AdminCertificateCard> createState() =>
-      __AdminCertificateCardState();
+      _AdminCertificateCardState();
 }
 
-class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
+class _AdminCertificateCardState
+    extends ConsumerState<_AdminCertificateCard> {
   bool _busy = false;
 
   Future<void> _approve() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Belgeyi Onayla'),
+        title: const Text('Belgeyi onayla'),
         content: Text(
-          '${widget.cert.title ?? widget.cert.type.label} belgesi onaylansın mı? Kullanıcının profilinde onay rozeti gösterilecek.',
+          '${widget.cert.title ?? widget.cert.type.label} belgesi onaylansın mı?',
         ),
         actions: [
           TextButton(
@@ -82,17 +152,13 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
         ],
       ),
     );
-
-    if (confirmed != true) return;
-    if (!mounted) return;
-
-    await _processDecision(approved: true);
+    if (confirmed == true && mounted) await _processDecision(approved: true);
   }
 
   Future<void> _reject() async {
     final reason = await showReasonDialog(
       context,
-      title: 'Belgeyi Reddet',
+      title: 'Belgeyi reddet',
       reasonLabel: 'Red sebebi',
       reasonHint: 'Belge okunamıyor, süresi dolmuş vb.',
       requiredError: 'Red sebebi zorunludur.',
@@ -107,23 +173,24 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
   Future<void> _processDecision({required bool approved, String? reason}) async {
     final adminId = ref.read(authServiceProvider).currentUser?.uid;
     if (adminId == null) return;
-
     setState(() => _busy = true);
     try {
-      final certService = ref.read(certificateServiceProvider);
+      final service = ref.read(certificateServiceProvider);
       if (approved) {
-        await certService.approveCertificate(
+        await service.approveCertificate(
           certId: widget.cert.id,
           adminId: adminId,
         );
       } else {
-        await certService.rejectCertificate(
+        await service.rejectCertificate(
           certId: widget.cert.id,
           adminId: adminId,
           reason: reason!,
         );
       }
-
+      // The decision has succeeded; remove it even if audit logging later
+      // fails, so a reviewed certificate cannot remain in the queue.
+      widget.onCompleted();
       await ref.read(adminServiceProvider).logAdminAction(
             AdminAction(
               adminId: adminId,
@@ -140,22 +207,13 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
               },
             ),
           );
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              approved ? 'Belge onaylandı.' : 'Belge reddedildi.',
-            ),
-          ),
+          SnackBar(content: Text(approved ? 'Belge onaylandı.' : 'Belge reddedildi.')),
         );
       }
     } catch (error, stackTrace) {
-      logError(
-        error,
-        stackTrace,
-        context: '__AdminCertificateCardState._processDecision',
-      );
+      logError(error, stackTrace, context: 'CertificateReviewScreen._decide');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(mapToFailure(error).message)),
@@ -166,8 +224,8 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
     }
   }
 
-  Future<void> _openDocument(String url) async {
-    final uri = Uri.tryParse(url);
+  Future<void> _openDocument() async {
+    final uri = Uri.tryParse(widget.cert.fileUrl);
     if (uri == null || !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -177,25 +235,10 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
     }
   }
 
-  IconData _getIconForType(CertificateType type) {
-    switch (type) {
-      case CertificateType.hijyen:
-        return Icons.clean_hands_outlined;
-      case CertificateType.cankurtaran:
-        return Icons.pool_outlined;
-      case CertificateType.ehliyet:
-        return Icons.drive_eta_outlined;
-      case CertificateType.dil:
-        return Icons.g_translate_outlined;
-      case CertificateType.diger:
-        return Icons.card_membership_outlined;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final cert = widget.cert;
-
+    final name = cert.userName ?? cert.userEmail ?? cert.userId;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -205,11 +248,9 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Theme.of(context).primaryColor.withAlpha(25),
-                  child: Icon(
-                    _getIconForType(cert.type),
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  child: Icon(cert.isApproved
+                      ? Icons.verified_outlined
+                      : Icons.workspace_premium_outlined),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -218,88 +259,49 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
                     children: [
                       Text(
                         cert.title ?? cert.type.label,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Tür: ${cert.type.label}',
-                        style: const TextStyle(fontSize: 13, color: Colors.grey),
-                      ),
+                      Text('$name · ${cert.type.label}'),
                     ],
                   ),
                 ),
+                Text(cert.status.label),
               ],
             ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Kullanıcı: ${cert.userName ?? cert.userEmail ?? cert.userId}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                  if (cert.userEmail != null && cert.userName != null)
-                    Text(
-                      'E-posta: ${cert.userEmail}',
-                      style: const TextStyle(fontSize: 12, color: Colors.black54),
-                    ),
-                  Text(
-                    'Kullanıcı ID: ${cert.userId}',
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Yükleme Tarihi: ${DateFormat('dd.MM.yyyy HH:mm').format(cert.createdAt)}',
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
+            Text('Yükleme: ${DateFormat('dd.MM.yyyy HH:mm').format(cert.createdAt)}'),
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.description_outlined),
-              title: const Text('Belge / Sertifika Dosyası'),
+              title: const Text('Belge / Sertifika dosyası'),
               trailing: const Icon(Icons.open_in_new_rounded),
-              onTap: () => _openDocument(cert.fileUrl),
+              onTap: _openDocument,
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _busy ? null : _reject,
-                    icon: const Icon(Icons.close_rounded, color: Colors.red),
-                    label: const Text('Reddet', style: TextStyle(color: Colors.red)),
+            if (cert.status == CertificateStatus.pending)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _busy ? null : _reject,
+                      icon: const Icon(Icons.close),
+                      label: const Text('Reddet'),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: _busy ? null : _approve,
-                    icon: _busy
-                        ? const SizedBox.square(
-                            dimension: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.check_rounded),
-                    label: const Text('Onayla'),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: _busy ? null : _approve,
+                      icon: _busy
+                          ? const SizedBox.square(
+                              dimension: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.check),
+                      label: const Text('Onayla'),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ),
       ),
