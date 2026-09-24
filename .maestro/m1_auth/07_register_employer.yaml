@@ -1,0 +1,38 @@
+appId: com.example.otelcim
+name: "m1 auth register employer"
+tags: [m1_auth, register]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- tapOn: ".*Kayıt Ol.*"
+- extendedWaitUntil:
+    visible: ".*Hesap türü.*"
+    timeout: 5000
+# TAHMİN: InkWell rol kartının birleşik erişilebilir etiketi başlık metnini içerecek.
+- tapOn: ".*Personel Arıyorum.*"
+- scrollUntilVisible:
+    element: ".*E-posta.*"
+    direction: DOWN
+- tapOn: ".*E-posta.*"
+- inputText: new2@e2e.test
+- tapOn: ".*Şifre.*"
+- inputText: Test1234!
+- tapOn: ".*Ad Soyad.*"
+- inputText: Yeni İşveren
+- scrollUntilVisible:
+    element: ".*Otel / İşletme Adı.*"
+    direction: DOWN
+- tapOn: ".*Otel / İşletme Adı.*"
+- inputText: E2E Otel
+- hideKeyboard
+- tapOn:
+    text: ".*Kayıt Ol.*"
+    index: -1
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- assertVisible: ".*Ana Sayfa.*"
+

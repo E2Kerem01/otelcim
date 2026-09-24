@@ -1,0 +1,12 @@
+appId: com.example.otelcim
+name: "m3 L3 detail shows urgent badge"
+tags: [m3, listing-detail, urgent]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Acil Aşçı Yardımcısı.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- assertVisible: ".*Acil Aşçı Yardımcısı.*"
+- assertVisible: ".*ACİL.*"
+- assertVisible: '.*30\.000 TL.*'

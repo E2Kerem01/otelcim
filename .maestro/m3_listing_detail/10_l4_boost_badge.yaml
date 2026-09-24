@@ -1,0 +1,12 @@
+appId: com.example.otelcim
+name: "m3 L4 detail shows active boost badge"
+tags: [m3, listing-detail, boost]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Barmen - Boost.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- assertVisible: ".*Barmen - Boost.*"
+- assertVisible: ".*Öne Çıkarılan İlan.*"
+- assertVisible: '.*32\.000 TL.*'

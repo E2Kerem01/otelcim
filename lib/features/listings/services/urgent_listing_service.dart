@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../shared/constants/functions_endpoint.dart';
 import '../../../shared/error/error_reporter.dart';
 
 /// Talks to the `verifyAndProcessUrgentListingPurchase` Cloud Function, which
@@ -31,10 +32,7 @@ class UrgentListingService {
       final user = FirebaseAuth.instance.currentUser;
       final idToken = await user?.getIdToken();
 
-      final url = Uri.parse(
-        'https://europe-west1-otelcim-7f0ba.cloudfunctions.net/'
-        'verifyAndProcessUrgentListingPurchase',
-      );
+      final url = functionsEndpoint('verifyAndProcessUrgentListingPurchase');
 
       final response = await http.post(
         url,

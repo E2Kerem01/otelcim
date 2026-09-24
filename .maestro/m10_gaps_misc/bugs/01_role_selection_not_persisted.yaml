@@ -1,0 +1,24 @@
+# BUG-m10-01: Onboarding rolü kullanıcı profiline kaydedilmiyor — beklenen: işveren seçimi sonrası profil menüsünde Yetenek Havuzum görünür / gerçek: seçim yalnızca onboardingProvider state'inde tutuluyor.
+appId: com.example.otelcim
+name: "m10 bug onboarding rolü profile yazılmıyor"
+tags: [m10, bug, onboarding]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../_helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- openLink: "otelcim-e2e://app/onboarding/role"
+- extendedWaitUntil:
+    visible: "Otelcim'e Hoş Geldiniz!"
+    timeout: 10000
+- tapOn: "Personel Arıyorum"
+- tapOn: "Devam Et"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Ayşe Aday"
+    timeout: 10000
+- assertVisible: "Yetenek Havuzum"

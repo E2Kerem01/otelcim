@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "m10 bölgeler ekranı ve harita geri dönüşü"
+tags: [m10, regions, navigation]
+---
+- runFlow: ../common/launch.yaml
+- openLink: "otelcim-e2e://app/regions"
+- extendedWaitUntil:
+    visible: "Bölgeler"
+    timeout: 10000
+- assertVisible: ".*Antalya.*"
+- assertVisible: ".*Bodrum.*"
+- assertVisible: "Bölge haritası"
+- tapOn: "Bölge haritası"
+- extendedWaitUntil:
+    visible: "Bölge haritası"
+    timeout: 10000
+- assertVisible: "Liste"
+- assertVisible: "Harita"
+- back
+- assertVisible: "Bölgeler"

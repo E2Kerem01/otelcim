@@ -1,0 +1,39 @@
+appId: com.example.otelcim
+name: "m8 admin removes permanent ban from seed user"
+tags: [m8_admin_core, users, ban, recovery]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/users"
+- extendedWaitUntil:
+    visible: ".*E-posta veya isimle ara.*"
+    timeout: 15000
+- tapOn: "E-posta veya isimle ara"
+- inputText: "banned@e2e.test"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: ".*Banlı Kullanıcı.*"
+    timeout: 10000
+- assertVisible: ".*Yasaklı.*"
+- assertVisible: ".*Yasağı Kaldır.*"
+- tapOn: ".*Yasağı Kaldır.*"
+- extendedWaitUntil:
+    visible: ".*Yasağı Kaldır.*"
+    timeout: 5000
+- assertVisible: '.*banned@e2e\.test kullanıcısının yasağını kaldırmak istiyor musunuz\?.*'
+- tapOn: ".*Onayla.*"
+- extendedWaitUntil:
+    visible: '.*İşlem tamamlandı\..*'
+    timeout: 10000
+- tapOn: "E-posta veya isimle ara"
+- eraseText: 50
+- inputText: "banned@e2e.test"
+- pressKey: Enter
+- extendedWaitUntil:
+    notVisible: ".*Yasaklı.*"
+    timeout: 10000
+- assertVisible: ".*Banlı Kullanıcı.*"
+- assertVisible: ".*Yasakla.*"

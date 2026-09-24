@@ -1,0 +1,32 @@
+appId: com.example.otelcim
+name: "m6 - 02 employer profile view and employer menu options"
+tags: [m6, profile]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+
+# Employer display name and email verification
+- assertVisible: ".*Mehmet İşveren.*"
+- assertVisible: ".*employer@e2e\\.test.*"
+
+# Employer should NOT see job seeker availability badge
+- assertNotVisible: ".*Hemen Başlayabilir.*"
+
+# Profile management options
+- assertVisible: ".*Profili Düzenle.*"
+- assertVisible: ".*Belgelerim / Sertifika Cüzdanı.*"
+- assertVisible: ".*Favorilerim.*"
+- assertVisible: ".*İlanlarım.*"
+
+# Employer-specific talent pool shortcut
+- assertVisible: ".*Yetenek Havuzum.*"
+
+# Boosted listings shortcut
+- assertVisible: ".*Öne Çıkarılan İlanlarım.*"

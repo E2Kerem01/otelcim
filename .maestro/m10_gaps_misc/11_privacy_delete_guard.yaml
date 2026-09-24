@@ -1,0 +1,37 @@
+appId: com.example.otelcim
+name: "m10 hesap silme diyaloğu doğrulama korumaları"
+tags: [m10, profile, privacy, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: _helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Gizlilik ve Veri Ayarları.*"
+    direction: DOWN
+- tapOn: ".*Gizlilik ve Veri Ayarları.*"
+- extendedWaitUntil:
+    visible: "Hesabımı Kalıcı Olarak Sil"
+    timeout: 10000
+- tapOn: "Hesabımı Sil"
+- extendedWaitUntil:
+    visible: "Hesabınızı Silin"
+    timeout: 10000
+- assertVisible: ".*BU İŞLEM GERİ ALINAMAZ!.*"
+- assertVisible: ".*Doğrulama için hesap şifrenizi girin:.*"
+- assertVisible: ".*Onaylamak için aşağıya \"SİL\" yazın:.*"
+- tapOn: "Hesabımı Kalıcı Olarak Sil"
+- assertVisible: "Lütfen şifrenizi girin."
+- tapOn: "Şifreniz"
+- inputText: "Test1234!"
+- tapOn: "SİL"
+- inputText: "HAYIR"
+- tapOn: "Hesabımı Kalıcı Olarak Sil"
+- assertVisible: 'Lütfen onay kutusuna büyük harflerle "SİL" yazın.'
+- tapOn: "İptal"
+- assertVisible: "Gizlilik ve Veri Ayarları"

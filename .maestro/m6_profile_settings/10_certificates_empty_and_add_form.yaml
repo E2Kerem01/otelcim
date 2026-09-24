@@ -1,0 +1,44 @@
+appId: com.example.otelcim
+name: "m6 - 10 certificate wallet empty state and upload form modal"
+tags: [m6, profile, certificates]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- tapOn: ".*Belgelerim / Sertifika Cüzdanı.*"
+- extendedWaitUntil:
+    visible: "Belge Cüzdanı"
+    timeout: 10000
+
+# Bilgilendirme kartı ve boş durum (empty state)
+- assertVisible: ".*Sertifika ve Belgelerinizi Doğrulayın.*"
+- assertVisible: ".*Henüz yüklenmiş belgeniz yok.*"
+- assertVisible: ".*Belge Yükle.*"
+
+# Yeni belge yükleme formunu aç (FloatingActionButton)
+- tapOn: ".*Belge Yükle.*"
+
+# Modal form alanlarını doğrula
+- extendedWaitUntil:
+    visible: ".*Yeni Belge Yükle.*"
+    timeout: 10000
+
+- assertVisible: ".*Belge Türü.*"
+- assertVisible: ".*Belge Başlığı / Açıklama.*"
+- assertVisible: ".*Fotoğraf veya PDF Belgesi Seçin.*"
+- assertVisible: ".*Onaya Gönder.*"
+
+# GÜVENLİK YASAKLARI: Dosya seçme ve yükleme tetiklenmez; formu kapat
+- back
+- extendedWaitUntil:
+    visible: "Belge Cüzdanı"
+    timeout: 10000
+
+- assertVisible: ".*Henüz yüklenmiş belgeniz yok.*"

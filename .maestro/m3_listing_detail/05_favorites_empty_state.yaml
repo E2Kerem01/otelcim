@@ -1,0 +1,22 @@
+appId: com.example.otelcim
+name: "m3 removing seeded favorite shows empty state"
+tags: [m3, listing-detail, favorites, empty-state]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Favorilerim.*"
+    timeout: 10000
+- tapOn: ".*Favorilerim.*"
+- extendedWaitUntil:
+    visible: '.*Garson \(Sezonluk\).*'
+    timeout: 10000
+- tapOn: ".*Favorilerden çıkar.*"
+- extendedWaitUntil:
+    visible: ".*Henüz favori ilanınız yok.*"
+    timeout: 10000
+- assertVisible: '.*Beğendiğiniz ilanlardaki kalp simgesine dokunarak buraya ekleyebilirsiniz\..*'

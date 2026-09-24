@@ -1,0 +1,11 @@
+# BUG-M11-02: sonuç sayısı toplamı yerine yüklenen sayfayı gösteriyor — beklenen: 37 sonuç / gerçek: ilk sayfa yüklenirken 20 sonuç.
+appId: com.example.otelcim
+name: "BUG-M11-02 - initial result count should be the total"
+tags: [m11_resilience, bug, skip, pagination, count]
+---
+# seed: many
+- runFlow: ../../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*37 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Sayfa İlanı 01.*"

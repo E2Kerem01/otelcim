@@ -1,0 +1,43 @@
+appId: com.example.otelcim
+name: "m12 - 07 font scale 2.0 create listing form and validation"
+tags: [m12, fontscale, forms, validation]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+
+# Open create listing form with 2.0 font scale
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: ".*Yeni İlan Aç.*"
+    timeout: 10000
+
+- takeScreenshot: m12_fontscale_create_listing
+- assertVisible: ".*İlan Başlığı.*"
+
+# Fill title
+- tapOn: "Örn. Bodrum Resort Resepsiyon Görevlisi"
+- inputText: "E2E Font Test İlanı"
+
+# Scroll down to verify fields render without clipping
+- scrollUntilVisible:
+    element: ".*İlan Açıklaması.*"
+    direction: DOWN
+- assertVisible: ".*İlan Açıklaması.*"
+
+# Scroll to bottom submit button
+- scrollUntilVisible:
+    element: ".*İlanı Yayınla.*"
+    direction: DOWN
+- assertVisible: ".*İlanı Yayınla.*"
+
+# Trigger form validation with incomplete fields
+- tapOn: ".*İlanı Yayınla.*"
+- extendedWaitUntil:
+    visible: ".*Lütfen kırmızı ile işaretli alanları doldurun.*|.*Açıklama gerekli.*|.*İletişim bilgisi gerekli.*"
+    timeout: 5000
+
+- assertVisible: ".*Lütfen kırmızı ile işaretli alanları doldurun.*|.*Açıklama gerekli.*|.*İletişim bilgisi gerekli.*"
+- takeScreenshot: m12_fontscale_form_validation

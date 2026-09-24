@@ -1,0 +1,29 @@
+appId: com.example.otelcim
+name: "admin certificate rejection requires a reason"
+tags: [m9_admin_content, admin, certificate, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/certificates"
+- extendedWaitUntil:
+    visible: "Hijyen Eğitimi Sertifikası"
+    timeout: 10000
+- tapOn: "Reddet"
+- extendedWaitUntil:
+    visible: "Belgeyi Reddet"
+    timeout: 5000
+- tapOn: "Red sebebi"
+- tapOn:
+    text: "Reddet"
+    index: -1
+- assertVisible: "Red sebebi zorunludur."
+- inputText: "Belge okunamıyor"
+- tapOn:
+    text: "Reddet"
+    index: -1
+- extendedWaitUntil:
+    visible: "Belge reddedildi."
+    timeout: 10000

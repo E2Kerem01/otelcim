@@ -1,0 +1,15 @@
+appId: com.example.otelcim
+name: "m2 discovery - employer can browse discovery feed"
+tags: [m2_discovery, access, role]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Barmen - Boost.*"
+- assertNotVisible: ".*Kapanmış İlan Housekeeping.*"
+

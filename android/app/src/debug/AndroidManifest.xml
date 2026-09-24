@@ -4,4 +4,20 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Debug-only: lets E2E builds (dart-define E2E_USE_EMULATOR=true)
+         reach the Firebase Auth emulator over plain HTTP on localhost. -->
+    <application android:usesCleartextTraffic="true">
+        <!-- Debug-only E2E deep links: otelcim-e2e://app/<route> opens any
+             go_router route directly (Maestro openLink), e.g. the admin
+             screens, which have no in-app entry point. -->
+        <activity android:name=".MainActivity">
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="true"/>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="otelcim-e2e" android:host="app"/>
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>

@@ -1,0 +1,46 @@
+appId: com.example.otelcim
+name: "m12 - 08 font scale 2.0 account list and chat screens"
+tags: [m12, fontscale, account, chat]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# Account (Hesabım) with enlarged text
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- takeScreenshot: m12_fontscale_account
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*Hemen Başlayabilir.*"
+
+# Scroll through entire profile menu down to Sign Out
+- scrollUntilVisible:
+    element: ".*Çıkış Yap.*"
+    direction: DOWN
+- assertVisible: ".*Çıkış Yap.*"
+
+# Messages screen with enlarged text
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+
+- takeScreenshot: m12_fontscale_chat_list
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz?.*"
+
+# Conversation detail with enlarged text
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Merhaba, ilan hâlâ aktif mi?.*"
+    timeout: 10000
+
+- takeScreenshot: m12_fontscale_chat_detail
+- assertVisible: ".*Merhaba, ilan hâlâ aktif mi?.*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz?.*"
+- assertVisible: ".*Mesajınızı yazın\\.\\.\\.*"

@@ -1,0 +1,21 @@
+appId: com.example.otelcim
+name: "m10 onboarding rol seçimi boş ve işveren"
+tags: [m10, onboarding, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: _helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- openLink: "otelcim-e2e://app/onboarding/role"
+- extendedWaitUntil:
+    visible: ".*Otelcim'e Hoş Geldiniz!.*"
+    timeout: 10000
+- tapOn: "Devam Et"
+- assertVisible: "Lütfen bir rol seçin"
+- tapOn: ".*Personel Arıyorum.*"
+- tapOn: "Devam Et"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"

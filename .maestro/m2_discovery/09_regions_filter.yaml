@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+name: "m2 discovery - region selection filters feed"
+tags: [m2_discovery, region]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Bölgeler.*"
+- extendedWaitUntil:
+    visible: ".*Bölgeler.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Bodrum.*"
+    direction: DOWN
+- tapOn: ".*Bodrum.*"
+- extendedWaitUntil:
+    visible: ".*Animatör.*"
+    timeout: 10000
+- assertVisible: ".*Bodrum.*"
+- assertVisible: ".*1 sonuç.*"
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"

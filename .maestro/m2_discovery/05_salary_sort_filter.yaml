@@ -1,0 +1,23 @@
+appId: com.example.otelcim
+name: "m2 discovery - salary filter and descending sort"
+tags: [m2_discovery, filters]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Filtreler.*"
+- extendedWaitUntil:
+    visible: ".*Gelişmiş filtreler.*"
+    timeout: 10000
+- tapOn: "En düşük maaş"
+- inputText: "33000"
+- scrollUntilVisible:
+    element: ".*Sıralama.*"
+    direction: DOWN
+- tapOn: ".*Sıralama.*"
+- tapOn: ".*Maaş yüksekten düşüğe.*"
+- tapOn: ".*Filtreleri uygula.*"
+- extendedWaitUntil:
+    visible: ".*2 sonuç.*"
+    timeout: 10000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*Spa Terapisti.*"
+- assertNotVisible: ".*Barmen - Boost.*"

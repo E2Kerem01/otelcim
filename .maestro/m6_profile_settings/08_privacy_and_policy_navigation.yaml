@@ -1,0 +1,50 @@
+appId: com.example.otelcim
+name: "m6 - 08 privacy settings and privacy policy navigation"
+tags: [m6, profile, privacy]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- scrollUntilVisible:
+    element: ".*Gizlilik ve Veri Ayarları.*"
+    direction: DOWN
+- tapOn: ".*Gizlilik ve Veri Ayarları.*"
+- extendedWaitUntil:
+    visible: "Gizlilik ve Veri Ayarları"
+    timeout: 10000
+
+# KVKK ve veri yönetimi menü öğeleri
+- assertVisible: ".*Kişisel Verileriniz ve KVKK.*"
+- assertVisible: ".*KVKK ve Gizlilik Politikası.*"
+- assertVisible: ".*Verilerimi İndir / Dışa Aktar.*"
+- assertVisible: ".*Hesabımı Kalıcı Olarak Sil.*"
+
+# KVKK Aydınlatma Metni ekranına geçiş
+- tapOn: ".*KVKK ve Gizlilik Politikası.*"
+- extendedWaitUntil:
+    visible: ".*Kişisel Verilerin Korunması ve Aydınlatma Metni.*"
+    timeout: 10000
+
+- assertVisible: ".*1\\. Veri Sorumlusu Hakkında.*"
+- assertVisible: ".*2\\. İşlenen Kişisel Verileriniz.*"
+
+# Geri tuşu ile Gizlilik ekranına dönüş
+- back
+- extendedWaitUntil:
+    visible: "Gizlilik ve Veri Ayarları"
+    timeout: 10000
+- assertVisible: ".*Kişisel Verileriniz ve KVKK.*"
+
+# Tekrar geri tuşu ile Hesabım ekranına dönüş
+- back
+- extendedWaitUntil:
+    visible: ".*Hesabım.*"
+    timeout: 10000
+- assertVisible: ".*Ayşe Aday.*"

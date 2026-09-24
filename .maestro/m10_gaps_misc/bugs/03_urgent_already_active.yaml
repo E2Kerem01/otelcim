@@ -1,0 +1,16 @@
+# BUG-m10-03: Zaten ACİL olan ilan için ücretli satın alma ekranı gösteriliyor — beklenen: acil durum bilgisi ve satın alma aksiyonu yok / gerçek: ücretli ekran ve satın alma düğmesi gösteriliyor.
+appId: com.example.otelcim
+name: "m10 bug zaten acil ilan tekrar satın alma"
+tags: [m10, bug, urgent]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../_helpers/login_no_hide.yaml
+    env:
+      EMAIL: employer@e2e.test
+- openLink: "otelcim-e2e://app/listing/L3/urgent"
+- extendedWaitUntil:
+    visible: "Acil İlan"
+    timeout: 10000
+- assertVisible: "Acil İlan (tek seferlik)"
+- assertNotVisible: "Satın Al ve Acil Yap"

@@ -1,0 +1,40 @@
+appId: com.example.otelcim
+name: "m12 - 04 dark mode profile account and chat screens"
+tags: [m12, dark, account, chat]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# Account (Hesabım) in dark mode
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*Hemen Başlayabilir.*"
+- assertVisible: ".*Profili Düzenle.*"
+- takeScreenshot: m12_dark_account
+
+# Messages list in dark mode
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz?.*"
+- takeScreenshot: m12_dark_chat_list
+
+# Chat conversation detail in dark mode
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Merhaba, ilan hâlâ aktif mi?.*"
+    timeout: 10000
+
+- assertVisible: ".*Merhaba, ilan hâlâ aktif mi?.*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz?.*"
+- takeScreenshot: m12_dark_chat_detail

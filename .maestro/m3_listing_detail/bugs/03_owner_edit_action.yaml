@@ -1,0 +1,18 @@
+# BUG-m3-03: İşveren kendi L1 detayında düzenleme aksiyonu göremiyor — beklenen: "Düzenle" ve boost/QR aksiyonları / gerçek: detail ekranında yalnızca boost ve QR aksiyonları render ediliyor.
+appId: com.example.otelcim
+name: "BUG m3 employer owns L1 and can edit from detail"
+tags: [m3, bug, listing-detail, employer]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- assertVisible: ".*İlanı Öne Çıkar.*"
+- assertVisible: ".*QR Poster Oluştur.*"
+# TAHMİN: PLAN'da beklenen, ancak detail widget'ında tanımlı olmayan düzenleme aksiyonu.
+- assertVisible: ".*Düzenle.*"

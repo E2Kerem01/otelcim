@@ -1,0 +1,42 @@
+appId: com.example.otelcim
+name: "m12 - 10 landscape unauthorized redirect and responsive login form"
+tags: [m12, landscape, auth, redirect, responsive]
+---
+- setOrientation: PORTRAIT
+- runFlow: ../../common/launch.yaml
+
+# Switch to landscape mode
+- setOrientation: LANDSCAPE_LEFT
+
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 10000
+
+# Edge case: Unauthorized user accesses protected route via deep link
+- openLink: "otelcim-e2e://app/create-listing"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+
+# In landscape (width >= 768), login screen renders wide 2-column card: form on left, brand panel on right
+- assertVisible: "E-posta"
+- assertVisible: "Şifre"
+- assertVisible: ".*Türkiye'nin Otel & Turizm İş Platformu.*"
+- takeScreenshot: m12_landscape_login
+
+# Fill login credentials in landscape layout
+- tapOn: "E-posta"
+- inputText: "seeker@e2e.test"
+- tapOn: "Şifre"
+- inputText: "Test1234!"
+- tapOn:
+    text: "Giriş Yap"
+    index: -1
+
+# Verify successful login returns to authenticated experience
+- extendedWaitUntil:
+    notVisible: "Şifre"
+    timeout: 15000
+
+# Restore orientation to portrait
+- setOrientation: PORTRAIT

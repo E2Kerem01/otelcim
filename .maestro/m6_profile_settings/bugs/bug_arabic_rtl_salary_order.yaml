@@ -1,0 +1,39 @@
+# BUG-m6-03: Listing card salary in Arabic RTL layout maintains Turkish LTR format without localization.
+# Beklenen: Uygulama dili Arapça seçildiğinde ana sayfadaki ilan kartı maaş bilgisi yerelleştirilmiş formatta (ör: "٣٥٬٠٠٠ ليرة" veya BiDi izoleli) görünmeli.
+# Gerçek: home_screen_widgets.dart:1059 Text(listing.salary) doğrudan hardcoded "35.000 TL" metnini LTR formatında render etmekte ve RTL metin akışında BiDi bozulmasına yol açmaktadır.
+appId: com.example.otelcim
+name: "m6 - bug arabic rtl salary formatting"
+tags: [m6, bugs, localization, rtl]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+# Dil ayarlarından Arapça seç
+- scrollUntilVisible:
+    element: ".*Uygulama Dili.*"
+    direction: DOWN
+- tapOn: ".*Uygulama Dili.*"
+- extendedWaitUntil:
+    visible: ".*Uygulama Dili.*"
+    timeout: 10000
+- tapOn: ".*العربية.*"
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 10000
+
+# Ana Sayfaya (الرئيسية) geç
+- tapOn: ".*الرئيسية.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+
+# BUG: Beklenen davranış - Maaşın Arapça yerelleştirilmiş olarak gösterilmesi (bugün "35.000 TL" hardcoded kalır)
+# TAHMİN: Yerelleştirilmiş Arapça para birimi formatı
+- assertVisible: ".*٣٥[.,]٠٠٠.*|.*ليرة.*"

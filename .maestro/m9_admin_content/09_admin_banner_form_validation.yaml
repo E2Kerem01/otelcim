@@ -1,0 +1,26 @@
+appId: com.example.otelcim
+name: "new banner form validates required fields"
+tags: [m9_admin_content, admin, banners, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/banners"
+- extendedWaitUntil:
+    visible: "Banner Reklam Yönetimi"
+    timeout: 10000
+- tapOn: "Yeni Banner"
+- extendedWaitUntil:
+    visible: "Yeni Banner Ekle"
+    timeout: 5000
+- scrollUntilVisible:
+    element: "Banner'ı Kaydet"
+    direction: DOWN
+- tapOn: "Banner'ı Kaydet"
+- assertVisible: "Başlık gerekli"
+- assertVisible: "Reklamveren adı gerekli"
+- assertVisible: "Hedef URL gerekli"
+- assertNotVisible: "Görsel yüklendi."
+

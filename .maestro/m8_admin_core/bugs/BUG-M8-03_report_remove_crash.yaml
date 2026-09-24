@@ -1,0 +1,34 @@
+# BUG-M8-03: Raporlanan ilanı kaldırma sonrası Flutter assertion ile uygulama çöküyor — beklenen: 'İlanı Kaldır işlemi tamamlandı.' ve L8'in feed'den kalkması / gerçek: kırmızı Flutter hata ekranı.
+appId: com.example.otelcim
+name: "BUG m8 removing reported listing crashes after applying action"
+tags: [m8_admin_core, bug, reports, listing-moderation, crash]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/reports"
+- extendedWaitUntil:
+    visible: ".*Hedef: İlan • L8.*"
+    timeout: 15000
+- assertVisible: ".*İlanı kaldır.*"
+- tapOn: ".*İlanı kaldır.*"
+- extendedWaitUntil:
+    visible: ".*İlanı Kaldır.*"
+    timeout: 5000
+- assertVisible: '.*Sebep \(isteğe bağlı\).*'
+- tapOn: '.*Sebep \(isteğe bağlı\).*'
+- inputText: "Şüpheli ilan doğrulaması"
+- tapOn: ".*Uygula.*"
+- extendedWaitUntil:
+    visible: '.*İlanı Kaldır işlemi tamamlandı\..*'
+    timeout: 10000
+- extendedWaitUntil:
+    visible: '.*Bekleyen şikâyet bulunmuyor\..*'
+    timeout: 10000
+- openLink: "otelcim-e2e://app/"
+- extendedWaitUntil:
+    visible: ".*6 sonuç.*"
+    timeout: 15000
+- assertNotVisible: ".*Güvenlik Görevlisi.*"

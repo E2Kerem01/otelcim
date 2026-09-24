@@ -1,0 +1,47 @@
+# BUG-M4-01: L1 düzenlenince koordinatlar korunmuyor — beklenen: başlık düzenlemesinden sonra L1 Yakınımda ekranında kalmalı / gerçek: EditListingScreen güncelleme modeline lat/lng aktarılmıyor ve değerler null'a düşüyor.
+appId: com.example.otelcim
+name: "BUG-M4-01 - editing L1 preserves nearby coordinates"
+tags: [m4, bug, skip]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- tapOn: "İlanlarım"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+# TAHMİN: L1, createdAt sıralamasında L3'ten sonra ikinci Düzenle düğmesidir.
+- tapOn:
+    text: "Düzenle"
+    index: 1
+- extendedWaitUntil:
+    visible: "Değişiklikleri Kaydet"
+    timeout: 10000
+# TAHMİN: labelsiz edit alanı mevcut başlık metniyle erişilebilir olur.
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- eraseText: 100
+- inputText: "Resepsiyonist Aranıyor Güncel"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Değişiklikleri Kaydet"
+    direction: DOWN
+- tapOn: "Değişiklikleri Kaydet"
+- extendedWaitUntil:
+    visible: "İlan güncellendi\\."
+    timeout: 15000
+- tapOn: ".*Ana Sayfa.*"
+- setLocation:
+    latitude: 36.88
+    longitude: 30.70
+- tapOn: "Yakınımda"
+- extendedWaitUntil:
+    visible: "Konum izni"
+    timeout: 10000
+- tapOn: "Devam Et"
+- extendedWaitUntil:
+    visible: "Yakındaki İlanlar"
+    timeout: 15000
+- assertVisible: ".*Resepsiyonist Aranıyor Güncel.*"

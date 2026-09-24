@@ -1,0 +1,24 @@
+appId: com.example.otelcim
+name: "02 m5_chat - user without conversations sees empty state in messages list"
+tags: [chat, empty-state]
+---
+# 1. Uygulama başlatılır
+- runFlow: ../common/launch.yaml
+
+# 2. Hiç sohbeti bulunmayan employer2 (Zeynep Otelci) ile giriş yapılır
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer2@e2e.test
+
+# 3. Mesajlar sekmesine gidilir
+- tapOn: ".*Mesajlar.*"
+
+# 4. Boş durum başlık ve açıklama metinleri doğrulanır (chat_list_screen.dart)
+- extendedWaitUntil:
+    visible: ".*Henüz Mesajınız Yok.*"
+    timeout: 10000
+- assertVisible: ".*İlan detay sayfasından ilan sahibine mesaj göndererek.*"
+
+# 5. Başka kullanıcılara ait sohbetlerin (L1) listelenmediği doğrulanır
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"

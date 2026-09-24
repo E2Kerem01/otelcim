@@ -1,0 +1,15 @@
+appId: com.example.otelcim
+name: "m1 auth seeker email login"
+tags: [m1_auth, auth]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- assertVisible: ".*Ana Sayfa.*"
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- assertVisible: ".*Hemen Başlayabilir.*"

@@ -1,0 +1,26 @@
+appId: com.example.otelcim
+name: "m8 admin session survives app restart and panel can reopen"
+tags: [m8_admin_core, restart, resilience]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin"
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 15000
+- assertVisible: ".*Kullanıcı Yönetimi.*"
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- openLink: "otelcim-e2e://app/admin"
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 15000
+- assertVisible: ".*Şikâyetler.*"
+- assertVisible: ".*İşlem Geçmişi.*"
+

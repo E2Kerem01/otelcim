@@ -1,0 +1,36 @@
+appId: com.example.otelcim
+name: "m12 - 12 arabic rtl home feed and bottom navigation tabs"
+tags: [m12, rtl, arabic, i18n, navigation]
+---
+- setOrientation: PORTRAIT
+
+# Launches app with Arabic RTL locale
+- runFlow: ../_helpers/launch_rtl.yaml
+
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 15000
+
+# 1. Verify all 5 bottom navigation tabs in Arabic RTL
+- assertVisible: ".*الرئيسية.*"
+- assertVisible: ".*الفئات.*"
+- assertVisible: ".*نشر إعلان.*"
+- assertVisible: ".*الرسائل.*"
+- assertVisible: ".*حسابي.*"
+
+# 2. Localized home feed text elements
+- assertVisible: ".*ابحث عن إعلانات الوظائف.*"
+- assertVisible: ".*7 نتيجة.*"
+- assertVisible: ".*بالقرب مني.*"
+- takeScreenshot: m12_rtl_home
+
+# 3. Categories tab in Arabic
+- tapOn: ".*الفئات.*"
+- extendedWaitUntil:
+    visible: ".*الاستقبال.*"
+    timeout: 10000
+
+- assertVisible: ".*الاستقبال.*"
+- assertVisible: ".*خدمة الغرف.*"
+- assertVisible: ".*المطبخ / الطهاة.*"
+- takeScreenshot: m12_rtl_categories

@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "m1 auth remember me survives restart"
+tags: [m1_auth, persistence]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- assertNotVisible: ".*Giriş Yap.*"
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+

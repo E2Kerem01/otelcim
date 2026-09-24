@@ -1,0 +1,23 @@
+appId: com.example.otelcim
+name: "m8 admin back returns from child screen to dashboard and home"
+tags: [m8_admin_core, navigation, back]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin"
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 15000
+- tapOn: ".*Şikâyetler.*"
+- extendedWaitUntil:
+    visible: ".*Şikâyetler.*"
+    timeout: 10000
+- assertVisible: ".*Hedef: İlan • L8.*"
+- back
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 10000
+- assertVisible: ".*Kullanıcı Yönetimi.*"
