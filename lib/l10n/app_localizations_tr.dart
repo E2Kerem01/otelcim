@@ -765,4 +765,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get allFilterChip => 'Tümü';
+
+  @override
+  String get perkHousing => 'Lojman';
+
+  @override
+  String perkMeals(int count) {
+    return '$count öğün';
+  }
+
+  @override
+  String get perkShuttle => 'Servis';
+
+  @override
+  String get verifiedEmployer => 'Doğrulanmış işveren';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'Yaz $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'Kış $years';
+  }
 }

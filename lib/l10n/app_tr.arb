@@ -563,5 +563,17 @@
   "allFilterChip": "Tümü",
   "@allFilterChip": {
     "description": "Category filter chip that clears the category filter"
-  }
+  },
+  "perkHousing": "Lojman",
+  "@perkHousing": {"description": "Feed card chip: the job includes staff housing"},
+  "perkMeals": "{count} öğün",
+  "@perkMeals": {"description": "Feed card chip: meals per day included", "placeholders": {"count": {"type": "int"}}},
+  "perkShuttle": "Servis",
+  "@perkShuttle": {"description": "Feed card chip: staff shuttle provided"},
+  "verifiedEmployer": "Doğrulanmış işveren",
+  "@verifiedEmployer": {"description": "Tooltip/semantic label for the verified-employer badge"},
+  "seasonSummerOf": "Yaz {year}",
+  "@seasonSummerOf": {"description": "Season label for any summer season code yaz_YYYY", "placeholders": {"year": {"type": "String"}}},
+  "seasonWinterOf": "Kış {years}",
+  "@seasonWinterOf": {"description": "Season label for any winter season code kis_YYYY_YY", "placeholders": {"years": {"type": "String"}}}
 }

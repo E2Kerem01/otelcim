@@ -270,5 +270,11 @@
   "sortOrderNewest": "Newest",
   "sortOrderSalaryHighToLow": "Salary: high to low",
   "sortOrderSalaryLowToHigh": "Salary: low to high",
-  "allFilterChip": "All"
+  "allFilterChip": "All",
+  "perkHousing": "Housing",
+  "perkMeals": "{count} meals",
+  "perkShuttle": "Shuttle",
+  "verifiedEmployer": "Verified employer",
+  "seasonSummerOf": "Summer {year}",
+  "seasonWinterOf": "Winter {years}"
 }
