@@ -1,0 +1,39 @@
+{
+  "_comment": "Exact key sets the Flutter client writes. The JS rules tests build payloads from these (lib/fixtures.ts) and client_payload_contract_test.dart checks the Dart models still produce them, so the rules tests cannot silently drift from what the app really sends.",
+  "UserProfile.toFirestore": [
+    "email", "displayName", "phoneNumber", "bio", "photoUrl", "hotelName", "position", "userType",
+    "isVerified", "verificationStatus", "verifiedAt", "notificationPreferences", "quietHoursStart",
+    "quietHoursEnd", "availableImmediately", "preferredExperienceLevel", "preferredEducationLevel",
+    "preferredRegion", "introVideoUrl", "referralCode", "referredBy", "createdAt", "updatedAt"
+  ],
+  "Listing.toMap": [
+    "posterId", "posterName", "posterVerified", "isUrgent", "title", "description", "season",
+    "contractStartDate", "contractEndDate", "category", "location", "salary", "city", "region", "lat",
+    "lng", "minSalaryTl", "maxSalaryTl", "employmentType", "experienceLevel", "educationLevel", "images",
+    "housingRoomType", "housingHasAc", "housingHasWifi", "housingMealsIncluded", "housingImages",
+    "staffShuttleRoute", "status", "createdAt", "updatedAt", "isBoosted", "boostExpiresAt", "boostType",
+    "boostPurchaseId", "viewCount", "messageCount"
+  ],
+  "Conversation.toMap": [
+    "listingId", "listingTitle", "posterId", "seekerId", "participantIds", "lastMessage", "lastSenderId",
+    "updatedAt", "createdAt", "hired", "hiredAt"
+  ],
+  "Message.toMap": ["senderId", "text", "sentAt"],
+  "Report.toMap": ["reporterId", "targetId", "targetType", "reason", "description", "createdAt"],
+  "Rating.toMap": ["conversationId", "raterId", "ratedUserId", "stars", "reviewText", "createdAt", "moderationStatus"],
+  "Certificate.toMap": [
+    "userId", "userName", "userEmail", "type", "title", "fileUrl", "status", "createdAt", "reviewedBy",
+    "reviewedAt", "rejectionReason"
+  ],
+  "VerificationRequest.toFirestore": [
+    "employerId", "submittedAt", "userId", "userEmail", "hotelName", "hotelAddress", "documentUrls", "status",
+    "requestedAt", "reviewedAt", "reviewedBy", "rejectionReason"
+  ],
+  "InterviewSlot.toMap": ["proposedBy", "slots", "selectedSlot", "status", "createdAt"],
+  "defaults": {
+    "Rating.moderationStatus": "approved",
+    "VerificationRequest.status": "pending",
+    "Listing.isUrgent": false,
+    "Listing.posterVerified": false
+  }
+}

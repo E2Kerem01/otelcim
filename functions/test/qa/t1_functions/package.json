@@ -1,0 +1,10 @@
+{
+  "name": "otelcim-functions-qa-t1",
+  "private": true,
+  "type": "module",
+  "description": "Zero-dependency tests for functions/src/index.ts (node:test + Node >= 22.18 type stripping). No npm install needed.",
+  "scripts": {
+    "test": "node --test --test-reporter=spec \"*.test.mjs\"",
+    "test:bugs": "node --test --test-reporter=spec \"*.test.mjs\" --test-name-pattern=BUG"
+  }
+}

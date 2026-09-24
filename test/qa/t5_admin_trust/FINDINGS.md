@@ -1,0 +1,10 @@
+# t5 bulguları
+
+- BUG-t5-001 — Orta — `lib/shared/services/report_service.dart:63`: `hasUserReportedTarget` `targetType` parametresini sorguya katmıyor; aynı kimlikli ilan ve kullanıcı raporları birbirine karışıyor. Repro: aynı reporter/targetId ile listing raporu oluştur, ardından user hedefini sorgula. Öneri: `where('targetType', isEqualTo: targetType.name)` eklemek ve uygun composite index'i sağlamak.
+- BUG-t5-002 — Yüksek — `lib/features/ratings/services/rating_service.dart:26-29`: caller-supplied `rating.id` ile aynı konuşma+rater için farklı belge oluşturulabiliyor. Repro: aynı `conversationId`/`raterId`, farklı dolu id ile iki gönderim. Öneri: kimlik üretimini servis sahiplenmeli veya transaction içinde conversationId+raterId benzersizliği kontrol edilmeli.
+- BUG-t5-003 — Yüksek — `lib/features/ratings/domain/rating_model.dart:36-39`: bilinmeyen `moderationStatus` değeri `approved` fallback'i alıyor; hatalı Firestore verisi kullanıcıya görünür ve ortalamaya girer. Öneri: bilinmeyen değeri `flagged`/`pending` kabul etmek veya parse hatası üretmek.
+- BUG-t5-004 — Yüksek — `lib/features/admin/services/verification_service.dart:48-58`: doğrulama onayı yalnızca isteği güncelliyor; `user_profiles.isVerified` ve `verificationStatus` güncellenmiyor. Öneri: profil güncellemesini aynı transaction/batch içinde yapmak.
+- BUG-t5-005 — Düşük — `lib/features/talent_pool/services/talent_pool_service.dart:33`: aynı aday yeniden eklenince mevcut not üzerine yazılıyor. Öneri: mevcut belgeyi transaction ile korumak veya istemciye açık bir güncelleme davranışı sunmak.
+- BUG-t5-006 — Orta — `lib/features/admin/services/admin_service.dart:84-95`: `contentModerator` rolü sertifika onay/red eylemlerine yetkili değil; ekran eylemi bu role veriliyorsa işlem reddedilir. Öneri: rol matrisi ile sertifika eylemlerini uyumlu hale getirmek.
+
+Test edilebilirlik: `lib/shared/services/verification_service.dart` doğrudan `FirebaseFirestore.instance` oluşturuyor; ağsız güvenilir birim testi için constructor/provider override edilebilir Firestore bağımlılığı gerekir.
