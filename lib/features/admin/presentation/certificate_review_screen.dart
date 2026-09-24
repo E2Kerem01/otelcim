@@ -10,6 +10,7 @@ import '../../profile/domain/certificate_model.dart';
 import '../../profile/services/certificate_service.dart';
 import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
+import 'widgets/reason_dialog.dart';
 
 class CertificateReviewScreen extends ConsumerWidget {
   const CertificateReviewScreen({super.key});
@@ -89,46 +90,15 @@ class __AdminCertificateCardState extends ConsumerState<_AdminCertificateCard> {
   }
 
   Future<void> _reject() async {
-    final controller = TextEditingController();
-    String? error;
-
-    final reason = await showDialog<String>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Belgeyi Reddet'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            maxLines: 3,
-            decoration: InputDecoration(
-              labelText: 'Red sebebi',
-              hintText: 'Belge okunamıyor, süresi dolmuş vb.',
-              errorText: error,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Vazgeç'),
-            ),
-            FilledButton(
-              onPressed: () {
-                final value = controller.text.trim();
-                if (value.isEmpty) {
-                  setState(() => error = 'Red sebebi zorunludur.');
-                  return;
-                }
-                Navigator.pop(context, value);
-              },
-              child: const Text('Reddet'),
-            ),
-          ],
-        ),
-      ),
+    final reason = await showReasonDialog(
+      context,
+      title: 'Belgeyi Reddet',
+      reasonLabel: 'Red sebebi',
+      reasonHint: 'Belge okunamıyor, süresi dolmuş vb.',
+      requiredError: 'Red sebebi zorunludur.',
+      confirmLabel: 'Reddet',
+      maxLines: 3,
     );
-
-    controller.dispose();
     if (reason != null && mounted) {
       await _processDecision(approved: false, reason: reason);
     }

@@ -858,79 +858,87 @@ class ListingCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: listingCategoryColor(
-                          listing.category,
-                        ).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        listingCategoryLabel(listing.category),
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: listingCategoryColor(listing.category),
-                        ),
+                    // Wrap, not a fixed Row: with large text (font scale 2.0)
+                    // the badges used to overflow and push the favourite
+                    // button and date off-screen (QA D31).
+                    Expanded(
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: listingCategoryColor(
+                                listing.category,
+                              ).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              listingCategoryLabel(listing.category),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: listingCategoryColor(listing.category),
+                              ),
+                            ),
+                          ),
+                          if (isBoostedActive) ...[
+                            const BoostBadge(isCompact: true),
+                          ],
+                          if (isSeasonalContract(listing.season)) ...[
+                            SeasonBadge(season: listing.season!),
+                          ],
+                          if (matchScore != null) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.teal.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.teal.shade300),
+                              ),
+                              child: Text(
+                                '%$matchScore ${AppLocalizations.of(context)!.matchLabel}',
+                                style: TextStyle(
+                                  color: Colors.teal.shade800,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                          if (listing.isUrgent) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.deepOrange.shade700,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.urgentBadge,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    if (isBoostedActive) ...[
-                      const SizedBox(width: 8),
-                      const BoostBadge(isCompact: true),
-                    ],
-                    if (isSeasonalContract(listing.season)) ...[
-                      const SizedBox(width: 8),
-                      SeasonBadge(season: listing.season!),
-                    ],
-                    if (matchScore != null) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.teal.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.teal.shade300),
-                        ),
-                        child: Text(
-                          '%$matchScore ${AppLocalizations.of(context)!.matchLabel}',
-                          style: TextStyle(
-                            color: Colors.teal.shade800,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (listing.isUrgent) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.deepOrange.shade700,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.urgentBadge,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                    const Spacer(),
                     AnimatedScale(
                       scale: isFavorite ? 1.15 : 1,
                       duration: const Duration(milliseconds: 180),

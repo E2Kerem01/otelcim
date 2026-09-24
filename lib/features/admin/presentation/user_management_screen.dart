@@ -9,6 +9,7 @@ import '../../../shared/services/auth_service.dart';
 import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
 import '../services/moderation_service.dart';
+import 'widgets/reason_dialog.dart';
 
 final _recentUsersProvider = StreamProvider.autoDispose<List<UserProfile>>(
   (ref) => ref.watch(adminServiceProvider).watchRecentUsers(),
@@ -139,63 +140,23 @@ class _UserCardState extends ConsumerState<_UserCard> {
   Future<void> _confirmAndRun(
     String title,
     String message,
-    Future<void> Function(String adminId) action, {
+    Future<void> Function(String adminId, String reason) action, {
     bool requireReason = false,
   }) async {
     final adminId = ref.read(authServiceProvider).currentUser?.uid;
     if (adminId == null) return;
 
-    final reasonController = TextEditingController();
-    String? error;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(title),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(message),
-              if (requireReason) ...[
-                const SizedBox(height: 12),
-                TextField(
-                  controller: reasonController,
-                  autofocus: true,
-                  maxLines: 2,
-                  decoration: InputDecoration(
-                    labelText: 'Sebep (zorunlu)',
-                    errorText: error,
-                  ),
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Vazgeç'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (requireReason && reasonController.text.trim().isEmpty) {
-                  setDialogState(() => error = 'Sebep girmeniz gerekiyor.');
-                  return;
-                }
-                Navigator.pop(context, true);
-              },
-              child: const Text('Onayla'),
-            ),
-          ],
-        ),
-      ),
+    final reason = await showReasonDialog(
+      context,
+      title: title,
+      message: message,
+      showReasonField: requireReason,
     );
-    reasonController.dispose();
-    if (confirmed != true || !mounted) return;
+    if (reason == null || !mounted) return;
 
     setState(() => _busy = true);
     try {
-      await action(adminId);
+      await action(adminId, reason);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('İşlem tamamlandı.')),
@@ -280,7 +241,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Yasağı Kaldır',
                               '${user.email} kullanıcısının yasağını kaldırmak istiyor musunuz?',
-                              (adminId) async {
+                              (adminId, reason) async {
                                 await moderation.unbanUser(userId: user.id, adminId: adminId);
                                 await ref.read(adminServiceProvider).logAdminAction(
                                       AdminAction(
@@ -303,8 +264,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Kullanıcıyı Yasakla',
                               '${user.email} kalıcı olarak yasaklanacak.',
-                              (adminId) async {
-                                const reason = 'Admin panelinden yasaklandı';
+                              (adminId, reason) async {
                                 await moderation.banUser(
                                   userId: user.id,
                                   adminId: adminId,
@@ -333,7 +293,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Askıyı Kaldır',
                               '${user.email} kullanıcısının askısını kaldırmak istiyor musunuz?',
-                              (adminId) async {
+                              (adminId, reason) async {
                                 await moderation.unsuspendUser(userId: user.id, adminId: adminId);
                                 await ref.read(adminServiceProvider).logAdminAction(
                                       AdminAction(
@@ -356,8 +316,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                         : () => _confirmAndRun(
                               'Kullanıcıyı Askıya Al',
                               '${user.email} 7 gün süreyle askıya alınacak.',
-                              (adminId) async {
-                                const reason = 'Admin panelinden askıya alındı';
+                              (adminId, reason) async {
                                 await moderation.suspendUser(
                                   userId: user.id,
                                   adminId: adminId,
@@ -375,6 +334,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                                       ),
                                     );
                               },
+                              requireReason: true,
                             ),
                     icon: const Icon(Icons.pause_circle_outline),
                     label: const Text('Askıya Al (7 gün)'),
