@@ -67,6 +67,24 @@ void main() {
       expect((await db.collection('listings').doc('l').get()).data()!['status'], 'active');
     });
 
+    test('verification decisions are mirrored onto the employer profile', () async {
+      final service = admin.VerificationService(db);
+      await db.collection('user_profiles').doc('emp').set({'hotelName': 'A', 'isVerified': false});
+      await db.collection('verification_requests').doc('va').set({'employerId': 'emp', 'status': 'pending'});
+      await service.approveVerification(verificationId: 'va', adminId: 'a');
+      final approved = (await db.collection('user_profiles').doc('emp').get()).data()!;
+      expect(approved['isVerified'], isTrue);
+      expect(approved['verificationStatus'], 'approved');
+      expect(approved['verifiedAt'], isA<Timestamp>());
+      expect(approved['hotelName'], 'A');
+
+      await db.collection('verification_requests').doc('vr').set({'employerId': 'emp', 'status': 'pending'});
+      await service.rejectVerification(verificationId: 'vr', adminId: 'a', reason: 'eksik');
+      final rejected = (await db.collection('user_profiles').doc('emp').get()).data()!;
+      expect(rejected['isVerified'], isFalse);
+      expect(rejected['verificationStatus'], 'rejected');
+    });
+
     test('verification service watches, approves and rejects requests', () async {
       final service = admin.VerificationService(db);
       await db.collection('verification_requests').doc('v1').set({'employerId': 'e', 'hotelName': 'A', 'documentUrls': <String>[], 'status': 'pending', 'submittedAt': Timestamp.now()});

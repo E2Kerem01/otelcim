@@ -12,6 +12,7 @@ import '../../listings/domain/listing_model.dart';
 import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
 import '../services/moderation_service.dart';
+import 'widgets/reason_dialog.dart';
 
 final _recentListingsProvider = StreamProvider.autoDispose<List<Listing>>(
   (ref) => ref.watch(listingServiceProvider).watchRecentListingsForAdmin(),
@@ -143,46 +144,13 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
     final adminId = ref.read(authServiceProvider).currentUser?.uid;
     if (adminId == null) return;
 
-    final reasonController = TextEditingController();
-    String? error;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('İlanı Kaldır'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('"${widget.listing.title}" ilanı kaldırılacak.'),
-              const SizedBox(height: 12),
-              TextField(
-                controller: reasonController,
-                autofocus: true,
-                maxLines: 2,
-                decoration: InputDecoration(labelText: 'Sebep (zorunlu)', errorText: error),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Vazgeç')),
-            FilledButton(
-              onPressed: () {
-                if (reasonController.text.trim().isEmpty) {
-                  setDialogState(() => error = 'Sebep girmeniz gerekiyor.');
-                  return;
-                }
-                Navigator.pop(context, true);
-              },
-              child: const Text('Kaldır'),
-            ),
-          ],
-        ),
-      ),
+    final reason = await showReasonDialog(
+      context,
+      title: 'İlanı Kaldır',
+      message: '"${widget.listing.title}" ilanı kaldırılacak.',
+      confirmLabel: 'Kaldır',
     );
-    final reason = reasonController.text.trim();
-    reasonController.dispose();
-    if (confirmed != true || !mounted) return;
+    if (reason == null || !mounted) return;
 
     setState(() => _busy = true);
     try {

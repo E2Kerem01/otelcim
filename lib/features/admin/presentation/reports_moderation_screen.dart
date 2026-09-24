@@ -10,6 +10,7 @@ import '../../../shared/services/report_service.dart';
 import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
 import '../services/moderation_service.dart';
+import 'widgets/reason_dialog.dart';
 
 final pendingReportsProvider = StreamProvider.autoDispose<List<Report>>(
   (ref) => ref.watch(reportServiceProvider).watchPendingReports(),
@@ -99,26 +100,14 @@ class _ReportCardState extends ConsumerState<_ReportCard> {
     }
   }
 
-  Future<String?> _reasonDialog(String title, {required bool requiredReason}) async {
-    final controller = TextEditingController();
-    String? error;
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
-        title: Text(title),
-        content: TextField(controller: controller, autofocus: true, maxLines: 3, decoration: InputDecoration(labelText: requiredReason ? 'Sebep (zorunlu)' : 'Sebep (isteğe bağlı)', errorText: error)),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Vazgeç')),
-          FilledButton(onPressed: () {
-            final value = controller.text.trim();
-            if (requiredReason && value.isEmpty) { setDialogState(() => error = 'Sebep girmeniz gerekiyor.'); return; }
-            Navigator.pop(context, value);
-          }, child: const Text('Uygula')),
-        ],
-      )),
+  Future<String?> _reasonDialog(String title, {required bool requiredReason}) {
+    return showReasonDialog(
+      context,
+      title: title,
+      reasonRequired: requiredReason,
+      confirmLabel: 'Uygula',
+      maxLines: 3,
     );
-    controller.dispose();
-    return result;
   }
 
   @override
