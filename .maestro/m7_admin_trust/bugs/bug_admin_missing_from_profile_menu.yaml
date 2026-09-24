@@ -3,9 +3,9 @@ appId: com.example.otelcim
 name: "m7 bug - admin panel entry missing from profile menu"
 tags: [m7, bugs, admin]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: admin@e2e.test
 - tapOn: ".*Hesabım.*"

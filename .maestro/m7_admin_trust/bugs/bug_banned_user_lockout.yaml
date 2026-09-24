@@ -3,9 +3,9 @@ appId: com.example.otelcim
 name: "m7 bug - banned user lockout screen stuck in loading spinner"
 tags: [m7, bugs, auth, moderation]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: banned@e2e.test
 - extendedWaitUntil:

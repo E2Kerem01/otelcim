@@ -3,9 +3,9 @@ appId: com.example.otelcim
 name: "m7 bug - add candidate to talent pool fails due to missing firestore rules"
 tags: [m7, bugs, talent_pool, permissions]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: employer@e2e.test
 - tapOn: ".*Mesajlar.*"

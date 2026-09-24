@@ -3,9 +3,9 @@ appId: com.example.otelcim
 name: "m7 bug - active boosted listing l4 not displayed in my boosts screen"
 tags: [m7, bugs, boosts]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: employer@e2e.test
 - tapOn: ".*Hesabım.*"

@@ -15,9 +15,13 @@ tags: [m1_auth, access-control, bug, expected-failure]
     visible: ".*Hesabınız Yasaklandı.*"
     timeout: 30000
 - assertVisible: ".*Çıkış Yap.*"
+# Back may leave the app from this root screen (acceptable for a lockout);
+# what matters is that relaunching lands on the lock screen again.
 - back
+- launchApp:
+    stopApp: false
 - extendedWaitUntil:
     visible: ".*Hesabınız Yasaklandı.*"
-    timeout: 10000
+    timeout: 20000
 - assertNotVisible: ".*Ana Sayfa.*"
 

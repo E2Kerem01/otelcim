@@ -3,9 +3,9 @@ appId: com.example.otelcim
 name: "m7 bug - admin reviews and dismisses report r1 on listing l8"
 tags: [m7, bugs, admin, reports, moderation]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: admin@e2e.test
 - tapOn: ".*Hesabım.*"

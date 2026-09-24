@@ -5,9 +5,9 @@ appId: com.example.otelcim
 name: "bug - a11y missing chat send button tooltip"
 tags: [bug, m12, a11y, chat, tooltip]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: seeker@e2e.test
 

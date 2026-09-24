@@ -5,7 +5,7 @@ appId: com.example.otelcim
 name: "bug - a11y missing listing share button tooltip"
 tags: [bug, m12, a11y, detail, share]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 
 - extendedWaitUntil:
     visible: ".*Resepsiyonist Aranıyor.*"

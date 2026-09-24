@@ -3,9 +3,9 @@ appId: com.example.otelcim
 name: "m7 bug - admin searches user bans seeker and verifies lockout"
 tags: [m7, bugs, admin, users, moderation]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: admin@e2e.test
 - tapOn: ".*Hesabım.*"
@@ -55,7 +55,7 @@ tags: [m7, bugs, admin, users, moderation]
     visible: ".*Ana Sayfa.*"
     timeout: 10000
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: seeker@e2e.test
 - extendedWaitUntil:

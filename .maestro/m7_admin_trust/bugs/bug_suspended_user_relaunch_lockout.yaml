@@ -3,9 +3,9 @@ appId: com.example.otelcim
 name: "m7 bug - suspended user lockout screen title fails on relaunch"
 tags: [m7, bugs, auth, moderation, restart]
 ---
-- runFlow: ../common/launch.yaml
+- runFlow: ../../common/launch.yaml
 - runFlow:
-    file: ../common/login.yaml
+    file: ../../common/login.yaml
     env:
       EMAIL: suspended@e2e.test
 - extendedWaitUntil:
