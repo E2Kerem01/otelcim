@@ -50,9 +50,17 @@ service cloud.firestore {
         && next.get('verifiedAt', null) == prev.get('verifiedAt', null);
     }
 
+    // Also covers the server-controlled referral/boost fields: on create there
+    // is no previous value for isNotChangingServerControlledProfileFields() to
+    // diff against, so a new profile could otherwise start with
+    // freeBoostCredits: 999.
     function moderationFieldsAtDefaults() {
       let next = request.resource.data;
-      return next.get('isBanned', false) == false
+      return next.get('freeBoostCredits', 0) == 0
+        && next.get('referralCount', 0) == 0
+        && next.get('referralRewardGranted', false) == false
+        && next.get('hasUsedFreeUrgentListing', false) == false
+        && next.get('isBanned', false) == false
         && next.get('isSuspended', false) == false
         && next.get('suspensionEnd', null) == null
         && next.get('warnings', []).size() == 0

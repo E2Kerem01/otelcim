@@ -170,6 +170,9 @@ describe('user_profiles', () => {
     await assertFails(setDoc(ref, { isVerified: true }));
     await assertFails(setDoc(ref, { verificationStatus: 'approved' }));
     await assertFails(setDoc(ref, { isBanned: true }));
+    await assertFails(setDoc(ref, { freeBoostCredits: 999 }));
+    await assertFails(setDoc(ref, { referralCount: 50 }));
+    await assertFails(setDoc(ref, { referralRewardGranted: true }));
     await assertSucceeds(setDoc(ref, { isVerified: false, verificationStatus: null, verifiedAt: null }));
 
     await assertFails(updateDoc(ref, { isVerified: true }));
