@@ -30,6 +30,37 @@ service cloud.firestore {
         .hasAny(['isAdmin', 'freeBoostCredits', 'referralCount', 'referralRewardGranted', 'hasUsedFreeUrgentListing']) || isAdmin();
     }
 
+    // Moderation / trust fields are admin-only (ModerationService, admin
+    // verification). Without this a banned user could write isBanned: false,
+    // move suspensionEnd into the past, wipe their warnings, or give
+    // themselves the verified badge. Compared by value with defaults rather
+    // than via affectedKeys(): UserProfile.toMap() always writes isVerified /
+    // verificationStatus / verifiedAt, so the first full profile write onto an
+    // fcmToken-only stub doc "adds" those keys with their default values and
+    // must still be allowed.
+    function moderationFieldsUnchanged() {
+      let next = request.resource.data;
+      let prev = resource.data;
+      return next.get('isBanned', false) == prev.get('isBanned', false)
+        && next.get('isSuspended', false) == prev.get('isSuspended', false)
+        && next.get('suspensionEnd', null) == prev.get('suspensionEnd', null)
+        && next.get('warnings', []) == prev.get('warnings', [])
+        && next.get('isVerified', false) == prev.get('isVerified', false)
+        && next.get('verificationStatus', null) == prev.get('verificationStatus', null)
+        && next.get('verifiedAt', null) == prev.get('verifiedAt', null);
+    }
+
+    function moderationFieldsAtDefaults() {
+      let next = request.resource.data;
+      return next.get('isBanned', false) == false
+        && next.get('isSuspended', false) == false
+        && next.get('suspensionEnd', null) == null
+        && next.get('warnings', []).size() == 0
+        && next.get('isVerified', false) == false
+        && next.get('verificationStatus', null) == null
+        && next.get('verifiedAt', null) == null;
+    }
+
     // Boost/urgent/ownership fields on a listing are only ever meant to be
     // written by Cloud Functions (verifyAndProcessBoostPurchase,
     // redeemFreeBoost, verifyAndProcessUrgentListingPurchase,
@@ -84,9 +115,11 @@ service cloud.firestore {
     match /user_profiles/{userId} {
       allow read: if true;
       allow create: if isOwner(userId) &&
-        (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin());
+        (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin()) &&
+        (moderationFieldsAtDefaults() || isAdmin());
       allow update: if (isOwner(userId) || isAdmin()) &&
-        isNotChangingAdminStatus() && isNotChangingServerControlledProfileFields();
+        isNotChangingAdminStatus() && isNotChangingServerControlledProfileFields() &&
+        (moderationFieldsUnchanged() || isAdmin());
       allow delete: if isOwner(userId) || isAdmin();
 
       match /favorites/{listingId} {

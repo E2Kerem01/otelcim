@@ -142,6 +142,75 @@ describe('user_profiles', () => {
     await assertFails(updateDoc(doc(db, 'user_profiles/' + OWNER), { referralCount: 999 }));
     await assertFails(updateDoc(doc(db, 'user_profiles/' + OWNER), { referralRewardGranted: true }));
   });
+
+  it('a banned or suspended user cannot lift their own ban, suspension or warnings', async () => {
+    await seed(testEnv, async (context) => {
+      await setDoc(doc(context.firestore(), 'user_profiles/' + OWNER), {
+        isBanned: true,
+        isSuspended: true,
+        suspensionEnd: new Date('2099-01-01'),
+        warnings: [{ reason: 'spam' }],
+        bio: 'hello',
+      });
+    });
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+    const ref = doc(db, 'user_profiles/' + OWNER);
+
+    await assertFails(updateDoc(ref, { isBanned: false }));
+    await assertFails(updateDoc(ref, { isSuspended: false }));
+    await assertFails(updateDoc(ref, { suspensionEnd: new Date('2000-01-01') }));
+    await assertFails(updateDoc(ref, { warnings: [] }));
+    await assertSucceeds(updateDoc(ref, { bio: 'still editable' }));
+  });
+
+  it('cannot self-grant the verified badge on create or update', async () => {
+    const db = testEnv.authenticatedContext(OTHER).firestore();
+    const ref = doc(db, 'user_profiles/' + OTHER);
+
+    await assertFails(setDoc(ref, { isVerified: true }));
+    await assertFails(setDoc(ref, { verificationStatus: 'approved' }));
+    await assertFails(setDoc(ref, { isBanned: true }));
+    await assertSucceeds(setDoc(ref, { isVerified: false, verificationStatus: null, verifiedAt: null }));
+
+    await assertFails(updateDoc(ref, { isVerified: true }));
+    await assertFails(updateDoc(ref, { verificationStatus: 'approved' }));
+    await assertFails(updateDoc(ref, { verifiedAt: new Date() }));
+  });
+
+  it('a full profile write onto an fcmToken-only stub doc still succeeds', async () => {
+    // NotificationService can create { fcmToken } before registration writes
+    // the full UserProfile.toMap(), which always carries the default
+    // isVerified / verificationStatus / verifiedAt values.
+    await seed(testEnv, async (context) => {
+      await setDoc(doc(context.firestore(), 'user_profiles/' + OWNER), { fcmToken: 'tok' });
+    });
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+
+    await assertSucceeds(
+      setDoc(doc(db, 'user_profiles/' + OWNER), {
+        fcmToken: 'tok',
+        fullName: 'Kerem',
+        isVerified: false,
+        verificationStatus: null,
+        verifiedAt: null,
+      }),
+    );
+  });
+
+  it('an admin can still ban, suspend, verify and unban users', async () => {
+    await seed(testEnv, async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'user_profiles/' + ADMIN), { isAdmin: true });
+      await setDoc(doc(db, 'user_profiles/' + OWNER), { bio: 'hello' });
+    });
+    const adminDb = testEnv.authenticatedContext(ADMIN).firestore();
+    const ref = doc(adminDb, 'user_profiles/' + OWNER);
+
+    await assertSucceeds(updateDoc(ref, { isSuspended: true, suspensionEnd: new Date('2099-01-01') }));
+    await assertSucceeds(updateDoc(ref, { isBanned: true, isSuspended: false }));
+    await assertSucceeds(updateDoc(ref, { isVerified: true, verificationStatus: 'approved' }));
+    await assertSucceeds(updateDoc(ref, { isBanned: false }));
+  });
 });
 
 describe('starting a new conversation', () => {
