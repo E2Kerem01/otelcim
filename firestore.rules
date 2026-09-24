@@ -99,8 +99,19 @@ service cloud.firestore {
     // moderation (update/delete) is also allowed for admins.
     match /listings/{listingId} {
       allow read: if true;
+      // A listing must be created un-boosted: boost state is only ever
+      // granted by the purchase/redeem Cloud Functions. Without this a client
+      // could create a listing with isBoosted: true and a far-future
+      // boostExpiresAt and skip payment entirely. Listing.toMap() sends these
+      // defaults. isUrgent stays client-settable here on purpose (see
+      // isNotChangingBoostOrOwnershipFields above).
       allow create: if isSignedIn() &&
-        request.resource.data.posterId == request.auth.uid;
+        request.resource.data.posterId == request.auth.uid &&
+        request.resource.data.get('isBoosted', false) == false &&
+        request.resource.data.get('boostExpiresAt', null) == null &&
+        request.resource.data.get('boostType', null) == null &&
+        request.resource.data.get('boostPurchaseId', null) == null &&
+        request.resource.data.get('urgentListingPurchaseId', null) == null;
       allow update: if (isOwner(resource.data.posterId) && isNotChangingBoostOrOwnershipFields() &&
         isNotBypassingListingModeration()) || isAdmin();
       allow delete: if isOwner(resource.data.posterId) || isAdmin();
@@ -135,6 +146,13 @@ service cloud.firestore {
       }
 
       match /seasonal_subscriptions/{subscriptionId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Employer's saved candidates (TalentPoolService). Had no rule, so the
+      // default deny made the whole Talent Pool feature fail in production;
+      // fake_cloud_firestore tests don't evaluate rules and stayed green.
+      match /talent_pool/{candidateId} {
         allow read, write: if isOwner(userId);
       }
     }
