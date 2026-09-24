@@ -1,0 +1,23 @@
+appId: com.example.otelcim
+name: "m7 - guest user views seasonal hiring calendar and sees sign-in prompt"
+tags: [m7, admin_trust, seasonal, guest]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Sezon Takvimi.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk İşe Alım Takvimi.*"
+    timeout: 10000
+- assertVisible: ".*Turizm Sezonu İşe Alım Dönemleri.*"
+- assertVisible: ".*Yaz Sezonu 2025.*"
+- assertVisible: ".*Kış Sezonu 2025-26.*"
+- assertVisible: ".*Tüm Yıl Sürekli İşe Alım.*"
+- scrollUntilVisible:
+    element: ".*Sezonluk işe alım hatırlatıcıları kurmak için lütfen giriş yapın\\..*"
+    direction: DOWN
+- assertVisible: ".*Sezonluk işe alım hatırlatıcıları kurmak için lütfen giriş yapın\\..*"
+- assertVisible: ".*Giriş Yap.*"
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"

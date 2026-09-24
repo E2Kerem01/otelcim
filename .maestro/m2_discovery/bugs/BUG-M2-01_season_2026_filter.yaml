@@ -1,0 +1,16 @@
+# BUG-m2_discovery-01: Seed sezonu filtre seçeneklerinde yok — beklenen: Yaz 2026 seçilebilir ve yaz_2026 ilanları listelenir / gerçek: seçenek yalnızca Yaz 2025, Kış 2025-26 ve Tüm Yıl
+appId: com.example.otelcim
+name: "BUG m2 discovery - Yaz 2026 season filter is missing"
+tags: [m2_discovery, bug, filters, seasonal]
+---
+- runFlow: ../../common/launch.yaml
+- tapOn: ".*Filtreler.*"
+- extendedWaitUntil:
+    visible: ".*Gelişmiş filtreler.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Sezon.*"
+    direction: DOWN
+- tapOn: ".*Sezon.*"
+- assertVisible: ".*Yaz 2026.*"
+

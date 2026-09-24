@@ -98,5 +98,11 @@
   "seasonYearRound": "Круглый год",
   "seasonAny": "Любой / все сезоны",
   "matchLabel": "Совпадение",
-  "allFilterChip": "Все"
+  "allFilterChip": "Все",
+  "perkHousing": "Жильё",
+  "perkMeals": "Питание: {count}",
+  "perkShuttle": "Трансфер",
+  "verifiedEmployer": "Проверенный работодатель",
+  "seasonSummerOf": "Лето {year}",
+  "seasonWinterOf": "Зима {years}"
 }

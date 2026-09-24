@@ -1,0 +1,17 @@
+appId: com.example.otelcim
+name: "smoke - feed shows seed data, seeker can sign in"
+tags: [smoke]
+---
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+- assertNotVisible: ".*Kapanmış İlan Housekeeping.*"
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000

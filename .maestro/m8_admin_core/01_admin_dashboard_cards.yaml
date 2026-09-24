@@ -1,0 +1,62 @@
+appId: com.example.otelcim
+name: "m8 admin dashboard shows seven cards and routes"
+tags: [m8_admin_core, admin, navigation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin"
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 15000
+- assertVisible: ".*İçerik moderasyonu.*"
+- assertVisible: ".*Şikâyetler.*"
+- assertVisible: ".*Doğrulama Talepleri.*"
+- assertVisible: ".*Kullanıcı Yönetimi.*"
+# TAHMİN: Dashboard kartlarının InkWell semantiği başlık Text'iyle birleşir; başlık regex'i kartı hedefler.
+- tapOn: ".*Şikâyetler.*"
+- extendedWaitUntil:
+    visible: ".*Şikâyetler.*"
+    timeout: 10000
+- assertVisible: ".*Hedef: İlan • L8.*"
+- back
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 10000
+# TAHMİN: Aşağı kaydırılmış ListView içinde görünür alt kart başlığı doğrudan InkWell'i tetikler.
+- tapOn: ".*Kullanıcı Yönetimi.*"
+- extendedWaitUntil:
+    visible: ".*Kullanıcı Yönetimi.*"
+    timeout: 10000
+- assertVisible: ".*E-posta veya isimle ara.*"
+- back
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*İlan Yönetimi.*"
+    direction: DOWN
+    timeout: 10000
+- assertVisible: ".*İlan Yönetimi.*"
+- scrollUntilVisible:
+    element: ".*Belge Onay Kuyruğu.*"
+    direction: DOWN
+    timeout: 10000
+- assertVisible: ".*Belge Onay Kuyruğu.*"
+- scrollUntilVisible:
+    element: ".*Banner Reklamlar.*"
+    direction: DOWN
+    timeout: 10000
+- assertVisible: ".*Banner Reklamlar.*"
+- scrollUntilVisible:
+    element: ".*İşlem Geçmişi.*"
+    direction: DOWN
+    timeout: 10000
+- assertVisible: ".*İşlem Geçmişi.*"
+- tapOn: ".*İşlem Geçmişi.*"
+- extendedWaitUntil:
+    visible: ".*İşlem Geçmişi.*"
+    timeout: 10000
+- assertVisible: ".*İşlem tipi.*"

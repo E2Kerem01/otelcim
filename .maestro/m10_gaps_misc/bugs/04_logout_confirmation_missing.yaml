@@ -1,0 +1,20 @@
+# BUG-m10-04: Profilde Çıkış Yap doğrudan oturumu kapatıyor — beklenen: onay diyaloğu / gerçek: profile_screen.dart doğrudan signOut çağırıyor.
+appId: com.example.otelcim
+name: "m10 bug çıkış onay diyaloğu yok"
+tags: [m10, bug, profile, authorization]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../_helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Ayşe Aday"
+    timeout: 10000
+- scrollUntilVisible:
+    element: "Çıkış Yap"
+    direction: DOWN
+- tapOn: "Çıkış Yap"
+# TAHMİN: Kaynakta onay diyaloğu olmadığı için beklenen metin kodda tanımlı değil.
+- assertVisible: "Çıkış yapmak istediğinize emin misiniz?"

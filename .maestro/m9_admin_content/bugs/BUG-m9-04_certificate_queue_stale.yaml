@@ -1,0 +1,28 @@
+# BUG-m9-04: Sertifika onayı/red sonrası bekleyen kart kuyruktan kalkmıyor — beklenen: işlem sonrası "Hijyen Eğitimi Sertifikası" kartının pending kuyruğundan çıkması / gerçek: başarı bildirimi görünmesine rağmen kart ekranda kalıyor
+appId: com.example.otelcim
+name: "BUG certificate review queue remains stale"
+tags: [m9_admin_content, bug, admin, certificate]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/certificates"
+- extendedWaitUntil:
+    visible: "Belge Onay Kuyruğu"
+    timeout: 10000
+- assertVisible: "Hijyen Eğitimi Sertifikası"
+- tapOn: "Onayla"
+- extendedWaitUntil:
+    visible: "Belgeyi Onayla"
+    timeout: 5000
+- tapOn:
+    text: "Onayla"
+    index: -1
+- extendedWaitUntil:
+    visible: "Belge onaylandı."
+    timeout: 10000
+- extendedWaitUntil:
+    notVisible: "Hijyen Eğitimi Sertifikası"
+    timeout: 10000

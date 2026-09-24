@@ -1,0 +1,6 @@
+# Maestro workspace config. Flows live in per-slice folders (m1_* .. m7_*).
+flows:
+  - "smoke/*"
+  - "m*/*"
+executionOrder:
+  continueOnFailure: true

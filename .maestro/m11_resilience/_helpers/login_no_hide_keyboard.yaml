@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+env:
+  PASSWORD: "Test1234!"
+---
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- tapOn: "E-posta"
+- inputText: ${EMAIL}
+- tapOn: "Şifre"
+- inputText: ${PASSWORD}
+# Tur 2 kuralı: login ekranında hideKeyboard kullanılmaz; adjustResize ile buton görünür.
+- tapOn:
+    text: "Giriş Yap"
+    index: -1
+- extendedWaitUntil:
+    notVisible: "Şifre"
+    timeout: 15000

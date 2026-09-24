@@ -1,0 +1,14 @@
+appId: com.example.otelcim
+name: "m2 discovery - guest feed and badges"
+tags: [m2_discovery, feed]
+---
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Barmen - Boost.*"
+- assertVisible: ".*Öne Çıkan.*"
+- assertVisible: ".*Acil Aşçı Yardımcısı.*"
+- assertVisible: ".*ACİL.*"
+- assertNotVisible: ".*Kapanmış İlan Housekeeping.*"
+

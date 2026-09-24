@@ -1,0 +1,12 @@
+# Upgrade test, old build: sign in and favourite L2 (seeker already has L2; add L1).
+appId: com.example.otelcim
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000

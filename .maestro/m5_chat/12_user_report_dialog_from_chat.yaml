@@ -1,0 +1,42 @@
+appId: com.example.otelcim
+name: "12 m5_chat - report user dialog from chat screen opens and dismisses"
+tags: [chat, report]
+---
+# 1. Uygulama başlatılır ve seeker girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Menü açılır ve "Kullanıcıyı Bildir" seçeneğine dokunulur
+# TAHMİN: Flutter PopupMenuButton varsayılan Türkçe MaterialLocalizations tooltip'i "Menüyü göster"
+- tapOn: ".*Menüyü göster.*"
+- extendedWaitUntil:
+    visible: ".*Kullanıcıyı Bildir.*"
+    timeout: 5000
+- tapOn: ".*Kullanıcıyı Bildir.*"
+
+# 4. Şikayet / bildirim diyaloğunun açıldığı doğrulanır
+- extendedWaitUntil:
+    visible: ".*Açıklama \\(İsteğe Bağlı\\).*"
+    timeout: 5000
+- assertVisible: ".*İptal.*"
+- assertVisible: ".*Gönder.*"
+
+# 5. "İptal" butonuna dokunulup diyaloğun kapandığı doğrulanır
+- tapOn: ".*İptal.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 5000
+- assertNotVisible: ".*Açıklama \\(İsteğe Bağlı\\).*"

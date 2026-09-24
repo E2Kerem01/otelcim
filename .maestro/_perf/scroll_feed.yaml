@@ -1,0 +1,16 @@
+# Perf helper (not a test): scrolls the 37-listing feed so gfxinfo has frames.
+appId: com.example.otelcim
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: ".*Barmen - Boost.*"
+    timeout: 20000
+- repeat:
+    times: 8
+    commands:
+      - swipe: {direction: UP, duration: 300}
+- repeat:
+    times: 8
+    commands:
+      - swipe: {direction: DOWN, duration: 300}

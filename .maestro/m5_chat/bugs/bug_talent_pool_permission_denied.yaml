@@ -1,0 +1,45 @@
+# BUG-m5-01: İşveren sohbet ekranından adayı yetenek havuzuna ekleyemiyor (Firestore kural eksikliği)
+# beklenen: İşveren "Yetenek Havuzuna Ekle" diyaloğunda "Ekle"ye bastığında "Aday yetenek havuzunuza eklendi." bildirimi görünmeli ve aday kaydedilmeli.
+# gerçek: firestore.rules içinde user_profiles/{userId}/talent_pool koleksiyonu için izin kuralı eksik olduğundan permission-denied hatası fırlatılır.
+appId: com.example.otelcim
+name: "BUG-m5-01 - employer add candidate to talent pool from chat"
+tags: [chat, bug, talent-pool]
+---
+# 1. Uygulama başlatılır ve employer girişi yapılır
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Menüden "Yetenek Havuzuna Ekle" seçilir
+# TAHMİN: Flutter PopupMenuButton varsayılan Türkçe MaterialLocalizations tooltip'i "Menüyü göster"
+- tapOn: ".*Menüyü göster.*"
+- extendedWaitUntil:
+    visible: ".*Yetenek Havuzuna Ekle.*"
+    timeout: 5000
+- tapOn: ".*Yetenek Havuzuna Ekle.*"
+
+# 4. Yetenek havuzu diyaloğunda not eklenir ve "Ekle"ye basılır
+- extendedWaitUntil:
+    visible: ".*gelecek sezon yetenek havuzunuza eklemek üzeresiniz\\..*"
+    timeout: 5000
+- tapOn: ".*Not Ekle.*"
+- inputText: "Ön büro tecrübesi güçlü aday."
+- hideKeyboard
+- tapOn: ".*Ekle.*"
+
+# 5. Beklenen davranış assert edilir (mevcut firestore.rules eksikliği nedeniyle kırılır)
+- extendedWaitUntil:
+    visible: ".*Aday yetenek havuzunuza eklendi\\..*"
+    timeout: 10000

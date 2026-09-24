@@ -1,0 +1,48 @@
+# BUG-m9-01: Admin verification approval is not reflected in the employer profile — beklenen: employer3 approval sonrası mobil Hesabım'da doğrulanmış durumu gösterilir / gerçek: verification request güncelleniyor, user profile alanları ve mobil gösterim güncellenmiyor.
+appId: com.example.otelcim
+name: "BUG verification approval should appear on employer profile"
+tags: [m9_admin_content, bug, verification]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/verifications"
+- extendedWaitUntil:
+    visible: "Yeni Otel"
+    timeout: 10000
+- tapOn: "Onayla"
+- extendedWaitUntil:
+    visible: "Doğrulamayı onayla"
+    timeout: 5000
+- tapOn:
+    text: "Onayla"
+    index: -1
+- extendedWaitUntil:
+    visible: "Doğrulama onaylandı."
+    timeout: 10000
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- tapOn: ".*Hesabım.*"
+- scrollUntilVisible:
+    element: "Çıkış Yap"
+    direction: DOWN
+- tapOn: "Çıkış Yap"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer3@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Can Başvuran"
+    timeout: 10000
+- assertVisible: "employer3@e2e.test"
+# TAHMİN: kaynakta doğrulama etiketi yok; beklenen ürün davranışı için kullanılan hedef metindir.
+- assertVisible: ".*Doğrulanmış.*"
+

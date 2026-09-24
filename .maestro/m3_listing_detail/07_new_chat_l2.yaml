@@ -1,0 +1,26 @@
+appId: com.example.otelcim
+name: "m3 seeker starts a new L2 chat"
+tags: [m3, listing-detail, chat]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- scrollUntilVisible:
+    element: '.*Garson \(Sezonluk\).*'
+    direction: DOWN
+- tapOn: '.*Garson \(Sezonluk\).*'
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- tapOn: "Mesaj Gönder"
+- extendedWaitUntil:
+    visible: ".*İlk mesajını hazırlayalım.*"
+    timeout: 10000
+- assertVisible: '.*Bir şablon seç, göndermeden önce düzenleyebilirsin\..*'
+- tapOn: ".*Kendi mesajımı yazacağım.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 15000
+- assertVisible: '.*Mesajınızı yazın\.\.\..*'

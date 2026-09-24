@@ -1,0 +1,13 @@
+# BUG-M11-01: sayfalı arama ikinci sayfadaki eşleşmeyi bulamıyor — beklenen: arama P30'u yükleyip göstermeli / gerçek: ilk sayfa istemci tarafında filtrelenince boş durum kalıyor.
+appId: com.example.otelcim
+name: "BUG-M11-01 - search should find a second-page listing"
+tags: [m11_resilience, bug, skip, pagination, search]
+---
+# seed: many
+- runFlow: ../../common/launch.yaml
+- tapOn: '.*İş ilanı ara\.\.\..*'
+- inputText: "Sayfa İlanı 30"
+- extendedWaitUntil:
+    visible: ".*Sayfa İlanı 30.*"
+    timeout: 15000
+- assertVisible: ".*1 sonuç.*"

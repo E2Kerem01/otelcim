@@ -1,0 +1,23 @@
+# BUG-m6-02: User bio is not rendered on mobile profile screen.
+# Beklenen: Profili düzenle ekranında bio güncellendiğinde veya seed verisinde bio varken ("Resepsiyon deneyimi 2 yıl") Hesabım ana ekranında bio görünmeli.
+# Gerçek: profile.bio sadece Desktop overview panelinde render ediliyor (profile_screen.dart:651); mobil Card içinde bio widget'ı bulunmuyor.
+appId: com.example.otelcim
+name: "m6 - bug profile bio not visible on mobile account screen"
+tags: [m6, bugs, profile, bio]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+# Seeker adı ve e-postası görünür
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*seeker@e2e\\.test.*"
+
+# BUG: Beklenen davranış - Seed verisindeki bio ("Resepsiyon deneyimi 2 yıl") profil ekranında görünmeli (bugün kırılır)
+- assertVisible: ".*Resepsiyon deneyimi 2 yıl.*"

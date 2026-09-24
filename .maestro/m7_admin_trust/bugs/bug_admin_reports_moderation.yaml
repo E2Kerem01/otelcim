@@ -1,0 +1,37 @@
+# BUG-m7-04: Admin şikayet yönetimi ekranına erişim ve R1 şikayetinin moderasyonu — beklenen: Admin kullanıcısı Hesabım > Yönetim Paneli > Şikâyetler ekranına girip R1 şikayetini ("Şüpheli ilan") görmeli, "Reddet" aksiyonu ile şikayeti kapatabilmeli / gerçek: Hesabım menüsünde Yönetim Paneli girişi bulunmadığı için admin kullanıcı şikayetler ekranına erişemiyor.
+appId: com.example.otelcim
+name: "m7 bug - admin reviews and dismisses report r1 on listing l8"
+tags: [m7, bugs, admin, reports, moderation]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Admin Yönetici.*"
+    timeout: 10000
+# TAHMİN: profile_screen.dart içerisine admin paneli eklendiğinde
+- scrollUntilVisible:
+    element: ".*Yönetim Paneli.*"
+    direction: DOWN
+- tapOn: ".*Yönetim Paneli.*"
+- extendedWaitUntil:
+    visible: ".*Şikâyetler.*"
+    timeout: 10000
+- tapOn: ".*Şikâyetler.*"
+- extendedWaitUntil:
+    visible: ".*Hedef: İlan • L8.*"
+    timeout: 10000
+- assertVisible: ".*Hedef: İlan • L8.*"
+- assertVisible: ".*Şüpheli ilan.*"
+- tapOn: ".*Reddet.*"
+- extendedWaitUntil:
+    visible: ".*Şikayeti Reddet.*"
+    timeout: 5000
+- tapOn: ".*Uygula.*"
+- extendedWaitUntil:
+    visible: ".*Bekleyen şikâyet bulunmuyor\\..*"
+    timeout: 10000
+- assertVisible: ".*Bekleyen şikâyet bulunmuyor\\..*"

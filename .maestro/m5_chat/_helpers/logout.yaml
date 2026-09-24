@@ -1,0 +1,12 @@
+# Helper: Logs out the current user via profile screen and waits for login screen.
+appId: com.example.otelcim
+---
+- tapOn: ".*Hesabım.*"
+- scrollUntilVisible:
+    element: ".*Çıkış Yap.*"
+    direction: DOWN
+    timeout: 10000
+- tapOn: ".*Çıkış Yap.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000

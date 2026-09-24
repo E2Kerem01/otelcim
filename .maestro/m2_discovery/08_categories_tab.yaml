@@ -1,0 +1,16 @@
+appId: com.example.otelcim
+name: "m2 discovery - categories tab navigates to filtered feed"
+tags: [m2_discovery, category]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Kategoriler.*"
+- extendedWaitUntil:
+    visible: ".*Kategoriler.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyon.*"
+- extendedWaitUntil:
+    visible: ".*1 sonuç.*"
+    timeout: 10000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertNotVisible: ".*Animatör.*"
+

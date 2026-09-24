@@ -1,0 +1,39 @@
+# BUG-M4-02: L3 acil ilanı düzenlenemiyor veya acil niteliğini kaybediyor — beklenen: başlık düzenlenince kayıt başarılı olmalı ve ACİL rozeti korunmalı / gerçek: EditListingScreen güncelleme modelinde isUrgent aktarılmıyor.
+appId: com.example.otelcim
+name: "BUG-M4-02 - editing L3 preserves urgent status"
+tags: [m4, bug, skip]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- tapOn: "İlanlarım"
+- extendedWaitUntil:
+    visible: ".*Acil Aşçı Yardımcısı.*"
+    timeout: 10000
+# TAHMİN: L3 createdAt sıralamasında ilk satırdır; ilk Düzenle düğmesi seçilir.
+- tapOn:
+    text: "Düzenle"
+    index: 0
+- extendedWaitUntil:
+    visible: "Değişiklikleri Kaydet"
+    timeout: 10000
+# TAHMİN: labelsiz edit alanı mevcut başlık metniyle erişilebilir olur.
+- tapOn: ".*Acil Aşçı Yardımcısı.*"
+- eraseText: 100
+- inputText: "Acil Aşçı Yardımcısı Güncel"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Değişiklikleri Kaydet"
+    direction: DOWN
+- tapOn: "Değişiklikleri Kaydet"
+- extendedWaitUntil:
+    visible: "İlan güncellendi\\."
+    timeout: 15000
+- tapOn: ".*Ana Sayfa.*"
+- extendedWaitUntil:
+    visible: ".*Acil Aşçı Yardımcısı Güncel.*"
+    timeout: 15000
+- assertVisible: ".*ACİL.*"

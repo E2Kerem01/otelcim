@@ -1,0 +1,36 @@
+appId: com.example.otelcim
+name: "m7 - user can delete a seasonal subscription and restore empty state"
+tags: [m7, admin_trust, seasonal, delete]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Sezon Takvimi.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk İşe Alım Takvimi.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*İlk Hatırlatıcıyı Oluştur.*"
+    direction: DOWN
+- tapOn: ".*İlk Hatırlatıcıyı Oluştur.*"
+- extendedWaitUntil:
+    visible: ".*Sezon İlanı Hatırlatıcı Ekle.*"
+    timeout: 10000
+- tapOn: ".*Hatırlatıcı Oluştur.*"
+- extendedWaitUntil:
+    visible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+    timeout: 10000
+- assertVisible: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+- scrollUntilVisible:
+    element: ".*Tüm Bölgeler - Tüm Kategoriler.*"
+    direction: DOWN
+# TAHMİN: IconButton üzerinde tooltip ve Semantics etiketi olmadığı için (D6), scroll sonrası kartın sağındaki silme ikonu tahmini ekran koordinatıyla (%85, %93) tıklanır
+- tapOn:
+    point: "85%,93%"
+- extendedWaitUntil:
+    visible: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
+    timeout: 10000
+- assertVisible: ".*Henüz kurulmuş bir sezon hatırlatıcısı yok\\..*"
+- assertNotVisible: ".*Tüm Bölgeler - Tüm Kategoriler.*"

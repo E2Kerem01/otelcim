@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+name: "m11 - category filter remains usable while loading another page"
+tags: [m11_resilience, pagination, filters]
+---
+# seed: many
+- runFlow: ../common/launch.yaml
+- tapOn: "Resepsiyon"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+- assertNotVisible: '.*Garson \(Sezonluk\).*'
+- scrollUntilVisible:
+    element: ".*Sayfa İlanı 30.*"
+    direction: DOWN
+- extendedWaitUntil:
+    visible: ".*Sayfa İlanı 30.*"
+    timeout: 15000
+- assertVisible: ".*Sayfa İlanı 24.*"
+- assertNotVisible: ".*Spa Terapisti.*"

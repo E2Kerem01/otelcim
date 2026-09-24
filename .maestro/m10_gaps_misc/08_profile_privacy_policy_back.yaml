@@ -1,0 +1,33 @@
+appId: com.example.otelcim
+name: "m10 profil gizlilik politikası ve geri dönüş"
+tags: [m10, profile, navigation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: _helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Gizlilik ve Veri Ayarları.*"
+    direction: DOWN
+- tapOn: ".*Gizlilik ve Veri Ayarları.*"
+- extendedWaitUntil:
+    visible: "Gizlilik ve Veri Ayarları"
+    timeout: 10000
+- assertVisible: "Kişisel Verileriniz ve KVKK"
+- tapOn: "KVKK ve Gizlilik Politikası"
+- extendedWaitUntil:
+    visible: "KVKK ve Gizlilik Politikası"
+    timeout: 10000
+- assertVisible: "Kişisel Verilerin Korunması ve Aydınlatma Metni"
+- back
+- assertVisible: "Kişisel Verileriniz ve KVKK"
+- back
+- extendedWaitUntil:
+    visible: ".*Hesabım.*"
+    timeout: 10000
+- assertVisible: ".*Ayşe Aday.*"

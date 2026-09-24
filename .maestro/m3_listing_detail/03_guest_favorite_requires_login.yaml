@@ -1,0 +1,15 @@
+appId: com.example.otelcim
+name: "m3 guest favorite action requires login"
+tags: [m3, listing-detail, guest, access-control]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- tapOn: ".*Favorilere ekle.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- assertVisible: ".*E-posta.*"
+- assertVisible: ".*Şifre.*"

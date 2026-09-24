@@ -1,0 +1,32 @@
+appId: com.example.otelcim
+name: "m8 admin ban form rejects empty reason"
+tags: [m8_admin_core, users, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/users"
+- extendedWaitUntil:
+    visible: ".*E-posta veya isimle ara.*"
+    timeout: 15000
+- tapOn: "E-posta veya isimle ara"
+- inputText: "Ayşe"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- assertVisible: '.*seeker@e2e\.test.*'
+- tapOn: ".*Yasakla.*"
+- extendedWaitUntil:
+    visible: ".*Kullanıcıyı Yasakla.*"
+    timeout: 5000
+- assertVisible: '.*Sebep \(zorunlu\).*'
+- tapOn: ".*Onayla.*"
+- extendedWaitUntil:
+    visible: '.*Sebep girmeniz gerekiyor\..*'
+    timeout: 5000
+- tapOn: ".*Vazgeç.*"
+- assertVisible: ".*Kullanıcı Yönetimi.*"
+- assertVisible: ".*Ayşe Aday.*"

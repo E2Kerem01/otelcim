@@ -1,0 +1,28 @@
+appId: com.example.otelcim
+name: "m12 - 03 dark mode home feed and listing detail"
+tags: [m12, dark, home, detail]
+---
+- runFlow: ../../common/launch.yaml
+
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+
+# Home feed verification in dark mode (asserting listings in current viewport)
+- assertVisible: ".*7 sonuç.*"
+- assertVisible: ".*Barmen - Boost.*"
+- assertVisible: ".*Acil Aşçı Yardımcısı.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- takeScreenshot: m12_dark_home
+
+# Open listing detail L1
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+
+# Detail content contrast and readability verification
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*35\\.000 TL.*"
+- assertVisible: ".*Lara bölgesinde.*"
+- takeScreenshot: m12_dark_listing_detail

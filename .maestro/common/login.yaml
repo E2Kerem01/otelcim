@@ -1,0 +1,21 @@
+# Signs in with e-mail + password. Params: EMAIL (required), PASSWORD (default Test1234!).
+# Starts from any signed-out screen; ends on the home feed.
+appId: com.example.otelcim
+env:
+  PASSWORD: "Test1234!"
+---
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- tapOn: "E-posta"
+- inputText: ${EMAIL}
+- tapOn: "Şifre"
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn:
+    text: "Giriş Yap"
+    index: -1
+- extendedWaitUntil:
+    notVisible: "Şifre"
+    timeout: 15000

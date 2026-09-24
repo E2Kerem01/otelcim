@@ -1,0 +1,29 @@
+appId: com.example.otelcim
+name: "m2 discovery - region map opens and list mode is usable"
+tags: [m2_discovery, region, navigation]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Bölgeler.*"
+- extendedWaitUntil:
+    visible: ".*Bölgeler.*"
+    timeout: 10000
+- tapOn: ".*Bölge haritası.*"
+- extendedWaitUntil:
+    visible: ".*Bölge haritası.*"
+    timeout: 10000
+# TAHMİN: SegmentedButton tooltip erişilebilir etiketi Flutter hiyerarşisinde görünür.
+- tapOn: ".*Liste.*"
+- scrollUntilVisible:
+    element: ".*Bodrum.*"
+    direction: DOWN
+- extendedWaitUntil:
+    visible: ".*Bodrum.*"
+    timeout: 10000
+- assertVisible: ".*aktif ilan.*"
+- back
+- assertVisible: ".*Bölgeler.*"
+- back
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"

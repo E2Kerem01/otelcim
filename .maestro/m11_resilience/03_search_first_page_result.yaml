@@ -1,0 +1,13 @@
+appId: com.example.otelcim
+name: "m11 - search result remains stable in a paginated feed"
+tags: [m11_resilience, search, pagination]
+---
+# seed: many
+- runFlow: ../common/launch.yaml
+- tapOn: '.*İş ilanı ara\.\.\..*'
+- inputText: "Sayfa İlanı 01"
+- extendedWaitUntil:
+    visible: ".*1 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Sayfa İlanı 01.*"
+- assertNotVisible: ".*Sayfa İlanı 02.*"

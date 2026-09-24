@@ -1,0 +1,24 @@
+# BUG-m7-03: Aktif boost'lu ilan (L4) Öne Çıkarılanlarım ekranında listelenmiyor — beklenen: İşverene ait ve isBoosted=true olan L4 ("Barmen - Boost") ilanının Öne Çıkarılanlarım ekranında ~5 gün kalan süre ve "Aktif" etiketiyle listelenmesi / gerçek: MyBoostsScreen yalnızca boost_purchases koleksiyonunu dinliyor, seed.mjs ise yalnızca listings/L4 üzerinde isBoosted bayrağı koyup boost_purchases dokümanı oluşturmadığı için ekran boş kalıyor.
+appId: com.example.otelcim
+name: "m7 bug - active boosted listing l4 not displayed in my boosts screen"
+tags: [m7, bugs, boosts]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Öne Çıkarılan İlanlarım.*"
+    direction: DOWN
+- tapOn: ".*Öne Çıkarılan İlanlarım.*"
+- extendedWaitUntil:
+    visible: ".*Öne Çıkarılanlarım.*"
+    timeout: 10000
+- assertVisible: ".*Barmen - Boost.*"
+- assertVisible: ".*Aktif.*"
+- assertVisible: ".*Bitiş Tarihi:.*"

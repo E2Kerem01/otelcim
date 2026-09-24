@@ -1,0 +1,30 @@
+appId: com.example.otelcim
+name: "m12 - 05 dark mode forms and empty state readability"
+tags: [m12, dark, forms, empty_state]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+
+# Create listing form in dark mode
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: ".*Yeni İlan Aç.*"
+    timeout: 10000
+
+- assertVisible: ".*Yeni İlan Aç.*"
+- assertVisible: ".*İlan Başlığı.*"
+- assertVisible: ".*Kategori.*"
+- takeScreenshot: m12_dark_create_listing
+
+# Empty state verification in dark mode (employer has no favorites in seed)
+- openLink: "otelcim-e2e://app/favorites"
+- extendedWaitUntil:
+    visible: ".*Henüz favori ilanınız yok.*"
+    timeout: 10000
+
+- assertVisible: ".*Henüz favori ilanınız yok.*"
+- assertVisible: ".*Beğendiğiniz ilanlardaki kalp simgesine dokunarak.*"
+- takeScreenshot: m12_dark_empty_favorites

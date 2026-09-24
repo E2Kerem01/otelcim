@@ -1,0 +1,28 @@
+appId: com.example.otelcim
+name: "m1 auth remember me off signs out on restart"
+tags: [m1_auth, persistence]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+# TAHMİN: Checkbox ve metni aynı Flutter semantik düğümünde birleşiyor;
+# metin seçicisi düğümün geniş bounds merkezine dokunduğu için kutuyu değiştirmiyor.
+# Kaynak yerleşime göre kutunun gerçek görsel konumu yaklaşık %13 x / %69 y'dir.
+- tapOn:
+    point: "13%,69%"
+- tapOn: "E-posta"
+- inputText: seeker@e2e.test
+- tapOn: "Şifre"
+- inputText: Test1234!
+- tapOn: "Giriş Yap"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 15000
+- assertNotVisible: ".*Ayşe Aday.*"

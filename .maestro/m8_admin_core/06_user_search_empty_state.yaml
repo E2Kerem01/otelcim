@@ -1,0 +1,25 @@
+appId: com.example.otelcim
+name: "m8 admin user search shows empty state"
+tags: [m8_admin_core, users, empty-state]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/users"
+- extendedWaitUntil:
+    visible: ".*E-posta veya isimle ara.*"
+    timeout: 15000
+- tapOn: "E-posta veya isimle ara"
+- inputText: "KesinlikleYokXYZ"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: '.*Sonuç bulunamadı\..*'
+    timeout: 10000
+- assertNotVisible: ".*Ayşe Aday.*"
+- openLink: "otelcim-e2e://app/admin"
+- extendedWaitUntil:
+    visible: ".*Yönetim Paneli.*"
+    timeout: 10000
+- assertNotVisible: '.*Sonuç bulunamadı\..*'

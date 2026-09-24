@@ -765,4 +765,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get allFilterChip => 'Все';
+
+  @override
+  String get perkHousing => 'Жильё';
+
+  @override
+  String perkMeals(int count) {
+    return 'Питание: $count';
+  }
+
+  @override
+  String get perkShuttle => 'Трансфер';
+
+  @override
+  String get verifiedEmployer => 'Проверенный работодатель';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'Лето $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'Зима $years';
+  }
 }

@@ -1,0 +1,32 @@
+# BUG-m9-02: İlan kaldırma sonrası Flutter framework assertion ile uygulama çöküyor — beklenen: "İlan kaldırıldı." bildirimi ve kaldırılmış durum / gerçek: kırmızı Flutter assertion ekranı (_dependents.isEmpty)
+appId: com.example.otelcim
+name: "BUG listing removal crashes with Flutter assertion"
+tags: [m9_admin_content, bug, admin, listings]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/listings"
+- extendedWaitUntil:
+    visible: "İlan Yönetimi"
+    timeout: 10000
+- tapOn: "İlan başlığıyla ara"
+- inputText: "Resepsiyonist Aranıyor"
+- pressKey: ENTER
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: "Kaldır"
+- extendedWaitUntil:
+    visible: "İlanı Kaldır"
+    timeout: 5000
+- tapOn: "Sebep (zorunlu)"
+- inputText: "E2E moderasyon kontrolü"
+- tapOn:
+    text: "Kaldır"
+    index: -1
+- extendedWaitUntil:
+    visible: "İlan kaldırıldı."
+    timeout: 10000

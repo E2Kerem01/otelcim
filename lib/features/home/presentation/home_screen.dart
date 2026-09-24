@@ -16,6 +16,7 @@ import '../../listings/presentation/listing_filter_labels.dart';
 import '../../listings/presentation/season_utils.dart';
 import '../../../core/responsive/responsive_layout.dart';
 import 'widgets/home_screen_widgets.dart';
+import 'widgets/listing_feed_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key, this.initialRegion});
@@ -68,11 +69,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (!_columnCountInitialized) {
       _columnCountInitialized = true;
       final width = MediaQuery.sizeOf(context).width;
+      // Phones read best as a single list; wider screens get 2-3 columns of
+      // the same text-first card.
       if (width >= desktopBreakpoint) {
-        _columnCount = 4;
-      } else if (width >= tabletBreakpoint) {
         _columnCount = 3;
-      } else if (width >= mobileBreakpoint) {
+      } else if (width >= tabletBreakpoint) {
         _columnCount = 2;
       }
     }
@@ -560,31 +561,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
-                            child: ListingCard(
+                            child: ListingFeedCard(
                               listing: paginationState.listings[index],
-                              columnCount: 1,
                             ),
                           ),
                           childCount: paginationState.listings.length,
                         ),
                       )
-                    : SliverGrid(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: _columnCount,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: _columnCount == 2
-                              ? 0.80
-                              : _columnCount == 3
-                                  ? 0.88
-                                  : 1.05,
-                        ),
+                    // Text-first cards vary in height, so rows of equal-height
+                    // cells instead of a fixed-aspect SliverGrid.
+                    : SliverList(
                         delegate: SliverChildBuilderDelegate(
-                          (context, index) => ListingCard(
-                            listing: paginationState.listings[index],
-                            columnCount: _columnCount,
-                          ),
-                          childCount: paginationState.listings.length,
+                          (context, row) {
+                            final cells = paginationState.listings
+                                .skip(row * _columnCount)
+                                .take(_columnCount)
+                                .toList();
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    for (var i = 0; i < _columnCount; i++) ...[
+                                      if (i > 0) const SizedBox(width: 12),
+                                      Expanded(
+                                        child: i < cells.length
+                                            ? ListingFeedCard(listing: cells[i])
+                                            : const SizedBox.shrink(),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          childCount: (paginationState.listings.length +
+                                  _columnCount -
+                                  1) ~/
+                              _columnCount,
                         ),
                       ),
               ),

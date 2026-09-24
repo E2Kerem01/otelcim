@@ -1,0 +1,27 @@
+appId: com.example.otelcim
+name: "m2 discovery - refresh view modes and restart"
+tags: [m2_discovery, feed, navigation]
+---
+- runFlow: ../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- swipe:
+    start: 50%, 55%
+    end: 50%, 90%
+    duration: 500
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+# TAHMİN: grid_col_2 Key'i cihaz hiyerarşisinde görünmedi; kaynak Tooltip erişilebilir etiketi eşleşir.
+- tapOn: ".*2 Sütun.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+# TAHMİN: grid_col_table Key'i yerine kaynak Tooltip erişilebilir etiketi eşleşir.
+- tapOn: ".*Tablo Görünümü.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- assertNotVisible: ".*Kapanmış İlan Housekeeping.*"

@@ -1,0 +1,60 @@
+appId: com.example.otelcim
+name: "admin activates and deactivates a home banner"
+tags: [m9_admin_content, admin, banners]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/banners"
+- extendedWaitUntil:
+    visible: "Banner Reklam Yönetimi"
+    timeout: 10000
+- assertVisible: "E2E Test Reklamı"
+- assertVisible: "Sponsor: E2E Reklamcı"
+- assertVisible: 'Hedef: https://example\.invalid'
+- assertVisible: "Sıra: 1"
+- assertVisible: "Süresiz"
+- tapOn: "Düzenle"
+- extendedWaitUntil:
+    visible: "Banner Düzenle"
+    timeout: 5000
+- tapOn: "Aktif Yayın Lansmanı"
+- scrollUntilVisible:
+    element: "Değişiklikleri Kaydet"
+    direction: DOWN
+- tapOn: "Değişiklikleri Kaydet"
+- extendedWaitUntil:
+    visible: "Banner güncellendi."
+    timeout: 10000
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "E2E Test Reklamı"
+    timeout: 10000
+- assertVisible: "Sponsorlu"
+- openLink: "otelcim-e2e://app/admin/banners"
+- extendedWaitUntil:
+    visible: "Banner Reklam Yönetimi"
+    timeout: 10000
+- tapOn: "Düzenle"
+- extendedWaitUntil:
+    visible: "Banner Düzenle"
+    timeout: 5000
+- tapOn: "Aktif Yayın Lansmanı"
+- scrollUntilVisible:
+    element: "Değişiklikleri Kaydet"
+    direction: DOWN
+- tapOn: "Değişiklikleri Kaydet"
+- extendedWaitUntil:
+    visible: "Banner güncellendi."
+    timeout: 10000
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 20000
+- assertNotVisible: "E2E Test Reklamı"

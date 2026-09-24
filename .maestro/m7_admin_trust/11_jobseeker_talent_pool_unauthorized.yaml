@@ -1,0 +1,17 @@
+appId: com.example.otelcim
+name: "m7 - jobseeker cannot access employer talent pool"
+tags: [m7, admin_trust, permissions, role_check]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*Belgelerim / Sertifika Cüzdanı.*"
+# İş arayan rolü yetenek havuzu özelliğini görmemeli
+- assertNotVisible: ".*Yetenek Havuzum.*"

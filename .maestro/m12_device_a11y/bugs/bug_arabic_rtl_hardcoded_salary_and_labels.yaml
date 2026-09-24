@@ -1,0 +1,16 @@
+# BUG-m12-04: Arapça RTL modunda maaş bilgisi LTR hardcoded Türkçe metin olarak render ediliyor (#61)
+# Beklenen: Yerelleştirilmiş para birimi formatı (örn. app_ar.arb salaryMinAndUp: '{amount} ليرة فأكثر' veya Arapça rakam/lira birimi).
+# Gerçek: Hardcoded '35.000 TL' metni doğrudan basılıyor ve RTL okuma yönüyle çelişiyor.
+appId: com.example.otelcim
+name: "bug - arabic rtl salary string formatting and currency order"
+tags: [bug, m12, rtl, arabic, bidi, currency]
+---
+# Launches app with Arabic RTL locale
+- runFlow: ../_helpers/launch_rtl.yaml
+
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 15000
+
+# TAHMİN: Yerelleştirilmiş Arapça para birimi veya lirasözcüğü beklenir
+- assertVisible: ".*٣٥[.,]٠٠٠.*|.*ليرة.*"

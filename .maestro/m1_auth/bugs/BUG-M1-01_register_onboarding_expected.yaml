@@ -1,0 +1,32 @@
+# BUG-M1-01: Yeni kayıt onboarding rol akışını atlıyor — beklenen: kayıt sonrası onboarding/rol ekranı; gerçek: router doğrudan ana sayfaya yönlendiriyor.
+appId: com.example.otelcim
+name: "BUG M1 register should open onboarding"
+tags: [m1_auth, bug, expected-failure]
+---
+- runFlow: ../../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- tapOn: ".*Kayıt Ol.*"
+- extendedWaitUntil:
+    visible: ".*Hesap türü.*"
+    timeout: 5000
+- tapOn: ".*İş Arıyorum.*"
+- scrollUntilVisible:
+    element: ".*E-posta.*"
+    direction: DOWN
+- tapOn: ".*E-posta.*"
+- inputText: bug-m1-01@e2e.test
+- tapOn: ".*Şifre.*"
+- inputText: Test1234!
+- tapOn: ".*Ad Soyad.*"
+- inputText: Onboarding Bekleyen
+- hideKeyboard
+- tapOn:
+    text: ".*Kayıt Ol.*"
+    index: -1
+- extendedWaitUntil:
+    visible: ".*Otelcim'e Hoş Geldiniz!.*"
+    timeout: 10000
+- assertVisible: ".*Devam Et.*"

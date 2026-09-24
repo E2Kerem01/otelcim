@@ -1,0 +1,24 @@
+appId: com.example.otelcim
+name: "m10 SMS giriş doğru kodla ana sayfa"
+tags: [m10, auth, sms]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- tapOn: "Telefon ile Giriş"
+- tapOn: "Telefon Numarası"
+- inputText: "5550000010"
+- tapOn: "Kod Gönder"
+- extendedWaitUntil:
+    visible: "SMS doğrulama kodu gönderildi."
+    timeout: 10000
+- runScript: ../_shared_scripts/sms_code.js
+- tapOn: "SMS Doğrulama Kodu"
+- inputText: ${output.smsCode}
+- tapOn: "Doğrula ve Giriş Yap"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+- assertVisible: ".*Ana Sayfa.*"

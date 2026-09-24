@@ -1,0 +1,56 @@
+# BUG-m5-02: Değerlendirme yapıldıktan sonra "Deneyimini Değerlendir" butonu kaybolmuyor ve tekrar gönderimde StateError veriyor
+# beklenen: Kullanıcı görüşmeyi puanladıktan sonra ChatHiredBanner üzerinde "Değerlendirildi" rozeti gösterilmeli veya buton pasif olmalıdır.
+# gerçek: Buton görünür ve tıklanabilir kalır, kullanıcı tekrar puan göndermeyi denediğinde "Bu görüşme için zaten değerlendirme yaptınız." hatası alır.
+appId: com.example.otelcim
+name: "BUG-m5-02 - hired banner should hide rate button after rating submitted"
+tags: [chat, bug, rating]
+---
+# 1. Uygulama başlatılır ve employer girişi yapılır
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. İşe alındı olarak işaretlenir
+# TAHMİN: Flutter PopupMenuButton varsayılan Türkçe MaterialLocalizations tooltip'i "Menüyü göster"
+- tapOn: ".*Menüyü göster.*"
+- extendedWaitUntil:
+    visible: ".*İşe Alındı Olarak İşaretle.*"
+    timeout: 5000
+- tapOn: ".*İşe Alındı Olarak İşaretle.*"
+- extendedWaitUntil:
+    visible: ".*Bu görüşmede işe alımın gerçekleştiğini onaylıyor musunuz\\?.*"
+    timeout: 5000
+- tapOn: ".*Onayla.*"
+
+# 4. İlk değerlendirme yapılır
+- extendedWaitUntil:
+    visible: ".*Deneyimini Değerlendir.*"
+    timeout: 10000
+- tapOn: ".*Deneyimini Değerlendir.*"
+- extendedWaitUntil:
+    visible: ".*Deneyimin nasıldı\\?.*"
+    timeout: 10000
+- tapOn: ".*5 yıldız.*"
+- tapOn: ".*Değerlendirmeyi Gönder.*"
+- extendedWaitUntil:
+    visible: ".*Değerlendirmeniz kaydedildi\\..*"
+    timeout: 10000
+
+# 5. Sohbet ekranına dönüldüğünde beklenen durum assert edilir:
+# "Deneyimini Değerlendir" butonu artık GÖRÜNMEMELİDİR (mevcut kodda buton hala görünür kaldığı için bu assert kırılır)
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+- assertNotVisible: ".*Deneyimini Değerlendir.*"

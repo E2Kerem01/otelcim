@@ -1,0 +1,10 @@
+# Starts the app. run.sh has already wiped app data (signed-out, empty
+# Firestore cache), set the app locale to tr and granted permissions before
+# every flow - do NOT use clearState here, it would reset the locale to en.
+appId: com.example.otelcim
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 20000

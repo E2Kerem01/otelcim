@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "smoke - phone login via Auth emulator SMS code"
+tags: [smoke]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- tapOn: ".*Telefon ile Giriş.*"
+- tapOn: "Telefon Numarası"
+- inputText: "5550000099"
+- tapOn: "Kod Gönder"
+- extendedWaitUntil:
+    visible: "SMS Doğrulama Kodu"
+    timeout: 20000
+- runScript: ../_shared_scripts/sms_code.js
+- tapOn: "SMS Doğrulama Kodu"
+- inputText: ${output.smsCode}
+- tapOn: "Doğrula ve Giriş Yap"
+- extendedWaitUntil:
+    notVisible: "SMS Doğrulama Kodu"
+    timeout: 20000

@@ -1,0 +1,17 @@
+# BUG-M4-03: jobseeker ilan oluşturma ekranına girebiliyor — beklenen: yanlış rolde İlan Ver engellenmeli veya ana sayfaya yönlendirilmeli / gerçek: router ve CreateListingScreen userType kontrolü yapmadan formu açıyor.
+appId: com.example.otelcim
+name: "BUG-M4-03 - seeker is denied from create listing"
+tags: [m4, bug, skip, wrong-role]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*İlan Ver.*"
+# TAHMİN: Kodda role-denial metni olmadığı için doğru davranış rota sonucu ile sınanır.
+- extendedWaitUntil:
+    notVisible: "Yeni İlan Aç"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"
+

@@ -1,0 +1,17 @@
+appId: com.example.otelcim
+name: "m2 discovery - seasonal calendar guest view"
+tags: [m2_discovery, seasonal]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Sezon Takvimi.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk İşe Alım Takvimi.*"
+    timeout: 10000
+- assertVisible: ".*Turizm Sezonu İşe Alım Dönemleri.*"
+- assertVisible: ".*Sezonluk Hatırlatıcılarım.*"
+- assertVisible: '.*Sezonluk işe alım hatırlatıcıları kurmak için lütfen giriş yapın\..*'
+- assertVisible: ".*Giriş Yap.*"
+- back
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 10000

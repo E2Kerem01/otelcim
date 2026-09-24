@@ -1,0 +1,47 @@
+appId: com.example.otelcim
+name: "m12 - 11 landscape master detail profile layout"
+tags: [m12, landscape, profile, responsive]
+---
+- setOrientation: PORTRAIT
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# Open profile in portrait first
+- openLink: "otelcim-e2e://app/profile"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+# Switch orientation to landscape
+- setOrientation: LANDSCAPE_LEFT
+
+- extendedWaitUntil:
+    visible: ".*Genel Bakış.*"
+    timeout: 10000
+
+# In landscape (width >= 768), Master-Detail two-panel layout is active
+# Left sidebar navigation items:
+- assertVisible: ".*Genel Bakış.*"
+- assertVisible: ".*Profili Düzenle.*"
+- assertVisible: ".*Belgelerim / Sertifika Cüzdanı.*"
+- assertVisible: ".*Favorilerim.*"
+
+# Right detail pane:
+- assertVisible: ".*Profil Genel Bakışı.*"
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*Hemen Başlayabilir.*"
+- takeScreenshot: m12_landscape_profile
+
+# Navigate to Edit Profile section within Master-Detail layout
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: ".*Ad Soyad.*"
+    timeout: 10000
+
+- assertVisible: ".*Ad Soyad.*"
+
+# Restore orientation to portrait
+- setOrientation: PORTRAIT

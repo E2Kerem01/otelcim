@@ -12,8 +12,21 @@ String listingSeasonLabel(AppLocalizations l10n, String season) {
     'yaz_2025' => l10n.seasonSummer2025,
     'kis_2025_26' => l10n.seasonWinter202526,
     'tum_yil' => l10n.seasonYearRound,
-    _ => season,
+    _ => _seasonFromCode(l10n, season),
   };
+}
+
+final _seasonCode = RegExp(r'^(yaz|kis)_(\d{4})(?:_(\d{2}))?$');
+
+/// Any year's season code (yaz_2026, kis_2026_27) as a readable label,
+/// instead of showing the raw code for seasons newer than the named keys.
+String _seasonFromCode(AppLocalizations l10n, String season) {
+  final match = _seasonCode.firstMatch(season);
+  if (match == null) return season;
+  final year = match.group(2)!;
+  if (match.group(1) == 'yaz') return l10n.seasonSummerOf(year);
+  final next = match.group(3);
+  return l10n.seasonWinterOf(next == null ? year : '$year-$next');
 }
 
 String formatContractDate(DateTime? date, AppLocalizations l10n) {

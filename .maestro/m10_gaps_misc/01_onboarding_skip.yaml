@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+name: "m10 onboarding geç ile ana sayfaya dön"
+tags: [m10, onboarding]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: _helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- openLink: "otelcim-e2e://app/onboarding"
+- extendedWaitUntil:
+    visible: ".*Kategorilere Göre İş İlanlarına Göz Atın.*"
+    timeout: 10000
+- assertVisible: "Geç"
+- tapOn: "Geç"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"

@@ -1,0 +1,28 @@
+appId: com.example.otelcim
+name: "m7 - employer opens my boosts screen and navigates to my listings via CTA"
+tags: [m7, admin_trust, employer, boosts]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Öne Çıkarılan İlanlarım.*"
+    direction: DOWN
+- assertVisible: ".*Öne Çıkarılan İlanlarım.*"
+- tapOn: ".*Öne Çıkarılan İlanlarım.*"
+- extendedWaitUntil:
+    visible: ".*Öne Çıkarılanlarım.*"
+    timeout: 10000
+- assertVisible: ".*Henüz Öne Çıkarılmış İlanınız Yok.*"
+- assertVisible: ".*İlanlarıma Git ve Öne Çıkar.*"
+- tapOn: ".*İlanlarıma Git ve Öne Çıkar.*"
+- extendedWaitUntil:
+    visible: ".*İlanlarım.*"
+    timeout: 10000
+- assertVisible: ".*İlanlarım.*"

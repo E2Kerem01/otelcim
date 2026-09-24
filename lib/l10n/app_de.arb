@@ -98,5 +98,11 @@
   "seasonYearRound": "Ganzjährig",
   "seasonAny": "Egal / Alle Saisons",
   "matchLabel": "Übereinstimmung",
-  "allFilterChip": "Alle"
+  "allFilterChip": "Alle",
+  "perkHousing": "Unterkunft",
+  "perkMeals": "{count} Mahlzeiten",
+  "perkShuttle": "Shuttle",
+  "verifiedEmployer": "Verifizierter Arbeitgeber",
+  "seasonSummerOf": "Sommer {year}",
+  "seasonWinterOf": "Winter {years}"
 }

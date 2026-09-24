@@ -1,0 +1,40 @@
+appId: com.example.otelcim
+name: "m12 - 09 landscape orientation home feed and listing detail"
+tags: [m12, landscape, orientation, responsive]
+---
+- setOrientation: PORTRAIT
+- runFlow: ../../common/launch.yaml
+
+# Switch orientation to landscape
+- setOrientation: LANDSCAPE_LEFT
+
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+
+# In landscape (width >= 768), desktop top navigation bar and responsive header appear
+- assertVisible: ".*OTELCIM.*"
+- assertVisible: ".*7 sonuç.*"
+
+# Home feed listings: scroll down to view listings in landscape viewport
+- scrollUntilVisible:
+    element: ".*Resepsiyonist Aranıyor.*"
+    direction: DOWN
+
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- takeScreenshot: m12_landscape_home
+
+# Open listing detail in landscape
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+
+# Wide desktop/landscape detail layout with right action card
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*35\\.000 TL.*"
+- assertVisible: ".*Mesaj Gönder.*"
+- takeScreenshot: m12_landscape_listing_detail
+
+# Restore orientation to portrait
+- setOrientation: PORTRAIT

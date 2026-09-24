@@ -1,0 +1,112 @@
+appId: com.example.otelcim
+name: "m6 - 12 language switch en de ru ar and return to tr"
+tags: [m6, profile, localization, language]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+# Dil ayarlarına git (Hesabım menüsünden)
+- scrollUntilVisible:
+    element: ".*Uygulama Dili.*"
+    direction: DOWN
+- tapOn: ".*Uygulama Dili.*"
+- extendedWaitUntil:
+    visible: "Uygulama Dili"
+    timeout: 10000
+
+# 1. İngilizce (English) seçimi
+- tapOn: ".*English.*"
+- extendedWaitUntil:
+    visible: "App Language"
+    timeout: 10000
+- assertVisible: "App Language"
+- assertVisible: ".*Some text is not translated yet.*"
+
+# Geri dönüp alt navigasyon sekmelerinin İngilizce olduğunu doğrula
+- back
+- extendedWaitUntil:
+    visible: ".*Home.*"
+    timeout: 10000
+- assertVisible: ".*Home.*"
+- assertVisible: ".*Categories.*"
+- assertVisible: ".*Post Listing.*"
+- assertVisible: ".*Messages.*"
+- assertVisible: ".*My Account.*"
+
+# Dil ayarlarına tekrar git (Hesabım menüsünden - back stack korunur)
+- scrollUntilVisible:
+    element: ".*Uygulama Dili.*"
+    direction: DOWN
+- tapOn: ".*Uygulama Dili.*"
+- extendedWaitUntil:
+    visible: "App Language"
+    timeout: 10000
+
+# 2. Almanca (Deutsch) seçimi
+- tapOn: ".*Deutsch.*"
+- extendedWaitUntil:
+    visible: "App-Sprache"
+    timeout: 10000
+- assertVisible: "App-Sprache"
+- assertVisible: ".*Einige Texte sind noch nicht übersetzt.*"
+
+# 3. Rusça (Русский) seçimi
+- tapOn: ".*Русский.*"
+- extendedWaitUntil:
+    visible: ".*Язык приложения.*"
+    timeout: 10000
+- assertVisible: ".*Язык приложения.*"
+- assertVisible: ".*Некоторые тексты ещё не переведены.*"
+
+# 4. Arapça (العربية - RTL) seçimi
+- tapOn: ".*العربية.*"
+- extendedWaitUntil:
+    visible: ".*لغة التطبيق.*"
+    timeout: 10000
+- assertVisible: ".*لغة التطبيق.*"
+- assertVisible: ".*بعض النصوص لم تُترجم بعد.*"
+
+# Geri dönüp alt navigasyon sekmelerinin Arapça (RTL) olduğunu doğrula
+- back
+- extendedWaitUntil:
+    visible: ".*الرئيسية.*"
+    timeout: 10000
+- assertVisible: ".*الرئيسية.*"
+- assertVisible: ".*الفئات.*"
+- assertVisible: ".*نشر إعلان.*"
+- assertVisible: ".*الرسائل.*"
+- assertVisible: ".*حسابي.*"
+
+# 5. Dil ayarlarına tekrar girip Türkçe'ye geri dön (Hesabım menüsünden)
+- scrollUntilVisible:
+    element: ".*Uygulama Dili.*"
+    direction: DOWN
+- tapOn: ".*Uygulama Dili.*"
+- extendedWaitUntil:
+    visible: ".*لغة التطبيق.*"
+    timeout: 10000
+
+- tapOn: ".*Türkçe.*"
+- extendedWaitUntil:
+    visible: "Uygulama Dili"
+    timeout: 10000
+- assertVisible: "Uygulama Dili"
+- assertVisible: ".*Bazı metinler henüz çevrilmedi.*"
+
+# Geri dönüp Türkçe sekmeleri doğrula
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertVisible: ".*Ana Sayfa.*"
+- assertVisible: ".*Kategoriler.*"
+- assertVisible: ".*İlan Ver.*"
+- assertVisible: ".*Mesajlar.*"
+- assertVisible: ".*Hesabım.*"

@@ -1,0 +1,41 @@
+appId: com.example.otelcim
+name: "11 m5_chat - back navigation from chat detail and session persistence across app restart"
+tags: [chat, navigation, restart]
+---
+# 1. Uygulama başlatılır ve seeker girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Geri tuşuna basılarak mesaj listesine dönülür
+- back
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*Mesajlarım.*"
+
+# 4. Uygulama kapatılıp yeniden başlatılır (stopApp: true, oturum açık kalmalı)
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 15000
+
+# 5. Mesajlar sekmesine gidilir ve oturumun/sohbetlerin korunduğu doğrulanır
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertNotVisible: ".*Mesajlaşmak İçin Giriş Yapın.*"
