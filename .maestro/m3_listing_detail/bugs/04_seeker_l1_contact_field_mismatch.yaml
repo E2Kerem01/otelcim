@@ -1,0 +1,31 @@
+# BUG-M3-04: Kimlik doğrulamalı iletişim bilgisi boş kalıyor — beklenen: ik+L1@e2e.test - 0242 555 00 00 görünür / gerçek: uygulama boş iletişim metni gösteriyor
+appId: com.example.otelcim
+name: "m3 BUG seeker L1 contact field mismatch"
+tags: [m3, listing-detail, bug, contact]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- openLink: "otelcim-e2e://app/listing/L1"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*İletişim Bilgisini Göster.*"
+    direction: DOWN
+    centerElement: true
+- assertVisible: ".*Deniz Otel.*"
+- tapOn: ".*İletişim Bilgisini Göster.*"
+- extendedWaitUntil:
+    visible: '.*ik\+L1@e2e\.test.*'
+    timeout: 10000
+- assertVisible: ".*0242 555 00 00.*"
+- tapOn: "Mesaj Gönder"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 15000
+- assertVisible: '.*Merhaba, ilan hâlâ aktif mi\?.*'
+- assertVisible: '.*Yarın görüşmeye gelebilir misiniz\?.*'
+- assertVisible: '.*Mesajınızı yazın\.\.\..*'

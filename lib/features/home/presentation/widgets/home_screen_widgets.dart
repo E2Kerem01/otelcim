@@ -723,24 +723,20 @@ class ListingCard extends ConsumerWidget {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 6,
-                                      vertical: 2,
+                                      vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: listingCategoryColor(
-                                        listing.category,
-                                      ).withValues(alpha: 0.12),
+                                      color: const Color(0xFF1E293B),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       listingCategoryLabel(listing.category),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 10,
+                                      style: const TextStyle(
+                                        fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: listingCategoryColor(
-                                          listing.category,
-                                        ),
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -749,8 +745,8 @@ class ListingCard extends ConsumerWidget {
                                   const SizedBox(width: 4),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                      vertical: 2,
+                                      horizontal: 6,
+                                      vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.deepOrange.shade700,
@@ -760,7 +756,7 @@ class ListingCard extends ConsumerWidget {
                                       AppLocalizations.of(context)!.urgentBadge,
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 9,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -785,10 +781,10 @@ class ListingCard extends ConsumerWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.location_on_outlined,
-                                  size: 12,
-                                  color: Colors.grey.shade600,
+                                  size: 14,
+                                  color: Color(0xFF495057),
                                 ),
                                 const SizedBox(width: 2),
                                 Expanded(
@@ -796,9 +792,9 @@ class ListingCard extends ConsumerWidget {
                                     listing.location,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.grey.shade600,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF495057),
                                     ),
                                   ),
                                 ),
@@ -858,79 +854,84 @@ class ListingCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: listingCategoryColor(
-                          listing.category,
-                        ).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        listingCategoryLabel(listing.category),
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: listingCategoryColor(listing.category),
-                        ),
+                    // Wrap, not a fixed Row: with large text (font scale 2.0)
+                    // the badges used to overflow and push the favourite
+                    // button and date off-screen (QA D31).
+                    Expanded(
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E293B),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              listingCategoryLabel(listing.category),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          if (isBoostedActive) ...[
+                            const BoostBadge(isCompact: true),
+                          ],
+                          if (isSeasonalContract(listing.season)) ...[
+                            SeasonBadge(season: listing.season!),
+                          ],
+                          if (matchScore != null) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0F766E),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '%$matchScore ${AppLocalizations.of(context)!.matchLabel}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                          if (listing.isUrgent) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.deepOrange.shade700,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.urgentBadge,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    if (isBoostedActive) ...[
-                      const SizedBox(width: 8),
-                      const BoostBadge(isCompact: true),
-                    ],
-                    if (isSeasonalContract(listing.season)) ...[
-                      const SizedBox(width: 8),
-                      SeasonBadge(season: listing.season!),
-                    ],
-                    if (matchScore != null) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.teal.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.teal.shade300),
-                        ),
-                        child: Text(
-                          '%$matchScore ${AppLocalizations.of(context)!.matchLabel}',
-                          style: TextStyle(
-                            color: Colors.teal.shade800,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (listing.isUrgent) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.deepOrange.shade700,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.urgentBadge,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                    const Spacer(),
                     AnimatedScale(
                       scale: isFavorite ? 1.15 : 1,
                       duration: const Duration(milliseconds: 180),

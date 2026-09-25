@@ -1,0 +1,25 @@
+# Signs in with e-mail + password in Arabic (RTL) mode.
+# Uses localized labels from app_ar.arb:
+#   Profile Tab: حسابي (navProfile)
+#   Email Tab: الدخول بالبريد الإلكتروني (loginWithEmail)
+#   Email field: البريد الإلكتروني (emailLabel)
+#   Password field: كلمة المرور (passwordLabel)
+#   Login Button: تسجيل الدخول (loginButton)
+appId: com.example.otelcim
+env:
+  PASSWORD: "Test1234!"
+---
+- tapOn: ".*حسابي.*"
+- extendedWaitUntil:
+    visible: "تسجيل الدخول"
+    timeout: 10000
+- tapOn: "البريد الإلكتروني"
+- inputText: ${EMAIL}
+- tapOn: "كلمة المرور"
+- inputText: ${PASSWORD}
+- tapOn:
+    text: "تسجيل الدخول"
+    index: -1
+- extendedWaitUntil:
+    notVisible: "كلمة المرور"
+    timeout: 15000

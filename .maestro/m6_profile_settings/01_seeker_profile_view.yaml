@@ -1,0 +1,43 @@
+appId: com.example.otelcim
+name: "m6 - 01 seeker profile view and account details"
+tags: [m6, profile]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+# Seeker display name and email verification
+- assertVisible: ".*Ayşe Aday.*"
+- assertVisible: ".*seeker@e2e\\.test.*"
+
+# Availability badge (specific to job seekers)
+- assertVisible: ".*Hemen Başlayabilir.*"
+
+# Profile management menu items
+- assertVisible: ".*Profili Düzenle.*"
+- assertVisible: ".*Belgelerim / Sertifika Cüzdanı.*"
+- assertVisible: ".*Favorilerim.*"
+- assertVisible: ".*İlanlarım.*"
+
+# Job seekers must NOT see employer-specific talent pool
+- assertNotVisible: ".*Yetenek Havuzum.*"
+
+# Scroll down to verify remaining profile menu items
+- scrollUntilVisible:
+    element: ".*Bildirim Ayarları.*"
+    direction: DOWN
+- assertVisible: ".*Bildirim Ayarları.*"
+- assertVisible: ".*Gizlilik ve Veri Ayarları.*"
+- assertVisible: ".*Arkadaşını Davet Et.*"
+- assertVisible: ".*Uygulama Dili.*"
+
+- scrollUntilVisible:
+    element: ".*Çıkış Yap.*"
+    direction: DOWN
+- assertVisible: ".*Çıkış Yap.*"

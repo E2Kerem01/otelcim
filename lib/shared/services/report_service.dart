@@ -29,7 +29,8 @@ class ReportService {
 
   Future<void> submitReport(Report report) async {
     try {
-      await _db.collection('reports').add(report.toMap());
+      final data = report.toMap()..['status'] = 'pending';
+      await _db.collection('reports').add(data);
     } catch (e, stackTrace) {
       logError(e, stackTrace, context: 'ReportService.submitReport');
       rethrow;

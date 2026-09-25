@@ -176,11 +176,17 @@ describe('listings: owner updates', () => {
 
   test(
     'the owner cannot inflate viewCount / messageCount',
-    { skip: bug('BUG-t2-11', 'viewCount/messageCount are unconstrained on create and update') },
     async () => {
       await denied(db(ALICE).update('listings/listing1', { viewCount: 999999 }));
     },
   );
+
+  test('a signed-in non-owner may increment viewCount by exactly one only', async () => {
+    await allowed(db(BOB).update('listings/listing1', { viewCount: 1 }));
+    await denied(db(BOB).update('listings/listing1', { viewCount: 3 }));
+    await denied(db(BOB).update('listings/listing1', { viewCount: 2, title: 'hacked' }));
+    await denied(db(null).update('listings/listing1', { viewCount: 2 }));
+  });
 });
 
 describe('listings: EditListingScreen contract on urgent / geo-tagged listings', () => {

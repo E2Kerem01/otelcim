@@ -1310,6 +1310,12 @@ abstract class AppLocalizations {
   /// **'Henüz İlan Bulunmuyor'**
   String get noListingsTitle;
 
+  /// No description provided for @listingsLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlanlar yüklenemedi. Lütfen tekrar deneyin.'**
+  String get listingsLoadError;
+
   /// Empty-state explanation on the home feed
   ///
   /// In tr, this message translates to:
@@ -1525,6 +1531,96 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tümü'**
   String get allFilterChip;
+
+  /// Feed card chip: the job includes staff housing
+  ///
+  /// In tr, this message translates to:
+  /// **'Lojman'**
+  String get perkHousing;
+
+  /// Feed card chip: meals per day included
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} öğün'**
+  String perkMeals(int count);
+
+  /// Feed card chip: staff shuttle provided
+  ///
+  /// In tr, this message translates to:
+  /// **'Servis'**
+  String get perkShuttle;
+
+  /// Tooltip/semantic label for the verified-employer badge
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrulanmış işveren'**
+  String get verifiedEmployer;
+
+  /// Season label for any summer season code yaz_YYYY
+  ///
+  /// In tr, this message translates to:
+  /// **'Yaz {year}'**
+  String seasonSummerOf(String year);
+
+  /// Season label for any winter season code kis_YYYY_YY
+  ///
+  /// In tr, this message translates to:
+  /// **'Kış {years}'**
+  String seasonWinterOf(String years);
+
+  /// No description provided for @forgotPasswordLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifremi unuttum?'**
+  String get forgotPasswordLink;
+
+  /// No description provided for @passwordResetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre sıfırlama'**
+  String get passwordResetTitle;
+
+  /// No description provided for @passwordResetSend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırlama bağlantısı gönder'**
+  String get passwordResetSend;
+
+  /// No description provided for @passwordResetSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.'**
+  String get passwordResetSuccess;
+
+  /// No description provided for @passwordResetInvalidEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir e-posta adresi girin.'**
+  String get passwordResetInvalidEmail;
+
+  /// No description provided for @passwordResetTooManyRequests.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.'**
+  String get passwordResetTooManyRequests;
+
+  /// No description provided for @passwordResetNetworkError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnternet bağlantınızı kontrol edip tekrar deneyin.'**
+  String get passwordResetNetworkError;
+
+  /// No description provided for @passwordResetGenericError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı gönderilemedi. Lütfen tekrar deneyin.'**
+  String get passwordResetGenericError;
+
+  /// No description provided for @adminPanelEntry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yönetim Paneli'**
+  String get adminPanelEntry;
 }
 
 class _AppLocalizationsDelegate

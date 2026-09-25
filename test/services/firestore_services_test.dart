@@ -67,6 +67,24 @@ void main() {
       expect((await db.collection('listings').doc('l').get()).data()!['status'], 'active');
     });
 
+    test('verification decisions are mirrored onto the employer profile', () async {
+      final service = admin.VerificationService(db);
+      await db.collection('user_profiles').doc('emp').set({'hotelName': 'A', 'isVerified': false});
+      await db.collection('verification_requests').doc('va').set({'employerId': 'emp', 'status': 'pending'});
+      await service.approveVerification(verificationId: 'va', adminId: 'a');
+      final approved = (await db.collection('user_profiles').doc('emp').get()).data()!;
+      expect(approved['isVerified'], isTrue);
+      expect(approved['verificationStatus'], 'approved');
+      expect(approved['verifiedAt'], isA<Timestamp>());
+      expect(approved['hotelName'], 'A');
+
+      await db.collection('verification_requests').doc('vr').set({'employerId': 'emp', 'status': 'pending'});
+      await service.rejectVerification(verificationId: 'vr', adminId: 'a', reason: 'eksik');
+      final rejected = (await db.collection('user_profiles').doc('emp').get()).data()!;
+      expect(rejected['isVerified'], isFalse);
+      expect(rejected['verificationStatus'], 'rejected');
+    });
+
     test('verification service watches, approves and rejects requests', () async {
       final service = admin.VerificationService(db);
       await db.collection('verification_requests').doc('v1').set({'employerId': 'e', 'hotelName': 'A', 'documentUrls': <String>[], 'status': 'pending', 'submittedAt': Timestamp.now()});
@@ -133,6 +151,52 @@ void main() {
       final metrics = await service.getDashboardMetrics();
       expect(metrics.activeListings, 1);
       expect(metrics.pendingVerifications, 1);
+    });
+  });
+
+  group('Admin overview (count aggregates)', () {
+    test('counts users, listings and pending work; old records fall outside the window', () async {
+      final db = FakeFirebaseFirestore();
+      final now = Timestamp.now();
+      final old = Timestamp.fromDate(DateTime.now().subtract(const Duration(days: 30)));
+      final users = db.collection('user_profiles');
+      await users.add({'userType': 'jobseeker', 'createdAt': now});
+      await users.add({'userType': 'jobseeker', 'createdAt': old, 'isBanned': true});
+      await users.add({'userType': 'employer', 'createdAt': now, 'isVerified': true});
+      await users.add({'userType': 'employer', 'createdAt': old, 'isSuspended': true});
+      final listings = db.collection('listings');
+      await listings.add({'status': 'active', 'isUrgent': true, 'createdAt': now});
+      await listings.add({'status': 'active', 'isBoosted': true, 'createdAt': old});
+      await listings.add({'status': 'closed', 'createdAt': now});
+      await db.collection('reports').add({'status': 'pending'});
+      await db.collection('reports').add({'status': 'dismissed'});
+      await db.collection('certificates').add({'status': 'pending'});
+      await db.collection('conversations').add({'posterId': 'a'});
+
+      final o = await AdminAnalyticsService(db).getOverview(recentDays: 7);
+      expect(o['users'], 4);
+      expect(o['jobseekers'], 2);
+      expect(o['employers'], 2);
+      expect(o['verifiedEmployers'], 1);
+      expect(o['banned'], 1);
+      expect(o['suspended'], 1);
+      expect(o['newUsers'], 2);
+      expect(o['listings'], 3);
+      expect(o['activeListings'], 2);
+      expect(o['urgentListings'], 1);
+      expect(o['boostedListings'], 1);
+      expect(o['newListings'], 2);
+      expect(o['pendingReports'], 1, reason: 'dismissed reports are not pending');
+      expect(o['pendingCertificates'], 1);
+      expect(o['conversations'], 1);
+      expect(o.recentDays, 7);
+    });
+
+    test('open reports count excludes dismissed reports', () async {
+      final db = FakeFirebaseFirestore();
+      await db.collection('reports').add({'status': 'pending'});
+      await db.collection('reports').add({'status': 'dismissed'});
+      expect(await AdminAnalyticsService(db).getOpenReportsCount(), 1);
     });
   });
 

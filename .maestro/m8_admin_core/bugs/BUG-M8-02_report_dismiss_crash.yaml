@@ -1,0 +1,36 @@
+# BUG-M8-02: Rapor reddetme sonrası Flutter assertion ile uygulama çöküyor — beklenen: 'Şikayeti Reddet işlemi tamamlandı.' ve bekleyen rapor listesinin boşalması / gerçek: '_dependents.isEmpty' kırmızı hata ekranı.
+appId: com.example.otelcim
+name: "BUG m8 report dismiss crashes after applying action"
+tags: [m8_admin_core, bug, reports, crash]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/reports"
+- extendedWaitUntil:
+    visible: ".*Şikâyetler.*"
+    timeout: 15000
+- assertVisible: ".*Şüpheli ilan.*"
+- assertVisible: ".*Hedef: İlan • L8.*"
+- assertVisible: ".*Bildiren:.*"
+- tapOn: ".*Reddet.*"
+- extendedWaitUntil:
+    visible: ".*Şikayeti Reddet.*"
+    timeout: 5000
+- assertVisible: '.*Sebep \(isteğe bağlı\).*'
+- tapOn: '.*Sebep \(isteğe bağlı\).*'
+- inputText: "İnceleme tamamlandı"
+- tapOn: ".*Uygula.*"
+- extendedWaitUntil:
+    visible: '.*Şikayeti Reddet işlemi tamamlandı\..*'
+    timeout: 10000
+- extendedWaitUntil:
+    visible: '.*Bekleyen şikâyet bulunmuyor\..*'
+    timeout: 10000
+- openLink: "otelcim-e2e://app/admin/audit-log"
+- extendedWaitUntil:
+    visible: ".*İşlem Geçmişi.*"
+    timeout: 10000
+- assertVisible: ".*Şikayeti Reddet.*"

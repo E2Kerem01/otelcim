@@ -1,0 +1,17 @@
+appId: com.example.otelcim
+name: "passive banner stays hidden after app restart"
+tags: [m9_admin_content, admin, banners, resilience]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- assertNotVisible: "E2E Test Reklamı"
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 20000
+- assertNotVisible: "E2E Test Reklamı"
+

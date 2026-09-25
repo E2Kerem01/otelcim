@@ -1,0 +1,33 @@
+# BUG-m9-05: Doğrulama reddi sonrası bekleyen kart kuyruktan kalkmıyor — beklenen: sebep ile red sonrası "Yeni Otel" kartının kalkması / gerçek: başarı bildirimi görünmesine rağmen kart ekranda kalıyor
+appId: com.example.otelcim
+name: "BUG rejected verification remains in queue"
+tags: [m9_admin_content, bug, admin, verification, validation]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/verifications"
+- extendedWaitUntil:
+    visible: "Yeni Otel"
+    timeout: 10000
+- tapOn: "Reddet"
+- extendedWaitUntil:
+    visible: "Doğrulamayı reddet"
+    timeout: 5000
+- tapOn: "Red sebebi"
+- tapOn:
+    text: "Reddet"
+    index: -1
+- assertVisible: "Red sebebi zorunludur."
+- inputText: "Belge bilgileri eksik"
+- tapOn:
+    text: "Reddet"
+    index: -1
+- extendedWaitUntil:
+    visible: "Doğrulama reddedildi."
+    timeout: 10000
+- extendedWaitUntil:
+    notVisible: "Yeni Otel"
+    timeout: 10000

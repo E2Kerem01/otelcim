@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,7 +24,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 // TEST-ONLY scaffolding, off by default. Never set in production builds.
-// Points Auth/Firestore at the local emulator suite and optionally
+// Points Auth/Firestore/Storage at the local emulator suite (Cloud Functions
+// via E2E_FUNCTIONS_BASE, see functions_endpoint.dart) and optionally
 // auto-signs-in a seeded test account, so live UI testing never touches
 // production data or requires typing a password into the app.
 const bool _kUseFirebaseEmulator = bool.fromEnvironment('E2E_USE_EMULATOR');
@@ -36,6 +38,7 @@ void main() async {
   if (_kUseFirebaseEmulator) {
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
     if (_kE2eTestEmail.isNotEmpty && _kE2eTestPassword.isNotEmpty) {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _kE2eTestEmail,

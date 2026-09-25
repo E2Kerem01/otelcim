@@ -7,6 +7,23 @@ import '../../../shared/models/app_user.dart';
 import '../../../shared/models/user_profile.dart';
 import '../domain/admin_action_model.dart';
 
+/// Ordered audit-log query shared by the admin history screen and its stream
+/// API. All optional filters are equality filters before the timestamp order.
+Query<Map<String, dynamic>> adminAuditLogQuery(
+  FirebaseFirestore db, {
+  String? adminId,
+  AdminActionType? actionType,
+}) {
+  Query<Map<String, dynamic>> query = db.collection('admin_audit_log');
+  if (adminId != null) {
+    query = query.where('adminId', isEqualTo: adminId);
+  }
+  if (actionType != null) {
+    query = query.where('actionType', isEqualTo: actionType.name);
+  }
+  return query.orderBy('timestamp', descending: true);
+}
+
 /// Service for admin-related operations including audit logging and permission checks
 class AdminService {
   AdminService(this._db);
@@ -33,17 +50,11 @@ class AdminService {
     AdminActionType? actionType,
     int? limit,
   }) {
-    Query<Map<String, dynamic>> query = _db.collection('admin_audit_log');
-
-    if (adminId != null) {
-      query = query.where('adminId', isEqualTo: adminId);
-    }
-
-    if (actionType != null) {
-      query = query.where('actionType', isEqualTo: actionType.name);
-    }
-
-    query = query.orderBy('timestamp', descending: true);
+    Query<Map<String, dynamic>> query = adminAuditLogQuery(
+      _db,
+      adminId: adminId,
+      actionType: actionType,
+    );
 
     if (limit != null) {
       query = query.limit(limit);

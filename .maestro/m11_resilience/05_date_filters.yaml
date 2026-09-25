@@ -1,0 +1,45 @@
+appId: com.example.otelcim
+name: "m11 - date filters respect seeded listing ages"
+tags: [m11_resilience, filters, dates, many]
+---
+# seed: many
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Filtreler.*"
+- extendedWaitUntil:
+    visible: ".*Gelişmiş filtreler.*"
+    timeout: 10000
+- tapOn: ".*İlan tarihi.*"
+- tapOn: "Son 24 saat"
+- tapOn: ".*Filtreleri uygula.*"
+- extendedWaitUntil:
+    visible: ".*1 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Acil Aşçı Yardımcısı.*"
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"
+- scrollUntilVisible:
+    element: ".*Filtreler.*"
+    direction: UP
+- tapOn: ".*Filtreler.*"
+- tapOn: ".*İlan tarihi.*"
+- tapOn: "Son hafta"
+- tapOn: ".*Filtreleri uygula.*"
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 15000
+- assertVisible: ".*Güvenlik Görevlisi.*"
+- assertNotVisible: ".*Sayfa İlanı 01.*"
+- scrollUntilVisible:
+    element: ".*Filtreler.*"
+    direction: UP
+- tapOn: ".*Filtreler.*"
+- tapOn: ".*İlan tarihi.*"
+- tapOn: "Son ay"
+- tapOn: ".*Filtreleri uygula.*"
+- scrollUntilVisible:
+    element: ".*Sayfa İlanı 22.*"
+    direction: DOWN
+- extendedWaitUntil:
+    visible: ".*Sayfa İlanı 22.*"
+    timeout: 15000
+- assertVisible: ".*29 sonuç.*"
+- assertNotVisible: ".*Sayfa İlanı 30.*"

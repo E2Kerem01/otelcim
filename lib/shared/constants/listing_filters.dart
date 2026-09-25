@@ -52,31 +52,58 @@ enum EducationLevel {
   }
 }
 
-enum ListingSeason {
-  yaz2025,
-  kis202526,
-  tumYil;
+class ListingSeason {
+  const ListingSeason._(this.code, this.label);
 
-  String get code => switch (this) {
-    ListingSeason.yaz2025 => 'yaz_2025',
-    ListingSeason.kis202526 => 'kis_2025_26',
-    ListingSeason.tumYil => 'tum_yil',
-  };
+  final String code;
+  final String label;
 
-  String get label => switch (this) {
-    ListingSeason.yaz2025 => 'Yaz 2025',
-    ListingSeason.kis202526 => 'Kış 2025-26',
-    ListingSeason.tumYil => 'Tüm Yıl',
-  };
+  static const yaz2025 = ListingSeason._('yaz_2025', 'Yaz 2025');
+  static const kis202526 = ListingSeason._('kis_2025_26', 'Kış 2025-26');
+  static const tumYil = ListingSeason._('tum_yil', 'Tüm Yıl');
+
+  /// The filter options are derived from the current year so new seasons
+  /// become selectable without a code change each year.
+  static List<ListingSeason> get values => listingSeasonOptions();
 
   static ListingSeason? fromCode(String? code) {
     if (code == null) return null;
-    for (final s in ListingSeason.values) {
-      if (s.code == code) return s;
+    if (code == yaz2025.code) return yaz2025;
+    if (code == kis202526.code) return kis202526;
+    if (code == tumYil.code) return tumYil;
+    final match = RegExp(r'^(yaz|kis)_(\d{4})(?:_(\d{2}))?$').firstMatch(code);
+    if (match != null) {
+      final year = match.group(2)!;
+      final label = match.group(1) == 'yaz'
+          ? 'Yaz $year'
+          : 'Kış $year${match.group(3) == null ? '' : '-${match.group(3)}'}';
+      return ListingSeason._(code, label);
     }
     return null;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is ListingSeason && other.code == code;
+
+  @override
+  int get hashCode => code.hashCode;
 }
+
+List<ListingSeason> listingSeasonOptions({DateTime Function()? clock}) {
+  final year = (clock ?? DateTime.now).call().year;
+  final nextYear = year + 1;
+  final winterCode =
+      'kis_${year}_${(nextYear % 100).toString().padLeft(2, '0')}';
+  return [
+    ListingSeason.fromCode('yaz_$year')!,
+    ListingSeason.fromCode(winterCode)!,
+    ListingSeason.tumYil,
+  ];
+}
+
+List<String> get listingSeasonValues =>
+    ListingSeason.values.map((season) => season.code).toList(growable: false);
 
 enum ListingDateFilter {
   all,

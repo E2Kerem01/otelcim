@@ -407,6 +407,7 @@
     "description": "Tooltip on the table view toggle"
   },
   "noListingsTitle": "Henüz İlan Bulunmuyor",
+  "listingsLoadError": "İlanlar yüklenemedi. Lütfen tekrar deneyin.",
   "@noListingsTitle": {
     "description": "Empty-state heading on the home feed"
   },
@@ -563,5 +564,26 @@
   "allFilterChip": "Tümü",
   "@allFilterChip": {
     "description": "Category filter chip that clears the category filter"
-  }
+  },
+  "perkHousing": "Lojman",
+  "@perkHousing": {"description": "Feed card chip: the job includes staff housing"},
+  "perkMeals": "{count} öğün",
+  "@perkMeals": {"description": "Feed card chip: meals per day included", "placeholders": {"count": {"type": "int"}}},
+  "perkShuttle": "Servis",
+  "@perkShuttle": {"description": "Feed card chip: staff shuttle provided"},
+  "verifiedEmployer": "Doğrulanmış işveren",
+  "@verifiedEmployer": {"description": "Tooltip/semantic label for the verified-employer badge"},
+  "seasonSummerOf": "Yaz {year}",
+  "@seasonSummerOf": {"description": "Season label for any summer season code yaz_YYYY", "placeholders": {"year": {"type": "String"}}},
+  "seasonWinterOf": "Kış {years}",
+  "@seasonWinterOf": {"description": "Season label for any winter season code kis_YYYY_YY", "placeholders": {"years": {"type": "String"}}},
+  "forgotPasswordLink": "Şifremi unuttum?",
+  "passwordResetTitle": "Şifre sıfırlama",
+  "passwordResetSend": "Sıfırlama bağlantısı gönder",
+  "passwordResetSuccess": "Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.",
+  "passwordResetInvalidEmail": "Geçerli bir e-posta adresi girin.",
+  "passwordResetTooManyRequests": "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.",
+  "passwordResetNetworkError": "İnternet bağlantınızı kontrol edip tekrar deneyin.",
+  "passwordResetGenericError": "Bağlantı gönderilemedi. Lütfen tekrar deneyin.",
+  "adminPanelEntry": "Yönetim Paneli"
 }

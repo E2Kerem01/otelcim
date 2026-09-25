@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:otelcim/features/auth/presentation/login_screen.dart';
 import 'package:otelcim/l10n/app_localizations.dart';
@@ -49,6 +50,46 @@ void main() {
   }
 
   group('LoginScreen Widget Tests', () {
+    testWidgets('system back from redirected login returns to home', (tester) async {
+      final router = GoRouter(
+        initialLocation: '/login?from=%2Fprofile',
+        routes: [
+          GoRoute(
+            path: '/login',
+            builder: (_, _) => const LoginScreen(),
+          ),
+          GoRoute(
+            path: '/',
+            builder: (_, _) => const Scaffold(body: Text('HOME')),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [authServiceProvider.overrideWith((ref) => mockAuthService)],
+          child: MaterialApp.router(
+            routerConfig: router,
+            locale: const Locale('tr'),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('tr'), Locale('en')],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(find.text('HOME'), findsOneWidget);
+    });
+
     testWidgets('renders header, segmented switch and email tab by default', (tester) async {
       await pumpLogin(tester);
 
@@ -58,6 +99,31 @@ void main() {
       expect(find.widgetWithText(TextFormField, 'E-posta'), findsOneWidget);
       expect(find.widgetWithText(TextFormField, 'Şifre'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Giriş Yap'), findsOneWidget);
+    });
+
+    testWidgets('opens password reset dialog with the login email and sends it', (tester) async {
+      when(() => mockAuthService.sendPasswordResetEmail(email: 'reset@example.com'))
+          .thenAnswer((_) async {});
+
+      await pumpLogin(tester);
+      await tester.enterText(find.byType(TextFormField).first, 'reset@example.com');
+      await tester.tap(find.text('Şifremi unuttum?'));
+      await tester.pump();
+
+      expect(find.text('Şifre sıfırlama'), findsOneWidget);
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.byType(TextFormField), findsNWidgets(3));
+      expect(
+        tester.widget<TextFormField>(find.byType(TextFormField).last).controller!.text,
+        'reset@example.com',
+      );
+
+      await tester.tap(find.text('Sıfırlama bağlantısı gönder'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockAuthService.sendPasswordResetEmail(email: 'reset@example.com'))
+          .called(1);
+      expect(find.text('Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.'), findsOneWidget);
     });
 
     testWidgets('shows validation errors when submitting empty email form', (tester) async {

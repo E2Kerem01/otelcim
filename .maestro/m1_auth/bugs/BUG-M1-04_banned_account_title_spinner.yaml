@@ -1,0 +1,27 @@
+# BUG-M1-04: Banlı hesap ekranı başlığı spinner'da kalıyor — beklenen: "Hesabınız Yasaklandı"; gerçek: destek açıklaması ve Çıkış Yap görünürken profil başlığı yerine sonsuz yükleme spinner'ı.
+appId: com.example.otelcim
+name: "BUG M1 banned account message should load"
+tags: [m1_auth, access-control, bug, expected-failure]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: banned@e2e.test
+- extendedWaitUntil:
+    visible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin.*"
+    timeout: 15000
+- extendedWaitUntil:
+    visible: ".*Hesabınız Yasaklandı.*"
+    timeout: 30000
+- assertVisible: ".*Çıkış Yap.*"
+# Back may leave the app from this root screen (acceptable for a lockout);
+# what matters is that relaunching lands on the lock screen again.
+- back
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: ".*Hesabınız Yasaklandı.*"
+    timeout: 20000
+- assertNotVisible: ".*Ana Sayfa.*"
+

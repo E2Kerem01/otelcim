@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../utils/search_keywords.dart';
 import 'app_user.dart';
 
 const Object _undefined = Object();
@@ -282,6 +283,9 @@ class UserProfile {
       // load time, silently discarding concurrent increments.
       'referralCode': referralCode,
       'referredBy': referredBy,
+      // Prefix tokens for admin search (lib/shared/utils/search_keywords.dart).
+      'searchKeywords':
+          buildSearchKeywords([displayName, email, hotelName, phoneNumber]),
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };

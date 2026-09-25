@@ -1,0 +1,15 @@
+# BUG-m10-02: Başkasının ilanı için acil ilan satın alma ekranı korunmuyor — beklenen: yetki reddi veya ana sayfaya dönüş / gerçek: işveren olmayan kullanıcıya satın alma ekranı açılıyor.
+appId: com.example.otelcim
+name: "m10 bug başkasının ilanında acil ekranı"
+tags: [m10, bug, urgent, authorization]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../_helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- openLink: "otelcim-e2e://app/listing/L6/urgent"
+- extendedWaitUntil:
+    visible: "Acil İlan"
+    timeout: 10000
+- assertNotVisible: "Satın Al ve Acil Yap"

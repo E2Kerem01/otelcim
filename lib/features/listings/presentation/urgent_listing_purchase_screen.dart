@@ -62,6 +62,11 @@ class _UrgentListingPurchaseScreenState
       return;
     }
 
+    final listing = ref.read(singleListingProvider(widget.listingId)).valueOrNull;
+    if (listing == null || listing.isUrgent || listing.posterId != user.uid) {
+      return;
+    }
+
     setState(() => _isProcessing = true);
     try {
       final paymentService = ref.read(paymentServiceProvider);
@@ -158,6 +163,22 @@ class _UrgentListingPurchaseScreenState
         data: (listing) {
           if (listing == null) {
             return const Center(child: Text('İlan bulunamadı.'));
+          }
+          final user = ref.watch(authServiceProvider).currentUser;
+          if (listing.isUrgent) {
+            return _buildGuardState(
+              // TODO(l10n): add urgentListingAlreadyActive (TR: "Bu ilan zaten acil.", EN: "This listing is already urgent.").
+              'Bu ilan zaten acil.',
+            );
+          }
+          if (user == null) {
+            return _buildGuardState('Lütfen önce giriş yapın.');
+          }
+          if (listing.posterId != user.uid) {
+            return _buildGuardState(
+              // TODO(l10n): add urgentListingOwnerOnly (TR: "Bu ilanı yalnızca sahibi acil yapabilir.", EN: "Only the owner can make this listing urgent.").
+              'Bu ilanı yalnızca sahibi acil yapabilir.',
+            );
           }
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -316,6 +337,15 @@ class _UrgentListingPurchaseScreenState
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildGuardState(String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(message, textAlign: TextAlign.center),
       ),
     );
   }

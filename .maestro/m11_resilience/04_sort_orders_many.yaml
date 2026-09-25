@@ -1,0 +1,50 @@
+appId: com.example.otelcim
+name: "m11 - all feed sort orders can be applied"
+tags: [m11_resilience, filters, sort, many]
+---
+# seed: many
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Filtreler.*"
+- extendedWaitUntil:
+    visible: ".*Gelişmiş filtreler.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Sıralama.*"
+    direction: DOWN
+- tapOn: ".*Sıralama.*"
+- tapOn: ".*Maaş yüksekten düşüğe.*"
+- tapOn: ".*Filtreleri uygula.*"
+- extendedWaitUntil:
+    visible: ".*Maaş yüksekten düşüğe.*"
+    timeout: 15000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- takeScreenshot: m11_sort_salary_high
+- scrollUntilVisible:
+    element: ".*Filtreler.*"
+    direction: UP
+- tapOn: ".*Filtreler.*"
+- scrollUntilVisible:
+    element: ".*Sıralama.*"
+    direction: DOWN
+- tapOn: ".*Sıralama.*"
+- tapOn: ".*Maaş düşükten yükseğe.*"
+- tapOn: ".*Filtreleri uygula.*"
+- extendedWaitUntil:
+    visible: ".*Maaş düşükten yükseğe.*"
+    timeout: 15000
+- assertVisible: ".*Sayfa İlanı 01.*"
+- takeScreenshot: m11_sort_salary_low
+- scrollUntilVisible:
+    element: ".*Filtreler.*"
+    direction: UP
+- tapOn: ".*Filtreler.*"
+- scrollUntilVisible:
+    element: ".*Sıralama.*"
+    direction: DOWN
+- tapOn: ".*Sıralama.*"
+- tapOn: "En yeni"
+- tapOn: ".*Filtreleri uygula.*"
+- extendedWaitUntil:
+    visible: ".*En yeni.*"
+    timeout: 15000
+- assertVisible: ".*Acil Aşçı Yardımcısı.*"

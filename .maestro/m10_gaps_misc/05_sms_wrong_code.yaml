@@ -1,0 +1,23 @@
+appId: com.example.otelcim
+name: "m10 SMS giriş yanlış kod hatası"
+tags: [m10, auth, sms]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- tapOn: "Telefon ile Giriş"
+- tapOn: "Telefon Numarası"
+- inputText: "5550000010"
+- tapOn: "Kod Gönder"
+- extendedWaitUntil:
+    visible: "SMS doğrulama kodu gönderildi."
+    timeout: 10000
+- tapOn: "SMS Doğrulama Kodu"
+- inputText: "123456"
+- tapOn: "Doğrula ve Giriş Yap"
+- extendedWaitUntil:
+    visible: "SMS doğrulama kodu hatalı veya süresi dolmuş."
+    timeout: 10000
+- assertVisible: "SMS doğrulama kodu hatalı veya süresi dolmuş."

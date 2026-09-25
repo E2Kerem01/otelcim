@@ -4,145 +4,175 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/services/auth_service.dart';
+import '../../listings/presentation/season_utils.dart';
 import '../services/seasonal_service.dart';
 
 class SeasonalCalendarScreen extends ConsumerStatefulWidget {
   const SeasonalCalendarScreen({super.key});
 
   @override
-  ConsumerState<SeasonalCalendarScreen> createState() => _SeasonalCalendarScreenState();
+  ConsumerState<SeasonalCalendarScreen> createState() =>
+      _SeasonalCalendarScreenState();
 }
 
-class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen> {
+class _SeasonalCalendarScreenState
+    extends ConsumerState<SeasonalCalendarScreen> {
   void _openAddSubscriptionModal(BuildContext context, String uid) {
     String? selectedCity;
     String? selectedCategory;
-    String selectedSeason = ListingSeason.yaz2025.code;
+    String selectedSeason = ListingSeason.values.first.code;
 
-    unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (modalContext) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.viewInsetsOf(context).bottom + 20),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Text(
-                            'Sezon İlanı Hatırlatıcı Ekle',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (modalContext) {
+          return StatefulBuilder(
+            builder: (context, setModalState) {
+              final l10n = AppLocalizations.of(context)!;
+              return Padding(
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  16,
+                  20,
+                  MediaQuery.viewInsetsOf(context).bottom + 20,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'Sezon İlanı Hatırlatıcı Ekle',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.pop(modalContext),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.',
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<String?>(
-                      initialValue: selectedCity,
-                      decoration: const InputDecoration(
-                        labelText: 'Bölge / Şehir',
-                        prefixIcon: Icon(Icons.location_city),
-                      ),
-                      items: [
-                        const DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text('Tüm Bölgeler'),
-                        ),
-                        ...turkishTourismCities.map(
-                          (city) => DropdownMenuItem(value: city, child: Text(city)),
-                        ),
-                      ],
-                      onChanged: (val) => setModalState(() => selectedCity = val),
-                    ),
-                    const SizedBox(height: 14),
-                    DropdownButtonFormField<String?>(
-                      initialValue: selectedCategory,
-                      decoration: const InputDecoration(
-                        labelText: 'Kategori',
-                        prefixIcon: Icon(Icons.work_outline),
-                      ),
-                      items: [
-                        const DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text('Tüm Kategoriler'),
-                        ),
-                        ...ListingCategory.values.map(
-                          (cat) => DropdownMenuItem(
-                            value: cat.name,
-                            child: Text(listingCategoryLabels[cat]!),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.pop(modalContext),
                           ),
-                        ),
-                      ],
-                      onChanged: (val) => setModalState(() => selectedCategory = val),
-                    ),
-                    const SizedBox(height: 14),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedSeason,
-                      decoration: const InputDecoration(
-                        labelText: 'Hedef Sezon',
-                        prefixIcon: Icon(Icons.date_range),
+                        ],
                       ),
-                      items: ListingSeason.values.map(
-                        (season) => DropdownMenuItem(
-                          value: season.code,
-                          child: Text(season.label),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.',
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String?>(
+                        initialValue: selectedCity,
+                        decoration: const InputDecoration(
+                          labelText: 'Bölge / Şehir',
+                          prefixIcon: Icon(Icons.location_city),
                         ),
-                      ).toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setModalState(() => selectedSeason = val);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        icon: const Icon(Icons.notifications_active),
-                        label: const Text('Hatırlatıcı Oluştur'),
-                        onPressed: () async {
-                          await ref.read(seasonalServiceProvider).addSubscription(
-                                userId: uid,
-                                city: selectedCity,
-                                category: selectedCategory,
-                                season: selectedSeason,
-                              );
-                          if (modalContext.mounted) {
-                            Navigator.pop(modalContext);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Sezonluk hatırlatıcı başarıyla oluşturuldu.')),
-                            );
+                        items: [
+                          const DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text('Tüm Bölgeler'),
+                          ),
+                          ...turkishTourismCities.map(
+                            (city) => DropdownMenuItem(
+                              value: city,
+                              child: Text(city),
+                            ),
+                          ),
+                        ],
+                        onChanged: (val) =>
+                            setModalState(() => selectedCity = val),
+                      ),
+                      const SizedBox(height: 14),
+                      DropdownButtonFormField<String?>(
+                        initialValue: selectedCategory,
+                        decoration: const InputDecoration(
+                          labelText: 'Kategori',
+                          prefixIcon: Icon(Icons.work_outline),
+                        ),
+                        items: [
+                          const DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text('Tüm Kategoriler'),
+                          ),
+                          ...ListingCategory.values.map(
+                            (cat) => DropdownMenuItem(
+                              value: cat.name,
+                              child: Text(listingCategoryLabels[cat]!),
+                            ),
+                          ),
+                        ],
+                        onChanged: (val) =>
+                            setModalState(() => selectedCategory = val),
+                      ),
+                      const SizedBox(height: 14),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedSeason,
+                        decoration: const InputDecoration(
+                          labelText: 'Hedef Sezon',
+                          prefixIcon: Icon(Icons.date_range),
+                        ),
+                        items: ListingSeason.values
+                            .map(
+                              (season) => DropdownMenuItem(
+                                value: season.code,
+                                child: Text(
+                                  listingSeasonLabel(l10n, season.code),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() => selectedSeason = val);
                           }
                         },
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          icon: const Icon(Icons.notifications_active),
+                          label: const Text('Hatırlatıcı Oluştur'),
+                          onPressed: () async {
+                            await ref
+                                .read(seasonalServiceProvider)
+                                .addSubscription(
+                                  userId: uid,
+                                  city: selectedCity,
+                                  category: selectedCategory,
+                                  season: selectedSeason,
+                                );
+                            if (modalContext.mounted) {
+                              Navigator.pop(modalContext);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Sezonluk hatırlatıcı başarıyla oluşturuldu.',
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        );
-      },
-    ));
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -152,7 +182,9 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEn ? 'Seasonal Hiring Calendar' : 'Sezonluk İşe Alım Takvimi'),
+        title: Text(
+          isEn ? 'Seasonal Hiring Calendar' : 'Sezonluk İşe Alım Takvimi',
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -163,7 +195,9 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
             Card(
               color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -179,15 +213,23 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isEn ? 'Tourism Season Hiring Periods' : 'Turizm Sezonu İşe Alım Dönemleri',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            isEn
+                                ? 'Tourism Season Hiring Periods'
+                                : 'Turizm Sezonu İşe Alım Dönemleri',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             isEn
                                 ? 'Track peak recruitment windows and set alerts for your preferred region & job category.'
                                 : 'Yoğun işe alım dönemlerini takip edin ve bölge/kategori bazlı sezon hatırlatıcıları kurun.',
-                            style: const TextStyle(fontSize: 12, color: Colors.black87),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black87,
+                            ),
                           ),
                         ],
                       ),
@@ -201,7 +243,9 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
 
             // Seasonal Windows List
             Text(
-              isEn ? 'Seasonal Recruitment Windows' : 'Sezonluk İşe Alım Dönemleri',
+              isEn
+                  ? 'Seasonal Recruitment Windows'
+                  : 'Sezonluk İşe Alım Dönemleri',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -209,7 +253,9 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
             ...SeasonalService.seasonalWindows.map(
               (window) => Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -218,9 +264,14 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
+                              color: Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -232,7 +283,11 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                             ),
                           ),
                           const Spacer(),
-                          const Icon(Icons.beach_access, size: 20, color: Colors.orange),
+                          const Icon(
+                            Icons.beach_access,
+                            size: 20,
+                            color: Colors.orange,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -243,13 +298,22 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  isEn ? 'Recruitment Peak' : 'İşe Alım Yoğunluğu',
-                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                  isEn
+                                      ? 'Recruitment Peak'
+                                      : 'İşe Alım Yoğunluğu',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isEn ? window.recruitmentPeriodEn : window.recruitmentPeriodTr,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  isEn
+                                      ? window.recruitmentPeriodEn
+                                      : window.recruitmentPeriodTr,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -259,13 +323,22 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  isEn ? 'Active Work Period' : 'Çalışma Dönemi',
-                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                  isEn
+                                      ? 'Active Work Period'
+                                      : 'Çalışma Dönemi',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isEn ? window.activeMonthsEn : window.activeMonthsTr,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  isEn
+                                      ? window.activeMonthsEn
+                                      : window.activeMonthsTr,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -275,7 +348,10 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                       const SizedBox(height: 10),
                       Text(
                         isEn ? window.descriptionEn : window.descriptionTr,
-                        style: const TextStyle(fontSize: 13, color: Colors.black87),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.black87,
+                        ),
                       ),
                     ],
                   ),
@@ -291,14 +367,18 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                 Expanded(
                   child: Text(
                     isEn ? 'Seasonal Reminders' : 'Sezonluk Hatırlatıcılarım',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 if (user != null)
                   ElevatedButton.icon(
                     icon: const Icon(Icons.add, size: 18),
                     label: Text(isEn ? 'Add Alert' : 'Ekle'),
-                    onPressed: () => _openAddSubscriptionModal(context, user.uid),
+                    onPressed: () =>
+                        _openAddSubscriptionModal(context, user.uid),
                   ),
               ],
             ),
@@ -310,7 +390,11 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      const Icon(Icons.lock_outline, size: 36, color: Colors.grey),
+                      const Icon(
+                        Icons.lock_outline,
+                        size: 36,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(height: 8),
                       Text(
                         isEn
@@ -330,7 +414,9 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
             else
               Consumer(
                 builder: (context, ref, child) {
-                  final subsAsync = ref.watch(userSeasonalSubscriptionsProvider(user.uid));
+                  final subsAsync = ref.watch(
+                    userSeasonalSubscriptionsProvider(user.uid),
+                  );
 
                   return subsAsync.when(
                     data: (subs) {
@@ -341,7 +427,11 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                             child: Center(
                               child: Column(
                                 children: [
-                                  const Icon(Icons.notifications_none, size: 40, color: Colors.grey),
+                                  const Icon(
+                                    Icons.notifications_none,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
                                   const SizedBox(height: 8),
                                   Text(
                                     isEn
@@ -352,8 +442,15 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                                   const SizedBox(height: 12),
                                   FilledButton.icon(
                                     icon: const Icon(Icons.add_alert),
-                                    label: Text(isEn ? 'Create First Alert' : 'İlk Hatırlatıcıyı Oluştur'),
-                                    onPressed: () => _openAddSubscriptionModal(context, user.uid),
+                                    label: Text(
+                                      isEn
+                                          ? 'Create First Alert'
+                                          : 'İlk Hatırlatıcıyı Oluştur',
+                                    ),
+                                    onPressed: () => _openAddSubscriptionModal(
+                                      context,
+                                      user.uid,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -365,14 +462,18 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                       return Column(
                         children: subs.map((sub) {
                           final seasonObj = ListingSeason.fromCode(sub.season);
-                          final seasonLabel = seasonObj?.label ?? sub.season ?? 'Tüm Sezonlar';
-                          final cityText = sub.city ?? (isEn ? 'All Regions' : 'Tüm Bölgeler');
+                          final seasonLabel =
+                              seasonObj?.label ?? sub.season ?? 'Tüm Sezonlar';
+                          final cityText =
+                              sub.city ??
+                              (isEn ? 'All Regions' : 'Tüm Bölgeler');
                           final catText = sub.category != null
-                              ? (listingCategoryLabels[ListingCategory.values.firstWhere(
-                                  (c) => c.name == sub.category,
-                                  orElse: () => ListingCategory.diger,
-                                )] ??
-                                  sub.category!)
+                              ? (listingCategoryLabels[ListingCategory.values
+                                        .firstWhere(
+                                          (c) => c.name == sub.category,
+                                          orElse: () => ListingCategory.diger,
+                                        )] ??
+                                    sub.category!)
                               : (isEn ? 'All Categories' : 'Tüm Kategoriler');
 
                           return Card(
@@ -380,11 +481,17 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: sub.enabled
-                                    ? Theme.of(context).primaryColor.withValues(alpha: 0.15)
+                                    ? Theme.of(
+                                        context,
+                                      ).primaryColor.withValues(alpha: 0.15)
                                     : Colors.grey.shade200,
                                 child: Icon(
-                                  sub.enabled ? Icons.notifications_active : Icons.notifications_off,
-                                  color: sub.enabled ? Theme.of(context).primaryColor : Colors.grey,
+                                  sub.enabled
+                                      ? Icons.notifications_active
+                                      : Icons.notifications_off,
+                                  color: sub.enabled
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.grey,
                                 ),
                               ),
                               title: Text('$cityText - $catText'),
@@ -398,17 +505,26 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                                   Switch(
                                     value: sub.enabled,
                                     onChanged: (val) {
-                                      unawaited(ref.read(seasonalServiceProvider).toggleSubscription(
-                                            userId: user.uid,
-                                            subscriptionId: sub.id,
-                                            enabled: val,
-                                          ));
+                                      unawaited(
+                                        ref
+                                            .read(seasonalServiceProvider)
+                                            .toggleSubscription(
+                                              userId: user.uid,
+                                              subscriptionId: sub.id,
+                                              enabled: val,
+                                            ),
+                                      );
                                     },
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red,
+                                    ),
                                     onPressed: () async {
-                                      await ref.read(seasonalServiceProvider).deleteSubscription(
+                                      await ref
+                                          .read(seasonalServiceProvider)
+                                          .deleteSubscription(
                                             userId: user.uid,
                                             subscriptionId: sub.id,
                                           );
@@ -421,8 +537,13 @@ class _SeasonalCalendarScreenState extends ConsumerState<SeasonalCalendarScreen>
                         }).toList(),
                       );
                     },
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, st) => Text(isEn ? 'Error loading alerts: $e' : 'Hatırlatıcılar yüklenemedi: $e'),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, st) => Text(
+                      isEn
+                          ? 'Error loading alerts: $e'
+                          : 'Hatırlatıcılar yüklenemedi: $e',
+                    ),
                   );
                 },
               ),

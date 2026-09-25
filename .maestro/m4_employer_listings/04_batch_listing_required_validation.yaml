@@ -1,0 +1,52 @@
+appId: com.example.otelcim
+name: "m4 - batch listing form validates hotel and position fields"
+tags: [m4, employer, batch, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: "Yeni İlan Aç"
+    timeout: 10000
+- tapOn: ".*Toplu İlan Ver.*"
+- extendedWaitUntil:
+    visible: "Toplu İlan Ver"
+    timeout: 10000
+- scrollUntilVisible:
+    element: "1 İlanı Atomik Yayınla"
+    direction: DOWN
+- tapOn: "1 İlanı Atomik Yayınla"
+- extendedWaitUntil:
+    visible: "Lütfen tüm pozisyon ve otel bilgilerini eksiksiz doldurun\\."
+    timeout: 10000
+- scrollUntilVisible:
+    element: "Otel adı gereklidir"
+    direction: UP
+- assertVisible: "Otel adı gereklidir"
+- scrollUntilVisible:
+    element: "Konum gereklidir"
+    direction: DOWN
+- assertVisible: "Konum gereklidir"
+- scrollUntilVisible:
+    element: "Şehir seçmeniz gerekiyor"
+    direction: DOWN
+- assertVisible: "Şehir seçmeniz gerekiyor"
+- scrollUntilVisible:
+    element: "İletişim bilgisi gereklidir"
+    direction: DOWN
+- assertVisible: "İletişim bilgisi gereklidir"
+- scrollUntilVisible:
+    element: "Başlık gereklidir"
+    direction: DOWN
+- assertVisible: "Başlık gereklidir"
+- scrollUntilVisible:
+    element: "Maaş bilgisi gereklidir"
+    direction: DOWN
+- assertVisible: "Maaş bilgisi gereklidir"
+- scrollUntilVisible:
+    element: "Açıklama gereklidir"
+    direction: DOWN
+- assertVisible: "Açıklama gereklidir"

@@ -1,0 +1,40 @@
+appId: com.example.otelcim
+name: "07 m5_chat - employer views chat list with availability badge and menu actions"
+tags: [chat, employer, availability-badge]
+---
+# 1. Uygulama başlatılır ve employer (Mehmet İşveren) girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+
+# 2. Mesajlar sekmesine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+
+# 3. Adayın "Hemen Başlayabilir" rozetinin liste kartında göründüğü doğrulanır
+- assertVisible: ".*Hemen Başlayabilir.*"
+
+# 4. L1 sohbetine girilir
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 5. AppBar'da "Sohbet" başlığı ve "Hemen Başlayabilir" rozeti doğrulanır
+- assertVisible: ".*Hemen Başlayabilir.*"
+
+# 6. Menü (üç nokta) açılır
+# TAHMİN: Flutter PopupMenuButton varsayılan Türkçe MaterialLocalizations tooltip'i "Menüyü göster"
+- tapOn: ".*Menüyü göster.*"
+
+# 7. İşverene özel mülakat, yetenek havuzu ve işe alım aksiyonları doğrulanır
+- extendedWaitUntil:
+    visible: ".*Mülakat Saati Öner.*"
+    timeout: 5000
+- assertVisible: ".*Yetenek Havuzuna Ekle.*"
+- assertVisible: ".*İşe Alındı Olarak İşaretle.*"
+- assertVisible: ".*Kullanıcıyı Bildir.*"

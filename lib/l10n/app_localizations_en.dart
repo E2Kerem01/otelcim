@@ -654,6 +654,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noListingsTitle => 'No listings yet';
 
   @override
+  String get listingsLoadError =>
+      'Listings could not be loaded. Please try again.';
+
+  @override
   String get noListingsBody =>
       'There are no active listings. You can load sample listings into the database or create a new one.';
 
@@ -765,4 +769,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allFilterChip => 'All';
+
+  @override
+  String get perkHousing => 'Housing';
+
+  @override
+  String perkMeals(int count) {
+    return '$count meals';
+  }
+
+  @override
+  String get perkShuttle => 'Shuttle';
+
+  @override
+  String get verifiedEmployer => 'Verified employer';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'Summer $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'Winter $years';
+  }
+
+  @override
+  String get forgotPasswordLink => 'Forgot password?';
+
+  @override
+  String get passwordResetTitle => 'Reset password';
+
+  @override
+  String get passwordResetSend => 'Send reset link';
+
+  @override
+  String get passwordResetSuccess =>
+      'If an account exists, a reset link was sent';
+
+  @override
+  String get passwordResetInvalidEmail => 'Enter a valid email address.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'Too many requests. Please try again later.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'Check your internet connection and try again.';
+
+  @override
+  String get passwordResetGenericError =>
+      'The reset link could not be sent. Please try again.';
+
+  @override
+  String get adminPanelEntry => 'Admin panel';
 }

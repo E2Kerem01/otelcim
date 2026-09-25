@@ -63,26 +63,30 @@ class DesktopTopNavBar extends ConsumerWidget {
     final borderColor = isDark ? const Color(0xFF2B3644) : const Color(0xFFE5E7EB);
 
     return Container(
-      height: 68,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border(
-          bottom: BorderSide(color: borderColor, width: 1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+      color: backgroundColor,
+      child: SafeArea(
+        bottom: false,
+        child: Container(
+          height: 68,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            border: Border(
+              bottom: BorderSide(color: borderColor, width: 1),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1440),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1440),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
               children: [
                 // Brand Logo & Title
                 InkWell(
@@ -144,9 +148,9 @@ class DesktopTopNavBar extends ConsumerWidget {
                             Text(
                               'Turizm & Otel İş İlanları',
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                                color: isDark ? Colors.grey.shade300 : const Color(0xFF495057),
                               ),
                             ),
                           ],
@@ -239,9 +243,10 @@ class DesktopTopNavBar extends ConsumerWidget {
                     // Favorites shortcut button
                     IconButton(
                       tooltip: 'Favorilerim',
+                      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                       icon: Icon(
                         Icons.favorite_outline_rounded,
-                        color: isDark ? Colors.grey.shade300 : const Color(0xFF64748B),
+                        color: isDark ? Colors.grey.shade300 : const Color(0xFF475569),
                       ),
                       onPressed: () => context.push('/favorites'),
                     ),
@@ -284,7 +289,9 @@ class DesktopTopNavBar extends ConsumerWidget {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

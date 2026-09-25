@@ -5,10 +5,46 @@ import '../../features/listings/domain/listing_model.dart';
 import '../constants/listing_filters.dart';
 import '../error/error_reporter.dart';
 
+List<Listing> _parseListingDocs(
+  Iterable<DocumentSnapshot> docs,
+  String context,
+) {
+  final listings = <Listing>[];
+  for (final doc in docs) {
+    try {
+      listings.add(Listing.fromDoc(doc));
+    } on Object catch (error, stackTrace) {
+      logError(error, stackTrace, context: '$context (${doc.id})');
+    }
+  }
+  return listings;
+}
+
 class ListingService {
   ListingService(this._db);
 
   final FirebaseFirestore _db;
+  final Set<String> _viewedListingIds = <String>{};
+
+  Future<void> incrementViewCountIfNeeded({
+    required String listingId,
+    required String ownerId,
+    required String? viewerId,
+  }) async {
+    if (viewerId == null || viewerId == ownerId || _viewedListingIds.contains(listingId)) {
+      return;
+    }
+
+    _viewedListingIds.add(listingId);
+    try {
+      await _db.collection('listings').doc(listingId).update({
+        'viewCount': FieldValue.increment(1),
+      });
+    } catch (error, stackTrace) {
+      _viewedListingIds.remove(listingId);
+      logError(error, stackTrace, context: 'ListingService.incrementViewCount');
+    }
+  }
 
   /// Counts active listings on Firestore without downloading documents.
   Future<int> countActiveListings({String? region, String? season}) async {
@@ -33,10 +69,10 @@ class ListingService {
         .collection('listings')
         .snapshots()
         .map((snap) {
-          var listings = snap.docs
-              .map(Listing.fromDoc)
-              .where((l) => l.status == ListingStatus.active)
-              .toList();
+          var listings = _parseListingDocs(
+            snap.docs,
+            'ListingService.watchActiveListings',
+          ).where((l) => l.status == ListingStatus.active).toList();
 
           listings.sort((a, b) {
             final aBoosted =
@@ -72,8 +108,11 @@ class ListingService {
           return listings;
         })
         .handleError((Object error, StackTrace stackTrace) {
-          logError(error, stackTrace, context: 'ListingService.watchActiveListings');
-          return <Listing>[];
+          logError(
+            error,
+            stackTrace,
+            context: 'ListingService.watchActiveListings',
+          );
         });
   }
 
@@ -82,10 +121,10 @@ class ListingService {
         .collection('listings')
         .snapshots()
         .map((snap) {
-          var listings = snap.docs
-              .map(Listing.fromDoc)
-              .where((l) => l.posterId == uid)
-              .toList();
+          var listings = _parseListingDocs(
+            snap.docs,
+            'ListingService.watchMyListings',
+          ).where((l) => l.posterId == uid).toList();
 
           listings.sort((a, b) {
             final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -96,8 +135,11 @@ class ListingService {
           return listings;
         })
         .handleError((Object error, StackTrace stackTrace) {
-          logError(error, stackTrace, context: 'ListingService.watchMyListings');
-          return <Listing>[];
+          logError(
+            error,
+            stackTrace,
+            context: 'ListingService.watchMyListings',
+          );
         });
   }
 
@@ -195,8 +237,11 @@ class ListingService {
   /// listing doc - see the comment on Listing.toMap. isSignedIn() (not
   /// ownership) gates reads there, matching the in-app "sign in to reveal
   /// contact info" UX; only the owner/admin may write it (firestore.rules).
-  DocumentReference<Map<String, dynamic>> _contactRef(String listingId) =>
-      _db.collection('listings').doc(listingId).collection('private').doc('contact');
+  DocumentReference<Map<String, dynamic>> _contactRef(String listingId) => _db
+      .collection('listings')
+      .doc(listingId)
+      .collection('private')
+      .doc('contact');
 
   Future<String> createListing(Listing listing) async {
     final id = newListingId();
@@ -254,11 +299,17 @@ class ListingService {
     });
   }
 
-  Future<Listing?> getListing(String listingId) async {
+  Future<Listing?> getListing(String listingId, {String? viewerId}) async {
     try {
       final doc = await _db.collection('listings').doc(listingId).get();
       if (!doc.exists) return null;
       var listing = Listing.fromDoc(doc);
+
+      await incrementViewCountIfNeeded(
+        listingId: listing.id,
+        ownerId: listing.posterId,
+        viewerId: viewerId,
+      );
 
       // contactInfo lives in a separate, sign-in-gated subdoc (see
       // Listing.toMap). Signed-out callers simply get '' back here, which
@@ -270,7 +321,11 @@ class ListingService {
           listing = listing.copyWithContactInfo(value);
         }
       } catch (e, stackTrace) {
-        logError(e, stackTrace, context: 'ListingService.getListing (contact subdoc)');
+        logError(
+          e,
+          stackTrace,
+          context: 'ListingService.getListing (contact subdoc)',
+        );
       }
 
       return listing;
@@ -338,7 +393,10 @@ class ListingService {
       final snapshot = await query.get();
 
       final pageDocs = snapshot.docs.take(limit).toList();
-      var listings = pageDocs.map(Listing.fromDoc).toList();
+      var listings = _parseListingDocs(
+        pageDocs,
+        'ListingService.getPaginatedListings',
+      );
 
       listings.sort((a, b) {
         final aBoosted =
@@ -428,11 +486,7 @@ class ListingService {
       );
     } catch (e, stackTrace) {
       logError(e, stackTrace, context: 'ListingService.getPaginatedListings');
-      return PaginatedListingsResult(
-        listings: [],
-        lastDocument: null,
-        hasMore: false,
-      );
+      rethrow;
     }
   }
 
@@ -472,42 +526,6 @@ class ListingService {
     );
   }
 
-  /// Most recently created listings of ANY status (active/closed/removed),
-  /// for the admin listing management screen. Deliberately unfiltered by
-  /// status so admins can see and restore removed listings too.
-  Stream<List<Listing>> watchRecentListingsForAdmin({int limit = 50}) {
-    return _db
-        .collection('listings')
-        .orderBy('createdAt', descending: true)
-        .limit(limit)
-        .snapshots()
-        .map((snap) => snap.docs.map(Listing.fromDoc).toList())
-        .handleError((Object error, StackTrace stackTrace) {
-          logError(error, stackTrace, context: 'ListingService.watchRecentListingsForAdmin');
-          return <Listing>[];
-        });
-  }
-
-  /// Prefix-searches listing titles for the admin listing management
-  /// screen. Firestore has no full-text search - matches from the start
-  /// of the title only.
-  Future<List<Listing>> searchListingsForAdmin(String query) async {
-    final trimmed = query.trim();
-    if (trimmed.isEmpty) return [];
-    try {
-      final snap = await _db
-          .collection('listings')
-          .orderBy('title')
-          .startAt([trimmed])
-          .endAt(['$trimmed'])
-          .limit(30)
-          .get();
-      return snap.docs.map(Listing.fromDoc).toList();
-    } catch (e, stackTrace) {
-      logError(e, stackTrace, context: 'ListingService.searchListingsForAdmin');
-      return [];
-    }
-  }
 }
 
 /// Result object for paginated listings queries

@@ -1,0 +1,39 @@
+appId: com.example.otelcim
+name: "m6 - 09 invite friends and referral code copy"
+tags: [m6, profile, referral]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- scrollUntilVisible:
+    element: ".*Arkadaşını Davet Et.*"
+    direction: DOWN
+- tapOn: ".*Arkadaşını Davet Et.*"
+- extendedWaitUntil:
+    visible: "Arkadaşını Davet Et"
+    timeout: 10000
+
+# Ekran başlığı ve referans kodu kartı
+- assertVisible: ".*Referans Kodun.*"
+
+# İstatistik kartları (davet sayısı ve boost hakkı)
+- assertVisible: ".*Davet Ettiğin Kişi Sayısı.*"
+- assertVisible: ".*Ücretsiz Boost Hakkın.*"
+
+# Kodu Kopyala butonuna dokun (tooltip / Semantics: Kodu Kopyala)
+- tapOn: ".*Kodu Kopyala.*"
+
+# Kopyalama bildirimini doğrula
+- extendedWaitUntil:
+    visible: ".*Kod kopyalandı.*"
+    timeout: 10000
+- assertVisible: ".*Kod kopyalandı.*"
+
+# GÜVENLİK YASAKLARI: Paylaş butonuna sistem paylaşım diyaloğu açtığı için BASILMAZ

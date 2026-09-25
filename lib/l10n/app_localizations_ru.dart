@@ -654,6 +654,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noListingsTitle => 'Пока нет объявлений';
 
   @override
+  String get listingsLoadError =>
+      'Не удалось загрузить объявления. Повторите попытку.';
+
+  @override
   String get noListingsBody =>
       'Активных объявлений нет. Вы можете загрузить примеры объявлений в базу данных или создать новое.';
 
@@ -765,4 +769,60 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get allFilterChip => 'Все';
+
+  @override
+  String get perkHousing => 'Жильё';
+
+  @override
+  String perkMeals(int count) {
+    return 'Питание: $count';
+  }
+
+  @override
+  String get perkShuttle => 'Трансфер';
+
+  @override
+  String get verifiedEmployer => 'Проверенный работодатель';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'Лето $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'Зима $years';
+  }
+
+  @override
+  String get forgotPasswordLink => 'Забыли пароль?';
+
+  @override
+  String get passwordResetTitle => 'Сброс пароля';
+
+  @override
+  String get passwordResetSend => 'Отправить ссылку для сброса';
+
+  @override
+  String get passwordResetSuccess =>
+      'Если существует аккаунт с этим адресом, ссылка для сброса отправлена';
+
+  @override
+  String get passwordResetInvalidEmail =>
+      'Введите действительный адрес электронной почты.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'Слишком много запросов. Повторите попытку позже.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'Проверьте подключение к интернету и повторите попытку.';
+
+  @override
+  String get passwordResetGenericError =>
+      'Не удалось отправить ссылку. Повторите попытку.';
+
+  @override
+  String get adminPanelEntry => 'Панель администратора';
 }

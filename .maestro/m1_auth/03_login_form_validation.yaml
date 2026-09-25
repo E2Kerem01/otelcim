@@ -1,0 +1,23 @@
+appId: com.example.otelcim
+name: "m1 auth login empty and invalid form"
+tags: [m1_auth, validation]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
+    timeout: 10000
+- tapOn: ".*Giriş Yap.*"
+- extendedWaitUntil:
+    visible: ".*Geçerli bir e-posta girin.*"
+    timeout: 5000
+- assertVisible: ".*Şifre en az 8 karakter ve en az 1 rakam içermelidir.*"
+- tapOn: ".*E-posta.*"
+- inputText: "gecersiz-e-posta"
+- tapOn: ".*Şifre.*"
+- inputText: "123"
+- hideKeyboard
+- tapOn: ".*Giriş Yap.*"
+- assertVisible: ".*Geçerli bir e-posta girin.*"
+- assertVisible: ".*Şifre en az 8 karakter ve en az 1 rakam içermelidir.*"
+

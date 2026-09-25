@@ -1,0 +1,43 @@
+appId: com.example.otelcim
+name: "08 m5_chat - employer opens propose interview dialog and dismisses"
+tags: [chat, interview]
+---
+# 1. Uygulama başlatılır ve employer girişi yapılır
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+
+# 2. Mesajlar sekmesinden L1 sohbetine gidilir
+- tapOn: ".*Mesajlar.*"
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+
+# 3. Menü açılır ve "Mülakat Saati Öner" seçilir
+# TAHMİN: Flutter PopupMenuButton varsayılan Türkçe MaterialLocalizations tooltip'i "Menüyü göster"
+- tapOn: ".*Menüyü göster.*"
+- extendedWaitUntil:
+    visible: ".*Mülakat Saati Öner.*"
+    timeout: 5000
+- tapOn: ".*Mülakat Saati Öner.*"
+
+# 4. Mülakat teklif diyaloğunun içeriği doğrulanır
+- extendedWaitUntil:
+    visible: ".*Adaya sunmak için 1-3 adet tarih ve saat önerisi ekleyin.*"
+    timeout: 5000
+- assertVisible: ".*Tarih/Saat Ekle.*"
+- assertVisible: ".*Vazgeç.*"
+- assertVisible: ".*Önerileri Gönder.*"
+
+# 5. "Vazgeç" butonuna dokunulup diyaloğun kapandığı doğrulanır
+- tapOn: ".*Vazgeç.*"
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 5000
+- assertNotVisible: ".*Adaya sunmak için 1-3 adet tarih ve saat önerisi ekleyin.*"

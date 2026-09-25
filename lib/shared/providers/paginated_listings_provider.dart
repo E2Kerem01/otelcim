@@ -13,12 +13,14 @@ class PaginatedListingsState {
   final bool hasMore;
   final bool isLoading;
   final DocumentSnapshot? lastDocument;
+  final Object? error;
 
   const PaginatedListingsState({
     required this.listings,
     required this.hasMore,
     required this.isLoading,
     this.lastDocument,
+    this.error,
   });
 
   PaginatedListingsState copyWith({
@@ -26,12 +28,15 @@ class PaginatedListingsState {
     bool? hasMore,
     bool? isLoading,
     DocumentSnapshot? lastDocument,
+    Object? error,
+    bool clearError = false,
   }) {
     return PaginatedListingsState(
       listings: listings ?? this.listings,
       hasMore: hasMore ?? this.hasMore,
       isLoading: isLoading ?? this.isLoading,
       lastDocument: lastDocument ?? this.lastDocument,
+      error: clearError ? null : error ?? this.error,
     );
   }
 }
@@ -54,7 +59,7 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
   Future<void> loadInitial() async {
     if (state.isLoading) return;
 
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
       final result = await _listingService.getPaginatedListings(
@@ -83,7 +88,7 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
         stackTrace,
         context: 'PaginatedListingsNotifier.loadInitial: ${failure.message}',
       );
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, error: error);
     }
   }
 
@@ -121,7 +126,7 @@ class PaginatedListingsNotifier extends StateNotifier<PaginatedListingsState> {
         stackTrace,
         context: 'PaginatedListingsNotifier.loadMore: ${failure.message}',
       );
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, error: error);
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../shared/constants/functions_endpoint.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../domain/boost_model.dart';
 import '../domain/boost_purchase_model.dart';
@@ -29,9 +30,7 @@ class BoostService {
       final user = FirebaseAuth.instance.currentUser;
       final idToken = await user?.getIdToken();
 
-      final url = Uri.parse(
-        'https://europe-west1-otelcim-7f0ba.cloudfunctions.net/verifyAndProcessBoostPurchase',
-      );
+      final url = functionsEndpoint('verifyAndProcessBoostPurchase');
 
       final response = await http.post(
         url,
@@ -84,9 +83,7 @@ class BoostService {
       final user = FirebaseAuth.instance.currentUser;
       final idToken = await user?.getIdToken();
 
-      final url = Uri.parse(
-        'https://europe-west1-otelcim-7f0ba.cloudfunctions.net/redeemFreeBoost',
-      );
+      final url = functionsEndpoint('redeemFreeBoost');
 
       final response = await http.post(
         url,

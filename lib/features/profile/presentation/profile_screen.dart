@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/widgets/video_player_dialog.dart';
+import '../../admin/services/admin_service.dart';
 import '../../boosts/presentation/my_boosts_screen.dart';
 import '../../favorites/presentation/favorites_screen.dart';
 import '../../listings/presentation/my_listings_screen.dart';
@@ -22,6 +24,29 @@ import '../../referrals/presentation/invite_friends_screen.dart';
 import 'talent_pool_screen.dart';
 import 'widgets/profile_screen_widgets.dart';
 
+Future<bool?> confirmSignOut(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
+  return showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      // TODO(l10n): add logoutConfirmationTitle (TR: "Çıkış Yap", EN: "Sign out").
+      title: Text(l10n?.signOut ?? 'Çıkış Yap'),
+      // TODO(l10n): add logoutConfirmationMessage (TR: "Çıkış yapmak istediğinize emin misiniz?", EN: "Are you sure you want to sign out?").
+      content: const Text('Çıkış yapmak istediğinize emin misiniz?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, false),
+          child: Text(l10n?.cancelButton ?? 'Vazgeç'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(dialogContext, true),
+          child: Text(l10n?.signOut ?? 'Çıkış Yap'),
+        ),
+      ],
+    ),
+  );
+}
+
 /// Screen for user profile management.
 /// Supports responsive Master-Detail layout for Desktop/Tablet wide screens (>= 768px).
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -35,11 +60,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _selectedSection = 'overview';
 
   Future<void> _handleLogout() async {
+    final shouldLogout = await confirmSignOut(context);
+    if (!mounted || shouldLogout != true) return;
     await ref.read(authServiceProvider).signOut();
     ref.invalidate(currentUserProfileProvider);
-    if (mounted) {
-      context.go('/login');
-    }
   }
 
   @override
@@ -51,6 +75,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     // account screen (blank/grey in release mode) on any transient profile
     // stream failure instead of just rendering with profile == null.
     final profile = ref.watch(currentUserProfileProvider).valueOrNull;
+    final adminService = ref.watch(adminServiceProvider);
+    final isAdmin = adminService.isAdminProfile(profile);
     final displayName = profile?.displayName;
     final photoUrl = profile?.photoUrl;
     final ratings = user == null ? null : ref.watch(userRatingsProvider(user.uid));
@@ -140,6 +166,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           child: ListView(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             children: [
+                              if (isAdmin)
+                                ProfileSidebarItem(
+                                  icon: Icons.admin_panel_settings_outlined,
+                                  title: AppLocalizations.of(context)!.adminPanelEntry,
+                                  subtitle: 'Kullanıcılar, ilanlar ve raporlar',
+                                  isSelected: false,
+                                  onTap: () => context.push('/admin'),
+                                ),
                               ProfileSidebarItem(
                                 icon: Icons.grid_view_rounded,
                                 title: 'Genel Bakış',
@@ -417,6 +451,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   error: (err, stack) => const SizedBox.shrink(),
                 ),
               const SizedBox(height: 20),
+              if (isAdmin) ...[
+                const AdminPanelMenuTile(),
+                const SizedBox(height: 12),
+              ],
               ProfileMenuTile(
                 icon: Icons.edit_outlined,
                 title: 'Profili Düzenle',
@@ -548,8 +586,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ratings,
           approvedCerts,
         );
-    }
   }
+}
 
   /// Desktop Overview Detail panel content
   Widget _buildOverviewDetail(
@@ -818,4 +856,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+}
+
+/// Entry to the admin panel, shown in "Hesabım" to admins only (D1): without
+/// it an admin on mobile has no way to reach /admin.
+class AdminPanelMenuTile extends StatelessWidget {
+  const AdminPanelMenuTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ProfileMenuTile(
+      icon: Icons.admin_panel_settings_outlined,
+      title: AppLocalizations.of(context)!.adminPanelEntry,
+      onTap: () => context.push('/admin'),
+    );
+  }
 }

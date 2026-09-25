@@ -1,0 +1,32 @@
+appId: com.example.otelcim
+name: "03 m5_chat - seeker views conversation list and message history"
+tags: [chat, history]
+---
+# 1. Uygulama başlatılır
+- runFlow: ../common/launch.yaml
+
+# 2. Seeker (Ayşe Aday) ile giriş yapılır
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+
+# 3. Mesajlar sekmesine gidilir
+- tapOn: ".*Mesajlar.*"
+
+# 4. L1 sohbeti ve son mesaj önizlemesi doğrulanır
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz\\?.*"
+
+# 5. Sohbete girilir
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+
+# 6. Sohbet ekranı başlığı ve mesaj geçmişi doğrulanır
+- extendedWaitUntil:
+    visible: ".*Sohbet.*"
+    timeout: 10000
+- assertVisible: ".*Merhaba, ilan hâlâ aktif mi\\?.*"
+- assertVisible: ".*Yarın görüşmeye gelebilir misiniz\\?.*"
+- assertVisible: ".*Mesajınızı yazın\\.\\.\\..*"

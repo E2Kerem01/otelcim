@@ -1,0 +1,16 @@
+# BUG-m12-03: Sistem karanlık modunda uygulama ThemeMode.light'a kilitli
+# Beklenen: Cihaz karanlık modda çalışırken ThemeMode.system ile koyu renk teması etkinleştirilmeli.
+# Gerçek: main.dart:84 içinde 'themeMode: ThemeMode.light' hardcoded tanımlı ve MaterialApp'e darkTheme sağlanmamış.
+appId: com.example.otelcim
+name: "bug - dark theme not implemented and locked to light mode"
+tags: [bug, m12, dark, theme]
+---
+- runFlow: ../../common/launch.yaml
+
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+
+# TAHMİN: Karanlık mod desteği uygulandığında koyu arka plan veya tema belirteci beklenir
+- assertVisible:
+    text: ".*Karanlık Mod.*|.*Dark.*"

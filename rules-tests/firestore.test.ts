@@ -142,6 +142,78 @@ describe('user_profiles', () => {
     await assertFails(updateDoc(doc(db, 'user_profiles/' + OWNER), { referralCount: 999 }));
     await assertFails(updateDoc(doc(db, 'user_profiles/' + OWNER), { referralRewardGranted: true }));
   });
+
+  it('a banned or suspended user cannot lift their own ban, suspension or warnings', async () => {
+    await seed(testEnv, async (context) => {
+      await setDoc(doc(context.firestore(), 'user_profiles/' + OWNER), {
+        isBanned: true,
+        isSuspended: true,
+        suspensionEnd: new Date('2099-01-01'),
+        warnings: [{ reason: 'spam' }],
+        bio: 'hello',
+      });
+    });
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+    const ref = doc(db, 'user_profiles/' + OWNER);
+
+    await assertFails(updateDoc(ref, { isBanned: false }));
+    await assertFails(updateDoc(ref, { isSuspended: false }));
+    await assertFails(updateDoc(ref, { suspensionEnd: new Date('2000-01-01') }));
+    await assertFails(updateDoc(ref, { warnings: [] }));
+    await assertSucceeds(updateDoc(ref, { bio: 'still editable' }));
+  });
+
+  it('cannot self-grant the verified badge on create or update', async () => {
+    const db = testEnv.authenticatedContext(OTHER).firestore();
+    const ref = doc(db, 'user_profiles/' + OTHER);
+
+    await assertFails(setDoc(ref, { isVerified: true }));
+    await assertFails(setDoc(ref, { verificationStatus: 'approved' }));
+    await assertFails(setDoc(ref, { isBanned: true }));
+    await assertFails(setDoc(ref, { freeBoostCredits: 999 }));
+    await assertFails(setDoc(ref, { referralCount: 50 }));
+    await assertFails(setDoc(ref, { referralRewardGranted: true }));
+    await assertSucceeds(setDoc(ref, { isVerified: false, verificationStatus: null, verifiedAt: null }));
+
+    await assertFails(updateDoc(ref, { isVerified: true }));
+    await assertFails(updateDoc(ref, { verificationStatus: 'approved' }));
+    await assertFails(updateDoc(ref, { verifiedAt: new Date() }));
+  });
+
+  it('a full profile write onto an fcmToken-only stub doc still succeeds', async () => {
+    // NotificationService can create { fcmToken } before registration writes
+    // the full UserProfile.toMap(), which always carries the default
+    // isVerified / verificationStatus / verifiedAt values.
+    await seed(testEnv, async (context) => {
+      await setDoc(doc(context.firestore(), 'user_profiles/' + OWNER), { fcmToken: 'tok' });
+    });
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+
+    await assertSucceeds(
+      setDoc(doc(db, 'user_profiles/' + OWNER), {
+        fcmToken: 'tok',
+        fullName: 'Kerem',
+        isVerified: false,
+        verificationStatus: null,
+        verifiedAt: null,
+      }),
+    );
+  });
+
+  it('an admin can still ban, suspend, verify and unban users', async () => {
+    await seed(testEnv, async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'user_profiles/' + ADMIN), { isAdmin: true });
+      await setDoc(doc(db, 'user_profiles/' + OWNER), { bio: 'hello' });
+    });
+    const adminDb = testEnv.authenticatedContext(ADMIN).firestore();
+    const ref = doc(adminDb, 'user_profiles/' + OWNER);
+
+    await assertSucceeds(updateDoc(ref, { isSuspended: true, suspensionEnd: new Date('2099-01-01') }));
+    await assertSucceeds(updateDoc(ref, { isBanned: true, isSuspended: false }));
+    await assertSucceeds(updateDoc(ref, { isVerified: true, verificationStatus: 'approved' }));
+    await assertSucceeds(updateDoc(ref, { isBanned: false }));
+  });
 });
 
 describe('starting a new conversation', () => {
@@ -256,5 +328,56 @@ describe('ratings', () => {
     await assertFails(
       addDoc(collection(raterDb, 'ratings'), { raterId: OTHER, ratedUserId: OWNER, stars: 6 }),
     );
+  });
+});
+
+describe('listing creation cannot skip payment', () => {
+  it('a listing cannot be created already boosted or with a purchase id', async () => {
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+    const base = { posterId: OWNER, status: 'active', title: 'Garson' };
+
+    await assertFails(setDoc(doc(db, 'listings/L1'), { ...base, isBoosted: true }));
+    await assertFails(setDoc(doc(db, 'listings/L2'), { ...base, boostExpiresAt: new Date('2099-01-01') }));
+    await assertFails(setDoc(doc(db, 'listings/L3'), { ...base, boostType: 'days30' }));
+    await assertFails(setDoc(doc(db, 'listings/L4'), { ...base, boostPurchaseId: 'fake' }));
+    await assertFails(setDoc(doc(db, 'listings/L5'), { ...base, urgentListingPurchaseId: 'fake' }));
+  });
+
+  it('a normal Listing.toMap() create, including a free urgent listing, still succeeds', async () => {
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+
+    await assertSucceeds(
+      setDoc(doc(db, 'listings/L1'), {
+        posterId: OWNER,
+        status: 'active',
+        title: 'Garson',
+        isUrgent: true,
+        isBoosted: false,
+        boostExpiresAt: null,
+        boostType: null,
+        boostPurchaseId: null,
+      }),
+    );
+  });
+});
+
+describe('talent pool', () => {
+  it('the employer can add, read and remove their own saved candidates', async () => {
+    const db = testEnv.authenticatedContext(OWNER).firestore();
+    const ref = doc(db, `user_profiles/${OWNER}/talent_pool/cand-1`);
+
+    await assertSucceeds(setDoc(ref, { candidateId: 'cand-1', note: 'iyi aday' }));
+    await assertSucceeds(getDoc(ref));
+    await assertSucceeds(deleteDoc(ref));
+  });
+
+  it('another user can neither read nor write someone else\'s talent pool', async () => {
+    await seed(testEnv, async (context) => {
+      await setDoc(doc(context.firestore(), `user_profiles/${OWNER}/talent_pool/cand-1`), { candidateId: 'cand-1' });
+    });
+    const otherDb = testEnv.authenticatedContext(OTHER).firestore();
+
+    await assertFails(getDoc(doc(otherDb, `user_profiles/${OWNER}/talent_pool/cand-1`)));
+    await assertFails(setDoc(doc(otherDb, `user_profiles/${OWNER}/talent_pool/cand-2`), { candidateId: 'cand-2' }));
   });
 });

@@ -654,6 +654,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noListingsTitle => 'لا توجد إعلانات بعد';
 
   @override
+  String get listingsLoadError =>
+      'تعذر تحميل الإعلانات. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get noListingsBody =>
       'لا توجد إعلانات نشطة. يمكنك تحميل إعلانات نموذجية إلى قاعدة البيانات أو إنشاء إعلان جديد.';
 
@@ -766,4 +770,59 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get allFilterChip => 'الكل';
+
+  @override
+  String get perkHousing => 'سكن';
+
+  @override
+  String perkMeals(int count) {
+    return '$count وجبات';
+  }
+
+  @override
+  String get perkShuttle => 'نقل';
+
+  @override
+  String get verifiedEmployer => 'صاحب عمل موثّق';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'صيف $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'شتاء $years';
+  }
+
+  @override
+  String get forgotPasswordLink => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get passwordResetTitle => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get passwordResetSend => 'إرسال رابط إعادة التعيين';
+
+  @override
+  String get passwordResetSuccess =>
+      'إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة التعيين';
+
+  @override
+  String get passwordResetInvalidEmail => 'أدخل عنوان بريد إلكتروني صالحًا.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'طلبات كثيرة جدًا. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'تحقق من اتصالك بالإنترنت وحاول مرة أخرى.';
+
+  @override
+  String get passwordResetGenericError =>
+      'تعذر إرسال الرابط. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get adminPanelEntry => 'لوحة الإدارة';
 }

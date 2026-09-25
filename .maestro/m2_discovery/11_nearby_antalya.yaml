@@ -1,0 +1,22 @@
+appId: com.example.otelcim
+name: "m2 discovery - nearby listings with granted location"
+tags: [m2_discovery, nearby]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Yakınımda.*"
+- extendedWaitUntil:
+    visible: ".*Konum izni.*"
+    timeout: 10000
+- tapOn: ".*Devam Et.*"
+- setLocation:
+    latitude: 36.88
+    longitude: 30.70
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+# TAHMİN: Nearby SegmentedButton'ın Liste tooltip'i erişilebilir seçici olarak eşleşir.
+- tapOn: ".*Liste.*"
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- assertVisible: ".*km uzakta.*"
+- assertNotVisible: '.*Garson \(Sezonluk\).*'
+- assertNotVisible: ".*Animatör.*"

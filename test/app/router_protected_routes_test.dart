@@ -5,6 +5,7 @@ void main() {
   group('isProtectedRoute', () {
     test('protects authenticated flows and their nested routes', () {
       const protectedLocations = [
+        '/account-suspended',
         '/create-listing',
         '/batch-create-listing',
         '/chat',

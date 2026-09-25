@@ -1,0 +1,16 @@
+appId: com.example.otelcim
+name: "m7 - banned user is permanently locked out"
+tags: [m7, admin_trust, auth, moderation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: banned@e2e.test
+- extendedWaitUntil:
+    visible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
+    timeout: 10000
+- assertVisible: ".*Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin\\..*"
+- assertVisible: ".*Çıkış Yap.*"
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"
+- tapOn: ".*Çıkış Yap.*"

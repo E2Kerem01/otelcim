@@ -1,0 +1,34 @@
+appId: com.example.otelcim
+name: "m3 seeker adds and removes L1 favorite"
+tags: [m3, listing-detail, favorites]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+- tapOn: ".*Favorilere ekle.*"
+- extendedWaitUntil:
+    visible: ".*Favorilerden çıkar.*"
+    timeout: 10000
+- tapOn: ".*Favorilerden çıkar.*"
+- extendedWaitUntil:
+    visible: ".*Favorilere ekle.*"
+    timeout: 10000
+- back
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Favorilerim.*"
+    timeout: 10000
+- tapOn: ".*Favorilerim.*"
+- extendedWaitUntil:
+    visible: '.*Garson \(Sezonluk\).*'
+    timeout: 10000
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"

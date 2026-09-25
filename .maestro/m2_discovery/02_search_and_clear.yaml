@@ -1,0 +1,20 @@
+appId: com.example.otelcim
+name: "m2 discovery - search and clear"
+tags: [m2_discovery, search]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: '.*İş ilanı ara\.\.\..*'
+- inputText: "Garson"
+- extendedWaitUntil:
+    visible: '.*Garson \(Sezonluk\).*'
+    timeout: 10000
+- assertVisible: ".*1 sonuç.*"
+- assertNotVisible: ".*Resepsiyonist Aranıyor.*"
+- eraseText: 50
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist.*"
+    timeout: 10000
+- assertVisible: ".*Resepsiyonist.*"

@@ -1,0 +1,15 @@
+appId: com.example.otelcim
+name: "employer cannot open admin verification queue"
+tags: [m9_admin_content, access-control]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- openLink: "otelcim-e2e://app/admin/verifications"
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
+- assertNotVisible: "Doğrulama Talepleri"
+

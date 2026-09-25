@@ -1,0 +1,50 @@
+appId: com.example.otelcim
+name: "m6 - 04 edit profile form validation errors"
+tags: [m6, profile, validation]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Mehmet İşveren.*"
+    timeout: 10000
+
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: "Profil"
+    timeout: 10000
+
+# Zorunlu Ad Soyad alanını temizle
+- tapOn: "Ad Soyad"
+- eraseText: 30
+
+# Geçersiz telefon numarası gir (10 haneden az)
+- tapOn: "Telefon Numarası"
+- inputText: "0555"
+
+# AppBar'daki Kaydet butonuna dokun (tooltip: Kaydet)
+- tapOn: "Kaydet"
+
+# Form doğrulama hatalarını doğrula
+- assertVisible: ".*Ad Soyad gereklidir.*"
+- assertVisible: ".*Telefon numarası en az 10 haneli olmalıdır.*"
+
+# Hatalı telefon formatı (harf ve geçersiz karakter)
+# Telefon alanındaki mevcut 0555 değerine dokunarak hata metniyle çakışmayı önle
+- tapOn: "0555"
+- eraseText: 10
+- inputText: "abc?!"
+- tapOn: "Kaydet"
+- assertVisible: ".*Geçerli bir telefon numarası giriniz.*"
+
+# Zorunlu Otel Adı alanını temizle (işveren doğrulaması)
+- scrollUntilVisible:
+    element: "Otel Adı"
+    direction: DOWN
+- tapOn: "Otel Adı"
+- eraseText: 30
+- tapOn: "Kaydet"
+- assertVisible: ".*Otel Adı gereklidir.*"

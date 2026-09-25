@@ -1,0 +1,19 @@
+appId: com.example.otelcim
+name: "m2 discovery - nearby permission can be cancelled"
+tags: [m2_discovery, nearby, edge]
+---
+- runFlow: ../common/launch.yaml
+- tapOn: ".*Yakınımda.*"
+- extendedWaitUntil:
+    visible: ".*Konum izni.*"
+    timeout: 10000
+- tapOn: ".*Vazgeç.*"
+- extendedWaitUntil:
+    visible: ".*Yakınınızdaki iş ilanlarını.*"
+    timeout: 10000
+- assertVisible: ".*Tekrar dene.*"
+- back
+- extendedWaitUntil:
+    visible: ".*7 sonuç.*"
+    timeout: 10000
+

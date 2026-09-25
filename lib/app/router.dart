@@ -35,6 +35,7 @@ import '../features/nearby/presentation/nearby_listings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/role_selection_screen.dart';
 import '../features/admin/presentation/certificate_review_screen.dart';
+import '../features/admin/presentation/widgets/admin_shell.dart';
 import '../features/profile/presentation/certificates_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/language_settings_screen.dart';
@@ -52,6 +53,7 @@ import '../shared/services/auth_service.dart';
 import '../shared/widgets/desktop_top_nav_bar.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _adminNavigatorKey = GlobalKey<NavigatorState>();
 
 Page<T> buildAppPage<T>({
   required BuildContext context,
@@ -97,6 +99,7 @@ bool isProtectedRoute(String location) {
 
   return location == '/create-listing' ||
       location == '/batch-create-listing' ||
+      location == '/account-suspended' ||
       location.startsWith('/chat') ||
       location.startsWith('/profile') ||
       location == '/my-listings' ||
@@ -122,7 +125,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
 
       if (!isLoggedIn && isProtectedRoute(location)) {
-        return '/login';
+        final from = state.uri.toString();
+        return '/login?from=${Uri.encodeComponent(from)}';
       }
 
       if (isLoggedIn && location != '/account-suspended') {
@@ -139,6 +143,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           return '/account-suspended';
         }
 
+        final isListingCreationRoute =
+            location == '/create-listing' ||
+            location == '/batch-create-listing';
+        // A null profile is still loading: let the screen-level guard decide
+        // instead of bouncing an employer's deep link to home.
+        final cannotCreateListing =
+            profile != null &&
+            profile.userType != 'employer' &&
+            !adminService.isAdminProfile(profile);
+        if (isListingCreationRoute && cannotCreateListing) {
+          return '/';
+        }
+
         if (location.startsWith('/admin') &&
             !adminService.isAdminProfile(profile)) {
           return '/';
@@ -146,6 +163,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLoggedIn && (location == '/login' || location == '/register')) {
+        final from = state.uri.queryParameters['from'];
+        final fromUri = from == null ? null : Uri.tryParse(from);
+        if (fromUri != null &&
+            !fromUri.hasScheme &&
+            !fromUri.hasAuthority &&
+            fromUri.path.startsWith('/') &&
+            !fromUri.path.startsWith('//') &&
+            fromUri.path != '/login' &&
+            fromUri.path != '/register') {
+          return from;
+        }
         return '/';
       }
 
@@ -570,77 +598,79 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const PrivacyPolicyScreen(),
         ),
       ),
-      GoRoute(
-        path: '/admin',
+      // Admin area: one shell with its own navigator so the wide-screen side
+      // menu (AdminShell) stays put while admins move between sections.
+      ShellRoute(
+        navigatorKey: _adminNavigatorKey,
         parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const AdminDashboardScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/admin/reports',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const ReportsModerationScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/admin/users',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const UserManagementScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/admin/listings',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const ListingManagementScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/admin/verifications',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const VerificationReviewScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/admin/certificates',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const CertificateReviewScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/admin/audit-log',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const AuditLogScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/admin/banners',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => buildAppPage(
-          context: context,
-          state: state,
-          child: const AdminBannerAdsScreen(),
-        ),
+        builder: (context, state, child) =>
+            AdminShell(location: state.matchedLocation, child: child),
+        routes: [
+          GoRoute(
+            path: '/admin',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const AdminDashboardScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/reports',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const ReportsModerationScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/users',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const UserManagementScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/listings',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const ListingManagementScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/verifications',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const VerificationReviewScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/certificates',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const CertificateReviewScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/audit-log',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const AuditLogScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/banners',
+            pageBuilder: (context, state) => buildAppPage(
+              context: context,
+              state: state,
+              child: const AdminBannerAdsScreen(),
+            ),
+          ),
+        ],
       ),
     ],
   );

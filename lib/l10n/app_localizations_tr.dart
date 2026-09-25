@@ -654,6 +654,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noListingsTitle => 'Henüz İlan Bulunmuyor';
 
   @override
+  String get listingsLoadError => 'İlanlar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
   String get noListingsBody =>
       'Sistemde aktif ilan bulunmamaktadır. Örnek ilanları veritabanına ekleyebilir veya yeni bir ilan oluşturabilirsiniz.';
 
@@ -765,4 +768,59 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get allFilterChip => 'Tümü';
+
+  @override
+  String get perkHousing => 'Lojman';
+
+  @override
+  String perkMeals(int count) {
+    return '$count öğün';
+  }
+
+  @override
+  String get perkShuttle => 'Servis';
+
+  @override
+  String get verifiedEmployer => 'Doğrulanmış işveren';
+
+  @override
+  String seasonSummerOf(String year) {
+    return 'Yaz $year';
+  }
+
+  @override
+  String seasonWinterOf(String years) {
+    return 'Kış $years';
+  }
+
+  @override
+  String get forgotPasswordLink => 'Şifremi unuttum?';
+
+  @override
+  String get passwordResetTitle => 'Şifre sıfırlama';
+
+  @override
+  String get passwordResetSend => 'Sıfırlama bağlantısı gönder';
+
+  @override
+  String get passwordResetSuccess =>
+      'Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.';
+
+  @override
+  String get passwordResetInvalidEmail => 'Geçerli bir e-posta adresi girin.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'İnternet bağlantınızı kontrol edip tekrar deneyin.';
+
+  @override
+  String get passwordResetGenericError =>
+      'Bağlantı gönderilemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get adminPanelEntry => 'Yönetim Paneli';
 }

@@ -1,0 +1,27 @@
+# BUG-m6-04: Jobseeker edit profile screen crashes with DropdownButton assertion failure when preferredRegion is set.
+# Beklenen: İş arayan kullanıcının (seeker@e2e.test) Profili Düzenle formu hatasız açılmalı ve "Şu An Boşta / Hemen Başlayabilir" alanı görünmelidir.
+# Gerçek: profile_form.dart:252'de DropdownButtonFormField<String?> preferredRegion initialValue'su 'Antalya' (büyük harf) iken tourismRegions.id listesi 'antalya' (küçük harf) olduğu için Flutter assertion hatası ('items == null || ... There should be exactly one item with [DropdownButton]'s value: Antalya') fırlatmakta ve ekran kırmızı ekrana (Red Screen) düşmektedir.
+appId: com.example.otelcim
+name: "m6 - bug seeker edit profile dropdown assertion crash"
+tags: [m6, bugs, profile, seeker, dropdown]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+
+- tapOn: ".*Profili Düzenle.*"
+- extendedWaitUntil:
+    visible: "Profil"
+    timeout: 10000
+
+# BUG: Beklenen davranış - İş arayan formunun hatasız yüklenip switch alanının görünmesi (bugün assertion crash ile kırılır)
+- scrollUntilVisible:
+    element: ".*Şu An Boşta / Hemen Başlayabilir.*"
+    direction: DOWN
+- assertVisible: ".*Şu An Boşta / Hemen Başlayabilir.*"

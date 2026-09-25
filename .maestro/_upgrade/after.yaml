@@ -1,0 +1,14 @@
+# Upgrade test, new build over old data: still signed in, feed + profile load.
+appId: com.example.otelcim
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 20000
+- assertVisible: ".*Resepsiyonist Aranıyor.*"
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- assertNotVisible: "Giriş Yap"

@@ -1,0 +1,53 @@
+appId: com.example.otelcim
+name: "admin approves certificate and seeker sees approved status"
+tags: [m9_admin_content, admin, certificate]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/certificates"
+- extendedWaitUntil:
+    visible: "Belge Onay Kuyruğu"
+    timeout: 10000
+- assertVisible: "Hijyen Eğitimi Sertifikası"
+- assertVisible: "Kullanıcı: Ali Aday"
+- assertVisible: 'E-posta: seeker2@e2e\.test'
+- assertVisible: "Belge / Sertifika Dosyası"
+- tapOn: "Onayla"
+- extendedWaitUntil:
+    visible: "Belgeyi Onayla"
+    timeout: 5000
+- tapOn:
+    text: "Onayla"
+    index: -1
+- extendedWaitUntil:
+    visible: "Belge onaylandı."
+    timeout: 10000
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 20000
+- tapOn: ".*Hesabım.*"
+- scrollUntilVisible:
+    element: "Çıkış Yap"
+    direction: DOWN
+- tapOn: "Çıkış Yap"
+- extendedWaitUntil:
+    visible: "Giriş Yap"
+    timeout: 10000
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: seeker2@e2e.test
+- tapOn: ".*Hesabım.*"
+- scrollUntilVisible:
+    element: "Belgelerim / Sertifika Cüzdanı"
+    direction: DOWN
+- tapOn: "Belgelerim / Sertifika Cüzdanı"
+- extendedWaitUntil:
+    visible: "Hijyen Eğitimi Sertifikası"
+    timeout: 10000
+- assertVisible: "Onaylandı"

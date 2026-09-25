@@ -1,0 +1,46 @@
+appId: com.example.otelcim
+name: "m12 - 02 detail back navigation and accessible actions"
+tags: [m12, a11y, navigation, back]
+---
+- runFlow: ../common/launch.yaml
+
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 15000
+
+# Open listing detail
+- tapOn: ".*Resepsiyonist Aranıyor.*"
+- extendedWaitUntil:
+    visible: ".*İlan Detayı.*"
+    timeout: 10000
+
+# Verify AppBar accessible actions
+- assertVisible: ".*İlan Detayı.*"
+- assertVisible:
+    text: ".*Favorilere ekle.*"
+
+# TAHMİN: Flutter default MaterialLocalizations backButtonTooltip in Turkish is 'Geri'
+- assertVisible:
+    text: ".*Geri.*"
+
+# Back to feed via back navigation
+- back
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*7 sonuç.*"
+
+# Open Seasonal Calendar via accessible tooltip button
+- tapOn:
+    text: ".*Sezon Takvimi.*"
+- extendedWaitUntil:
+    visible: ".*Sezonluk İşe Alım Takvimi.*"
+    timeout: 10000
+- assertVisible: ".*Sezonluk Hatırlatıcılarım.*"
+
+# Return to home feed
+- back
+- extendedWaitUntil:
+    visible: ".*Resepsiyonist Aranıyor.*"
+    timeout: 10000
+- assertVisible: ".*7 sonuç.*"

@@ -39,6 +39,23 @@ void main() {
     });
   });
 
+  group('ListingSeason dynamic options', () {
+    test('builds current summer and winter values from the injected clock', () {
+      final seasons = listingSeasonOptions(clock: () => DateTime(2026, 9, 25));
+
+      expect(seasons.map((season) => season.code), [
+        'yaz_2026',
+        'kis_2026_27',
+        'tum_yil',
+      ]);
+    });
+
+    test('dynamic seasons get readable labels', () {
+      expect(ListingSeason.fromCode('yaz_2026')!.label, 'Yaz 2026');
+      expect(ListingSeason.fromCode('kis_2026_27')!.label, 'Kış 2026-27');
+    });
+  });
+
   group('EmploymentType', () {
     test('label returns non-empty Turkish text for all employment types', () {
       expect(EmploymentType.fullTime.label, 'Tam zamanlı');

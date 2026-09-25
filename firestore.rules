@@ -30,6 +30,45 @@ service cloud.firestore {
         .hasAny(['isAdmin', 'freeBoostCredits', 'referralCount', 'referralRewardGranted', 'hasUsedFreeUrgentListing']) || isAdmin();
     }
 
+    // Moderation / trust fields are admin-only (ModerationService, admin
+    // verification). Without this a banned user could write isBanned: false,
+    // move suspensionEnd into the past, wipe their warnings, or give
+    // themselves the verified badge. Compared by value with defaults rather
+    // than via affectedKeys(): UserProfile.toMap() always writes isVerified /
+    // verificationStatus / verifiedAt, so the first full profile write onto an
+    // fcmToken-only stub doc "adds" those keys with their default values and
+    // must still be allowed.
+    function moderationFieldsUnchanged() {
+      let next = request.resource.data;
+      let prev = resource.data;
+      return next.get('isBanned', false) == prev.get('isBanned', false)
+        && next.get('isSuspended', false) == prev.get('isSuspended', false)
+        && next.get('suspensionEnd', null) == prev.get('suspensionEnd', null)
+        && next.get('warnings', []) == prev.get('warnings', [])
+        && next.get('isVerified', false) == prev.get('isVerified', false)
+        && next.get('verificationStatus', null) == prev.get('verificationStatus', null)
+        && next.get('verifiedAt', null) == prev.get('verifiedAt', null);
+    }
+
+    // Also covers the server-controlled referral/boost fields: on create there
+    // is no previous value for isNotChangingServerControlledProfileFields() to
+    // diff against, so a new profile could otherwise start with
+    // freeBoostCredits: 999.
+    function moderationFieldsAtDefaults() {
+      let next = request.resource.data;
+      return next.get('freeBoostCredits', 0) == 0
+        && next.get('referralCount', 0) == 0
+        && next.get('referralRewardGranted', false) == false
+        && next.get('hasUsedFreeUrgentListing', false) == false
+        && next.get('isBanned', false) == false
+        && next.get('isSuspended', false) == false
+        && next.get('suspensionEnd', null) == null
+        && next.get('warnings', []).size() == 0
+        && next.get('isVerified', false) == false
+        && next.get('verificationStatus', null) == null
+        && next.get('verifiedAt', null) == null;
+    }
+
     // Boost/urgent/ownership fields on a listing are only ever meant to be
     // written by Cloud Functions (verifyAndProcessBoostPurchase,
     // redeemFreeBoost, verifyAndProcessUrgentListingPurchase,
@@ -43,7 +82,7 @@ service cloud.firestore {
     // flip a listing to urgent later without going through payment.
     function isNotChangingBoostOrOwnershipFields() {
       return !request.resource.data.diff(resource.data).affectedKeys()
-        .hasAny(['isBoosted', 'boostExpiresAt', 'boostType', 'boostPurchaseId', 'posterId', 'isUrgent', 'urgentListingPurchaseId']);
+        .hasAny(['isBoosted', 'boostExpiresAt', 'boostType', 'boostPurchaseId', 'posterId', 'isUrgent', 'urgentListingPurchaseId', 'viewCount']);
     }
 
     // 'removed' is a moderation state set by ModerationService.removeListing
@@ -60,10 +99,24 @@ service cloud.firestore {
     // moderation (update/delete) is also allowed for admins.
     match /listings/{listingId} {
       allow read: if true;
+      // A listing must be created un-boosted: boost state is only ever
+      // granted by the purchase/redeem Cloud Functions. Without this a client
+      // could create a listing with isBoosted: true and a far-future
+      // boostExpiresAt and skip payment entirely. Listing.toMap() sends these
+      // defaults. isUrgent stays client-settable here on purpose (see
+      // isNotChangingBoostOrOwnershipFields above).
       allow create: if isSignedIn() &&
-        request.resource.data.posterId == request.auth.uid;
-      allow update: if (isOwner(resource.data.posterId) && isNotChangingBoostOrOwnershipFields() &&
-        isNotBypassingListingModeration()) || isAdmin();
+        request.resource.data.posterId == request.auth.uid &&
+        request.resource.data.get('isBoosted', false) == false &&
+        request.resource.data.get('boostExpiresAt', null) == null &&
+        request.resource.data.get('boostType', null) == null &&
+        request.resource.data.get('boostPurchaseId', null) == null &&
+        request.resource.data.get('urgentListingPurchaseId', null) == null;
+      allow update: if (isSignedIn() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']) &&
+        request.resource.data.get('viewCount', 0) == resource.data.get('viewCount', 0) + 1) ||
+        (isOwner(resource.data.posterId) && isNotChangingBoostOrOwnershipFields() &&
+          isNotBypassingListingModeration()) || isAdmin();
       allow delete: if isOwner(resource.data.posterId) || isAdmin();
 
       // Contact details (phone/email) are split out from the listing doc
@@ -84,9 +137,11 @@ service cloud.firestore {
     match /user_profiles/{userId} {
       allow read: if true;
       allow create: if isOwner(userId) &&
-        (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin());
+        (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin()) &&
+        (moderationFieldsAtDefaults() || isAdmin());
       allow update: if (isOwner(userId) || isAdmin()) &&
-        isNotChangingAdminStatus() && isNotChangingServerControlledProfileFields();
+        isNotChangingAdminStatus() && isNotChangingServerControlledProfileFields() &&
+        (moderationFieldsUnchanged() || isAdmin());
       allow delete: if isOwner(userId) || isAdmin();
 
       match /favorites/{listingId} {
@@ -94,6 +149,13 @@ service cloud.firestore {
       }
 
       match /seasonal_subscriptions/{subscriptionId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Employer's saved candidates (TalentPoolService). Had no rule, so the
+      // default deny made the whole Talent Pool feature fail in production;
+      // fake_cloud_firestore tests don't evaluate rules and stayed green.
+      match /talent_pool/{candidateId} {
         allow read, write: if isOwner(userId);
       }
     }

@@ -1,0 +1,56 @@
+appId: com.example.otelcim
+name: "m11 - long listing title and description stay usable"
+tags: [m11_resilience, long-content, employer]
+---
+- runFlow: ../common/launch.yaml
+- runFlow:
+    file: _helpers/login_no_hide_keyboard.yaml
+    env:
+      EMAIL: employer@e2e.test
+- tapOn: ".*İlan Ver.*"
+- extendedWaitUntil:
+    visible: "Yeni İlan Aç"
+    timeout: 10000
+- tapOn: ".*Bodrum Resort Resepsiyon Görevlisi.*"
+- inputText: "Müşteri ilişkileri ve resepsiyon operasyonları için Antalya Lara bölgesinde İngilizce bilen, misafir karşılama ve rezervasyon süreçlerine hâkim, vardiya koordinasyonu yapabilecek deneyimli ekip arkadaşı arıyoruz; bu ifade özellikle kartta taşma ve detayda tam metin kontrolü için iki yüz karakteri aşan uzun E2E ilan başlığıdır."
+- scrollUntilVisible:
+    element: '.*Örn\. Muğla / Bodrum.*'
+    direction: DOWN
+- tapOn: '.*Örn\. Muğla / Bodrum.*'
+- inputText: "Antalya / Lara"
+- scrollUntilVisible:
+    element: ".*Bölge seçin.*"
+    direction: DOWN
+- tapOn: ".*Bölge seçin.*"
+- tapOn: "Antalya"
+- tapOn: "Şehir seçin"
+- tapOn: "Antalya"
+- scrollUntilVisible:
+    element: '.*Örn\. 35\.000₺ \+ yemek.*'
+    direction: DOWN
+- tapOn: '.*Örn\. 35\.000₺ \+ yemek.*'
+- inputText: "35.000 TL"
+- scrollUntilVisible:
+    element: ".*0555 123 4567.*"
+    direction: DOWN
+- tapOn: ".*0555 123 4567.*"
+- inputText: "ik+long@e2e.test"
+- scrollUntilVisible:
+    element: '.*İlanınızla ilgili tüm detayları açıklayın\.\.\..*'
+    direction: DOWN
+- tapOn: '.*İlanınızla ilgili tüm detayları açıklayın\.\.\..*'
+- inputText: "Bu açıklama, uzun içerik dayanıklılığını doğrulamak için iki yüz karakterden uzundur. Resepsiyon ekibimiz misafir karşılama, rezervasyon, telefon ve vardiya süreçlerini yürütür. Sezon boyunca ekip çalışması, güler yüzlü iletişim ve düzenli raporlama beklenir."
+- scrollUntilVisible:
+    element: "İlanı Yayınla"
+    direction: DOWN
+- tapOn: "İlanı Yayınla"
+- extendedWaitUntil:
+    visible: ".*Müşteri ilişkileri ve resepsiyon operasyonları.*"
+    timeout: 15000
+- takeScreenshot: m11_long_listing_card
+- tapOn: ".*Müşteri ilişkileri ve resepsiyon operasyonları.*"
+- extendedWaitUntil:
+    visible: ".*Bu açıklama, uzun içerik dayanıklılığını doğrulamak.*"
+    timeout: 15000
+- assertVisible: ".*güler yüzlü iletişim.*"
+- takeScreenshot: m11_long_listing_detail
