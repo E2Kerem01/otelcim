@@ -30,6 +30,8 @@ void main() {
 
   Future<void> pumpScreen(WidgetTester tester) async {
     useTallViewport(tester);
+    // Below AdminPagedView.tableBreakpoint so the list renders as cards.
+    tester.view.physicalSize = const Size(800, 2400);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [bannerAdServiceProvider.overrideWithValue(BannerAdService(db))],
@@ -51,10 +53,10 @@ void main() {
   }
 
   group('AdminBannerAdsScreen — list', () {
-    testWidgets('no banners: empty state with an "add first banner" button', (tester) async {
+    testWidgets('no banners: empty state, the "new banner" action stays available', (tester) async {
       await pumpScreen(tester);
-      expect(find.text("Henüz Reklam Banner'ı Yok"), findsOneWidget);
-      expect(find.text("İlk Banner'ı Ekle"), findsOneWidget);
+      expect(find.text('Bu filtreyle banner bulunamadı.'), findsOneWidget);
+      expect(find.text('Yeni Banner'), findsOneWidget);
     });
 
     testWidgets('card shows sponsor, order and "Süresiz" / end date; inactive banners are listed too',
@@ -67,6 +69,10 @@ void main() {
         'endDate': Timestamp.fromDate(DateTime(2026, 10, 1)),
       });
       await pumpScreen(tester);
+      // The default tab lists active banners only.
+      expect(find.text('Biten Banner'), findsNothing);
+      await tester.tap(find.text('Tümü'));
+      await tester.pumpAndSettle();
 
       expect(find.text('Süresiz Banner'), findsOneWidget);
       expect(find.text('Sponsor: -'), findsOneWidget);
@@ -84,6 +90,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect((await read('a'))!['isActive'], isFalse);
+      // It leaves the "Aktif" tab and shows up under "Pasif".
+      expect(find.text('Yaz Fırsatları'), findsNothing);
+      await tester.tap(find.text('Pasif'));
+      await tester.pumpAndSettle();
       expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
     });
 
@@ -93,7 +103,7 @@ void main() {
 
       await tester.tap(find.byTooltip('Sil'));
       await tester.pumpAndSettle();
-      expect(find.text('Banner Silinsin mi?'), findsOneWidget);
+      expect(find.text('Banner silinsin mi?'), findsOneWidget);
       await tester.tap(find.text('İptal'));
       await tester.pumpAndSettle();
 
@@ -111,7 +121,7 @@ void main() {
 
       expect(await read('a'), isNull);
       expect(find.text('Banner silindi.'), findsOneWidget);
-      expect(find.text("Henüz Reklam Banner'ı Yok"), findsOneWidget);
+      expect(find.text('Bu filtreyle banner bulunamadı.'), findsOneWidget);
     });
   });
 
@@ -192,6 +202,10 @@ void main() {
         'endDate': Timestamp.fromDate(DateTime(2026, 10, 1)),
       });
       await pumpScreen(tester);
+      // The default tab lists active banners only.
+      expect(find.text('Biten Banner'), findsNothing);
+      await tester.tap(find.text('Tümü'));
+      await tester.pumpAndSettle();
       await openEditSheet(tester);
       await tester.enterText(find.widgetWithText(TextFormField, 'Banner Başlığı *'), 'Değişti');
       await saveEdit(tester);

@@ -4,10 +4,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/banner_ad_model.dart';
 
+/// Ordered query used by the paged admin banner list.
+Query<Map<String, dynamic>> adminBannerAdsQuery(
+  FirebaseFirestore db, {
+  required String filter,
+}) {
+  Query<Map<String, dynamic>> query = db.collection('banner_ads');
+  if (filter == 'active') {
+    query = query.where('isActive', isEqualTo: true);
+  } else if (filter == 'inactive') {
+    query = query.where('isActive', isEqualTo: false);
+  }
+  return query.orderBy('order').orderBy('createdAt', descending: true);
+}
+
 class BannerAdService {
   BannerAdService(this._db);
 
   final FirebaseFirestore _db;
+
+  /// Paged admin list query for a filter tab ('all' | 'active' | 'inactive').
+  Query<Map<String, dynamic>> adminQuery({required String filter}) =>
+      adminBannerAdsQuery(_db, filter: filter);
 
   /// Stream of active banner ads for home page display
   /// Filters for isActive == true and non-expired end dates, sorted by order

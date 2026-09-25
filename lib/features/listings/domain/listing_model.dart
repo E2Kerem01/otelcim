@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../shared/constants/listing_filters.dart';
+import '../../../shared/utils/search_keywords.dart';
 
 enum ListingStatus { active, closed, removed }
 
@@ -241,6 +242,9 @@ class Listing {
     'boostType': boostType,
     'boostPurchaseId': boostPurchaseId,
     'viewCount': viewCount,
+    // Prefix tokens for admin search (lib/shared/utils/search_keywords.dart).
+    'searchKeywords':
+        buildSearchKeywords([title, posterName, city, location, region]),
     'messageCount': messageCount,
   };
 

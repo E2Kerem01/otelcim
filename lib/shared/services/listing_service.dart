@@ -499,53 +499,6 @@ class ListingService {
     );
   }
 
-  /// Most recently created listings of ANY status (active/closed/removed),
-  /// for the admin listing management screen. Deliberately unfiltered by
-  /// status so admins can see and restore removed listings too.
-  Stream<List<Listing>> watchRecentListingsForAdmin({int limit = 50}) {
-    return _db
-        .collection('listings')
-        .orderBy('createdAt', descending: true)
-        .limit(limit)
-        .snapshots()
-        .map(
-          (snap) => _parseListingDocs(
-            snap.docs,
-            'ListingService.watchRecentListingsForAdmin',
-          ),
-        )
-        .handleError((Object error, StackTrace stackTrace) {
-          logError(
-            error,
-            stackTrace,
-            context: 'ListingService.watchRecentListingsForAdmin',
-          );
-        });
-  }
-
-  /// Prefix-searches listing titles for the admin listing management
-  /// screen. Firestore has no full-text search - matches from the start
-  /// of the title only.
-  Future<List<Listing>> searchListingsForAdmin(String query) async {
-    final trimmed = query.trim();
-    if (trimmed.isEmpty) return [];
-    try {
-      final snap = await _db
-          .collection('listings')
-          .orderBy('title')
-          .startAt([trimmed])
-          .endAt(['$trimmed'])
-          .limit(30)
-          .get();
-      return _parseListingDocs(
-        snap.docs,
-        'ListingService.searchListingsForAdmin',
-      );
-    } catch (e, stackTrace) {
-      logError(e, stackTrace, context: 'ListingService.searchListingsForAdmin');
-      return [];
-    }
-  }
 }
 
 /// Result object for paginated listings queries
