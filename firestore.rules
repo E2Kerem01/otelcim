@@ -16,9 +16,12 @@ service cloud.firestore {
         get(/databases/$(database)/documents/user_profiles/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Prevent regular users from tampering with their isAdmin field
-    function isNotChangingAdminStatus() {
-      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']) || isAdmin();
+    // Prevent regular users from tampering with admin access, and prevent an
+    // admin from removing their own access while managing another profile.
+    function isNotChangingAdminStatus(userId) {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['isAdmin', 'adminRole']) ||
+        (isAdmin() && userId != request.auth.uid);
     }
 
     // Prevent regular users from tampering with fields that are only ever
@@ -27,7 +30,7 @@ service cloud.firestore {
     // by grantReferralRewardIfEligible, and the isAdmin flag above.
     function isNotChangingServerControlledProfileFields() {
       return !request.resource.data.diff(resource.data).affectedKeys()
-        .hasAny(['isAdmin', 'freeBoostCredits', 'referralCount', 'referralRewardGranted', 'hasUsedFreeUrgentListing']) || isAdmin();
+        .hasAny(['isAdmin', 'adminRole', 'freeBoostCredits', 'referralCount', 'referralRewardGranted', 'hasUsedFreeUrgentListing']) || isAdmin();
     }
 
     // Moderation / trust fields are admin-only (ModerationService, admin
@@ -48,6 +51,10 @@ service cloud.firestore {
         && next.get('isVerified', false) == prev.get('isVerified', false)
         && next.get('verificationStatus', null) == prev.get('verificationStatus', null)
         && next.get('verifiedAt', null) == prev.get('verifiedAt', null);
+    }
+
+    function isNotModeratingSelf(userId) {
+      return userId != request.auth.uid;
     }
 
     // Also covers the server-controlled referral/boost fields: on create there
@@ -140,8 +147,8 @@ service cloud.firestore {
         (!request.resource.data.keys().hasAny(['isAdmin']) || request.resource.data.isAdmin == false || isAdmin()) &&
         (moderationFieldsAtDefaults() || isAdmin());
       allow update: if (isOwner(userId) || isAdmin()) &&
-        isNotChangingAdminStatus() && isNotChangingServerControlledProfileFields() &&
-        (moderationFieldsUnchanged() || isAdmin());
+        isNotChangingAdminStatus(userId) && isNotChangingServerControlledProfileFields() &&
+        (moderationFieldsUnchanged() || (isAdmin() && isNotModeratingSelf(userId)));
       allow delete: if isOwner(userId) || isAdmin();
 
       match /favorites/{listingId} {

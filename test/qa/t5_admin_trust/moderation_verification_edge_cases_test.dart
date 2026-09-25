@@ -70,6 +70,37 @@ void main() {
       expect(data['suspensionReason'], isNull);
       expect(data['suspensionEnd'], isNull);
     });
+
+    test('an admin cannot ban or suspend their own account', () async {
+      await db.collection('user_profiles').doc('admin-1').set({
+        'isBanned': false,
+        'isSuspended': false,
+      });
+
+      await expectLater(
+        service.banUser(
+          userId: 'admin-1',
+          adminId: 'admin-1',
+          reason: 'self moderation',
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            contains('kendi hesabında'),
+          ),
+        ),
+      );
+      await expectLater(
+        service.suspendUser(userId: 'admin-1', adminId: 'admin-1'),
+        throwsA(isA<StateError>()),
+      );
+
+      final data = (await db.collection('user_profiles').doc('admin-1').get())
+          .data()!;
+      expect(data['isBanned'], isFalse);
+      expect(data['isSuspended'], isFalse);
+    });
   });
 
   group('Admin VerificationService', () {

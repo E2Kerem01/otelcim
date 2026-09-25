@@ -11,6 +11,15 @@ class ModerationService {
 
   final FirebaseFirestore _db;
 
+  void _rejectSelfModeration({
+    required String userId,
+    required String adminId,
+  }) {
+    if (userId == adminId) {
+      throw StateError('Yönetici kendi hesabında moderasyon işlemi yapamaz.');
+    }
+  }
+
   /// Dismiss a report without taking action
   Future<void> dismissReport({
     required String reportId,
@@ -85,6 +94,7 @@ class ModerationService {
     required String adminId,
     String? reason,
   }) async {
+    _rejectSelfModeration(userId: userId, adminId: adminId);
     try {
       await _db.collection('user_profiles').doc(userId).update({
         'warnings': FieldValue.arrayUnion([
@@ -129,6 +139,7 @@ class ModerationService {
     String? reason,
     DateTime? suspensionEnd,
   }) async {
+    _rejectSelfModeration(userId: userId, adminId: adminId);
     try {
       await _db.collection('user_profiles').doc(userId).update({
         'isSuspended': true,
@@ -152,6 +163,7 @@ class ModerationService {
     required String adminId,
     required String reason,
   }) async {
+    _rejectSelfModeration(userId: userId, adminId: adminId);
     try {
       await _db.collection('user_profiles').doc(userId).update({
         'isBanned': true,
@@ -172,6 +184,7 @@ class ModerationService {
     required String userId,
     required String adminId,
   }) async {
+    _rejectSelfModeration(userId: userId, adminId: adminId);
     try {
       await _db.collection('user_profiles').doc(userId).update({
         'isSuspended': false,
@@ -194,6 +207,7 @@ class ModerationService {
     required String userId,
     required String adminId,
   }) async {
+    _rejectSelfModeration(userId: userId, adminId: adminId);
     try {
       await _db.collection('user_profiles').doc(userId).update({
         'isBanned': false,
