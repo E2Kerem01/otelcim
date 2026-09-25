@@ -654,6 +654,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noListingsTitle => 'Henüz İlan Bulunmuyor';
 
   @override
+  String get listingsLoadError => 'İlanlar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
   String get noListingsBody =>
       'Sistemde aktif ilan bulunmamaktadır. Örnek ilanları veritabanına ekleyebilir veya yeni bir ilan oluşturabilirsiniz.';
 

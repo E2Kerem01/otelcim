@@ -654,6 +654,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noListingsTitle => 'No listings yet';
 
   @override
+  String get listingsLoadError =>
+      'Listings could not be loaded. Please try again.';
+
+  @override
   String get noListingsBody =>
       'There are no active listings. You can load sample listings into the database or create a new one.';
 

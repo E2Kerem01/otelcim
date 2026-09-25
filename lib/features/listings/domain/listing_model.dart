@@ -88,65 +88,104 @@ class Listing {
   });
 
   factory Listing.fromDoc(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>? ?? <String, dynamic>{};
+    final rawData = doc.data();
+    final data = rawData is Map
+        ? Map<String, dynamic>.from(rawData)
+        : <String, dynamic>{};
     return Listing(
       id: doc.id,
-      posterId: data['posterId'] as String? ?? '',
-      posterName: data['posterName'] as String? ?? '',
-      posterVerified: data['posterVerified'] as bool? ?? false,
-      isUrgent: data['isUrgent'] as bool? ?? false,
-      season: data['season'] as String?,
-      contractStartDate: (data['contractStartDate'] as Timestamp?)?.toDate(),
-      contractEndDate: (data['contractEndDate'] as Timestamp?)?.toDate(),
-      title: data['title'] as String? ?? '',
-      description: data['description'] as String? ?? '',
-      category: data['category'] as String? ?? 'diger',
-      location: data['location'] as String? ?? '',
-      salary: data['salary'] as String? ?? '',
-      city: data['city'] as String?,
-      region: data['region'] as String?,
-      lat: (data['lat'] as num?)?.toDouble(),
-      lng: (data['lng'] as num?)?.toDouble(),
-      minSalaryTl: (data['minSalaryTl'] as num?)?.toInt(),
-      maxSalaryTl: (data['maxSalaryTl'] as num?)?.toInt(),
+      posterId: _string(data['posterId']) ?? '',
+      posterName: _string(data['posterName']) ?? '',
+      posterVerified: _bool(data['posterVerified']) ?? false,
+      isUrgent: _bool(data['isUrgent']) ?? false,
+      season: _string(data['season']),
+      contractStartDate: _dateTime(data['contractStartDate']),
+      contractEndDate: _dateTime(data['contractEndDate']),
+      title: _string(data['title']) ?? '',
+      description: _string(data['description']) ?? '',
+      category: _string(data['category']) ?? 'diger',
+      location: _string(data['location']) ?? '',
+      salary: _string(data['salary']) ?? '',
+      city: _string(data['city']),
+      region: _string(data['region']),
+      lat: _double(data['lat']),
+      lng: _double(data['lng']),
+      minSalaryTl: _int(data['minSalaryTl']),
+      maxSalaryTl: _int(data['maxSalaryTl']),
       employmentType: _employmentTypeFromString(
-        data['employmentType'] as String?,
+        _string(data['employmentType']),
       ),
-      experienceLevel: data['experienceLevel'] as String?,
-      educationLevel: data['educationLevel'] as String?,
-      contactInfo: data['contactInfo'] as String? ?? '',
+      experienceLevel: _string(data['experienceLevel']),
+      educationLevel: _string(data['educationLevel']),
+      contactInfo: _string(data['contactInfo']) ?? '',
       images:
-          (data['images'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          (data['imageUrls'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
+          _stringList(data['images']) ??
+          _stringList(data['imageUrls']) ??
           const [],
-      housingRoomType: data['housingRoomType'] as String?,
-      housingHasAc: data['housingHasAc'] as bool?,
-      housingHasWifi: data['housingHasWifi'] as bool?,
-      housingMealsIncluded: (data['housingMealsIncluded'] as num?)?.toInt(),
-      housingImages:
-          (data['housingImages'] as List<dynamic>?)
-              ?.whereType<String>()
-              .toList() ??
-          const [],
-      staffShuttleRoute: data['staffShuttleRoute'] as String?,
-      status: switch (data['status'] as String? ?? 'active') {
+      housingRoomType: _string(data['housingRoomType']),
+      housingHasAc: _bool(data['housingHasAc']),
+      housingHasWifi: _bool(data['housingHasWifi']),
+      housingMealsIncluded: _int(data['housingMealsIncluded']),
+      housingImages: _stringList(data['housingImages']) ?? const [],
+      staffShuttleRoute: _string(data['staffShuttleRoute']),
+      status: switch (_string(data['status']) ?? 'active') {
         'closed' => ListingStatus.closed,
         'removed' => ListingStatus.removed,
         _ => ListingStatus.active,
       },
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
-      isBoosted: data['isBoosted'] as bool? ?? false,
-      boostExpiresAt: (data['boostExpiresAt'] as Timestamp?)?.toDate(),
-      boostType: data['boostType'] as String?,
-      boostPurchaseId: data['boostPurchaseId'] as String?,
-      viewCount: data['viewCount'] as int? ?? 0,
-      messageCount: data['messageCount'] as int? ?? 0,
+      createdAt: _dateTime(data['createdAt']),
+      updatedAt: _dateTime(data['updatedAt']),
+      isBoosted: _bool(data['isBoosted']) ?? false,
+      boostExpiresAt: _dateTime(data['boostExpiresAt']),
+      boostType: _string(data['boostType']),
+      boostPurchaseId: _string(data['boostPurchaseId']),
+      viewCount: _int(data['viewCount']) ?? 0,
+      messageCount: _int(data['messageCount']) ?? 0,
     );
+  }
+
+  static String? _string(Object? value) {
+    if (value == null) return null;
+    return value is String ? value : value.toString();
+  }
+
+  static bool? _bool(Object? value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      return switch (value.trim().toLowerCase()) {
+        'true' || '1' || 'yes' => true,
+        'false' || '0' || 'no' => false,
+        _ => null,
+      };
+    }
+    return null;
+  }
+
+  static int? _int(Object? value) {
+    if (value == null) return null;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString().trim()) ??
+        double.tryParse(value.toString().trim())?.toInt();
+  }
+
+  static double? _double(Object? value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString().trim());
+  }
+
+  static DateTime? _dateTime(Object? value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
+  static List<String>? _stringList(Object? value) {
+    if (value is! Iterable) return null;
+    return value.whereType<String>().toList();
   }
 
   Map<String, dynamic> toMap() => {

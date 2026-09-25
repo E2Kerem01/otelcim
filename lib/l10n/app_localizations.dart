@@ -1310,6 +1310,12 @@ abstract class AppLocalizations {
   /// **'Henüz İlan Bulunmuyor'**
   String get noListingsTitle;
 
+  /// No description provided for @listingsLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlanlar yüklenemedi. Lütfen tekrar deneyin.'**
+  String get listingsLoadError;
+
   /// Empty-state explanation on the home feed
   ///
   /// In tr, this message translates to:

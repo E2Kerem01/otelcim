@@ -12,30 +12,32 @@ import 'package:otelcim/shared/services/auth_service.dart';
 import 'package:otelcim/shared/services/listing_service.dart';
 import 'package:otelcim/shared/services/notification_service.dart';
 
-class MockPaginatedListingsNotifier extends StateNotifier<PaginatedListingsState>
+class MockPaginatedListingsNotifier
+    extends StateNotifier<PaginatedListingsState>
     implements PaginatedListingsNotifier {
-  MockPaginatedListingsNotifier(List<Listing> listings)
-      : super(
-          PaginatedListingsState(
-            listings: listings,
-            hasMore: false,
-            isLoading: false,
-          ),
-        );
+  MockPaginatedListingsNotifier(List<Listing> listings, {Object? error})
+    : super(
+        PaginatedListingsState(
+          listings: listings,
+          hasMore: false,
+          isLoading: false,
+          error: error,
+        ),
+      );
 
   @override
   PaginationParams get params => (
-        category: null,
-        searchQuery: '',
-        city: null,
-        region: null,
-        minSalaryTl: null,
-        maxSalaryTl: null,
-        dateFilter: ListingDateFilter.all,
-        employmentType: null,
-        sortOrder: ListingSortOrder.newest,
-        season: null,
-      );
+    category: null,
+    searchQuery: '',
+    city: null,
+    region: null,
+    minSalaryTl: null,
+    maxSalaryTl: null,
+    dateFilter: ListingDateFilter.all,
+    employmentType: null,
+    sortOrder: ListingSortOrder.newest,
+    season: null,
+  );
 
   @override
   Future<void> loadInitial() async {}
@@ -43,8 +45,12 @@ class MockPaginatedListingsNotifier extends StateNotifier<PaginatedListingsState
   @override
   Future<void> loadMore() async {}
 
+  var refreshCount = 0;
+
   @override
-  Future<void> refresh() async {}
+  Future<void> refresh() async {
+    refreshCount++;
+  }
 }
 
 class FakeNotificationService implements NotificationService {
@@ -75,6 +81,7 @@ void main() {
     salary: '35.000 TL',
     contactInfo: '05320000000',
   );
+  MockPaginatedListingsNotifier? errorNotifier;
 
   Widget buildTestableWidget() {
     return ProviderScope(
@@ -82,10 +89,10 @@ void main() {
         paginatedListingsProvider.overrideWith(
           (ref, params) => MockPaginatedListingsNotifier([sampleListing]),
         ),
-        activeBannerAdsProvider.overrideWith(
-          (ref) => Stream.value([]),
+        activeBannerAdsProvider.overrideWith((ref) => Stream.value([])),
+        notificationServiceProvider.overrideWithValue(
+          FakeNotificationService(),
         ),
-        notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         listingServiceProvider.overrideWithValue(FakeListingService()),
         authStateProvider.overrideWith((ref) => Stream.value(null)),
       ],
@@ -97,17 +104,46 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: [
-          Locale('tr', ''),
-          Locale('en', ''),
+        supportedLocales: [Locale('tr', ''), Locale('en', '')],
+        home: HomeScreen(),
+      ),
+    );
+  }
+
+  Widget buildErrorWidget() {
+    return ProviderScope(
+      overrides: [
+        paginatedListingsProvider.overrideWith(
+          (ref, params) => errorNotifier = MockPaginatedListingsNotifier(
+            const [],
+            error: Exception('permission-denied'),
+          ),
+        ),
+        activeBannerAdsProvider.overrideWith((ref) => Stream.value([])),
+        notificationServiceProvider.overrideWithValue(
+          FakeNotificationService(),
+        ),
+        listingServiceProvider.overrideWithValue(FakeListingService()),
+        authStateProvider.overrideWith((ref) => Stream.value(null)),
+      ],
+      child: const MaterialApp(
+        locale: Locale('tr', ''),
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
         ],
+        supportedLocales: [Locale('tr', ''), Locale('en', '')],
         home: HomeScreen(),
       ),
     );
   }
 
   group('HomeScreen Grid & Search Tests', () {
-    testWidgets('renders search bar with hint and interactive clear button', (tester) async {
+    testWidgets('renders search bar with hint and interactive clear button', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1200, 2000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -136,7 +172,9 @@ void main() {
       expect(find.text('Resepsiyonist'), findsNothing);
     });
 
-    testWidgets('renders grid column selector buttons (1, 2, 3, 4 columns)', (tester) async {
+    testWidgets('renders grid column selector buttons (1, 2, 3, 4 columns)', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1200, 2000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -153,6 +191,20 @@ void main() {
         await tester.tap(colFinder);
         await tester.pump(const Duration(milliseconds: 300));
       }
+    });
+
+    testWidgets('shows a retry state when the feed provider errors', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildErrorWidget());
+      await tester.pump();
+
+      expect(find.byIcon(Icons.cloud_off_outlined), findsOneWidget);
+      expect(find.text('Tekrar dene'), findsOneWidget);
+      expect(find.byIcon(Icons.hotel_outlined), findsNothing);
+      await tester.tap(find.text('Tekrar dene'));
+      await tester.pump();
+      expect(errorNotifier!.refreshCount, 1);
     });
   });
 }

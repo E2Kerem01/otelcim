@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
@@ -22,6 +23,29 @@ import '../../referrals/presentation/invite_friends_screen.dart';
 import 'talent_pool_screen.dart';
 import 'widgets/profile_screen_widgets.dart';
 
+Future<bool?> confirmSignOut(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
+  return showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      // TODO(l10n): add logoutConfirmationTitle (TR: "Çıkış Yap", EN: "Sign out").
+      title: Text(l10n?.signOut ?? 'Çıkış Yap'),
+      // TODO(l10n): add logoutConfirmationMessage (TR: "Çıkış yapmak istediğinize emin misiniz?", EN: "Are you sure you want to sign out?").
+      content: const Text('Çıkış yapmak istediğinize emin misiniz?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, false),
+          child: Text(l10n?.cancelButton ?? 'Vazgeç'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(dialogContext, true),
+          child: Text(l10n?.signOut ?? 'Çıkış Yap'),
+        ),
+      ],
+    ),
+  );
+}
+
 /// Screen for user profile management.
 /// Supports responsive Master-Detail layout for Desktop/Tablet wide screens (>= 768px).
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -35,11 +59,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _selectedSection = 'overview';
 
   Future<void> _handleLogout() async {
+    final shouldLogout = await confirmSignOut(context);
+    if (!mounted || shouldLogout != true) return;
     await ref.read(authServiceProvider).signOut();
     ref.invalidate(currentUserProfileProvider);
-    if (mounted) {
-      context.go('/login');
-    }
   }
 
   @override
@@ -548,8 +571,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ratings,
           approvedCerts,
         );
-    }
   }
+}
 
   /// Desktop Overview Detail panel content
   Widget _buildOverviewDetail(

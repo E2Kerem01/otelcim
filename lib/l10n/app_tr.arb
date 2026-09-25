@@ -407,6 +407,7 @@
     "description": "Tooltip on the table view toggle"
   },
   "noListingsTitle": "Henüz İlan Bulunmuyor",
+  "listingsLoadError": "İlanlar yüklenemedi. Lütfen tekrar deneyin.",
   "@noListingsTitle": {
     "description": "Empty-state heading on the home feed"
   },

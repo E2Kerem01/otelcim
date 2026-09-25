@@ -38,21 +38,20 @@ class ChatAppBarTitle extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: Colors.green.shade50,
+              color: const Color(0xFF15803D),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.green.shade300),
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.bolt_rounded, size: 14, color: Colors.green.shade700),
-                const SizedBox(width: 2),
+                Icon(Icons.bolt_rounded, size: 14, color: Colors.white),
+                SizedBox(width: 2),
                 Text(
                   'Hemen Başlayabilir',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green.shade800,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -70,21 +69,20 @@ class ChatAppBarTitle extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: const Color(0xFF1D4ED8),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue.shade300),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.play_circle_fill_rounded, size: 14, color: Colors.blue.shade700),
-                  const SizedBox(width: 3),
+                  Icon(Icons.play_circle_fill_rounded, size: 14, color: Colors.white),
+                  SizedBox(width: 3),
                   Text(
                     'Tanıtım Videosu',
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade900,
+                      color: Colors.white,
                     ),
                   ),
                 ],
@@ -347,6 +345,8 @@ class ChatMessageComposer extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           IconButton(
+            tooltip: 'Gönder',
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: Icon(Icons.send_rounded, color: Theme.of(context).primaryColor),
             onPressed: onSend,
           ),

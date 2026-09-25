@@ -98,6 +98,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return raw.trim();
   }
 
+  Widget _withBackToHome(Widget child) {
+    return PopScope<void>(
+      canPop: false,
+      onPopInvokedWithResult: (_, _) {
+        if (mounted) context.go('/');
+      },
+      child: child,
+    );
+  }
+
   Future<void> _submitEmail() async {
     if (_lockoutSeconds > 0) return;
     if (!_emailFormKey.currentState!.validate()) return;
@@ -301,7 +311,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
 
     if (isWide) {
-      return Scaffold(
+      return _withBackToHome(Scaffold(
         body: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(32),
@@ -326,10 +336,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
-      );
+      ));
     }
 
-    return Scaffold(
+    return _withBackToHome(Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -347,7 +357,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildEmailForm(AppLocalizations? l10n) {

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
 
-const listingSeasonValues = <String>['yaz_2025', 'kis_2025_26', 'tum_yil'];
-
 bool isSeasonalContract(String? season) =>
     season != null && season != 'tum_yil';
 

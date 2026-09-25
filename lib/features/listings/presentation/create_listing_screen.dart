@@ -300,6 +300,33 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final authUser = ref.watch(authServiceProvider).currentUser;
+    final profileAsync = ref.watch(currentUserProfileProvider);
+    final profile = profileAsync.valueOrNull;
+    final canCreateListing =
+        profile != null && (profile.userType == 'employer' || profile.isAdmin);
+
+    if (authUser == null) {
+      return _buildAccessDenied(
+        context,
+        // TODO(l10n): add listingCreateLoginRequired (TR: "İlan vermek için lütfen giriş yapın.", EN: "Please sign in to create a listing.").
+        'İlan vermek için lütfen giriş yapın.',
+      );
+    }
+    if (profileAsync.isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Yeni İlan Aç')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (!canCreateListing) {
+      return _buildAccessDenied(
+        context,
+        // TODO(l10n): add listingCreateEmployerOnly (TR: "İlan vermek yalnızca işveren hesapları için kullanılabilir.", EN: "Only employer accounts can create listings.").
+        'İlan vermek yalnızca işveren hesapları için kullanılabilir.',
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Yeni İlan Aç')),
       body: SingleChildScrollView(
@@ -670,6 +697,31 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 isSubmitting: _submitting,
                 label: 'İlanı Yayınla',
                 onPressed: _submit,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccessDenied(BuildContext context, String message) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Yeni İlan Aç')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.lock_outline, size: 48),
+              const SizedBox(height: 16),
+              Text(message, textAlign: TextAlign.center),
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: () => context.go('/'),
+                // TODO(l10n): add returnHome (TR: "Ana Sayfaya Dön", EN: "Return home").
+                child: const Text('Ana Sayfaya Dön'),
               ),
             ],
           ),

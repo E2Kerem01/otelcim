@@ -235,6 +235,7 @@
   "gridColumnsTooltip": "{count} columns",
   "tableViewTooltip": "Table view",
   "noListingsTitle": "No listings yet",
+  "listingsLoadError": "Listings could not be loaded. Please try again.",
   "noListingsBody": "There are no active listings. You can load sample listings into the database or create a new one.",
   "seedSampleListingsAction": "Load sample listings into database",
   "createFirstListingAction": "Create the first listing",

@@ -5,6 +5,21 @@ import '../../features/listings/domain/listing_model.dart';
 import '../constants/listing_filters.dart';
 import '../error/error_reporter.dart';
 
+List<Listing> _parseListingDocs(
+  Iterable<DocumentSnapshot> docs,
+  String context,
+) {
+  final listings = <Listing>[];
+  for (final doc in docs) {
+    try {
+      listings.add(Listing.fromDoc(doc));
+    } on Object catch (error, stackTrace) {
+      logError(error, stackTrace, context: '$context (${doc.id})');
+    }
+  }
+  return listings;
+}
+
 class ListingService {
   ListingService(this._db);
 
@@ -33,10 +48,10 @@ class ListingService {
         .collection('listings')
         .snapshots()
         .map((snap) {
-          var listings = snap.docs
-              .map(Listing.fromDoc)
-              .where((l) => l.status == ListingStatus.active)
-              .toList();
+          var listings = _parseListingDocs(
+            snap.docs,
+            'ListingService.watchActiveListings',
+          ).where((l) => l.status == ListingStatus.active).toList();
 
           listings.sort((a, b) {
             final aBoosted =
@@ -72,8 +87,11 @@ class ListingService {
           return listings;
         })
         .handleError((Object error, StackTrace stackTrace) {
-          logError(error, stackTrace, context: 'ListingService.watchActiveListings');
-          return <Listing>[];
+          logError(
+            error,
+            stackTrace,
+            context: 'ListingService.watchActiveListings',
+          );
         });
   }
 
@@ -82,10 +100,10 @@ class ListingService {
         .collection('listings')
         .snapshots()
         .map((snap) {
-          var listings = snap.docs
-              .map(Listing.fromDoc)
-              .where((l) => l.posterId == uid)
-              .toList();
+          var listings = _parseListingDocs(
+            snap.docs,
+            'ListingService.watchMyListings',
+          ).where((l) => l.posterId == uid).toList();
 
           listings.sort((a, b) {
             final tA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -96,8 +114,11 @@ class ListingService {
           return listings;
         })
         .handleError((Object error, StackTrace stackTrace) {
-          logError(error, stackTrace, context: 'ListingService.watchMyListings');
-          return <Listing>[];
+          logError(
+            error,
+            stackTrace,
+            context: 'ListingService.watchMyListings',
+          );
         });
   }
 
@@ -195,8 +216,11 @@ class ListingService {
   /// listing doc - see the comment on Listing.toMap. isSignedIn() (not
   /// ownership) gates reads there, matching the in-app "sign in to reveal
   /// contact info" UX; only the owner/admin may write it (firestore.rules).
-  DocumentReference<Map<String, dynamic>> _contactRef(String listingId) =>
-      _db.collection('listings').doc(listingId).collection('private').doc('contact');
+  DocumentReference<Map<String, dynamic>> _contactRef(String listingId) => _db
+      .collection('listings')
+      .doc(listingId)
+      .collection('private')
+      .doc('contact');
 
   Future<String> createListing(Listing listing) async {
     final id = newListingId();
@@ -270,7 +294,11 @@ class ListingService {
           listing = listing.copyWithContactInfo(value);
         }
       } catch (e, stackTrace) {
-        logError(e, stackTrace, context: 'ListingService.getListing (contact subdoc)');
+        logError(
+          e,
+          stackTrace,
+          context: 'ListingService.getListing (contact subdoc)',
+        );
       }
 
       return listing;
@@ -338,7 +366,10 @@ class ListingService {
       final snapshot = await query.get();
 
       final pageDocs = snapshot.docs.take(limit).toList();
-      var listings = pageDocs.map(Listing.fromDoc).toList();
+      var listings = _parseListingDocs(
+        pageDocs,
+        'ListingService.getPaginatedListings',
+      );
 
       listings.sort((a, b) {
         final aBoosted =
@@ -428,11 +459,7 @@ class ListingService {
       );
     } catch (e, stackTrace) {
       logError(e, stackTrace, context: 'ListingService.getPaginatedListings');
-      return PaginatedListingsResult(
-        listings: [],
-        lastDocument: null,
-        hasMore: false,
-      );
+      rethrow;
     }
   }
 
@@ -481,10 +508,18 @@ class ListingService {
         .orderBy('createdAt', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snap) => snap.docs.map(Listing.fromDoc).toList())
+        .map(
+          (snap) => _parseListingDocs(
+            snap.docs,
+            'ListingService.watchRecentListingsForAdmin',
+          ),
+        )
         .handleError((Object error, StackTrace stackTrace) {
-          logError(error, stackTrace, context: 'ListingService.watchRecentListingsForAdmin');
-          return <Listing>[];
+          logError(
+            error,
+            stackTrace,
+            context: 'ListingService.watchRecentListingsForAdmin',
+          );
         });
   }
 
@@ -502,7 +537,10 @@ class ListingService {
           .endAt(['$trimmed'])
           .limit(30)
           .get();
-      return snap.docs.map(Listing.fromDoc).toList();
+      return _parseListingDocs(
+        snap.docs,
+        'ListingService.searchListingsForAdmin',
+      );
     } catch (e, stackTrace) {
       logError(e, stackTrace, context: 'ListingService.searchListingsForAdmin');
       return [];
