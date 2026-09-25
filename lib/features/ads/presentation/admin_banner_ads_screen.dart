@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -92,7 +91,7 @@ class AdminBannerAdsScreen extends ConsumerWidget {
   }
 }
 
-class _AdminBannerAdsBody extends StatefulWidget {
+class _AdminBannerAdsBody extends ConsumerStatefulWidget {
   const _AdminBannerAdsBody({
     required this.onEdit,
     required this.onDelete,
@@ -102,10 +101,10 @@ class _AdminBannerAdsBody extends StatefulWidget {
   final Future<bool> Function(BannerAd) onDelete;
 
   @override
-  State<_AdminBannerAdsBody> createState() => _AdminBannerAdsBodyState();
+  ConsumerState<_AdminBannerAdsBody> createState() => _AdminBannerAdsBodyState();
 }
 
-class _AdminBannerAdsBodyState extends State<_AdminBannerAdsBody> {
+class _AdminBannerAdsBodyState extends ConsumerState<_AdminBannerAdsBody> {
   late final AdminPagedController<BannerAd> _controller =
       AdminPagedController<BannerAd>(
         fromDoc: (doc) => BannerAd.fromDoc(doc),
@@ -126,10 +125,9 @@ class _AdminBannerAdsBodyState extends State<_AdminBannerAdsBody> {
   }
 
   void _reload() {
-    unawaited(_controller.setQuery(adminBannerAdsQuery(
-      FirebaseFirestore.instance,
-      filter: _filter,
-    )));
+    unawaited(_controller.setQuery(ref
+        .read(bannerAdServiceProvider)
+        .adminQuery(filter: _filter)));
   }
 
   @override
@@ -161,7 +159,8 @@ class _AdminBannerAdsBodyState extends State<_AdminBannerAdsBody> {
               },
               onToggleActive: (value) {
                 unawaited(
-                  BannerAdService(FirebaseFirestore.instance)
+                  ref
+                      .read(bannerAdServiceProvider)
                       .toggleActive(banner.id, value)
                       .then((_) => _controller.refresh()),
                 );
@@ -295,25 +294,25 @@ class _AdminBannerCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    'SÄ±ra: ${banner.order}',
+                    'Sıra: ${banner.order}',
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(width: 8),
                 if (banner.endDate != null)
                   Text(
-                    'BitiÅŸ: ${banner.endDate!.day}.${banner.endDate!.month}.${banner.endDate!.year}',
+                    'Bitiş: ${banner.endDate!.day}.${banner.endDate!.month}.${banner.endDate!.year}',
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   )
                 else
                   Text(
-                    'SÃ¼resiz',
+                    'Süresiz',
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   ),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.edit_outlined, size: 20),
-                  tooltip: 'DÃ¼zenle',
+                  tooltip: 'Düzenle',
                   onPressed: onEdit,
                 ),
                 IconButton(
@@ -391,7 +390,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('GÃ¶rsel yÃ¼klendi.')),
+          const SnackBar(content: Text('Görsel yüklendi.')),
         );
       }
     } catch (error, stackTrace) {
@@ -433,7 +432,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
     if (!_formKey.currentState!.validate()) return;
     if (_imageUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('LÃ¼tfen bir banner gÃ¶rseli yÃ¼kleyin veya URL girin.')),
+        const SnackBar(content: Text('Lütfen bir banner görseli yükleyin veya URL girin.')),
       );
       return;
     }
@@ -473,7 +472,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.existingAd != null ? 'Banner gÃ¼ncellendi.' : 'Banner eklendi.')),
+          SnackBar(content: Text(widget.existingAd != null ? 'Banner güncellendi.' : 'Banner eklendi.')),
         );
         Navigator.of(context).pop();
       }
@@ -511,7 +510,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.existingAd != null ? 'Banner DÃ¼zenle' : 'Yeni Banner Ekle',
+                    widget.existingAd != null ? 'Banner Düzenle' : 'Yeni Banner Ekle',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -541,7 +540,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                               CachedNetworkImage(
                                 imageUrl: _imageUrl,
                                 fit: BoxFit.cover,
-                                errorWidget: (_, _, _) => const Center(child: Text('GÃ¶rsel yÃ¼klenemedi')),
+                                errorWidget: (_, _, _) => const Center(child: Text('Görsel yüklenemedi')),
                               ),
                               Positioned(
                                 right: 8,
@@ -564,7 +563,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                               ElevatedButton.icon(
                                 onPressed: _pickAndUploadImage,
                                 icon: const Icon(Icons.upload_rounded),
-                                label: const Text('GÃ¶rsel YÃ¼kle'),
+                                label: const Text('Görsel Yükle'),
                               ),
                             ],
                           ),
@@ -576,10 +575,10 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: 'Banner BaÅŸlÄ±ÄŸÄ± *',
-                  hintText: 'Ã–rn. Jolly Tur ile Yaz FÄ±rsatlarÄ±',
+                  labelText: 'Banner Başlığı *',
+                  hintText: 'Örn. Jolly Tur ile Yaz Fırsatları',
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'BaÅŸlÄ±k gerekli' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Başlık gerekli' : null,
               ),
 
               const SizedBox(height: 12),
@@ -588,10 +587,10 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
               TextFormField(
                 controller: _advertiserController,
                 decoration: const InputDecoration(
-                  labelText: 'Reklamveren Firma AdÄ± *',
-                  hintText: 'Ã–rn. Jolly Tur',
+                  labelText: 'Reklamveren Firma Adı *',
+                  hintText: 'Örn. Jolly Tur',
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Reklamveren adÄ± gerekli' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Reklamveren adı gerekli' : null,
               ),
 
               const SizedBox(height: 12),
@@ -601,7 +600,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                 controller: _targetUrlController,
                 keyboardType: TextInputType.url,
                 decoration: const InputDecoration(
-                  labelText: 'Hedef BaÄŸlantÄ± (URL) *',
+                  labelText: 'Hedef Bağlantı (URL) *',
                   hintText: 'https://www.jollytur.com',
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Hedef URL gerekli' : null,
@@ -614,8 +613,8 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                 controller: _orderController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  labelText: 'SÄ±ralama Ã–nceliÄŸi (0, 1, 2...)',
-                  hintText: 'KÃ¼Ã§Ã¼k olan ilk gÃ¶sterilir',
+                  labelText: 'Sıralama Önceliği (0, 1, 2...)',
+                  hintText: 'Küçük olan ilk gösterilir',
                 ),
               ),
 
@@ -630,7 +629,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                       icon: const Icon(Icons.calendar_today, size: 16),
                       label: Text(
                         _startDate == null
-                            ? 'BaÅŸlangÄ±Ã§ Tarihi'
+                            ? 'Başlangıç Tarihi'
                             : '${_startDate!.day}.${_startDate!.month}.${_startDate!.year}',
                         style: const TextStyle(fontSize: 12),
                       ),
@@ -643,7 +642,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                       icon: const Icon(Icons.event, size: 16),
                       label: Text(
                         _endDate == null
-                            ? 'BitiÅŸ Tarihi (SÃ¼resiz)'
+                            ? 'Bitiş Tarihi (Süresiz)'
                             : '${_endDate!.day}.${_endDate!.month}.${_endDate!.year}',
                         style: const TextStyle(fontSize: 12),
                       ),
@@ -657,8 +656,8 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
               // Active Switch Row
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Aktif YayÄ±n LansmanÄ±'),
-                subtitle: const Text('Pasif yapÄ±lÄ±rsa anasayfada gizlenir'),
+                title: const Text('Aktif Yayın Lansmanı'),
+                subtitle: const Text('Pasif yapılırsa anasayfada gizlenir'),
                 value: _isActive,
                 onChanged: (val) => setState(() => _isActive = val),
               ),
@@ -681,7 +680,7 @@ class _BannerAdFormSheetState extends ConsumerState<_BannerAdFormSheet> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : Text(widget.existingAd != null ? 'DeÄŸiÅŸiklikleri Kaydet' : 'Banner\'Ä± Kaydet'),
+                      : Text(widget.existingAd != null ? 'Değişiklikleri Kaydet' : 'Banner\'ı Kaydet'),
                 ),
               ),
             ],

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +15,7 @@ import '../services/admin_service.dart';
 import 'widgets/admin_paged_controller.dart';
 import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
 const _certificateFilters = <AdminFilter>[
   AdminFilter('pending', 'Bekleyen', icon: Icons.hourglass_top_outlined),
@@ -55,7 +55,7 @@ class _CertificateReviewScreenState
 
   void _reload() {
     unawaited(_controller.setQuery(adminCertificatesQuery(
-      FirebaseFirestore.instance,
+      ref.read(firestoreProvider),
       filter: _filter,
     )));
   }

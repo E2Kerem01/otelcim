@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +8,7 @@ import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
 import 'widgets/admin_paged_controller.dart';
 import 'widgets/admin_paged_view.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
 final _auditFilters = <AdminFilter>[
   const AdminFilter('all', 'Tüm işlemler'),
@@ -46,7 +46,7 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
 
   void _reload() {
     unawaited(_controller.setQuery(adminAuditLogQuery(
-      FirebaseFirestore.instance,
+      ref.read(firestoreProvider),
       adminId: _adminId,
       actionType: _type,
     )));

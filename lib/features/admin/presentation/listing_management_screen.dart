@@ -17,6 +17,7 @@ import '../services/moderation_service.dart';
 import 'widgets/admin_paged_controller.dart';
 import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
 const _listingFilters = <AdminFilter>[
   AdminFilter('all', 'Tümü'),
@@ -87,7 +88,7 @@ class _ListingManagementScreenState
     unawaited(
       _listings.setQuery(
         adminListingsQuery(
-          FirebaseFirestore.instance,
+          ref.read(firestoreProvider),
           filter: _filter,
           search: _searchController.text,
         ),

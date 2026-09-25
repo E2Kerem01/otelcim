@@ -16,6 +16,7 @@ import '../../../shared/utils/search_keywords.dart';
 import 'widgets/admin_paged_controller.dart';
 import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
 /// Standalone admin screen to find any user and suspend/ban/unsuspend/unban
 /// them. Server-side pagination (20 per page), filter tabs and prefix search
@@ -86,7 +87,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
 
   void _reload() {
     unawaited(_users.setQuery(adminUsersQuery(
-      FirebaseFirestore.instance,
+      ref.read(firestoreProvider),
       filter: _filter,
       search: _searchController.text,
     )));

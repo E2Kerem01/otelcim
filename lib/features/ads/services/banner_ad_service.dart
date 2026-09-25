@@ -23,6 +23,10 @@ class BannerAdService {
 
   final FirebaseFirestore _db;
 
+  /// Paged admin list query for a filter tab ('all' | 'active' | 'inactive').
+  Query<Map<String, dynamic>> adminQuery({required String filter}) =>
+      adminBannerAdsQuery(_db, filter: filter);
+
   /// Stream of active banner ads for home page display
   /// Filters for isActive == true and non-expired end dates, sorted by order
   Stream<List<BannerAd>> watchActiveBannerAds() {

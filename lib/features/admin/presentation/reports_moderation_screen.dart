@@ -15,6 +15,7 @@ import '../services/moderation_service.dart';
 import 'widgets/admin_paged_controller.dart';
 import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
 const _reportFilters = <AdminFilter>[
   AdminFilter('pending', 'Bekleyen', icon: Icons.pending_actions),
@@ -106,7 +107,7 @@ class _ReportsModerationScreenState
     unawaited(
       _reports.setQuery(
         adminReportsQuery(
-          FirebaseFirestore.instance,
+          ref.read(firestoreProvider),
           filter: _filter,
           targetType: _targetType,
         ),

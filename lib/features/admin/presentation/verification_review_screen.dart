@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +15,7 @@ import '../services/verification_service.dart';
 import 'widgets/admin_paged_controller.dart';
 import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
 final pendingVerificationsProvider =
     StreamProvider.autoDispose<List<VerificationRequest>>(
@@ -60,7 +60,7 @@ class _VerificationReviewScreenState
 
   void _reload() {
     unawaited(_controller.setQuery(adminVerificationQuery(
-      FirebaseFirestore.instance,
+      ref.read(firestoreProvider),
       filter: _filter,
     )));
   }
