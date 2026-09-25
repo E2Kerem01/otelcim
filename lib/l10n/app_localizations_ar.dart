@@ -794,4 +794,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String seasonWinterOf(String years) {
     return 'شتاء $years';
   }
+
+  @override
+  String get forgotPasswordLink => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get passwordResetTitle => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get passwordResetSend => 'إرسال رابط إعادة التعيين';
+
+  @override
+  String get passwordResetSuccess =>
+      'إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة التعيين';
+
+  @override
+  String get passwordResetInvalidEmail => 'أدخل عنوان بريد إلكتروني صالحًا.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'طلبات كثيرة جدًا. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'تحقق من اتصالك بالإنترنت وحاول مرة أخرى.';
+
+  @override
+  String get passwordResetGenericError =>
+      'تعذر إرسال الرابط. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get adminPanelEntry => 'لوحة الإدارة';
 }

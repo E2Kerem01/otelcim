@@ -81,7 +81,7 @@ class FakeListingService implements ListingService {
   final Map<String, Object> errors;
 
   @override
-  Future<Listing?> getListing(String id) async {
+  Future<Listing?> getListing(String id, {String? viewerId}) async {
     final error = errors[id];
     if (error != null) throw error;
     return listings[id];

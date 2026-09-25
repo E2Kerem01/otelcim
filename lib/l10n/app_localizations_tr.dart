@@ -792,4 +792,35 @@ class AppLocalizationsTr extends AppLocalizations {
   String seasonWinterOf(String years) {
     return 'Kış $years';
   }
+
+  @override
+  String get forgotPasswordLink => 'Şifremi unuttum?';
+
+  @override
+  String get passwordResetTitle => 'Şifre sıfırlama';
+
+  @override
+  String get passwordResetSend => 'Sıfırlama bağlantısı gönder';
+
+  @override
+  String get passwordResetSuccess =>
+      'Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.';
+
+  @override
+  String get passwordResetInvalidEmail => 'Geçerli bir e-posta adresi girin.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'İnternet bağlantınızı kontrol edip tekrar deneyin.';
+
+  @override
+  String get passwordResetGenericError =>
+      'Bağlantı gönderilemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get adminPanelEntry => 'Yönetim Paneli';
 }

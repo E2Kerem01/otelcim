@@ -24,6 +24,27 @@ class ListingService {
   ListingService(this._db);
 
   final FirebaseFirestore _db;
+  final Set<String> _viewedListingIds = <String>{};
+
+  Future<void> incrementViewCountIfNeeded({
+    required String listingId,
+    required String ownerId,
+    required String? viewerId,
+  }) async {
+    if (viewerId == null || viewerId == ownerId || _viewedListingIds.contains(listingId)) {
+      return;
+    }
+
+    _viewedListingIds.add(listingId);
+    try {
+      await _db.collection('listings').doc(listingId).update({
+        'viewCount': FieldValue.increment(1),
+      });
+    } catch (error, stackTrace) {
+      _viewedListingIds.remove(listingId);
+      logError(error, stackTrace, context: 'ListingService.incrementViewCount');
+    }
+  }
 
   /// Counts active listings on Firestore without downloading documents.
   Future<int> countActiveListings({String? region, String? season}) async {
@@ -278,11 +299,17 @@ class ListingService {
     });
   }
 
-  Future<Listing?> getListing(String listingId) async {
+  Future<Listing?> getListing(String listingId, {String? viewerId}) async {
     try {
       final doc = await _db.collection('listings').doc(listingId).get();
       if (!doc.exists) return null;
       var listing = Listing.fromDoc(doc);
+
+      await incrementViewCountIfNeeded(
+        listingId: listing.id,
+        ownerId: listing.posterId,
+        viewerId: viewerId,
+      );
 
       // contactInfo lives in a separate, sign-in-gated subdoc (see
       // Listing.toMap). Signed-out callers simply get '' back here, which

@@ -115,6 +115,10 @@ class AuthService extends ChangeNotifier {
     return user;
   }
 
+  Future<void> sendPasswordResetEmail({required String email}) {
+    return _auth.sendPasswordResetEmail(email: email);
+  }
+
   Future<String> verifyPhoneNumber({required String phoneNumber}) async {
     final completer = Completer<String>();
     await _auth.verifyPhoneNumber(

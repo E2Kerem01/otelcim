@@ -28,7 +28,10 @@ final _listingProvider = FutureProvider.family<Listing?, String>((
   ref,
   listingId,
 ) {
-  return ref.watch(listingServiceProvider).getListing(listingId);
+  return ref.watch(listingServiceProvider).getListing(
+        listingId,
+        viewerId: ref.read(authServiceProvider).currentUser?.uid,
+      );
 });
 
 class ListingDetailScreen extends ConsumerStatefulWidget {

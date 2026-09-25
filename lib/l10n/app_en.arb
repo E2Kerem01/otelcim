@@ -277,5 +277,14 @@
   "perkShuttle": "Shuttle",
   "verifiedEmployer": "Verified employer",
   "seasonSummerOf": "Summer {year}",
-  "seasonWinterOf": "Winter {years}"
+  "seasonWinterOf": "Winter {years}",
+  "forgotPasswordLink": "Forgot password?",
+  "passwordResetTitle": "Reset password",
+  "passwordResetSend": "Send reset link",
+  "passwordResetSuccess": "If an account exists, a reset link was sent",
+  "passwordResetInvalidEmail": "Enter a valid email address.",
+  "passwordResetTooManyRequests": "Too many requests. Please try again later.",
+  "passwordResetNetworkError": "Check your internet connection and try again.",
+  "passwordResetGenericError": "The reset link could not be sent. Please try again.",
+  "adminPanelEntry": "Admin panel"
 }
