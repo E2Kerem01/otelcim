@@ -69,9 +69,24 @@ describe('user_profiles: legitimate client flows keep working', () => {
     await allowed(db(ADMIN).update(`user_profiles/${EVE}`, { isBanned: true, banReason: 'spam' }));
     await allowed(db(ADMIN).update(`user_profiles/${EVE}`, { isSuspended: true, suspensionEnd: FUTURE }));
   });
+
+  test('an admin cannot moderate their own profile', async () => {
+    await denied(db(ADMIN).update(`user_profiles/${ADMIN}`, { isBanned: true, banReason: 'self ban' }));
+    await denied(db(ADMIN).update(`user_profiles/${ADMIN}`, { isSuspended: true, suspensionEnd: FUTURE }));
+  });
 });
 
 describe('user_profiles: isAdmin and referral/boost counters (already protected)', () => {
+  test('an admin cannot demote themselves but can demote another admin', async () => {
+    await adminSdk.set(
+      'user_profiles/other_admin',
+      profilePayload('other_admin', { isAdmin: true, adminRole: 'contentModerator' }),
+    );
+
+    await denied(db(ADMIN).update(`user_profiles/${ADMIN}`, { isAdmin: false, adminRole: null }));
+    await allowed(db(ADMIN).update('user_profiles/other_admin', { isAdmin: false, adminRole: null }));
+  });
+
   test('creating a profile with isAdmin:true is denied, isAdmin:false is allowed', async () => {
     await denied(db('u_admin_try').set('user_profiles/u_admin_try', profilePayload('u_admin_try', { isAdmin: true })));
     await allowed(db('u_plain').set('user_profiles/u_plain', profilePayload('u_plain', { isAdmin: false })));

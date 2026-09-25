@@ -109,6 +109,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd.MM.yyyy');
+    final currentAdminUid = ref.read(authServiceProvider).currentUser?.uid;
     return Scaffold(
       appBar: AppBar(title: const Text('Kullanıcı Yönetimi')),
       body: Column(
@@ -169,11 +170,18 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                 ),
                 AdminColumn(
                   label: 'Rol',
-                  cell: (_, u) => Text(u.isAdmin
-                      ? 'Admin'
-                      : u.userType == 'employer'
-                          ? 'İşveren'
-                          : 'İş arayan'),
+                  cell: (_, u) => Wrap(
+                    spacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(u.isAdmin
+                          ? 'Admin'
+                          : u.userType == 'employer'
+                              ? 'İşveren'
+                              : 'İş arayan'),
+                      if (u.id == currentAdminUid) const _SelfChip(),
+                    ],
+                  ),
                 ),
                 AdminColumn(label: 'Durum', cell: (_, u) => _StatusChip(user: u)),
                 AdminColumn(
@@ -219,6 +227,20 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
+class _SelfChip extends StatelessWidget {
+  const _SelfChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Chip(
+      label: Text('Siz'),
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      labelStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+    );
+  }
+}
+
 class _UserCard extends ConsumerStatefulWidget {
   const _UserCard({required this.user});
   final UserProfile user;
@@ -238,6 +260,14 @@ class _UserCardState extends ConsumerState<_UserCard> {
   }) async {
     final adminId = ref.read(authServiceProvider).currentUser?.uid;
     if (adminId == null) return;
+    if (adminId == widget.user.id) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kendi hesabınız üzerinde işlem yapamazsınız.')),
+        );
+      }
+      return;
+    }
 
     final reason = await showReasonDialog(
       context,
@@ -270,6 +300,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
   @override
   Widget build(BuildContext context) {
     final user = widget.user;
+    final isSelf = ref.read(authServiceProvider).currentUser?.uid == user.id;
     final moderation = ref.read(moderationServiceProvider);
     final name = (user.displayName?.isNotEmpty ?? false) ? user.displayName! : user.email;
 
@@ -294,6 +325,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                     ],
                   ),
                 ),
+                if (isSelf) const _SelfChip(),
                 if (_busy)
                   const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2)),
               ],
@@ -329,7 +361,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
               children: [
                 if (user.isBanned)
                   OutlinedButton.icon(
-                    onPressed: _busy
+                    onPressed: (_busy || isSelf)
                         ? null
                         : () => _confirmAndRun(
                               'Yasağı Kaldır',
@@ -352,7 +384,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                   )
                 else
                   FilledButton.tonalIcon(
-                    onPressed: _busy
+                    onPressed: (_busy || isSelf)
                         ? null
                         : () => _confirmAndRun(
                               'Kullanıcıyı Yasakla',
@@ -381,7 +413,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                   ),
                 if (user.isSuspended)
                   OutlinedButton.icon(
-                    onPressed: _busy
+                    onPressed: (_busy || isSelf)
                         ? null
                         : () => _confirmAndRun(
                               'Askıyı Kaldır',
@@ -404,7 +436,7 @@ class _UserCardState extends ConsumerState<_UserCard> {
                   )
                 else
                   OutlinedButton.icon(
-                    onPressed: (_busy || user.isBanned)
+                    onPressed: (_busy || isSelf || user.isBanned)
                         ? null
                         : () => _confirmAndRun(
                               'Kullanıcıyı Askıya Al',
