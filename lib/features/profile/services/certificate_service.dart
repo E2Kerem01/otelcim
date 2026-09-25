@@ -27,6 +27,18 @@ final pendingCertificatesProvider =
   return ref.watch(certificateServiceProvider).watchPendingCertificates();
 });
 
+/// Ordered query used by the paged admin certificate review queue.
+Query<Map<String, dynamic>> adminCertificatesQuery(
+  FirebaseFirestore db, {
+  required String filter,
+}) {
+  Query<Map<String, dynamic>> query = db.collection('certificates');
+  if (filter != 'all') {
+    query = query.where('status', isEqualTo: filter);
+  }
+  return query.orderBy('createdAt', descending: true);
+}
+
 class CertificateService {
   CertificateService({
     FirebaseFirestore? firestore,
@@ -102,9 +114,10 @@ class CertificateService {
 
   /// Watch all pending certificates (for admin review).
   Stream<List<Certificate>> watchPendingCertificates() {
-    return _certificatesRef
-        .where('status', isEqualTo: CertificateStatus.pending.name)
-        .snapshots()
+    return adminCertificatesQuery(
+      _firestore,
+      filter: CertificateStatus.pending.name,
+    ).snapshots()
         .map((snapshot) {
       final list = snapshot.docs.map((doc) => Certificate.fromDoc(doc)).toList();
       list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
