@@ -137,18 +137,19 @@ void main() {
       expect(find.text('₺149,99'), findsOneWidget);
     });
 
-    testWidgets('[BUG-t3-10] listing that is already urgent is not offered for sale again', (tester) async {
+    testWidgets('listing that is already urgent is not offered for sale again', (tester) async {
       await openScreen(tester, listing: makeListing(isUrgent: true));
       // Expected: an "already urgent" state instead of a buy button.
       expect(find.text(_buyButton), findsNothing);
-    }, skip: widgetBug('BUG-t3-10: urgent purchase screen sells urgency for a listing that is already isUrgent'));
+      expect(find.text('Bu ilan zaten acil.'), findsOneWidget);
+    });
   });
 
   group('UrgentListingPurchaseScreen — purchase flow', () {
-    testWidgets('signed-out user is asked to log in; no store call', (tester) async {
+    testWidgets('signed-out user cannot buy; no store call', (tester) async {
       await openScreen(tester, listing: makeListing(), uid: null);
-      await tapBuy(tester);
       expect(find.text('Lütfen önce giriş yapın.'), findsOneWidget);
+      expect(find.text(_buyButton), findsNothing);
       verifyNever(() => h.iap.buyNonConsumable(purchaseParam: any(named: 'purchaseParam')));
     });
 
@@ -248,14 +249,13 @@ void main() {
       expect(find.textContaining('size ait değil'), findsOneWidget);
     }, skip: widgetBug('BUG-t3-05: plain Exception from the service is mapped to the generic message'));
 
-    testWidgets("[BUG-t3-06] another user's listing is refused before the store charges", (tester) async {
-      h.answerBuyWith(makePurchase('urgent_listing', PurchaseStatus.purchased));
+    testWidgets("another user's listing is refused before the store charges", (tester) async {
       await openScreen(tester, listing: makeListing(posterId: 'someone-else'), uid: 'owner');
 
-      await tapBuy(tester);
-
+      expect(find.text('Bu ilanı yalnızca sahibi acil yapabilir.'), findsOneWidget);
+      expect(find.text(_buyButton), findsNothing);
       verifyNever(() => h.iap.buyNonConsumable(purchaseParam: any(named: 'purchaseParam')));
-    }, skip: widgetBug('BUG-t3-06: no ownership check before charging'));
+    });
 
     testWidgets('"continue without urgent" skips the purchase and leaves the screen', (tester) async {
       await openScreen(tester, listing: makeListing());

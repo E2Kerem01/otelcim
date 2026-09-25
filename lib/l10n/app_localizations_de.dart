@@ -654,6 +654,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noListingsTitle => 'Noch keine Anzeigen';
 
   @override
+  String get listingsLoadError =>
+      'Anzeigen konnten nicht geladen werden. Bitte versuche es erneut.';
+
+  @override
   String get noListingsBody =>
       'Es gibt keine aktiven Anzeigen. Du kannst Beispielanzeigen in die Datenbank laden oder eine neue erstellen.';
 

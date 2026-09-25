@@ -81,7 +81,10 @@ void main() {
     test('fromDoc applies safe defaults and preserves Arabic/RTL text', () {
       final db = FakeFirebaseFirestore();
 
-      return db.collection('listings').doc('rtl').set({
+      return db
+          .collection('listings')
+          .doc('rtl')
+          .set({
             'title': 'موظف استقبال',
             'description': 'مطلوب للعمل في فندق',
             'location': 'أنطاليا',
@@ -138,16 +141,51 @@ void main() {
       expect(parsed.images, ['a.jpg', 'b.jpg']);
     });
 
-    test('malformed image data is ignored instead of crashing listing parsing', () async {
-      final db = FakeFirebaseFirestore();
-      await db.collection('listings').doc('bad-images').set({
-        'images': [1, 2],
-      });
-      final doc = await db.collection('listings').doc('bad-images').get();
+    test(
+      'tolerates malformed scalar types without dropping a valid listing',
+      () async {
+        final db = FakeFirebaseFirestore();
+        await db.collection('listings').doc('good').set({
+          ...listingDocument(createdAt: DateTime(2026, 1, 2), id: 'good'),
+          'housingMealsIncluded': '2',
+          'lat': '36.5',
+          'lng': 30,
+          'minSalaryTl': '35000',
+          'posterVerified': 'true',
+          'images': [1, 'good.jpg'],
+        });
+        await db.collection('listings').doc('bad').set({
+          ...listingDocument(createdAt: DateTime(2025, 12, 31), id: 'bad'),
+          'housingMealsIncluded': true,
+          'lat': true,
+          'images': [1],
+        });
 
-      expect(() => Listing.fromDoc(doc), returnsNormally);
-    },
-      skip: 'BUG-t4-001: Listing.fromDoc casts malformed image entries to String',
+        final results = await ListingService(db).watchActiveListings().first;
+
+        expect(results.map((item) => item.id), contains('good'));
+        final parsedGood = results.singleWhere((item) => item.id == 'good');
+        expect(parsedGood.housingMealsIncluded, 2);
+        expect(parsedGood.lat, 36.5);
+        expect(parsedGood.minSalaryTl, 35000);
+        expect(parsedGood.posterVerified, isTrue);
+        expect(parsedGood.images, ['good.jpg']);
+      },
+    );
+
+    test(
+      'malformed image data is ignored instead of crashing listing parsing',
+      () async {
+        final db = FakeFirebaseFirestore();
+        await db.collection('listings').doc('bad-images').set({
+          'images': [1, 2],
+        });
+        final doc = await db.collection('listings').doc('bad-images').get();
+
+        expect(() => Listing.fromDoc(doc), returnsNormally);
+      },
+      skip:
+          'BUG-t4-001: Listing.fromDoc casts malformed image entries to String',
     );
   });
 
@@ -160,154 +198,202 @@ void main() {
       service = ListingService(db);
     });
 
-    test('createListingWithId stores contact only in the private subdocument', () async {
-      await service.createListingWithId('created', listing(id: 'created'));
+    test(
+      'createListingWithId stores contact only in the private subdocument',
+      () async {
+        await service.createListingWithId('created', listing(id: 'created'));
 
-      final publicDoc = await db.collection('listings').doc('created').get();
-      final contactDoc = await db
-          .collection('listings')
-          .doc('created')
-          .collection('private')
-          .doc('contact')
-          .get();
+        final publicDoc = await db.collection('listings').doc('created').get();
+        final contactDoc = await db
+            .collection('listings')
+            .doc('created')
+            .collection('private')
+            .doc('contact')
+            .get();
 
-      expect(publicDoc.data()!.containsKey('contactInfo'), isFalse);
-      expect(publicDoc.data()!['isUrgent'], isTrue);
-      expect(publicDoc.data()!['lat'], 36.8841);
-      expect(contactDoc.data()!['value'], '0532 111 22 33');
-    });
+        expect(publicDoc.data()!.containsKey('contactInfo'), isFalse);
+        expect(publicDoc.data()!['isUrgent'], isTrue);
+        expect(publicDoc.data()!['lat'], 36.8841);
+        expect(contactDoc.data()!['value'], '0532 111 22 33');
+      },
+    );
 
-    test('updateListing preserves createdAt, removes legacy contact, and updates contact subdoc', () async {
-      final originalCreatedAt = DateTime(2026, 1, 2, 3, 4);
-      await db.collection('listings').doc('edited').set({
-        ...listingDocument(createdAt: originalCreatedAt, id: 'edited'),
-        'createdAt': Timestamp.fromDate(originalCreatedAt),
-        'contactInfo': 'legacy public contact',
-      });
+    test(
+      'updateListing preserves createdAt, removes legacy contact, and updates contact subdoc',
+      () async {
+        final originalCreatedAt = DateTime(2026, 1, 2, 3, 4);
+        await db.collection('listings').doc('edited').set({
+          ...listingDocument(createdAt: originalCreatedAt, id: 'edited'),
+          'createdAt': Timestamp.fromDate(originalCreatedAt),
+          'contactInfo': 'legacy public contact',
+        });
 
-      await service.updateListing(
-        listing(id: 'edited', createdAt: originalCreatedAt),
-      );
-
-      final publicData =
-          (await db.collection('listings').doc('edited').get()).data()!;
-      final contactData = (await db
-              .collection('listings')
-              .doc('edited')
-              .collection('private')
-              .doc('contact')
-              .get())
-          .data()!;
-
-      expect((publicData['createdAt'] as Timestamp).toDate(), originalCreatedAt);
-      expect(publicData.containsKey('contactInfo'), isFalse);
-      expect(contactData['value'], '0532 111 22 33');
-    });
-
-    test('getListing returns null for an unknown id and merges private contact', () async {
-      await db.collection('listings').doc('known').set(
-        listingDocument(createdAt: DateTime(2026, 2, 1), id: 'known'),
-      );
-      await db
-          .collection('listings')
-          .doc('known')
-          .collection('private')
-          .doc('contact')
-          .set({'value': 'contact loaded after sign-in'});
-
-      final known = await service.getListing('known');
-      final missing = await service.getListing('missing');
-
-      expect(known, isNotNull);
-      expect(known!.contactInfo, 'contact loaded after sign-in');
-      expect(missing, isNull);
-    });
-
-    test('active stream excludes closed and removed listings and ranks live boosts first', () async {
-      final now = DateTime.now();
-      await db.collection('listings').doc('normal').set(
-        listingDocument(createdAt: now, id: 'normal', title: 'Normal'),
-      );
-      await db.collection('listings').doc('live-boost').set(
-        listingDocument(
-          createdAt: now.subtract(const Duration(days: 1)),
-          id: 'live-boost',
-          title: 'Boost',
-          isBoosted: true,
-          boostExpiresAt: now.add(const Duration(days: 1)),
-        ),
-      );
-      await db.collection('listings').doc('expired-boost').set(
-        listingDocument(
-          createdAt: now.add(const Duration(minutes: 1)),
-          id: 'expired-boost',
-          title: 'Expired',
-          isBoosted: true,
-          boostExpiresAt: now.subtract(const Duration(minutes: 1)),
-        ),
-      );
-      await db.collection('listings').doc('closed').set(
-        listingDocument(
-          createdAt: now.add(const Duration(minutes: 2)),
-          id: 'closed',
-          status: 'closed',
-        ),
-      );
-
-      final results = await service.watchActiveListings().first;
-
-      expect(results.map((item) => item.id), ['live-boost', 'expired-boost', 'normal']);
-      expect(results.any((item) => item.id == 'closed'), isFalse);
-    });
-
-    test('pagination reports no next page at the exact limit and a next page above it', () async {
-      final createdAt = DateTime(2026, 3, 1);
-      for (var i = 0; i < 3; i++) {
-        await db.collection('listings').doc('page-$i').set(
-          listingDocument(
-            createdAt: createdAt.subtract(Duration(days: i)),
-            id: 'page-$i',
-            title: 'Page $i',
-          ),
+        await service.updateListing(
+          listing(id: 'edited', createdAt: originalCreatedAt),
         );
-      }
 
-      final exact = await service.getPaginatedListings(limit: 3);
-      final partial = await service.getPaginatedListings(limit: 2);
+        final publicData = (await db.collection('listings').doc('edited').get())
+            .data()!;
+        final contactData =
+            (await db
+                    .collection('listings')
+                    .doc('edited')
+                    .collection('private')
+                    .doc('contact')
+                    .get())
+                .data()!;
 
-      expect(exact.listings, hasLength(3));
-      expect(exact.hasMore, isFalse);
-      expect(exact.lastDocument, isNotNull);
-      expect(partial.listings, hasLength(2));
-      expect(partial.hasMore, isTrue);
-    });
+        expect(
+          (publicData['createdAt'] as Timestamp).toDate(),
+          originalCreatedAt,
+        );
+        expect(publicData.containsKey('contactInfo'), isFalse);
+        expect(contactData['value'], '0532 111 22 33');
+      },
+    );
 
-    test('salary filters include boundary values and exclude null salary ranges', () async {
-      final createdAt = DateTime(2026, 4, 1);
-      await db.collection('listings').doc('boundary').set(
-        listingDocument(
-          createdAt: createdAt,
-          id: 'boundary',
-          minSalaryTl: 35000,
-          maxSalaryTl: 40000,
-        ),
-      );
-      await db.collection('listings').doc('no-salary').set(
-        listingDocument(
-          createdAt: createdAt.subtract(const Duration(days: 1)),
-          id: 'no-salary',
-          minSalaryTl: null,
-          maxSalaryTl: null,
-        ),
-      );
+    test(
+      'getListing returns null for an unknown id and merges private contact',
+      () async {
+        await db
+            .collection('listings')
+            .doc('known')
+            .set(listingDocument(createdAt: DateTime(2026, 2, 1), id: 'known'));
+        await db
+            .collection('listings')
+            .doc('known')
+            .collection('private')
+            .doc('contact')
+            .set({'value': 'contact loaded after sign-in'});
 
-      final result = await service.getPaginatedListings(
-        minSalaryTl: 40000,
-        maxSalaryTl: 35000,
-      );
+        final known = await service.getListing('known');
+        final missing = await service.getListing('missing');
 
-      expect(result.listings.map((item) => item.id), ['boundary']);
-    });
+        expect(known, isNotNull);
+        expect(known!.contactInfo, 'contact loaded after sign-in');
+        expect(missing, isNull);
+      },
+    );
+
+    test(
+      'active stream excludes closed and removed listings and ranks live boosts first',
+      () async {
+        final now = DateTime.now();
+        await db
+            .collection('listings')
+            .doc('normal')
+            .set(
+              listingDocument(createdAt: now, id: 'normal', title: 'Normal'),
+            );
+        await db
+            .collection('listings')
+            .doc('live-boost')
+            .set(
+              listingDocument(
+                createdAt: now.subtract(const Duration(days: 1)),
+                id: 'live-boost',
+                title: 'Boost',
+                isBoosted: true,
+                boostExpiresAt: now.add(const Duration(days: 1)),
+              ),
+            );
+        await db
+            .collection('listings')
+            .doc('expired-boost')
+            .set(
+              listingDocument(
+                createdAt: now.add(const Duration(minutes: 1)),
+                id: 'expired-boost',
+                title: 'Expired',
+                isBoosted: true,
+                boostExpiresAt: now.subtract(const Duration(minutes: 1)),
+              ),
+            );
+        await db
+            .collection('listings')
+            .doc('closed')
+            .set(
+              listingDocument(
+                createdAt: now.add(const Duration(minutes: 2)),
+                id: 'closed',
+                status: 'closed',
+              ),
+            );
+
+        final results = await service.watchActiveListings().first;
+
+        expect(results.map((item) => item.id), [
+          'live-boost',
+          'expired-boost',
+          'normal',
+        ]);
+        expect(results.any((item) => item.id == 'closed'), isFalse);
+      },
+    );
+
+    test(
+      'pagination reports no next page at the exact limit and a next page above it',
+      () async {
+        final createdAt = DateTime(2026, 3, 1);
+        for (var i = 0; i < 3; i++) {
+          await db
+              .collection('listings')
+              .doc('page-$i')
+              .set(
+                listingDocument(
+                  createdAt: createdAt.subtract(Duration(days: i)),
+                  id: 'page-$i',
+                  title: 'Page $i',
+                ),
+              );
+        }
+
+        final exact = await service.getPaginatedListings(limit: 3);
+        final partial = await service.getPaginatedListings(limit: 2);
+
+        expect(exact.listings, hasLength(3));
+        expect(exact.hasMore, isFalse);
+        expect(exact.lastDocument, isNotNull);
+        expect(partial.listings, hasLength(2));
+        expect(partial.hasMore, isTrue);
+      },
+    );
+
+    test(
+      'salary filters include boundary values and exclude null salary ranges',
+      () async {
+        final createdAt = DateTime(2026, 4, 1);
+        await db
+            .collection('listings')
+            .doc('boundary')
+            .set(
+              listingDocument(
+                createdAt: createdAt,
+                id: 'boundary',
+                minSalaryTl: 35000,
+                maxSalaryTl: 40000,
+              ),
+            );
+        await db
+            .collection('listings')
+            .doc('no-salary')
+            .set(
+              listingDocument(
+                createdAt: createdAt.subtract(const Duration(days: 1)),
+                id: 'no-salary',
+                minSalaryTl: null,
+                maxSalaryTl: null,
+              ),
+            );
+
+        final result = await service.getPaginatedListings(
+          minSalaryTl: 40000,
+          maxSalaryTl: 35000,
+        );
+
+        expect(result.listings.map((item) => item.id), ['boundary']);
+      },
+    );
 
     // searchListingsForAdmin was replaced by the paged adminListingsQuery
     // (keyword prefix search over searchKeywords) in the admin panel rework.
@@ -337,34 +423,42 @@ void main() {
     test(
       'Turkish dotted-I search is case-insensitive for listing locations',
       () async {
-        await db.collection('listings').doc('istanbul').set(
-          listingDocument(
-            createdAt: DateTime(2026, 6, 1),
-            id: 'istanbul',
-            title: 'Garson',
-          )..['location'] = 'İstanbul',
-        );
+        await db
+            .collection('listings')
+            .doc('istanbul')
+            .set(
+              listingDocument(
+                createdAt: DateTime(2026, 6, 1),
+                id: 'istanbul',
+                title: 'Garson',
+              )..['location'] = 'İstanbul',
+            );
 
-        final result = await service.getPaginatedListings(searchQuery: 'istanbul');
+        final result = await service.getPaginatedListings(
+          searchQuery: 'istanbul',
+        );
 
         expect(result.listings.map((item) => item.id), ['istanbul']);
       },
-      skip: 'BUG-t4-002: Dart lower-case matching does not normalize Turkish dotted-I',
+      skip:
+          'BUG-t4-002: Dart lower-case matching does not normalize Turkish dotted-I',
     );
 
     test(
       'zero page size does not advertise a phantom next page',
       () async {
-        await db.collection('listings').doc('one').set(
-          listingDocument(createdAt: DateTime(2026, 7, 1), id: 'one'),
-        );
+        await db
+            .collection('listings')
+            .doc('one')
+            .set(listingDocument(createdAt: DateTime(2026, 7, 1), id: 'one'));
 
         final result = await service.getPaginatedListings(limit: 0);
 
         expect(result.listings, isEmpty);
         expect(result.hasMore, isFalse);
       },
-      skip: 'BUG-t4-003: limit zero yields hasMore=true when any document exists',
+      skip:
+          'BUG-t4-003: limit zero yields hasMore=true when any document exists',
     );
   });
 }

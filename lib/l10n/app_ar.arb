@@ -57,6 +57,7 @@
   "gridColumnsTooltip": "{count} أعمدة",
   "tableViewTooltip": "عرض الجدول",
   "noListingsTitle": "لا توجد إعلانات بعد",
+  "listingsLoadError": "تعذر تحميل الإعلانات. يرجى المحاولة مرة أخرى.",
   "noListingsBody": "لا توجد إعلانات نشطة. يمكنك تحميل إعلانات نموذجية إلى قاعدة البيانات أو إنشاء إعلان جديد.",
   "seedSampleListingsAction": "تحميل إعلانات نموذجية إلى قاعدة البيانات",
   "createFirstListingAction": "أنشئ أول إعلان",

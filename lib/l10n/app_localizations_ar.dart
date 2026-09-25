@@ -654,6 +654,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noListingsTitle => 'لا توجد إعلانات بعد';
 
   @override
+  String get listingsLoadError =>
+      'تعذر تحميل الإعلانات. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get noListingsBody =>
       'لا توجد إعلانات نشطة. يمكنك تحميل إعلانات نموذجية إلى قاعدة البيانات أو إنشاء إعلان جديد.';
 

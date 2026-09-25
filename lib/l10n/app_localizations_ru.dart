@@ -654,6 +654,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noListingsTitle => 'Пока нет объявлений';
 
   @override
+  String get listingsLoadError =>
+      'Не удалось загрузить объявления. Повторите попытку.';
+
+  @override
   String get noListingsBody =>
       'Активных объявлений нет. Вы можете загрузить примеры объявлений в базу данных или создать новое.';
 

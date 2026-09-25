@@ -71,53 +71,63 @@ void main() {
     service = MockListingService();
   });
 
-  test('loadInitial clears loading and publishes a service failure without losing state', () async {
-    stubInitial(service, () async => throw StateError('temporary read failure'));
-    final notifier = PaginatedListingsNotifier(service, params);
+  test(
+    'loadInitial clears loading and publishes a service failure without losing state',
+    () async {
+      stubInitial(
+        service,
+        () async => throw StateError('temporary read failure'),
+      );
+      final notifier = PaginatedListingsNotifier(service, params);
 
-    await notifier.loadInitial();
+      await notifier.loadInitial();
 
-    expect(notifier.state.listings, isEmpty);
-    expect(notifier.state.isLoading, isFalse);
-    expect(notifier.state.hasMore, isTrue);
-  });
+      expect(notifier.state.listings, isEmpty);
+      expect(notifier.state.isLoading, isFalse);
+      expect(notifier.state.hasMore, isTrue);
+      expect(notifier.state.error, isA<StateError>());
+    },
+  );
 
-  test('a second loadInitial while the first is pending does not duplicate the request', () async {
-    final pending = Completer<PaginatedListingsResult>();
-    stubInitial(service, () => pending.future);
-    final notifier = PaginatedListingsNotifier(service, params);
+  test(
+    'a second loadInitial while the first is pending does not duplicate the request',
+    () async {
+      final pending = Completer<PaginatedListingsResult>();
+      stubInitial(service, () => pending.future);
+      final notifier = PaginatedListingsNotifier(service, params);
 
-    final first = notifier.loadInitial();
-    await Future<void>.delayed(Duration.zero);
-    final second = notifier.loadInitial();
+      final first = notifier.loadInitial();
+      await Future<void>.delayed(Duration.zero);
+      final second = notifier.loadInitial();
 
-    expect(notifier.state.isLoading, isTrue);
-    pending.complete(
-      PaginatedListingsResult(
-        listings: [listing('one')],
-        lastDocument: null,
-        hasMore: false,
-      ),
-    );
-    await Future.wait([first, second]);
+      expect(notifier.state.isLoading, isTrue);
+      pending.complete(
+        PaginatedListingsResult(
+          listings: [listing('one')],
+          lastDocument: null,
+          hasMore: false,
+        ),
+      );
+      await Future.wait([first, second]);
 
-    verify(
-      () => service.getPaginatedListings(
-        category: any(named: 'category'),
-        searchQuery: any(named: 'searchQuery'),
-        city: any(named: 'city'),
-        region: any(named: 'region'),
-        minSalaryTl: any(named: 'minSalaryTl'),
-        maxSalaryTl: any(named: 'maxSalaryTl'),
-        dateFilter: any(named: 'dateFilter'),
-        employmentType: any(named: 'employmentType'),
-        sortOrder: any(named: 'sortOrder'),
-        season: any(named: 'season'),
-      ),
-    ).called(1);
-    expect(notifier.state.listings.single.id, 'one');
-    expect(notifier.state.isLoading, isFalse);
-  });
+      verify(
+        () => service.getPaginatedListings(
+          category: any(named: 'category'),
+          searchQuery: any(named: 'searchQuery'),
+          city: any(named: 'city'),
+          region: any(named: 'region'),
+          minSalaryTl: any(named: 'minSalaryTl'),
+          maxSalaryTl: any(named: 'maxSalaryTl'),
+          dateFilter: any(named: 'dateFilter'),
+          employmentType: any(named: 'employmentType'),
+          sortOrder: any(named: 'sortOrder'),
+          season: any(named: 'season'),
+        ),
+      ).called(1);
+      expect(notifier.state.listings.single.id, 'one');
+      expect(notifier.state.isLoading, isFalse);
+    },
+  );
 
   test('loadMore is a no-op when there is no cursor or no next page', () async {
     stubInitial(

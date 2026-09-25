@@ -57,6 +57,7 @@
   "gridColumnsTooltip": "{count} Spalten",
   "tableViewTooltip": "Tabellenansicht",
   "noListingsTitle": "Noch keine Anzeigen",
+  "listingsLoadError": "Anzeigen konnten nicht geladen werden. Bitte versuche es erneut.",
   "noListingsBody": "Es gibt keine aktiven Anzeigen. Du kannst Beispielanzeigen in die Datenbank laden oder eine neue erstellen.",
   "seedSampleListingsAction": "Beispielanzeigen in Datenbank laden",
   "createFirstListingAction": "Erstelle die erste Anzeige",

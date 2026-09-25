@@ -57,6 +57,7 @@
   "gridColumnsTooltip": "{count} столбца",
   "tableViewTooltip": "Табличный вид",
   "noListingsTitle": "Пока нет объявлений",
+  "listingsLoadError": "Не удалось загрузить объявления. Повторите попытку.",
   "noListingsBody": "Активных объявлений нет. Вы можете загрузить примеры объявлений в базу данных или создать новое.",
   "seedSampleListingsAction": "Загрузить примеры объявлений в базу",
   "createFirstListingAction": "Создайте первое объявление",

@@ -723,24 +723,20 @@ class ListingCard extends ConsumerWidget {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 6,
-                                      vertical: 2,
+                                      vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: listingCategoryColor(
-                                        listing.category,
-                                      ).withValues(alpha: 0.12),
+                                      color: const Color(0xFF1E293B),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       listingCategoryLabel(listing.category),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 10,
+                                      style: const TextStyle(
+                                        fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: listingCategoryColor(
-                                          listing.category,
-                                        ),
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -749,8 +745,8 @@ class ListingCard extends ConsumerWidget {
                                   const SizedBox(width: 4),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                      vertical: 2,
+                                      horizontal: 6,
+                                      vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.deepOrange.shade700,
@@ -760,7 +756,7 @@ class ListingCard extends ConsumerWidget {
                                       AppLocalizations.of(context)!.urgentBadge,
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 9,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -785,10 +781,10 @@ class ListingCard extends ConsumerWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.location_on_outlined,
-                                  size: 12,
-                                  color: Colors.grey.shade600,
+                                  size: 14,
+                                  color: Color(0xFF495057),
                                 ),
                                 const SizedBox(width: 2),
                                 Expanded(
@@ -796,9 +792,9 @@ class ListingCard extends ConsumerWidget {
                                     listing.location,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.grey.shade600,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF495057),
                                     ),
                                   ),
                                 ),
@@ -872,20 +868,18 @@ class ListingCard extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
-                              vertical: 2,
+                              vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: listingCategoryColor(
-                                listing.category,
-                              ).withValues(alpha: 0.12),
+                              color: const Color(0xFF1E293B),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               listingCategoryLabel(listing.category),
-                              style: TextStyle(
-                                fontSize: 11,
+                              style: const TextStyle(
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: listingCategoryColor(listing.category),
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -902,15 +896,14 @@ class ListingCard extends ConsumerWidget {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.teal.shade50,
+                                color: const Color(0xFF0F766E),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.teal.shade300),
                               ),
                               child: Text(
                                 '%$matchScore ${AppLocalizations.of(context)!.matchLabel}',
-                                style: TextStyle(
-                                  color: Colors.teal.shade800,
-                                  fontSize: 11,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -930,7 +923,7 @@ class ListingCard extends ConsumerWidget {
                                 AppLocalizations.of(context)!.urgentBadge,
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 10,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

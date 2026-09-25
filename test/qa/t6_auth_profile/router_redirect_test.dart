@@ -18,7 +18,10 @@ class FakeGoRouterState extends Fake implements GoRouterState {
   final String _matchedLocation;
 
   @override
-  String get matchedLocation => _matchedLocation;
+  String get matchedLocation => uri.path;
+
+  @override
+  Uri get uri => Uri.parse(_matchedLocation);
 }
 
 void main() {
@@ -87,6 +90,7 @@ void main() {
 
       test('redirects to /login when accessing protected routes', () async {
         const protectedRoutes = <String>[
+          '/account-suspended',
           '/create-listing',
           '/batch-create-listing',
           '/chat',
@@ -107,8 +111,24 @@ void main() {
 
         for (final route in protectedRoutes) {
           final result = await executeRedirect(route);
-          expect(result, '/login', reason: 'Route $route should redirect to /login');
+          expect(
+            result,
+            '/login?from=${Uri.encodeComponent(route)}',
+            reason: 'Route $route should redirect to /login with its origin',
+          );
         }
+      });
+
+      test('redirects job seekers away from listing creation', () async {
+        final profile = createSampleProfile();
+        when(() => mockAdminService.getUserProfile('user_123'))
+            .thenAnswer((_) async => profile);
+        when(() => mockAdminService.isAdminProfile(profile)).thenReturn(false);
+        when(() => mockAuthService.currentUser)
+            .thenReturn(const AppUser(uid: 'user_123', email: 'test@example.com'));
+
+        expect(await executeRedirect('/create-listing'), '/');
+        expect(await executeRedirect('/batch-create-listing'), '/');
       });
 
       test('allows access without redirect on public routes', () async {
@@ -147,6 +167,13 @@ void main() {
       test('redirects to / when visiting /login or /register', () async {
         expect(await executeRedirect('/login'), '/');
         expect(await executeRedirect('/register'), '/');
+      });
+
+      test('returns to the protected origin after login', () async {
+        expect(
+          await executeRedirect('/login?from=%2Fprofile'),
+          '/profile',
+        );
       });
 
       test('allows access to standard protected routes', () async {

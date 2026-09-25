@@ -99,6 +99,7 @@ bool isProtectedRoute(String location) {
 
   return location == '/create-listing' ||
       location == '/batch-create-listing' ||
+      location == '/account-suspended' ||
       location.startsWith('/chat') ||
       location.startsWith('/profile') ||
       location == '/my-listings' ||
@@ -124,7 +125,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
 
       if (!isLoggedIn && isProtectedRoute(location)) {
-        return '/login';
+        final from = state.uri.toString();
+        return '/login?from=${Uri.encodeComponent(from)}';
       }
 
       if (isLoggedIn && location != '/account-suspended') {
@@ -141,6 +143,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           return '/account-suspended';
         }
 
+        final isListingCreationRoute =
+            location == '/create-listing' ||
+            location == '/batch-create-listing';
+        // A null profile is still loading: let the screen-level guard decide
+        // instead of bouncing an employer's deep link to home.
+        final cannotCreateListing =
+            profile != null &&
+            profile.userType != 'employer' &&
+            !adminService.isAdminProfile(profile);
+        if (isListingCreationRoute && cannotCreateListing) {
+          return '/';
+        }
+
         if (location.startsWith('/admin') &&
             !adminService.isAdminProfile(profile)) {
           return '/';
@@ -148,6 +163,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLoggedIn && (location == '/login' || location == '/register')) {
+        final from = state.uri.queryParameters['from'];
+        final fromUri = from == null ? null : Uri.tryParse(from);
+        if (fromUri != null &&
+            !fromUri.hasScheme &&
+            !fromUri.hasAuthority &&
+            fromUri.path.startsWith('/') &&
+            !fromUri.path.startsWith('//') &&
+            fromUri.path != '/login' &&
+            fromUri.path != '/register') {
+          return from;
+        }
         return '/';
       }
 
