@@ -7,6 +7,7 @@ import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/widgets/video_player_dialog.dart';
+import '../../admin/services/admin_service.dart';
 import '../../boosts/presentation/my_boosts_screen.dart';
 import '../../favorites/presentation/favorites_screen.dart';
 import '../../listings/presentation/my_listings_screen.dart';
@@ -74,6 +75,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     // account screen (blank/grey in release mode) on any transient profile
     // stream failure instead of just rendering with profile == null.
     final profile = ref.watch(currentUserProfileProvider).valueOrNull;
+    final adminService = ref.watch(adminServiceProvider);
+    final isAdmin = adminService.isAdminProfile(profile);
     final displayName = profile?.displayName;
     final photoUrl = profile?.photoUrl;
     final ratings = user == null ? null : ref.watch(userRatingsProvider(user.uid));
@@ -163,6 +166,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           child: ListView(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             children: [
+                              if (isAdmin)
+                                ProfileSidebarItem(
+                                  icon: Icons.admin_panel_settings_outlined,
+                                  title: AppLocalizations.of(context)!.adminPanelEntry,
+                                  subtitle: 'Kullanıcılar, ilanlar ve raporlar',
+                                  isSelected: false,
+                                  onTap: () => context.push('/admin'),
+                                ),
                               ProfileSidebarItem(
                                 icon: Icons.grid_view_rounded,
                                 title: 'Genel Bakış',
@@ -440,6 +451,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   error: (err, stack) => const SizedBox.shrink(),
                 ),
               const SizedBox(height: 20),
+              if (isAdmin) ...[
+                const AdminPanelMenuTile(),
+                const SizedBox(height: 12),
+              ],
               ProfileMenuTile(
                 icon: Icons.edit_outlined,
                 title: 'Profili Düzenle',
@@ -841,4 +856,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+}
+
+/// Entry to the admin panel, shown in "Hesabım" to admins only (D1): without
+/// it an admin on mobile has no way to reach /admin.
+class AdminPanelMenuTile extends StatelessWidget {
+  const AdminPanelMenuTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ProfileMenuTile(
+      icon: Icons.admin_panel_settings_outlined,
+      title: AppLocalizations.of(context)!.adminPanelEntry,
+      onTap: () => context.push('/admin'),
+    );
+  }
 }

@@ -218,6 +218,32 @@ void main() {
       },
     );
 
+    test('increments a non-owner view only once per service session', () async {
+      await db.collection('listings').doc('viewed').set({
+        ...listingDocument(createdAt: DateTime(2026, 2, 1), id: 'viewed'),
+        'viewCount': 4,
+      });
+
+      await service.incrementViewCountIfNeeded(
+        listingId: 'viewed',
+        ownerId: 'employer-1',
+        viewerId: 'employer-1',
+      );
+      await service.incrementViewCountIfNeeded(
+        listingId: 'viewed',
+        ownerId: 'employer-1',
+        viewerId: 'seeker-1',
+      );
+      await service.incrementViewCountIfNeeded(
+        listingId: 'viewed',
+        ownerId: 'employer-1',
+        viewerId: 'seeker-1',
+      );
+
+      final saved = await db.collection('listings').doc('viewed').get();
+      expect(saved.data()!['viewCount'], 5);
+    });
+
     test(
       'updateListing preserves createdAt, removes legacy contact, and updates contact subdoc',
       () async {

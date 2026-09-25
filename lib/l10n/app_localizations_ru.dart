@@ -793,4 +793,36 @@ class AppLocalizationsRu extends AppLocalizations {
   String seasonWinterOf(String years) {
     return 'Зима $years';
   }
+
+  @override
+  String get forgotPasswordLink => 'Забыли пароль?';
+
+  @override
+  String get passwordResetTitle => 'Сброс пароля';
+
+  @override
+  String get passwordResetSend => 'Отправить ссылку для сброса';
+
+  @override
+  String get passwordResetSuccess =>
+      'Если существует аккаунт с этим адресом, ссылка для сброса отправлена';
+
+  @override
+  String get passwordResetInvalidEmail =>
+      'Введите действительный адрес электронной почты.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'Слишком много запросов. Повторите попытку позже.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'Проверьте подключение к интернету и повторите попытку.';
+
+  @override
+  String get passwordResetGenericError =>
+      'Не удалось отправить ссылку. Повторите попытку.';
+
+  @override
+  String get adminPanelEntry => 'Панель администратора';
 }

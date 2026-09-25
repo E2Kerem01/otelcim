@@ -1567,6 +1567,60 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kış {years}'**
   String seasonWinterOf(String years);
+
+  /// No description provided for @forgotPasswordLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifremi unuttum?'**
+  String get forgotPasswordLink;
+
+  /// No description provided for @passwordResetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre sıfırlama'**
+  String get passwordResetTitle;
+
+  /// No description provided for @passwordResetSend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırlama bağlantısı gönder'**
+  String get passwordResetSend;
+
+  /// No description provided for @passwordResetSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.'**
+  String get passwordResetSuccess;
+
+  /// No description provided for @passwordResetInvalidEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir e-posta adresi girin.'**
+  String get passwordResetInvalidEmail;
+
+  /// No description provided for @passwordResetTooManyRequests.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.'**
+  String get passwordResetTooManyRequests;
+
+  /// No description provided for @passwordResetNetworkError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnternet bağlantınızı kontrol edip tekrar deneyin.'**
+  String get passwordResetNetworkError;
+
+  /// No description provided for @passwordResetGenericError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı gönderilemedi. Lütfen tekrar deneyin.'**
+  String get passwordResetGenericError;
+
+  /// No description provided for @adminPanelEntry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yönetim Paneli'**
+  String get adminPanelEntry;
 }
 
 class _AppLocalizationsDelegate

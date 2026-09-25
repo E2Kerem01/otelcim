@@ -44,6 +44,17 @@ void main() {
       unawaited(authStateController.close());
     });
 
+    test('sends password reset email through FirebaseAuth', () async {
+      when(() => auth.sendPasswordResetEmail(email: 'user@example.com'))
+          .thenAnswer((_) async {});
+
+      final service = AuthService(auth, db);
+      await service.sendPasswordResetEmail(email: 'user@example.com');
+
+      verify(() => auth.sendPasswordResetEmail(email: 'user@example.com')).called(1);
+      service.dispose();
+    });
+
     group('verifyPhoneNumber', () {
       test('completes with verificationId when codeSent callback is triggered', () async {
         when(

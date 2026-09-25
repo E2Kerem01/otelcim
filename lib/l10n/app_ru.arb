@@ -105,5 +105,14 @@
   "perkShuttle": "Трансфер",
   "verifiedEmployer": "Проверенный работодатель",
   "seasonSummerOf": "Лето {year}",
-  "seasonWinterOf": "Зима {years}"
+  "seasonWinterOf": "Зима {years}",
+  "forgotPasswordLink": "Забыли пароль?",
+  "passwordResetTitle": "Сброс пароля",
+  "passwordResetSend": "Отправить ссылку для сброса",
+  "passwordResetSuccess": "Если существует аккаунт с этим адресом, ссылка для сброса отправлена",
+  "passwordResetInvalidEmail": "Введите действительный адрес электронной почты.",
+  "passwordResetTooManyRequests": "Слишком много запросов. Повторите попытку позже.",
+  "passwordResetNetworkError": "Проверьте подключение к интернету и повторите попытку.",
+  "passwordResetGenericError": "Не удалось отправить ссылку. Повторите попытку.",
+  "adminPanelEntry": "Панель администратора"
 }

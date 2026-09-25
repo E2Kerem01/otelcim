@@ -101,6 +101,31 @@ void main() {
       expect(find.widgetWithText(ElevatedButton, 'Giriş Yap'), findsOneWidget);
     });
 
+    testWidgets('opens password reset dialog with the login email and sends it', (tester) async {
+      when(() => mockAuthService.sendPasswordResetEmail(email: 'reset@example.com'))
+          .thenAnswer((_) async {});
+
+      await pumpLogin(tester);
+      await tester.enterText(find.byType(TextFormField).first, 'reset@example.com');
+      await tester.tap(find.text('Şifremi unuttum?'));
+      await tester.pump();
+
+      expect(find.text('Şifre sıfırlama'), findsOneWidget);
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.byType(TextFormField), findsNWidgets(3));
+      expect(
+        tester.widget<TextFormField>(find.byType(TextFormField).last).controller!.text,
+        'reset@example.com',
+      );
+
+      await tester.tap(find.text('Sıfırlama bağlantısı gönder'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockAuthService.sendPasswordResetEmail(email: 'reset@example.com'))
+          .called(1);
+      expect(find.text('Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.'), findsOneWidget);
+    });
+
     testWidgets('shows validation errors when submitting empty email form', (tester) async {
       await pumpLogin(tester);
 

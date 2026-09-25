@@ -82,7 +82,7 @@ service cloud.firestore {
     // flip a listing to urgent later without going through payment.
     function isNotChangingBoostOrOwnershipFields() {
       return !request.resource.data.diff(resource.data).affectedKeys()
-        .hasAny(['isBoosted', 'boostExpiresAt', 'boostType', 'boostPurchaseId', 'posterId', 'isUrgent', 'urgentListingPurchaseId']);
+        .hasAny(['isBoosted', 'boostExpiresAt', 'boostType', 'boostPurchaseId', 'posterId', 'isUrgent', 'urgentListingPurchaseId', 'viewCount']);
     }
 
     // 'removed' is a moderation state set by ModerationService.removeListing
@@ -112,8 +112,11 @@ service cloud.firestore {
         request.resource.data.get('boostType', null) == null &&
         request.resource.data.get('boostPurchaseId', null) == null &&
         request.resource.data.get('urgentListingPurchaseId', null) == null;
-      allow update: if (isOwner(resource.data.posterId) && isNotChangingBoostOrOwnershipFields() &&
-        isNotBypassingListingModeration()) || isAdmin();
+      allow update: if (isSignedIn() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']) &&
+        request.resource.data.get('viewCount', 0) == resource.data.get('viewCount', 0) + 1) ||
+        (isOwner(resource.data.posterId) && isNotChangingBoostOrOwnershipFields() &&
+          isNotBypassingListingModeration()) || isAdmin();
       allow delete: if isOwner(resource.data.posterId) || isAdmin();
 
       // Contact details (phone/email) are split out from the listing doc

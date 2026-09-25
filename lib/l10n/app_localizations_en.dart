@@ -793,4 +793,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String seasonWinterOf(String years) {
     return 'Winter $years';
   }
+
+  @override
+  String get forgotPasswordLink => 'Forgot password?';
+
+  @override
+  String get passwordResetTitle => 'Reset password';
+
+  @override
+  String get passwordResetSend => 'Send reset link';
+
+  @override
+  String get passwordResetSuccess =>
+      'If an account exists, a reset link was sent';
+
+  @override
+  String get passwordResetInvalidEmail => 'Enter a valid email address.';
+
+  @override
+  String get passwordResetTooManyRequests =>
+      'Too many requests. Please try again later.';
+
+  @override
+  String get passwordResetNetworkError =>
+      'Check your internet connection and try again.';
+
+  @override
+  String get passwordResetGenericError =>
+      'The reset link could not be sent. Please try again.';
+
+  @override
+  String get adminPanelEntry => 'Admin panel';
 }

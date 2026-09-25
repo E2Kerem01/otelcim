@@ -576,5 +576,14 @@
   "seasonSummerOf": "Yaz {year}",
   "@seasonSummerOf": {"description": "Season label for any summer season code yaz_YYYY", "placeholders": {"year": {"type": "String"}}},
   "seasonWinterOf": "Kış {years}",
-  "@seasonWinterOf": {"description": "Season label for any winter season code kis_YYYY_YY", "placeholders": {"years": {"type": "String"}}}
+  "@seasonWinterOf": {"description": "Season label for any winter season code kis_YYYY_YY", "placeholders": {"years": {"type": "String"}}},
+  "forgotPasswordLink": "Şifremi unuttum?",
+  "passwordResetTitle": "Şifre sıfırlama",
+  "passwordResetSend": "Sıfırlama bağlantısı gönder",
+  "passwordResetSuccess": "Bu e-posta ile bir hesap varsa, sıfırlama bağlantısı gönderildi.",
+  "passwordResetInvalidEmail": "Geçerli bir e-posta adresi girin.",
+  "passwordResetTooManyRequests": "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.",
+  "passwordResetNetworkError": "İnternet bağlantınızı kontrol edip tekrar deneyin.",
+  "passwordResetGenericError": "Bağlantı gönderilemedi. Lütfen tekrar deneyin.",
+  "adminPanelEntry": "Yönetim Paneli"
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -124,6 +125,143 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _handleFailure(error);
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  String _passwordResetErrorMessage(Object error, AppLocalizations l10n) {
+    final code = error is FirebaseException ? error.code : null;
+    switch (code) {
+      case 'invalid-email':
+        return l10n.passwordResetInvalidEmail;
+      case 'too-many-requests':
+        return l10n.passwordResetTooManyRequests;
+      case 'network-request-failed':
+      case 'unavailable':
+      case 'deadline-exceeded':
+        return l10n.passwordResetNetworkError;
+      default:
+        return l10n.passwordResetGenericError;
+    }
+  }
+
+  Future<void> _showPasswordResetDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    final emailController = TextEditingController(
+      text: _emailController.text.trim(),
+    );
+    final formKey = GlobalKey<FormState>();
+
+    final sent = await showDialog<bool>(
+      context: context,
+      builder: (_) {
+        var sending = false;
+        String? errorMessage;
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(l10n.passwordResetTitle),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: emailController,
+                      autofocus: emailController.text.isEmpty,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: l10n.emailLabel,
+                        hintText: l10n.emailHint,
+                      ),
+                      validator: (value) {
+                        final email = value?.trim() ?? '';
+                        if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                            .hasMatch(email)) {
+                          return l10n.emailValidation;
+                        }
+                        return null;
+                      },
+                    ),
+                    if (errorMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: sending ? null : () => Navigator.pop(context),
+                  child: Text(l10n.cancelButton),
+                ),
+                FilledButton(
+                  onPressed: sending
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) return;
+                          setDialogState(() {
+                            sending = true;
+                            errorMessage = null;
+                          });
+                          try {
+                            await ref
+                                .read(authServiceProvider)
+                                .sendPasswordResetEmail(
+                                  email: emailController.text.trim(),
+                                );
+                            if (context.mounted) {
+                              Navigator.pop(context, true);
+                            }
+                          } on FirebaseAuthException catch (error) {
+                            if (!context.mounted) return;
+                            if (error.code == 'user-not-found') {
+                              Navigator.pop(context, true);
+                              return;
+                            }
+                            setDialogState(() {
+                              sending = false;
+                              errorMessage = _passwordResetErrorMessage(
+                                error,
+                                l10n,
+                              );
+                            });
+                          } catch (error) {
+                            if (!context.mounted) return;
+                            setDialogState(() {
+                              sending = false;
+                              errorMessage = _passwordResetErrorMessage(
+                                error,
+                                l10n,
+                              );
+                            });
+                          }
+                        },
+                  child: sending
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.passwordResetSend),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    emailController.dispose();
+
+    if (sent == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.passwordResetSuccess)),
+      );
     }
   }
 
@@ -407,6 +545,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
                 : Text(l10n?.loginButton ?? 'Giriş Yap'),
+          ),
+          TextButton(
+            onPressed: (_loading || _lockoutSeconds > 0)
+                ? null
+                : _showPasswordResetDialog,
+            child: Text(l10n?.forgotPasswordLink ?? 'Şifremi unuttum?'),
           ),
         ],
       ),
