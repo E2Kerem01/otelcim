@@ -42,6 +42,7 @@ export function profilePayload(uid: string, overrides: Data = {}): Data {
     referredBy: null,
     createdAt: NOW,
     updatedAt: NOW,
+    searchKeywords: [],
     ...overrides,
   };
 }
@@ -80,6 +81,7 @@ export function listingPayload(posterId: string, overrides: Data = {}): Data {
     status: 'active',
     createdAt: SERVER_TIMESTAMP,
     updatedAt: SERVER_TIMESTAMP,
+    searchKeywords: [],
     isBoosted: false,
     boostExpiresAt: null,
     boostType: null,
