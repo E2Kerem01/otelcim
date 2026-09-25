@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
+import '../domain/admin_action_model.dart';
+import 'admin_service.dart';
 
 class ModerationService {
   ModerationService(this._db);
@@ -24,6 +26,55 @@ class ModerationService {
       });
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'ModerationService.dismissReport');
+      throw mapToFailure(error);
+    }
+  }
+
+  /// Dismisses many reports and records one audit entry per report.
+  ///
+  /// Firestore batches accept at most 500 writes. Keeping the operational
+  /// updates below 450 leaves room for small future changes while avoiding
+  /// the limit. Audit entries are written through the existing audit API so
+  /// they retain the same shape as single-report moderation actions.
+  Future<void> dismissReports({
+    required List<String> ids,
+    required String adminId,
+    String? reason,
+  }) async {
+    final reportIds = ids.toSet().toList();
+    if (reportIds.isEmpty) return;
+
+    try {
+      for (var start = 0; start < reportIds.length; start += 450) {
+        final end = start + 450 < reportIds.length
+            ? start + 450
+            : reportIds.length;
+        final batch = _db.batch();
+        for (final reportId in reportIds.sublist(start, end)) {
+          batch.update(_db.collection('reports').doc(reportId), {
+            'status': 'dismissed',
+            'reviewedBy': adminId,
+            'reviewedAt': FieldValue.serverTimestamp(),
+            'dismissalReason': reason,
+          });
+        }
+        await batch.commit();
+      }
+
+      final adminService = AdminService(_db);
+      for (final reportId in reportIds) {
+        await adminService.logAdminAction(
+          AdminAction(
+            adminId: adminId,
+            actionType: AdminActionType.dismissReport,
+            targetType: AdminActionTargetType.report,
+            targetId: reportId,
+            reason: reason,
+          ),
+        );
+      }
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'ModerationService.dismissReports');
       throw mapToFailure(error);
     }
   }

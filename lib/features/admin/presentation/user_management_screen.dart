@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -9,15 +12,15 @@ import '../../../shared/services/auth_service.dart';
 import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
 import '../services/moderation_service.dart';
+import '../../../shared/utils/search_keywords.dart';
+import 'widgets/admin_paged_controller.dart';
+import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
-final _recentUsersProvider = StreamProvider.autoDispose<List<UserProfile>>(
-  (ref) => ref.watch(adminServiceProvider).watchRecentUsers(),
-);
-
-/// Standalone admin screen to search any user and suspend/ban/unsuspend/
-/// unban their account directly - previously these actions were only
-/// reachable by opening a report against that user first.
+/// Standalone admin screen to find any user and suspend/ban/unsuspend/unban
+/// them. Server-side pagination (20 per page), filter tabs and prefix search
+/// over `searchKeywords` keep it usable with any number of users.
 class UserManagementScreen extends ConsumerStatefulWidget {
   const UserManagementScreen({super.key});
 
@@ -25,85 +28,160 @@ class UserManagementScreen extends ConsumerStatefulWidget {
   ConsumerState<UserManagementScreen> createState() => _UserManagementScreenState();
 }
 
+const _userFilters = <AdminFilter>[
+  AdminFilter('all', 'Tümü'),
+  AdminFilter('jobseeker', 'İş arayan', icon: Icons.person_search_outlined),
+  AdminFilter('employer', 'İşveren', icon: Icons.apartment_outlined),
+  AdminFilter('verified', 'Doğrulanmış', icon: Icons.verified_outlined),
+  AdminFilter('banned', 'Yasaklı', icon: Icons.block),
+  AdminFilter('suspended', 'Askıda', icon: Icons.pause_circle_outline),
+  AdminFilter('admin', 'Admin', icon: Icons.admin_panel_settings_outlined),
+];
+
+/// The Firestore query for a filter tab and optional search text. Exposed for
+/// tests; composite indexes for every combination are in
+/// firestore.indexes.json.
+Query<Map<String, dynamic>> adminUsersQuery(
+  FirebaseFirestore db, {
+  required String filter,
+  String search = '',
+}) {
+  Query<Map<String, dynamic>> query = db.collection('user_profiles');
+  query = switch (filter) {
+    'jobseeker' => query.where('userType', isEqualTo: 'jobseeker'),
+    'employer' => query.where('userType', isEqualTo: 'employer'),
+    'verified' => query.where('isVerified', isEqualTo: true),
+    'banned' => query.where('isBanned', isEqualTo: true),
+    'suspended' => query.where('isSuspended', isEqualTo: true),
+    'admin' => query.where('isAdmin', isEqualTo: true),
+    _ => query,
+  };
+  final token = searchToken(search);
+  // Searching drops the createdAt ordering: relevance matters more than
+  // recency there, and it keeps the index set small.
+  return token != null
+      ? query.where('searchKeywords', arrayContains: token)
+      : query.orderBy('createdAt', descending: true);
+}
+
 class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
   final _searchController = TextEditingController();
-  List<UserProfile>? _searchResults;
-  bool _searching = false;
+  late final AdminPagedController<UserProfile> _users = AdminPagedController(
+    fromDoc: UserProfile.fromFirestore,
+    idOf: (user) => user.id,
+  );
+  String _filter = 'all';
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _users.dispose();
     super.dispose();
   }
 
-  Future<void> _runSearch(String query) async {
-    if (query.trim().isEmpty) {
-      setState(() => _searchResults = null);
-      return;
-    }
-    setState(() => _searching = true);
-    final results = await ref.read(adminServiceProvider).searchUsers(query);
-    if (!mounted) return;
-    setState(() {
-      _searchResults = results;
-      _searching = false;
-    });
+  void _reload() {
+    unawaited(_users.setQuery(adminUsersQuery(
+      ref.read(firestoreProvider),
+      filter: _filter,
+      search: _searchController.text,
+    )));
+  }
+
+  Future<void> _openUser(UserProfile user) async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => Dialog(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: SingleChildScrollView(child: _UserCard(user: user)),
+        ),
+      ),
+    );
+    await _users.refresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    final recentUsers = ref.watch(_recentUsersProvider);
-    final listToShow = _searchResults;
-
+    final dateFormat = DateFormat('dd.MM.yyyy');
     return Scaffold(
       appBar: AppBar(title: const Text('Kullanıcı Yönetimi')),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'E-posta veya isimle ara',
+                labelText: 'İsim, e-posta, otel veya telefonla ara',
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searching
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : (_searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchResults = null);
-                            },
-                          )
-                        : null),
+                suffixIcon: _searchController.text.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Aramayı temizle',
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                          _reload();
+                        },
+                      ),
                 border: const OutlineInputBorder(),
               ),
-              onSubmitted: _runSearch,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _reload(),
               onChanged: (value) {
-                if (value.trim().isEmpty) setState(() => _searchResults = null);
+                if (value.isEmpty) _reload();
+                setState(() {});
               },
             ),
           ),
+          AdminFilterBar(
+            filters: _userFilters,
+            selectedId: _filter,
+            onSelected: (id) {
+              setState(() => _filter = id);
+              _reload();
+            },
+          ),
+          const SizedBox(height: 8),
           Expanded(
-            child: listToShow != null
-                ? (listToShow.isEmpty
-                    ? const Center(child: Text('Sonuç bulunamadı.'))
-                    : _UserList(users: listToShow))
-                : recentUsers.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (_, _) => const Center(child: Text('Kullanıcılar yüklenemedi.')),
-                    data: (items) => items.isEmpty
-                        ? const Center(child: Text('Henüz kullanıcı yok.'))
-                        : _UserList(users: items),
-                  ),
+            child: AdminPagedView<UserProfile>(
+              controller: _users,
+              emptyText: 'Bu filtreyle kullanıcı bulunamadı.',
+              cardBuilder: (_, user) => _UserCard(user: user),
+              onRowTap: (user) => unawaited(_openUser(user)),
+              columns: [
+                AdminColumn(
+                  label: 'Ad',
+                  flex: 2,
+                  cell: (_, u) => Text(u.displayName ?? '—', overflow: TextOverflow.ellipsis),
+                ),
+                AdminColumn(
+                  label: 'E-posta',
+                  flex: 3,
+                  cell: (_, u) => Text(u.email, overflow: TextOverflow.ellipsis),
+                ),
+                AdminColumn(
+                  label: 'Rol',
+                  cell: (_, u) => Text(u.isAdmin
+                      ? 'Admin'
+                      : u.userType == 'employer'
+                          ? 'İşveren'
+                          : 'İş arayan'),
+                ),
+                AdminColumn(label: 'Durum', cell: (_, u) => _StatusChip(user: u)),
+                AdminColumn(
+                  label: 'Kayıt',
+                  cell: (_, u) => Text(dateFormat.format(u.createdAt)),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -111,17 +189,32 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
   }
 }
 
-class _UserList extends StatelessWidget {
-  const _UserList({required this.users});
-  final List<UserProfile> users;
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.user});
+  final UserProfile user;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: users.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (_, index) => _UserCard(user: users[index]),
+    final (label, color) = user.isBanned
+        ? ('Yasaklı', Colors.red)
+        : user.isSuspended
+            ? ('Askıda', Colors.orange)
+            : user.isVerified
+                ? ('Doğrulanmış', Colors.green)
+                : ('Aktif', Colors.blueGrey);
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 12),
+        ),
+      ),
     );
   }
 }

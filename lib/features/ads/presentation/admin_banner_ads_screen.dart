@@ -4,12 +4,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/storage_service.dart';
+import '../../admin/presentation/widgets/admin_paged_controller.dart';
+import '../../admin/presentation/widgets/admin_paged_view.dart';
 import '../domain/banner_ad_model.dart';
 import '../services/banner_ad_service.dart';
+
+const _bannerFilters = <AdminFilter>[
+  AdminFilter('active', 'Aktif', icon: Icons.visibility_outlined),
+  AdminFilter('inactive', 'Pasif', icon: Icons.visibility_off_outlined),
+  AdminFilter('all', 'Tümü'),
+];
 
 class AdminBannerAdsScreen extends ConsumerWidget {
   const AdminBannerAdsScreen({super.key});
@@ -25,12 +34,12 @@ class AdminBannerAdsScreen extends ConsumerWidget {
     ));
   }
 
-  Future<void> _deleteBanner(BuildContext context, WidgetRef ref, BannerAd ad) async {
+  Future<bool> _deleteBanner(BuildContext context, WidgetRef ref, BannerAd ad) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Banner Silinsin mi?'),
-        content: Text('"${ad.title}" reklam banner\'ı tamamen silinecek.'),
+        title: const Text('Banner silinsin mi?'),
+        content: Text('"${ad.title}" reklam bannerı tamamen silinecek.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -45,99 +54,156 @@ class AdminBannerAdsScreen extends ConsumerWidget {
       ),
     );
 
-    if (confirmed == true) {
-      try {
-        await ref.read(bannerAdServiceProvider).deleteBannerAd(ad.id);
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Banner silindi.')),
-          );
-        }
-      } catch (error, stackTrace) {
-        logError(
-          error,
-          stackTrace,
-          context: 'AdminBannerAdsScreen._deleteBanner',
+    if (confirmed != true) return false;
+    try {
+      await ref.read(bannerAdServiceProvider).deleteBannerAd(ad.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Banner silindi.')),
         );
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(mapToFailure(error).message)),
-          );
-        }
       }
+      return true;
+    } catch (error, stackTrace) {
+      logError(error, stackTrace, context: 'AdminBannerAdsScreen._deleteBanner');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mapToFailure(error).message)),
+        );
+      }
+      return false;
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bannersAsync = ref.watch(allBannerAdsProvider);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Banner Reklam Yönetimi'),
-      ),
+      appBar: AppBar(title: const Text('Banner Reklam Yönetimi')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showBannerForm(context, ref),
         icon: const Icon(Icons.add),
         label: const Text('Yeni Banner'),
       ),
-      body: bannersAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Hata: $err')),
-        data: (banners) {
-          if (banners.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.campaign_outlined,
-                      size: 64,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Henüz Reklam Banner\'ı Yok',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Anasayfada gösterilecek sponsorlu reklam banner\'larını buradan ekleyebilirsiniz.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => _showBannerForm(context, ref),
-                      icon: const Icon(Icons.add),
-                      label: const Text('İlk Banner\'ı Ekle'),
-                    ),
-                  ],
+      body: _AdminBannerAdsBody(
+        onEdit: (banner) => _showBannerForm(context, ref, banner),
+        onDelete: (banner) => _deleteBanner(context, ref, banner),
+      ),
+    );
+  }
+}
+
+class _AdminBannerAdsBody extends ConsumerStatefulWidget {
+  const _AdminBannerAdsBody({
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final ValueChanged<BannerAd> onEdit;
+  final Future<bool> Function(BannerAd) onDelete;
+
+  @override
+  ConsumerState<_AdminBannerAdsBody> createState() => _AdminBannerAdsBodyState();
+}
+
+class _AdminBannerAdsBodyState extends ConsumerState<_AdminBannerAdsBody> {
+  late final AdminPagedController<BannerAd> _controller =
+      AdminPagedController<BannerAd>(
+        fromDoc: (doc) => BannerAd.fromDoc(doc),
+        idOf: (banner) => banner.id,
+      );
+  String _filter = 'active';
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _reload() {
+    unawaited(_controller.setQuery(ref
+        .read(bannerAdServiceProvider)
+        .adminQuery(filter: _filter)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        AdminFilterBar(
+          filters: _bannerFilters,
+          selectedId: _filter,
+          onSelected: (id) {
+            setState(() => _filter = id);
+            _reload();
+          },
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: AdminPagedView<BannerAd>(
+            controller: _controller,
+            emptyText: 'Bu filtreyle banner bulunamadı.',
+            cardBuilder: (_, banner) => _AdminBannerCard(
+              banner: banner,
+              onEdit: () => widget.onEdit(banner),
+              onDelete: () {
+                unawaited(widget.onDelete(banner).then((deleted) {
+                  if (deleted) {
+                    _controller.removeWhere((item) => item.id == banner.id);
+                  }
+                }));
+              },
+              onToggleActive: (value) {
+                unawaited(
+                  ref
+                      .read(bannerAdServiceProvider)
+                      .toggleActive(banner.id, value)
+                      .then((_) => _controller.refresh()),
+                );
+              },
+            ),
+            columns: [
+              AdminColumn(
+                label: 'Banner',
+                flex: 3,
+                cell: (_, banner) => Text(
+                  banner.title,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: banners.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final banner = banners[index];
-              return _AdminBannerCard(
-                banner: banner,
-                onEdit: () => _showBannerForm(context, ref, banner),
-                onDelete: () => _deleteBanner(context, ref, banner),
-                onToggleActive: (val) {
-                  unawaited(ref.read(bannerAdServiceProvider).toggleActive(banner.id, val));
-                },
-              );
-            },
-          );
-        },
-      ),
+              AdminColumn(
+                label: 'Reklamveren',
+                flex: 2,
+                cell: (_, banner) => Text(
+                  banner.advertiserName,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              AdminColumn(
+                label: 'Sıra',
+                cell: (_, banner) => Text(banner.order.toString()),
+              ),
+              AdminColumn(
+                label: 'Durum',
+                cell: (_, banner) => Text(banner.isActive ? 'Aktif' : 'Pasif'),
+              ),
+              AdminColumn(
+                label: 'Oluşturma',
+                flex: 2,
+                cell: (_, banner) => Text(
+                  banner.createdAt == null
+                      ? '—'
+                      : DateFormat('dd.MM.yyyy HH:mm').format(banner.createdAt!),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

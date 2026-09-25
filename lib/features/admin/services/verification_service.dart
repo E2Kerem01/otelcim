@@ -5,6 +5,18 @@ import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../domain/verification_request_model.dart';
 
+/// Ordered query used by the paged admin verification review queue.
+Query<Map<String, dynamic>> adminVerificationQuery(
+  FirebaseFirestore db, {
+  required String filter,
+}) {
+  Query<Map<String, dynamic>> query = db.collection('verification_requests');
+  if (filter != 'all') {
+    query = query.where('status', isEqualTo: filter);
+  }
+  return query.orderBy('submittedAt', descending: true);
+}
+
 class VerificationService {
   VerificationService(this._db);
 
@@ -12,10 +24,7 @@ class VerificationService {
 
   /// Watch pending verification requests ordered by submission date
   Stream<List<VerificationRequest>> watchPendingVerifications() {
-    return _db
-        .collection('verification_requests')
-        .where('status', isEqualTo: 'pending')
-        .orderBy('submittedAt', descending: true)
+    return adminVerificationQuery(_db, filter: 'pending')
         .snapshots()
         .map((snap) {
       return snap.docs.map(VerificationRequest.fromDoc).toList();

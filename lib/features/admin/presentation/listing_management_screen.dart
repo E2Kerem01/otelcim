@@ -1,112 +1,211 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../shared/constants/categories.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
-import '../../../shared/services/listing_service.dart';
+import '../../../shared/utils/search_keywords.dart';
 import '../../listings/domain/listing_model.dart';
 import '../domain/admin_action_model.dart';
 import '../services/admin_service.dart';
 import '../services/moderation_service.dart';
+import 'widgets/admin_paged_controller.dart';
+import 'widgets/admin_paged_view.dart';
 import 'widgets/reason_dialog.dart';
+import '../../../shared/providers/firestore_provider.dart';
 
-final _recentListingsProvider = StreamProvider.autoDispose<List<Listing>>(
-  (ref) => ref.watch(listingServiceProvider).watchRecentListingsForAdmin(),
-);
+const _listingFilters = <AdminFilter>[
+  AdminFilter('all', 'Tümü'),
+  AdminFilter('active', 'Aktif', icon: Icons.check_circle_outline),
+  AdminFilter('closed', 'Kapalı', icon: Icons.pause_circle_outline),
+  AdminFilter('removed', 'Kaldırılmış', icon: Icons.delete_outline),
+  AdminFilter('urgent', 'Acil', icon: Icons.priority_high),
+  AdminFilter('featured', 'Öne çıkan', icon: Icons.star_outline),
+];
 
-/// Standalone admin screen to search any listing and remove/restore it
-/// directly - previously removeListing was only reachable by opening a
-/// report against that listing first.
+/// Firestore query used by the paginated admin listing screen.
+///
+/// Search intentionally omits an orderBy, as in the user management screen:
+/// Firestore can then use the array-contains search index together with the
+/// selected equality filter. The normal list is newest first.
+Query<Map<String, dynamic>> adminListingsQuery(
+  FirebaseFirestore db, {
+  required String filter,
+  String search = '',
+}) {
+  Query<Map<String, dynamic>> query = db.collection('listings');
+  query = switch (filter) {
+    'active' => query.where('status', isEqualTo: 'active'),
+    'closed' => query.where('status', isEqualTo: 'closed'),
+    'removed' => query.where('status', isEqualTo: 'removed'),
+    'urgent' => query.where('isUrgent', isEqualTo: true),
+    'featured' => query.where('isBoosted', isEqualTo: true),
+    _ => query,
+  };
+
+  final token = searchToken(search);
+  return token != null
+      ? query.where('searchKeywords', arrayContains: token)
+      : query.orderBy('createdAt', descending: true);
+}
+
 class ListingManagementScreen extends ConsumerStatefulWidget {
   const ListingManagementScreen({super.key});
 
   @override
-  ConsumerState<ListingManagementScreen> createState() => _ListingManagementScreenState();
+  ConsumerState<ListingManagementScreen> createState() =>
+      _ListingManagementScreenState();
 }
 
-class _ListingManagementScreenState extends ConsumerState<ListingManagementScreen> {
+class _ListingManagementScreenState
+    extends ConsumerState<ListingManagementScreen> {
   final _searchController = TextEditingController();
-  List<Listing>? _searchResults;
-  bool _searching = false;
+  late final AdminPagedController<Listing> _listings = AdminPagedController(
+    fromDoc: Listing.fromDoc,
+    idOf: (listing) => listing.id,
+  );
+  String _filter = 'all';
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _listings.dispose();
     super.dispose();
   }
 
-  Future<void> _runSearch(String query) async {
-    if (query.trim().isEmpty) {
-      setState(() => _searchResults = null);
-      return;
-    }
-    setState(() => _searching = true);
-    final results = await ref.read(listingServiceProvider).searchListingsForAdmin(query);
-    if (!mounted) return;
-    setState(() {
-      _searchResults = results;
-      _searching = false;
-    });
+  void _reload() {
+    unawaited(
+      _listings.setQuery(
+        adminListingsQuery(
+          ref.read(firestoreProvider),
+          filter: _filter,
+          search: _searchController.text,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openListing(Listing listing) async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => Dialog(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: SingleChildScrollView(
+            child: _ListingCard(
+              listing: listing,
+              onChanged: () => unawaited(_listings.refresh()),
+            ),
+          ),
+        ),
+      ),
+    );
+    await _listings.refresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    final recentListings = ref.watch(_recentListingsProvider);
-    final listToShow = _searchResults;
-
+    final dateFormat = DateFormat('dd.MM.yyyy');
     return Scaffold(
       appBar: AppBar(title: const Text('İlan Yönetimi')),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'İlan başlığıyla ara',
+                labelText: 'Başlık, işveren veya konumla ara',
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searching
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : (_searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchResults = null);
-                            },
-                          )
-                        : null),
+                suffixIcon: _searchController.text.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Aramayı temizle',
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                          _reload();
+                        },
+                      ),
                 border: const OutlineInputBorder(),
               ),
-              onSubmitted: _runSearch,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _reload(),
               onChanged: (value) {
-                if (value.trim().isEmpty) setState(() => _searchResults = null);
+                if (value.isEmpty) _reload();
+                setState(() {});
               },
             ),
           ),
+          AdminFilterBar(
+            filters: _listingFilters,
+            selectedId: _filter,
+            onSelected: (id) {
+              setState(() => _filter = id);
+              _reload();
+            },
+          ),
+          const SizedBox(height: 8),
           Expanded(
-            child: listToShow != null
-                ? (listToShow.isEmpty
-                    ? const Center(child: Text('Sonuç bulunamadı.'))
-                    : _ListingList(listings: listToShow))
-                : recentListings.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (_, _) => const Center(child: Text('İlanlar yüklenemedi.')),
-                    data: (items) => items.isEmpty
-                        ? const Center(child: Text('Henüz ilan yok.'))
-                        : _ListingList(listings: items),
+            child: AdminPagedView<Listing>(
+              controller: _listings,
+              emptyText: 'Bu filtreyle ilan bulunamadı.',
+              cardBuilder: (_, listing) => _ListingCard(
+                listing: listing,
+                onChanged: () => unawaited(_listings.refresh()),
+              ),
+              onRowTap: (listing) => unawaited(_openListing(listing)),
+              columns: [
+                AdminColumn(
+                  label: 'Başlık',
+                  flex: 2,
+                  cell: (_, listing) => Text(
+                    listing.title,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ),
+                AdminColumn(
+                  label: 'İşveren',
+                  flex: 2,
+                  cell: (_, listing) => Text(
+                    listing.posterName,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                AdminColumn(
+                  label: 'Konum',
+                  flex: 2,
+                  cell: (_, listing) => Text(
+                    listing.city ?? listing.location,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                AdminColumn(
+                  label: 'Durum',
+                  cell: (_, listing) => _ListingStatusChip(listing: listing),
+                ),
+                AdminColumn(
+                  label: 'Oluşturma',
+                  cell: (_, listing) => Text(
+                    listing.createdAt == null
+                        ? '—'
+                        : dateFormat.format(listing.createdAt!),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -114,24 +213,44 @@ class _ListingManagementScreenState extends ConsumerState<ListingManagementScree
   }
 }
 
-class _ListingList extends StatelessWidget {
-  const _ListingList({required this.listings});
-  final List<Listing> listings;
+class _ListingStatusChip extends StatelessWidget {
+  const _ListingStatusChip({required this.listing});
+
+  final Listing listing;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: listings.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (_, index) => _ListingCard(listing: listings[index]),
+    final (label, color) = switch (listing.status) {
+      ListingStatus.active => ('Aktif', Colors.green),
+      ListingStatus.closed => ('Kapalı', Colors.grey),
+      ListingStatus.removed => ('Kaldırılmış', Colors.red),
+    };
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+        ),
+      ),
     );
   }
 }
 
 class _ListingCard extends ConsumerStatefulWidget {
-  const _ListingCard({required this.listing});
+  const _ListingCard({required this.listing, this.onChanged});
+
   final Listing listing;
+  final VoidCallback? onChanged;
 
   @override
   ConsumerState<_ListingCard> createState() => _ListingCardState();
@@ -143,7 +262,6 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
   Future<void> _remove() async {
     final adminId = ref.read(authServiceProvider).currentUser?.uid;
     if (adminId == null) return;
-
     final reason = await showReasonDialog(
       context,
       title: 'İlanı Kaldır',
@@ -169,8 +287,11 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
               details: {'listingTitle': widget.listing.title},
             ),
           );
+      widget.onChanged?.call();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İlan kaldırıldı.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('İlan kaldırıldı.')),
+        );
       }
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'ListingManagementScreen._remove');
@@ -203,8 +324,11 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
               details: {'listingTitle': widget.listing.title},
             ),
           );
+      widget.onChanged?.call();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İlan geri yüklendi.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('İlan geri yüklendi.')),
+        );
       }
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'ListingManagementScreen._restore');
@@ -221,12 +345,6 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
   @override
   Widget build(BuildContext context) {
     final listing = widget.listing;
-    final statusInfo = switch (listing.status) {
-      ListingStatus.active => (label: 'Aktif', color: Colors.green),
-      ListingStatus.closed => (label: 'Kapalı', color: Colors.grey),
-      ListingStatus.removed => (label: 'Kaldırıldı', color: Colors.red),
-    };
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -244,21 +362,19 @@ class _ListingCardState extends ConsumerState<_ListingCard> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Chip(
-                  label: Text(statusInfo.label, style: const TextStyle(fontSize: 12)),
-                  backgroundColor: statusInfo.color.withValues(alpha: 0.1),
-                  labelStyle: TextStyle(color: statusInfo.color),
-                  visualDensity: VisualDensity.compact,
-                ),
+                _ListingStatusChip(listing: listing),
                 if (_busy) ...[
                   const SizedBox(width: 8),
-                  const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                  const SizedBox.square(
+                    dimension: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ],
               ],
             ),
             const SizedBox(height: 6),
             Text(
-              '${listing.posterName} • ${listingCategoryLabel(listing.category)} • ${listing.location}',
+              '${listing.posterName} • ${listing.city ?? listing.location}',
               style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
             if (listing.createdAt != null)

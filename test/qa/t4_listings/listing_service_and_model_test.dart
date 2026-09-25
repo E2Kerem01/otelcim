@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:otelcim/features/listings/domain/listing_model.dart';
 import 'package:otelcim/shared/constants/listing_filters.dart';
 import 'package:otelcim/shared/services/listing_service.dart';
+import 'package:otelcim/features/admin/presentation/listing_management_screen.dart';
+import 'package:otelcim/shared/utils/search_keywords.dart';
 
 Listing listing({
   String id = 'listing-1',
@@ -307,17 +309,29 @@ void main() {
       expect(result.listings.map((item) => item.id), ['boundary']);
     });
 
-    test('admin title search matches a trimmed prefix and empty input returns no results', () async {
+    // searchListingsForAdmin was replaced by the paged adminListingsQuery
+    // (keyword prefix search over searchKeywords) in the admin panel rework.
+    test('admin listing search matches a trimmed, Turkish-insensitive prefix; empty search lists all', () async {
       await db.collection('listings').doc('admin-1').set({
         ...listingDocument(createdAt: DateTime(2026, 5, 1), id: 'admin-1'),
         'title': 'Ön Büro Resepsiyonisti',
+        'searchKeywords': buildSearchKeywords(['Ön Büro Resepsiyonisti']),
+      });
+      await db.collection('listings').doc('admin-2').set({
+        ...listingDocument(createdAt: DateTime(2026, 5, 2), id: 'admin-2'),
+        'title': 'Garson',
+        'searchKeywords': buildSearchKeywords(['Garson']),
       });
 
-      final prefix = await service.searchListingsForAdmin('  Ön  ');
-      final empty = await service.searchListingsForAdmin('   ');
+      Future<List<String>> ids(String search) async =>
+          (await adminListingsQuery(db, filter: 'all', search: search).get())
+              .docs
+              .map((doc) => doc.id)
+              .toList();
 
-      expect(prefix.map((item) => item.id), ['admin-1']);
-      expect(empty, isEmpty);
+      expect(await ids('  Ön  '), ['admin-1']);
+      expect(await ids('buro'), ['admin-1']);
+      expect((await ids('   ')).toSet(), {'admin-1', 'admin-2'});
     });
 
     test(
