@@ -66,7 +66,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -77,21 +76,21 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
             child: SegmentedButton<MapSplitViewMode>(
               key: const ValueKey('region_map_view_mode_segmented_button'),
               showSelectedIcon: false,
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: MapSplitViewMode.split,
                   icon: Icon(Icons.vertical_split_rounded),
-                  tooltip: 'Bölünmüş Ekran',
+                  tooltip: l10n.listingDiscoverySplitView,
                 ),
                 ButtonSegment(
                   value: MapSplitViewMode.list,
                   icon: Icon(Icons.view_list_rounded),
-                  tooltip: 'Liste',
+                  tooltip: l10n.listingDiscoveryListView,
                 ),
                 ButtonSegment(
                   value: MapSplitViewMode.map,
                   icon: Icon(Icons.map_rounded),
-                  tooltip: 'Harita',
+                  tooltip: l10n.listingDiscoveryMapView,
                 ),
               ],
               selected: {_viewMode},
@@ -125,7 +124,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                 return _buildRegionList(
                   context: context,
                   counts: counts,
-                  isEnglish: isEnglish,
                   l10n: l10n,
                 );
               }
@@ -134,7 +132,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                 return _buildRegionMap(
                   context: context,
                   counts: counts,
-                  isEnglish: isEnglish,
                   l10n: l10n,
                 );
               }
@@ -147,7 +144,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                       child: _buildRegionList(
                         context: context,
                         counts: counts,
-                        isEnglish: isEnglish,
                         l10n: l10n,
                       ),
                     ),
@@ -156,7 +152,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                       child: _buildRegionMap(
                         context: context,
                         counts: counts,
-                        isEnglish: isEnglish,
                         l10n: l10n,
                       ),
                     ),
@@ -170,7 +165,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                       child: _buildRegionMap(
                         context: context,
                         counts: counts,
-                        isEnglish: isEnglish,
                         l10n: l10n,
                       ),
                     ),
@@ -180,7 +174,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                       child: _buildRegionList(
                         context: context,
                         counts: counts,
-                        isEnglish: isEnglish,
                         l10n: l10n,
                       ),
                     ),
@@ -197,7 +190,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
   Widget _buildRegionList({
     required BuildContext context,
     required Map<String, int> counts,
-    required bool isEnglish,
     required AppLocalizations l10n,
   }) {
     return ListView.separated(
@@ -251,7 +243,7 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                 ),
               ),
               title: Text(
-                isEnglish ? region.nameEn : region.nameTr,
+                localizedTourismRegionName(l10n, region),
                 style: TextStyle(
                   fontWeight: isHovered ? FontWeight.bold : FontWeight.w600,
                   color: isHovered ? colorScheme.primary : colorScheme.onSurface,
@@ -279,7 +271,6 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
   Widget _buildRegionMap({
     required BuildContext context,
     required Map<String, int> counts,
-    required bool isEnglish,
     required AppLocalizations l10n,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -377,7 +368,7 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
                           ),
                         ),
                         child: Text(
-                          isEnglish ? region.nameEn : region.nameTr,
+                          localizedTourismRegionName(l10n, region),
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 11,

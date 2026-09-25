@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/verification_request.dart';
@@ -47,6 +48,7 @@ class _VerificationRequestScreenState
 
   /// Shows a file picker for selecting verification documents
   Future<void> _pickDocument() async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -62,8 +64,8 @@ class _VerificationRequestScreenState
       if (!hasUsableData) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Dosya seçilirken hata oluştu'),
+          SnackBar(
+            content: Text(l10n.verificationFilePickError),
             backgroundColor: Colors.red,
           ),
         );
@@ -76,7 +78,7 @@ class _VerificationRequestScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -85,6 +87,7 @@ class _VerificationRequestScreenState
 
   /// Uploads a document to Firebase Storage
   Future<void> _uploadDocument(XFile file, String fileName) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isUploading = true;
     });
@@ -94,7 +97,7 @@ class _VerificationRequestScreenState
       final currentUser = authState.value;
 
       if (currentUser == null) {
-        throw Exception('Kullanıcı oturum açmamış');
+        throw Exception(l10n.notAuthenticatedError);
       }
 
       final storageService = ref.read(storageServiceProvider);
@@ -112,8 +115,8 @@ class _VerificationRequestScreenState
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Belge yüklendi'),
+        SnackBar(
+          content: Text(l10n.verificationDocumentUploaded),
           backgroundColor: Colors.green,
         ),
       );
@@ -122,7 +125,7 @@ class _VerificationRequestScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -145,14 +148,15 @@ class _VerificationRequestScreenState
 
   /// Submits the verification request
   Future<void> _submitRequest() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (_documentUrls.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('En az bir belge yüklemeniz gerekiyor'),
+        SnackBar(
+          content: Text(l10n.verificationDocumentRequired),
           backgroundColor: Colors.orange,
         ),
       );
@@ -168,7 +172,7 @@ class _VerificationRequestScreenState
       final currentUser = authState.value;
 
       if (currentUser == null) {
-        throw Exception('Kullanıcı oturum açmamış');
+        throw Exception(l10n.notAuthenticatedError);
       }
 
       final verificationService = ref.read(verificationServiceProvider);
@@ -191,8 +195,8 @@ class _VerificationRequestScreenState
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Doğrulama talebi gönderildi'),
+        SnackBar(
+          content: Text(l10n.verificationRequestSubmitted),
           backgroundColor: Colors.green,
         ),
       );
@@ -204,7 +208,7 @@ class _VerificationRequestScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -219,11 +223,12 @@ class _VerificationRequestScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(currentUserProfileProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Otel Doğrulama'),
+        title: Text(l10n.hotelVerificationTitle),
         actions: [
           if (_isSubmitting)
             const Center(
@@ -243,7 +248,7 @@ class _VerificationRequestScreenState
             IconButton(
               icon: const Icon(Icons.check),
               onPressed: _submitRequest,
-              tooltip: 'Gönder',
+              tooltip: l10n.sendAction,
             ),
         ],
       ),
@@ -256,12 +261,12 @@ class _VerificationRequestScreenState
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
               Text(
-                'Profil yüklenirken hata oluştu',
+                l10n.profileLoadingError,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
               Text(
-                error.toString(),
+                l10n.profileLoadingError,
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -296,7 +301,7 @@ class _VerificationRequestScreenState
                                   color: Colors.blue[700]),
                               const SizedBox(width: 8),
                               Text(
-                                'Doğrulama Hakkında',
+                                l10n.verificationAboutTitle,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -309,8 +314,7 @@ class _VerificationRequestScreenState
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Otelinizi doğrulamak için vergi kimlik belgesi, turizm işletme belgesi veya otel kayıt belgesi yüklemeniz gerekmektedir. '
-                            'Yüklediğiniz belgeler güvenli bir şekilde saklanır ve sadece yöneticiler tarafından incelenebilir.',
+                            l10n.verificationAboutDescription,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
@@ -322,18 +326,18 @@ class _VerificationRequestScreenState
                   // Hotel name field
                   TextFormField(
                     controller: _hotelNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Otel Adı',
-                      hintText: 'Otelinizin resmi adını girin',
+                    decoration: InputDecoration(
+                      labelText: l10n.profileFormHotelNameLabel,
+                      hintText: l10n.hotelNameHint,
                       prefixIcon: Icon(Icons.business),
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Otel adı gereklidir';
+                        return l10n.hotelNameRequired;
                       }
                       if (value.trim().length < 3) {
-                        return 'Otel adı en az 3 karakter olmalıdır';
+                        return l10n.hotelNameMinLength;
                       }
                       return null;
                     },
@@ -344,19 +348,19 @@ class _VerificationRequestScreenState
                   // Hotel address field
                   TextFormField(
                     controller: _hotelAddressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Otel Adresi',
-                      hintText: 'Otelinizin tam adresini girin',
+                    decoration: InputDecoration(
+                      labelText: l10n.hotelAddressLabel,
+                      hintText: l10n.hotelAddressHint,
                       prefixIcon: Icon(Icons.location_on),
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 3,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Otel adresi gereklidir';
+                        return l10n.hotelAddressRequired;
                       }
                       if (value.trim().length < 10) {
-                        return 'Lütfen tam adres girin';
+                        return l10n.fullAddressRequired;
                       }
                       return null;
                     },
@@ -366,14 +370,14 @@ class _VerificationRequestScreenState
 
                   // Documents section
                   Text(
-                    'Doğrulama Belgeleri',
+                    l10n.verificationDocumentsTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Vergi kimlik belgesi, turizm işletme belgesi veya otel kayıt belgesi yükleyin (PDF, JPG, PNG)',
+                    l10n.verificationDocumentsDescription,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(height: 16),
@@ -412,7 +416,7 @@ class _VerificationRequestScreenState
                           )
                         : const Icon(Icons.add),
                     label: Text(
-                      _isUploading ? 'Yükleniyor...' : 'Belge Ekle',
+                      _isUploading ? l10n.uploadingAction : l10n.addDocumentAction,
                     ),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
@@ -436,7 +440,7 @@ class _VerificationRequestScreenState
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Doğrulama Talebini Gönder'),
+                        : Text(l10n.submitVerificationAction),
                   ),
                 ],
               ),

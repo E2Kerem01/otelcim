@@ -134,21 +134,21 @@ class _NearbyListingsScreenState extends ConsumerState<NearbyListingsScreen> {
             child: SegmentedButton<NearbyViewMode>(
               key: const ValueKey('nearby_view_mode_segmented_button'),
               showSelectedIcon: false,
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: NearbyViewMode.split,
                   icon: Icon(Icons.vertical_split_rounded),
-                  tooltip: 'Bölünmüş',
+                  tooltip: l10n.listingNearbySplitView,
                 ),
                 ButtonSegment(
                   value: NearbyViewMode.list,
                   icon: Icon(Icons.view_list_rounded),
-                  tooltip: 'Liste',
+                  tooltip: l10n.listingNearbyListView,
                 ),
                 ButtonSegment(
                   value: NearbyViewMode.map,
                   icon: Icon(Icons.map_rounded),
-                  tooltip: 'Harita',
+                  tooltip: l10n.listingNearbyMapView,
                 ),
               ],
               selected: {_viewMode},
@@ -372,7 +372,7 @@ class _NearbyListingsScreenState extends ConsumerState<NearbyListingsScreen> {
         width: 48,
         height: 48,
         child: Tooltip(
-          message: 'Konumunuz',
+          message: l10n.listingNearbyUserLocation,
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,

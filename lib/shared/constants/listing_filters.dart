@@ -1,3 +1,5 @@
+import '../../l10n/app_localizations.dart';
+
 enum EmploymentType {
   fullTime,
   partTime,
@@ -7,6 +9,12 @@ enum EmploymentType {
     EmploymentType.fullTime => 'Tam zamanlı',
     EmploymentType.partTime => 'Yarı zamanlı',
     EmploymentType.seasonal => 'Mevsimlik',
+  };
+
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    EmploymentType.fullTime => l10n.employmentTypeFullTime,
+    EmploymentType.partTime => l10n.employmentTypePartTime,
+    EmploymentType.seasonal => l10n.employmentTypeSeasonal,
   };
 }
 
@@ -21,6 +29,13 @@ enum ExperienceLevel {
     ExperienceLevel.underOneYear => '1 Yıldan Az',
     ExperienceLevel.oneToThreeYears => '1-3 Yıl',
     ExperienceLevel.threePlusYears => '3+ Yıl',
+  };
+
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    ExperienceLevel.none => l10n.experienceNone,
+    ExperienceLevel.underOneYear => l10n.experienceUnderOneYear,
+    ExperienceLevel.oneToThreeYears => l10n.experienceOneToThreeYears,
+    ExperienceLevel.threePlusYears => l10n.experienceThreePlusYears,
   };
 
   static ExperienceLevel? fromName(String? value) {
@@ -44,6 +59,13 @@ enum EducationLevel {
     EducationLevel.university => 'En Az Üniversite',
   };
 
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    EducationLevel.none => l10n.educationNone,
+    EducationLevel.primary => l10n.educationPrimary,
+    EducationLevel.highSchool => l10n.educationHighSchool,
+    EducationLevel.university => l10n.educationUniversity,
+  };
+
   static EducationLevel? fromName(String? value) {
     for (final level in values) {
       if (level.name == value) return level;
@@ -61,6 +83,22 @@ class ListingSeason {
   static const yaz2025 = ListingSeason._('yaz_2025', 'Yaz 2025');
   static const kis202526 = ListingSeason._('kis_2025_26', 'Kış 2025-26');
   static const tumYil = ListingSeason._('tum_yil', 'Tüm Yıl');
+
+  String localizedLabel(AppLocalizations l10n) {
+    if (code == yaz2025.code) return l10n.seasonSummer2025;
+    if (code == kis202526.code) return l10n.seasonWinter202526;
+    if (code == tumYil.code) return l10n.seasonYearRound;
+    final match = RegExp(r'^(yaz|kis)_(\d{4})(?:_(\d{2}))?$').firstMatch(code);
+    if (match != null) {
+      final year = match.group(2)!;
+      if (match.group(1) == 'yaz') {
+        return l10n.seasonSummerOf(year);
+      }
+      final next = match.group(3);
+      return l10n.seasonWinterOf(next == null ? year : '$year-$next');
+    }
+    return label;
+  }
 
   /// The filter options are derived from the current year so new seasons
   /// become selectable without a code change each year.
@@ -118,6 +156,13 @@ enum ListingDateFilter {
     ListingDateFilter.lastMonth => 'Son ay',
   };
 
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    ListingDateFilter.all => l10n.dateFilterAll,
+    ListingDateFilter.last24Hours => l10n.dateFilterLast24Hours,
+    ListingDateFilter.lastWeek => l10n.dateFilterLastWeek,
+    ListingDateFilter.lastMonth => l10n.dateFilterLastMonth,
+  };
+
   DateTime? get cutoff => switch (this) {
     ListingDateFilter.all => null,
     ListingDateFilter.last24Hours => DateTime.now().subtract(
@@ -142,7 +187,14 @@ enum ListingSortOrder {
     ListingSortOrder.salaryHighToLow => 'Maaş yüksekten düşüğe',
     ListingSortOrder.salaryLowToHigh => 'Maaş düşükten yükseğe',
   };
+
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    ListingSortOrder.newest => l10n.sortOrderNewest,
+    ListingSortOrder.salaryHighToLow => l10n.sortOrderSalaryHighToLow,
+    ListingSortOrder.salaryLowToHigh => l10n.sortOrderSalaryLowToHigh,
+  };
 }
+
 
 const turkishTourismCities = <String>[
   'Antalya',

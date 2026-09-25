@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-import '../../../shared/error/error_mapper.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
@@ -56,9 +56,10 @@ class _UrgentListingPurchaseScreenState
   }
 
   Future<void> _handlePurchase() async {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) {
-      _snack('Lütfen önce giriş yapın.');
+      _snack(l10n.listingUrgentLoginRequired);
       return;
     }
 
@@ -99,12 +100,12 @@ class _UrgentListingPurchaseScreenState
           verificationData = platform == 'app_store' ? receipt : null;
         }
       } else {
-        _snack('Satın alma mağazası şu an kullanılamıyor.');
+        _snack(l10n.listingBoostStoreUnavailable);
         return;
       }
 
       if (!purchaseSuccess) {
-        _snack('Satın alma tamamlanamadı veya iptal edildi.');
+        _snack(l10n.listingBoostPurchaseFailed);
         return;
       }
 
@@ -121,8 +122,8 @@ class _UrgentListingPurchaseScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.green.shade700,
-          content: const Text(
-            'İlanınız acil olarak işaretlendi.',
+          content: Text(
+            l10n.listingUrgentSuccess,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
@@ -130,7 +131,7 @@ class _UrgentListingPurchaseScreenState
       _leave();
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'UrgentListingPurchaseScreen._handlePurchase');
-      _snack(mapToFailure(error).message);
+      _snack(l10n.listingUrgentVerificationError);
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
@@ -152,32 +153,31 @@ class _UrgentListingPurchaseScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final paymentService = ref.watch(paymentServiceProvider);
     final listingAsync = ref.watch(singleListingProvider(widget.listingId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Acil İlan')),
+      appBar: AppBar(title: Text(l10n.listingUrgentTitle)),
       body: listingAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('İlan yüklenirken hata: $err')),
+        error: (err, _) => Center(child: Text(l10n.listingLoadError('$err'))),
         data: (listing) {
           if (listing == null) {
-            return const Center(child: Text('İlan bulunamadı.'));
+            return Center(child: Text(l10n.listingNotFound));
           }
           final user = ref.watch(authServiceProvider).currentUser;
           if (listing.isUrgent) {
             return _buildGuardState(
-              // TODO(l10n): add urgentListingAlreadyActive (TR: "Bu ilan zaten acil.", EN: "This listing is already urgent.").
-              'Bu ilan zaten acil.',
+              l10n.listingUrgentAlreadyActive,
             );
           }
           if (user == null) {
-            return _buildGuardState('Lütfen önce giriş yapın.');
+            return _buildGuardState(l10n.listingUrgentLoginRequired);
           }
           if (listing.posterId != user.uid) {
             return _buildGuardState(
-              // TODO(l10n): add urgentListingOwnerOnly (TR: "Bu ilanı yalnızca sahibi acil yapabilir.", EN: "Only the owner can make this listing urgent.").
-              'Bu ilanı yalnızca sahibi acil yapabilir.',
+              l10n.listingUrgentOwnerOnly,
             );
           }
           return SingleChildScrollView(
@@ -232,19 +232,17 @@ class _UrgentListingPurchaseScreenState
                         children: [
                           Icon(Icons.bolt, color: Colors.deepOrange.shade700),
                           const SizedBox(width: 8),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Ücretsiz acil ilan hakkınızı daha önce kullandınız',
+                              l10n.listingUrgentFreeUsed,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Acil ilanlar, bölgedeki adaylara anlık bildirim '
-                        'gönderilir ve listede acil rozetiyle öne çıkar. '
-                        'Bu ilanı acil yapmak için tek seferlik ücret alınır.',
+                      Text(
+                        l10n.listingUrgentFreeUsedBody,
                         style: TextStyle(fontSize: 13),
                       ),
                     ],
@@ -266,9 +264,9 @@ class _UrgentListingPurchaseScreenState
                     ),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'Acil İlan (tek seferlik)',
+                            l10n.listingUrgentPriceLabel,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -308,8 +306,8 @@ class _UrgentListingPurchaseScreenState
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
-                            'Satın Al ve Acil Yap',
+                        : Text(
+                            l10n.listingUrgentPurchaseAction,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -321,14 +319,13 @@ class _UrgentListingPurchaseScreenState
                 Center(
                   child: TextButton(
                     onPressed: _isProcessing ? null : _leave,
-                    child: const Text('Şimdilik acil yapmadan devam et'),
+                    child: Text(l10n.listingUrgentSkipAction),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Center(
                   child: Text(
-                    'Ödeme güvenli şekilde Google Play / App Store üzerinden '
-                    'tamamlanır.',
+                    l10n.listingUrgentPaymentNotice,
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                     textAlign: TextAlign.center,
                   ),

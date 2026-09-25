@@ -116,9 +116,13 @@ class _ProfileFormState extends State<ProfileForm> {
   }
 
   /// Validates that a required field is not empty
-  String? _validateRequired(String? value, String fieldName) {
+  String? _validateRequired(
+    String? value,
+    String fieldName,
+    AppLocalizations l10n,
+  ) {
     if (value == null || value.trim().isEmpty) {
-      return '$fieldName gereklidir';
+      return l10n.profileFormRequiredField(fieldName);
     }
     return null;
   }
@@ -132,13 +136,13 @@ class _ProfileFormState extends State<ProfileForm> {
     // Basic phone number validation (digits, spaces, dashes, parentheses, plus)
     final phoneRegex = RegExp(r'^[\d\s\-\(\)\+]+$');
     if (!phoneRegex.hasMatch(value)) {
-      return 'Geçerli bir telefon numarası giriniz';
+      return AppLocalizations.of(context)!.phoneValidation;
     }
 
     // Check minimum length (at least 10 digits)
     final digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
     if (digitsOnly.length < 10) {
-      return 'Telefon numarası en az 10 haneli olmalıdır';
+      return AppLocalizations.of(context)!.profileFormPhoneMinLength;
     }
 
     return null;
@@ -156,23 +160,27 @@ class _ProfileFormState extends State<ProfileForm> {
           // Display Name (Required)
           TextFormField(
             controller: _displayNameController,
-            decoration: const InputDecoration(
-              labelText: 'Ad Soyad',
-              hintText: 'Adınızı ve soyadınızı giriniz',
+            decoration: InputDecoration(
+              labelText: l10n.profileFormDisplayNameLabel,
+              hintText: l10n.profileFormDisplayNameHint,
               prefixIcon: Icon(Icons.person_outline),
               border: OutlineInputBorder(),
             ),
             textCapitalization: TextCapitalization.words,
-            validator: (value) => _validateRequired(value, 'Ad Soyad'),
+            validator: (value) => _validateRequired(
+              value,
+              l10n.profileFormDisplayNameLabel,
+              l10n,
+            ),
           ),
           const SizedBox(height: 16),
 
           // Phone Number (Optional)
           TextFormField(
             controller: _phoneNumberController,
-            decoration: const InputDecoration(
-              labelText: 'Telefon Numarası',
-              hintText: 'Telefon numaranızı giriniz',
+            decoration: InputDecoration(
+              labelText: l10n.phoneLabel,
+              hintText: l10n.profileFormPhoneHint,
               prefixIcon: Icon(Icons.phone_outlined),
               border: OutlineInputBorder(),
             ),
@@ -184,9 +192,9 @@ class _ProfileFormState extends State<ProfileForm> {
           // Bio (Optional, Multiline)
           TextFormField(
             controller: _bioController,
-            decoration: const InputDecoration(
-              labelText: 'Hakkında',
-              hintText: 'Kendiniz hakkında kısa bir açıklama yazınız',
+            decoration: InputDecoration(
+              labelText: l10n.profileFormBioLabel,
+              hintText: l10n.profileFormBioHint,
               prefixIcon: Icon(Icons.info_outline),
               border: OutlineInputBorder(),
               alignLabelWithHint: true,
@@ -299,18 +307,18 @@ class _ProfileFormState extends State<ProfileForm> {
                       size: 20,
                     ),
                     const SizedBox(width: 8),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Şu An Boşta / Hemen Başlayabilir',
+                        l10n.profileFormAvailabilityTitle,
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                     ),
                   ],
                 ),
-                subtitle: const Padding(
+                subtitle: Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: Text(
-                    'Açık olduğunda işverenlerin sohbet ekranında yeşil "Hemen Başlayabilir" rozeti gösterilir.',
+                    l10n.profileFormAvailabilitySubtitle,
                     style: TextStyle(fontSize: 12),
                   ),
                 ),
@@ -325,28 +333,36 @@ class _ProfileFormState extends State<ProfileForm> {
             // Hotel Name (Required for employers)
             TextFormField(
               controller: _hotelNameController,
-              decoration: const InputDecoration(
-                labelText: 'Otel Adı',
-                hintText: 'Çalıştığınız otelin adını giriniz',
+              decoration: InputDecoration(
+                labelText: l10n.profileFormHotelNameLabel,
+                hintText: l10n.profileFormHotelNameHint,
                 prefixIcon: Icon(Icons.business_outlined),
                 border: OutlineInputBorder(),
               ),
               textCapitalization: TextCapitalization.words,
-              validator: (value) => _validateRequired(value, 'Otel Adı'),
+              validator: (value) => _validateRequired(
+                value,
+                l10n.profileFormHotelNameLabel,
+                l10n,
+              ),
             ),
             const SizedBox(height: 16),
 
             // Position (Required for employers)
             TextFormField(
               controller: _positionController,
-              decoration: const InputDecoration(
-                labelText: 'Pozisyon',
-                hintText: 'Görevinizi giriniz (örn: İnsan Kaynakları Müdürü)',
+              decoration: InputDecoration(
+                labelText: l10n.profileFormPositionLabel,
+                hintText: l10n.profileFormPositionHint,
                 prefixIcon: Icon(Icons.work_outline),
                 border: OutlineInputBorder(),
               ),
               textCapitalization: TextCapitalization.words,
-              validator: (value) => _validateRequired(value, 'Pozisyon'),
+              validator: (value) => _validateRequired(
+                value,
+                l10n.profileFormPositionLabel,
+                l10n,
+              ),
             ),
             const SizedBox(height: 16),
           ],

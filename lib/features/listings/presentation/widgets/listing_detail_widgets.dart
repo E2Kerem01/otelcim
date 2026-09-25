@@ -8,6 +8,7 @@ import '../../../../shared/constants/listing_filters.dart';
 import '../../../boosts/presentation/widgets/boost_badge.dart';
 import '../../domain/listing_model.dart';
 import '../listing_requirement_labels.dart';
+import '../listing_filter_labels.dart';
 import '../whatsapp_utils.dart';
 
 /// Presentational sections of [ListingDetailScreen] (see that file) split
@@ -28,13 +29,14 @@ class ListingHeaderInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Chip(
-              label: Text(listingCategoryLabel(listing.category)),
+              label: Text(listingCategoryLabelFor(l10n, listing.category)),
               backgroundColor:
                   Theme.of(context).primaryColor.withValues(alpha: 0.1),
               side: BorderSide.none,
@@ -91,6 +93,7 @@ class ListingSalaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -101,8 +104,8 @@ class ListingSalaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Maaş',
+          Text(
+            l10n.listingSalaryLabel,
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
           const SizedBox(height: 4),
@@ -199,11 +202,12 @@ class ListingDescriptionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'İlan Açıklaması',
+        Text(
+          l10n.listingDescriptionLabel,
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
@@ -228,6 +232,7 @@ class ListingHousingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -325,6 +330,7 @@ class ListingStaffShuttleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -366,6 +372,7 @@ class ListingPosterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -398,7 +405,7 @@ class ListingPosterCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'İlan Sahibi',
+                    l10n.listingPosterLabel,
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 12,
@@ -418,7 +425,7 @@ class ListingPosterCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              'İletişim bilgisini görmek için giriş yapın',
+                              l10n.listingContactLoginPrompt,
                               style: TextStyle(
                                 color: Colors.orange.shade800,
                                 fontSize: 12,
@@ -449,7 +456,7 @@ class ListingPosterCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'İletişim Bilgisini Göster',
+                            l10n.listingContactReveal,
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontSize: 12,
@@ -481,6 +488,7 @@ class ListingSafetyTipsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       color: Theme.of(context).colorScheme.tertiaryContainer,
       child: Padding(
@@ -544,6 +552,7 @@ class _ListingImageGalleryState extends State<ListingImageGallery> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (widget.listing.images.isEmpty) {
       final categoryEnum = ListingCategory.values.firstWhere(
         (c) => c.name == widget.listing.category,
@@ -576,7 +585,7 @@ class _ListingImageGalleryState extends State<ListingImageGallery> {
               ),
               const SizedBox(height: 8),
               Text(
-                listingCategoryLabels[categoryEnum] ?? 'Otelcim İlanı',
+                listingCategoryLabelFor(l10n, widget.listing.category),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -702,7 +711,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  isOwner ? 'İlan Yönetimi' : 'İş Başvurusu & İletişim',
+                  isOwner ? l10n.listingManagementTitle : l10n.listingApplicationContactTitle,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -722,7 +731,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Maaş / Ücret',
+                    l10n.listingSalaryOrPay,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade700,
@@ -749,7 +758,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                   onPressed: () => context.push('/listing/${listing.id}/boost'),
                   icon: const Icon(Icons.rocket_launch_rounded),
                   label: Text(
-                    isBoostedActive ? 'Öne Çıkarma' : 'İlanı Öne Çıkar',
+                    isBoostedActive ? l10n.listingBoostActionShort : l10n.listingBoostAction,
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber.shade700,
@@ -786,7 +795,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                           ),
                         )
                       : const Icon(Icons.message_outlined),
-                  label: const Text('Başvur / Mesaj Gönder'),
+                  label: Text(l10n.listingApplyMessage),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -838,7 +847,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'İlan Sahibi',
+                        l10n.listingPosterLabel,
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 11,
@@ -863,7 +872,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        'İletişim bilgisini görmek için giriş yapın',
+                        l10n.listingContactLoginPrompt,
                         style: TextStyle(
                           color: Colors.orange.shade800,
                           fontSize: 12,
@@ -895,7 +904,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'İletişim Bilgisini Göster',
+                      l10n.listingContactReveal,
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontSize: 12,
@@ -922,7 +931,7 @@ class ListingRightStickyActionCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Otelcim ile doğrudan ve ücretsiz iş başvurusu',
+                      l10n.listingDirectApplicationNotice(l10n.appName),
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.grey.shade700,

@@ -15,24 +15,23 @@ class InviteFriendsScreen extends ConsumerWidget {
   const InviteFriendsScreen({super.key});
 
   Future<void> _copyCode(BuildContext context, String code) async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     await Clipboard.setData(ClipboardData(text: code));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n?.codeCopiedMessage ?? 'Kod kopyalandı')),
+      SnackBar(content: Text(l10n.codeCopiedMessage)),
     );
   }
 
   Future<void> _shareCode(BuildContext context, String code) async {
-    final l10n = AppLocalizations.of(context);
-    final message = l10n?.shareReferralMessage(code) ??
-        "Otelcim'de otel/turizm işleri bul veya ilan ver! $code kodumla kayıt ol, ikimiz de kazanalım.";
+    final l10n = AppLocalizations.of(context)!;
+    final message = l10n.shareReferralMessage(code);
     await SharePlus.instance.share(ShareParams(text: message));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final currentUser = ref.watch(authServiceProvider).currentUser;
     final profile = ref.watch(currentUserProfileProvider).value;
     final referralCode = profile?.referralCode ??
@@ -42,7 +41,7 @@ class InviteFriendsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.inviteFriendsTitle ?? 'Arkadaşını Davet Et'),
+        title: Text(l10n.inviteFriendsTitle),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -57,8 +56,7 @@ class InviteFriendsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              l10n?.inviteFriendsDescription ??
-                  'Kodunu arkadaşınla paylaş, o kaydolup ilk ilanını yayınladığında veya ilk sohbetini başlattığında sana ücretsiz bir boost hakkı kazandırsın.',
+              l10n.inviteFriendsDescription,
               style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
             ),
             const SizedBox(height: 24),
@@ -69,7 +67,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n?.yourReferralCodeLabel ?? 'Referans Kodun',
+                      l10n.yourReferralCodeLabel,
                       style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                     ),
                     const SizedBox(height: 8),
@@ -86,7 +84,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                           ),
                         ),
                         IconButton(
-                          tooltip: l10n?.copyCodeAction ?? 'Kodu Kopyala',
+                          tooltip: l10n.copyCodeAction,
                           icon: const Icon(Icons.copy_rounded),
                           onPressed: referralCode.isEmpty
                               ? null
@@ -102,7 +100,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                             ? null
                             : () => _shareCode(context, referralCode),
                         icon: const Icon(Icons.share_rounded),
-                        label: Text(l10n?.shareCodeAction ?? 'Paylaş'),
+                        label: Text(l10n.shareCodeAction),
                       ),
                     ),
                   ],
@@ -115,7 +113,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                 Expanded(
                   child: _StatCard(
                     icon: Icons.people_alt_rounded,
-                    label: l10n?.referralCountLabel ?? 'Davet Ettiğin Kişi Sayısı',
+                    label: l10n.referralCountLabel,
                     value: '$referralCount',
                   ),
                 ),
@@ -123,7 +121,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                 Expanded(
                   child: _StatCard(
                     icon: Icons.rocket_launch_rounded,
-                    label: l10n?.freeBoostCreditsLabel ?? 'Ücretsiz Boost Hakkın',
+                    label: l10n.freeBoostCreditsLabel,
                     value: '$freeBoostCredits',
                   ),
                 ),

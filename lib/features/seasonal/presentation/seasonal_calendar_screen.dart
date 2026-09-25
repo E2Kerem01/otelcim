@@ -49,10 +49,10 @@ class _SeasonalCalendarScreenState
                     children: [
                       Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Sezon İlanı Hatırlatıcı Ekle',
-                              style: TextStyle(
+                              l10n.coreSeasonalAddAlertTitle,
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -65,21 +65,21 @@ class _SeasonalCalendarScreenState
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Sezon başlamadan önce belirlediğiniz şehir ve kategorideki ilanlardan haberdar olun.',
-                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      Text(
+                        l10n.coreSeasonalAddAlertDesc,
+                        style: const TextStyle(fontSize: 13, color: Colors.grey),
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String?>(
                         initialValue: selectedCity,
-                        decoration: const InputDecoration(
-                          labelText: 'Bölge / Şehir',
-                          prefixIcon: Icon(Icons.location_city),
+                        decoration: InputDecoration(
+                          labelText: l10n.coreSeasonalRegionCityLabel,
+                          prefixIcon: const Icon(Icons.location_city),
                         ),
                         items: [
-                          const DropdownMenuItem<String?>(
+                          DropdownMenuItem<String?>(
                             value: null,
-                            child: Text('Tüm Bölgeler'),
+                            child: Text(l10n.coreSeasonalAllRegions),
                           ),
                           ...turkishTourismCities.map(
                             (city) => DropdownMenuItem(
@@ -94,19 +94,19 @@ class _SeasonalCalendarScreenState
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String?>(
                         initialValue: selectedCategory,
-                        decoration: const InputDecoration(
-                          labelText: 'Kategori',
-                          prefixIcon: Icon(Icons.work_outline),
+                        decoration: InputDecoration(
+                          labelText: l10n.coreSeasonalCategoryLabel,
+                          prefixIcon: const Icon(Icons.work_outline),
                         ),
                         items: [
-                          const DropdownMenuItem<String?>(
+                          DropdownMenuItem<String?>(
                             value: null,
-                            child: Text('Tüm Kategoriler'),
+                            child: Text(l10n.coreSeasonalAllCategories),
                           ),
                           ...ListingCategory.values.map(
                             (cat) => DropdownMenuItem(
                               value: cat.name,
-                              child: Text(listingCategoryLabels[cat]!),
+                              child: Text(listingCategoryLabel(cat, l10n)),
                             ),
                           ),
                         ],
@@ -116,9 +116,9 @@ class _SeasonalCalendarScreenState
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
                         initialValue: selectedSeason,
-                        decoration: const InputDecoration(
-                          labelText: 'Hedef Sezon',
-                          prefixIcon: Icon(Icons.date_range),
+                        decoration: InputDecoration(
+                          labelText: l10n.coreSeasonalTargetSeasonLabel,
+                          prefixIcon: const Icon(Icons.date_range),
                         ),
                         items: ListingSeason.values
                             .map(
@@ -141,23 +141,21 @@ class _SeasonalCalendarScreenState
                         width: double.infinity,
                         child: FilledButton.icon(
                           icon: const Icon(Icons.notifications_active),
-                          label: const Text('Hatırlatıcı Oluştur'),
+                          label: Text(l10n.coreSeasonalCreateAlertAction),
                           onPressed: () async {
                             await ref
                                 .read(seasonalServiceProvider)
                                 .addSubscription(
-                                  userId: uid,
-                                  city: selectedCity,
-                                  category: selectedCategory,
-                                  season: selectedSeason,
-                                );
+                                   userId: uid,
+                                   city: selectedCity,
+                                   category: selectedCategory,
+                                   season: selectedSeason,
+                                 );
                             if (modalContext.mounted) {
                               Navigator.pop(modalContext);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Sezonluk hatırlatıcı başarıyla oluşturuldu.',
-                                  ),
+                                SnackBar(
+                                  content: Text(l10n.coreSeasonalAlertCreatedSuccess),
                                 ),
                               );
                             }
@@ -178,13 +176,11 @@ class _SeasonalCalendarScreenState
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authStateProvider).value;
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          isEn ? 'Seasonal Hiring Calendar' : 'Sezonluk İşe Alım Takvimi',
-        ),
+        title: Text(l10n.coreSeasonalCalendarTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -213,9 +209,7 @@ class _SeasonalCalendarScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isEn
-                                ? 'Tourism Season Hiring Periods'
-                                : 'Turizm Sezonu İşe Alım Dönemleri',
+                            l10n.coreSeasonalIntroTitle,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -223,9 +217,7 @@ class _SeasonalCalendarScreenState
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            isEn
-                                ? 'Track peak recruitment windows and set alerts for your preferred region & job category.'
-                                : 'Yoğun işe alım dönemlerini takip edin ve bölge/kategori bazlı sezon hatırlatıcıları kurun.',
+                            l10n.coreSeasonalIntroDesc,
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.black87,
@@ -243,9 +235,7 @@ class _SeasonalCalendarScreenState
 
             // Seasonal Windows List
             Text(
-              isEn
-                  ? 'Seasonal Recruitment Windows'
-                  : 'Sezonluk İşe Alım Dönemleri',
+              l10n.coreSeasonalWindowsHeading,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -275,7 +265,7 @@ class _SeasonalCalendarScreenState
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              isEn ? window.titleEn : window.titleTr,
+                              window.localizedTitle(l10n),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).primaryColor,
@@ -298,9 +288,7 @@ class _SeasonalCalendarScreenState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  isEn
-                                      ? 'Recruitment Peak'
-                                      : 'İşe Alım Yoğunluğu',
+                                  l10n.coreSeasonalRecruitmentPeakLabel,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
@@ -308,9 +296,7 @@ class _SeasonalCalendarScreenState
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isEn
-                                      ? window.recruitmentPeriodEn
-                                      : window.recruitmentPeriodTr,
+                                  window.localizedRecruitmentPeriod(l10n),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -323,9 +309,7 @@ class _SeasonalCalendarScreenState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  isEn
-                                      ? 'Active Work Period'
-                                      : 'Çalışma Dönemi',
+                                  l10n.coreSeasonalActivePeriodLabel,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
@@ -333,9 +317,7 @@ class _SeasonalCalendarScreenState
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isEn
-                                      ? window.activeMonthsEn
-                                      : window.activeMonthsTr,
+                                  window.localizedActiveMonths(l10n),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -347,7 +329,7 @@ class _SeasonalCalendarScreenState
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        isEn ? window.descriptionEn : window.descriptionTr,
+                        window.localizedDescription(l10n),
                         style: const TextStyle(
                           fontSize: 13,
                           color: Colors.black87,
@@ -366,7 +348,7 @@ class _SeasonalCalendarScreenState
               children: [
                 Expanded(
                   child: Text(
-                    isEn ? 'Seasonal Reminders' : 'Sezonluk Hatırlatıcılarım',
+                    l10n.coreSeasonalRemindersHeading,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -376,7 +358,7 @@ class _SeasonalCalendarScreenState
                 if (user != null)
                   ElevatedButton.icon(
                     icon: const Icon(Icons.add, size: 18),
-                    label: Text(isEn ? 'Add Alert' : 'Ekle'),
+                    label: Text(l10n.coreAddAction),
                     onPressed: () =>
                         _openAddSubscriptionModal(context, user.uid),
                   ),
@@ -397,15 +379,13 @@ class _SeasonalCalendarScreenState
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        isEn
-                            ? 'Please sign in to set seasonal hiring reminders.'
-                            : 'Sezonluk işe alım hatırlatıcıları kurmak için lütfen giriş yapın.',
+                        l10n.coreSeasonalSignInPrompt,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
                       OutlinedButton(
                         onPressed: () => context.push('/login'),
-                        child: Text(isEn ? 'Sign In' : 'Giriş Yap'),
+                        child: Text(l10n.loginButton),
                       ),
                     ],
                   ),
@@ -434,19 +414,13 @@ class _SeasonalCalendarScreenState
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    isEn
-                                        ? 'No active seasonal alerts set yet.'
-                                        : 'Henüz kurulmuş bir sezon hatırlatıcısı yok.',
+                                    l10n.coreSeasonalNoAlerts,
                                     style: const TextStyle(color: Colors.grey),
                                   ),
                                   const SizedBox(height: 12),
                                   FilledButton.icon(
                                     icon: const Icon(Icons.add_alert),
-                                    label: Text(
-                                      isEn
-                                          ? 'Create First Alert'
-                                          : 'İlk Hatırlatıcıyı Oluştur',
-                                    ),
+                                    label: Text(l10n.coreSeasonalCreateFirstAlert),
                                     onPressed: () => _openAddSubscriptionModal(
                                       context,
                                       user.uid,
@@ -463,18 +437,12 @@ class _SeasonalCalendarScreenState
                         children: subs.map((sub) {
                           final seasonObj = ListingSeason.fromCode(sub.season);
                           final seasonLabel =
-                              seasonObj?.label ?? sub.season ?? 'Tüm Sezonlar';
+                              seasonObj != null ? listingSeasonLabel(l10n, seasonObj.code) : (sub.season ?? l10n.coreSeasonalAllSeasons);
                           final cityText =
-                              sub.city ??
-                              (isEn ? 'All Regions' : 'Tüm Bölgeler');
+                              sub.city ?? l10n.coreSeasonalAllRegions;
                           final catText = sub.category != null
-                              ? (listingCategoryLabels[ListingCategory.values
-                                        .firstWhere(
-                                          (c) => c.name == sub.category,
-                                          orElse: () => ListingCategory.diger,
-                                        )] ??
-                                    sub.category!)
-                              : (isEn ? 'All Categories' : 'Tüm Kategoriler');
+                              ? localizedListingCategoryName(sub.category!, l10n)
+                              : l10n.coreSeasonalAllCategories;
 
                           return Card(
                             margin: const EdgeInsets.only(bottom: 8),
@@ -496,7 +464,7 @@ class _SeasonalCalendarScreenState
                               ),
                               title: Text('$cityText - $catText'),
                               subtitle: Text(
-                                '${isEn ? 'Season' : 'Sezon'}: $seasonLabel',
+                                '${l10n.coreSeasonLabel}: $seasonLabel',
                                 style: const TextStyle(fontSize: 12),
                               ),
                               trailing: Row(
@@ -540,9 +508,7 @@ class _SeasonalCalendarScreenState
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
                     error: (e, st) => Text(
-                      isEn
-                          ? 'Error loading alerts: $e'
-                          : 'Hatırlatıcılar yüklenemedi: $e',
+                      l10n.coreSeasonalAlertsLoadError('$e'),
                     ),
                   );
                 },

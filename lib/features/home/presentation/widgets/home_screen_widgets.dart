@@ -241,7 +241,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               ...ListingCategory.values.map(
                 (value) => DropdownMenuItem(
                   value: value,
-                  child: Text(listingCategoryLabels[value]!),
+                  child: Text(listingCategoryLabelFor(l10n, value.name)),
                 ),
               ),
             ],
@@ -730,7 +730,7 @@ class ListingCard extends ConsumerWidget {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      listingCategoryLabel(listing.category),
+                                      listingCategoryLabelFor(l10n, listing.category),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -875,7 +875,7 @@ class ListingCard extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              listingCategoryLabel(listing.category),
+                              listingCategoryLabelFor(l10n, listing.category),
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -1333,7 +1333,7 @@ class ListingTableRow extends ConsumerWidget {
                     Expanded(
                       flex: 2,
                       child: Text(
-                        listingCategoryLabel(listing.category),
+                        listingCategoryLabelFor(l10n, listing.category),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(

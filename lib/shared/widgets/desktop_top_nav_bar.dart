@@ -146,7 +146,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              'Turizm & Otel İş İlanları',
+                              l10n.coreBrandSubtitle,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -242,7 +242,7 @@ class DesktopTopNavBar extends ConsumerWidget {
                   children: [
                     // Favorites shortcut button
                     IconButton(
-                      tooltip: 'Favorilerim',
+                      tooltip: l10n.coreFavoritesTooltip,
                       constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                       icon: Icon(
                         Icons.favorite_outline_rounded,

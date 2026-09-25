@@ -68,21 +68,20 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
 
   Future<void> _markAsHired() async {
     if (_conversation?.hired == true || _markingHired) return;
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('İşe alındı olarak işaretle'),
-        content: const Text(
-          'Bu görüşmede işe alımın gerçekleştiğini onaylıyor musunuz?',
-        ),
+        title: Text(l10n.coreMarkHiredDialogTitle),
+        content: Text(l10n.coreMarkHiredDialogDesc),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Vazgeç'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Onayla'),
+            child: Text(l10n.coreConfirmAction),
           ),
         ],
       ),
@@ -96,14 +95,14 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
           .markConversationHired(widget.conversationId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Görüşme işe alındı olarak işaretlendi.')),
+          SnackBar(content: Text(l10n.coreConversationMarkedHiredSuccess)),
         );
       }
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'ChatDetailScreen._markHired');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mapToFailure(error).message)),
+          SnackBar(content: Text(mapToFailure(error, l10n).message)),
         );
       }
     } finally {
@@ -136,8 +135,10 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
       if (mounted) {
         // Give the text back so nothing typed is lost on failure.
         _messageController.text = text;
+        final l10n = AppLocalizations.of(context);
+        final errorMsg = mapToFailure(error, l10n).message;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Mesaj gönderilemedi: ${mapToFailure(error).message}')),
+          SnackBar(content: Text(l10n?.coreMessageSendFailed(errorMsg) ?? 'Mesaj gönderilemedi: $errorMsg')),
         );
       }
     }
@@ -145,12 +146,13 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
 
   void _showReportDialog() {
     if (_otherParticipantId == null) return;
+    final l10n = AppLocalizations.of(context);
     unawaited(showDialog(
       context: context,
       builder: (context) => ReportDialog(
         targetType: ReportTargetType.user,
         targetId: _otherParticipantId!,
-        targetName: 'Kullanıcı',
+        targetName: l10n?.coreUserLabel ?? 'Kullanıcı',
       ),
     ));
   }
@@ -159,32 +161,35 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     if (_otherParticipantId == null) return;
     final myUid = ref.read(authStateProvider).value?.uid;
     if (myUid == null) return;
+    final l10n = AppLocalizations.of(context);
 
     final otherProfile = ref.read(userProfileProvider(_otherParticipantId!)).value;
+    final defaultCandidate = l10n?.coreCandidateLabel ?? 'Aday';
     final candidateName = (otherProfile?.displayName?.isNotEmpty == true)
         ? otherProfile!.displayName!
-        : (otherProfile?.email.isNotEmpty == true ? otherProfile!.email : 'Aday');
+        : (otherProfile?.email.isNotEmpty == true ? otherProfile!.email : defaultCandidate);
 
     final noteController = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Yetenek Havuzuna Ekle'),
+        title: Text(l10n?.addToTalentPool ?? 'Yetenek Havuzuna Ekle'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '$candidateName kişisini gelecek sezon yetenek havuzunuza eklemek üzeresiniz.',
+              l10n?.coreAddToTalentPoolPrompt(candidateName) ??
+                  '$candidateName kişisini gelecek sezon yetenek havuzunuza eklemek üzeresiniz.',
             ),
             const SizedBox(height: 12),
             TextField(
               controller: noteController,
-              decoration: const InputDecoration(
-                labelText: 'Not Ekle (İsteğe Bağlı)',
-                hintText: 'Örn: Resepsiyon için 2026 yaz dönemi adayı',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n?.coreAddNoteOptional ?? 'Not Ekle (İsteğe Bağlı)',
+                hintText: l10n?.coreAddNoteHint ?? 'Örn: Resepsiyon için 2026 yaz dönemi adayı',
+                border: const OutlineInputBorder(),
               ),
               maxLines: 2,
             ),
@@ -193,11 +198,11 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Vazgeç'),
+            child: Text(l10n?.cancelButton ?? 'Vazgeç'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Ekle'),
+            child: Text(l10n?.coreAddAction ?? 'Ekle'),
           ),
         ],
       ),
@@ -215,14 +220,14 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
           );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Aday yetenek havuzunuza eklendi.')),
+          SnackBar(content: Text(l10n?.candidateAddedToTalentPool ?? 'Aday yetenek havuzunuza eklendi.')),
         );
       }
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'ChatDetailScreen._addToTalentPool');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mapToFailure(error).message)),
+          SnackBar(content: Text(mapToFailure(error, l10n).message)),
         );
       }
     }
@@ -246,7 +251,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Adaya sunmak için 1-3 adet tarih ve saat önerisi ekleyin:'),
+                    Text(l10n?.coreInterviewSlotsInstruction ?? 'Adaya sunmak için 1-3 adet tarih ve saat önerisi ekleyin:'),
                     const SizedBox(height: 12),
                     ...selectedSlots.map(
                       (slot) => ListTile(
@@ -286,7 +291,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                           });
                         },
                         icon: const Icon(Icons.add_alarm),
-                        label: const Text('Tarih/Saat Ekle'),
+                        label: Text(l10n?.coreAddDateTimeAction ?? 'Tarih/Saat Ekle'),
                       ),
                   ],
                 ),
@@ -314,7 +319,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                             );
                           }
                         },
-                  child: const Text('Önerileri Gönder'),
+                  child: Text(l10n?.coreSendProposalsAction ?? 'Önerileri Gönder'),
                 ),
               ],
             );
@@ -364,34 +369,34 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                     ),
                   ),
                 if (isEmployer)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'talent_pool',
                     child: Row(
                       children: [
-                        Icon(Icons.person_add_alt_1_outlined),
-                        SizedBox(width: 12),
-                        Text('Yetenek Havuzuna Ekle'),
+                        const Icon(Icons.person_add_alt_1_outlined),
+                        const SizedBox(width: 12),
+                        Text(l10n?.addToTalentPool ?? 'Yetenek Havuzuna Ekle'),
                       ],
                     ),
                   ),
                 if (_conversation?.hired != true)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'hired',
                     child: Row(
                       children: [
-                        Icon(Icons.handshake_outlined),
-                        SizedBox(width: 12),
-                        Text('İşe Alındı Olarak İşaretle'),
+                        const Icon(Icons.handshake_outlined),
+                        const SizedBox(width: 12),
+                        Text(l10n?.coreMarkAsHiredAction ?? 'İşe Alındı Olarak İşaretle'),
                       ],
                     ),
                   ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'report',
                   child: Row(
                     children: [
-                      Icon(Icons.flag_outlined, color: Colors.red),
-                      SizedBox(width: 12),
-                      Text('Kullanıcıyı Bildir'),
+                      const Icon(Icons.flag_outlined, color: Colors.red),
+                      const SizedBox(width: 12),
+                      Text(l10n?.coreReportUserAction ?? 'Kullanıcıyı Bildir'),
                     ],
                   ),
                 ),

@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 
 import '../error/error_mapper.dart';
 import '../error/error_reporter.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Modal dialog or screen to play profile intro video.
 /// Supports both network URLs (Firebase Storage) and local files (during preview before save).
@@ -16,18 +17,18 @@ class VideoPlayerDialog extends StatefulWidget {
     super.key,
     this.videoUrl,
     this.videoFile,
-    this.title = 'Tanıtım Videosu',
+    this.title,
   }) : assert(videoUrl != null || videoFile != null, 'Either videoUrl or videoFile must be provided');
 
   final String? videoUrl;
   final XFile? videoFile;
-  final String title;
+  final String? title;
 
   static Future<void> show(
     BuildContext context, {
     String? videoUrl,
     XFile? videoFile,
-    String title = 'Tanıtım Videosu',
+    String? title,
   }) {
     return showDialog<void>(
       context: context,
@@ -103,6 +104,9 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final dialogTitle = widget.title ?? l10n?.coreIntroVideoTitle ?? 'Tanıtım Videosu';
+
     return Dialog(
       backgroundColor: Colors.black,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -122,7 +126,7 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.title,
+                      dialogTitle,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -155,9 +159,9 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
                         children: [
                           const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
                           const SizedBox(height: 12),
-                          const Text(
-                            'Video yüklenemedi',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          Text(
+                            l10n?.coreVideoLoadError ?? 'Video yüklenemedi',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -169,14 +173,14 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
                       ),
                     )
                   else if (!_isInitialized)
-                    const Column(
+                    Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        CircularProgressIndicator(color: Colors.white),
-                        SizedBox(height: 12),
+                        const CircularProgressIndicator(color: Colors.white),
+                        const SizedBox(height: 12),
                         Text(
-                          'Video hazırlanıyor...',
-                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                          l10n?.coreVideoPreparing ?? 'Video hazırlanıyor...',
+                          style: const TextStyle(color: Colors.white70, fontSize: 13),
                         ),
                       ],
                     )

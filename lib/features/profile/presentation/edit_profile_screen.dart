@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/user_profile.dart';
@@ -49,6 +50,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   /// Handles the save button press
   Future<void> _handleSave() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -62,7 +64,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       final currentUser = authState.value;
 
       if (currentUser == null) {
-        throw Exception('Kullanıcı oturum açmamış');
+        throw Exception(l10n.notAuthenticatedError);
       }
 
       final profileService = ref.read(profileServiceProvider);
@@ -102,8 +104,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profil başarıyla kaydedildi'),
+        SnackBar(
+          content: Text(l10n.profileSavedMessage),
           backgroundColor: Colors.green,
         ),
       );
@@ -117,7 +119,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -132,12 +134,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(currentUserProfileProvider);
     final authState = ref.watch(authStateProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil'),
+        title: Text(l10n.editProfile),
         actions: [
           if (_isSaving)
             const Center(
@@ -157,7 +160,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             IconButton(
               icon: const Icon(Icons.check),
               onPressed: _handleSave,
-              tooltip: 'Kaydet',
+              tooltip: l10n.saveAction,
             ),
         ],
       ),
@@ -170,12 +173,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
               Text(
-                'Profil yüklenirken hata oluştu',
+                l10n.profileLoadingError,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
               Text(
-                error.toString(),
+                l10n.profileLoadingError,
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -200,8 +203,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
           final currentUser = authState.value;
           if (currentUser == null) {
-            return const Center(
-              child: Text('Kullanıcı oturum açmamış'),
+            return Center(
+              child: Text(l10n.loginRequiredMessage),
             );
           }
 
@@ -283,7 +286,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           ));
                         },
                         icon: const Icon(Icons.verified),
-                        label: const Text('Otelinizi Doğrulayın'),
+                        label: Text(l10n.verifyHotelAction),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
@@ -307,7 +310,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Profili Kaydet'),
+                      : Text(l10n.saveAction),
                 ),
               ],
             ),

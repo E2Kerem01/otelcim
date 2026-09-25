@@ -5,6 +5,7 @@ import '../../../../shared/constants/categories.dart';
 import '../../../../shared/constants/listing_filters.dart';
 import '../../../discovery/domain/tourism_region.dart';
 import '../listing_requirement_labels.dart';
+import '../listing_filter_labels.dart';
 import '../season_utils.dart';
 
 /// Field widgets shared between [CreateListingScreen] and [EditListingScreen]
@@ -60,7 +61,7 @@ class RequiredFieldsLegend extends StatelessWidget {
           ),
         ),
         Text(
-          'işaretli alanlar zorunludur',
+          AppLocalizations.of(context)!.listingRequiredFieldsLegend,
           style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
         ),
       ],
@@ -118,7 +119,7 @@ class ListingCategoryDropdown extends StatelessWidget {
           .map(
             (c) => DropdownMenuItem(
               value: c,
-              child: Text(listingCategoryLabels[c]!),
+              child: Text(listingCategoryLabelFor(AppLocalizations.of(context)!, c.name)),
             ),
           )
           .toList(),
@@ -141,6 +142,7 @@ class TourismRegionDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return DropdownButtonFormField<String>(
       initialValue: value,
       hint: Text(AppLocalizations.of(context)!.regionSelectHint),
@@ -149,9 +151,7 @@ class TourismRegionDropdown extends StatelessWidget {
             (region) => DropdownMenuItem(
               value: region.id,
               child: Text(
-                Localizations.localeOf(context).languageCode == 'en'
-                    ? region.nameEn
-                    : region.nameTr,
+                localizedTourismRegionName(l10n, region),
               ),
             ),
           )
@@ -178,7 +178,7 @@ class TourismCityDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       initialValue: value,
-      hint: const Text('Şehir seçin'),
+      hint: Text(AppLocalizations.of(context)!.listingCitySelect),
       items: turkishTourismCities
           .map((city) => DropdownMenuItem(value: city, child: Text(city)))
           .toList(),
@@ -204,11 +204,14 @@ class EmploymentTypeDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<EmploymentType>(
       initialValue: value,
-      hint: showHint ? const Text('Çalışma tipi seçin') : null,
+      hint: showHint ? Text(AppLocalizations.of(context)!.listingEmploymentTypeSelect) : null,
       items: EmploymentType.values
           .map(
             (type) =>
-                DropdownMenuItem(value: type, child: Text(type.label)),
+                DropdownMenuItem(
+                  value: type,
+                  child: Text(employmentTypeLabel(AppLocalizations.of(context)!, type)),
+                ),
           )
           .toList(),
       onChanged: onChanged,
@@ -363,27 +366,28 @@ class SalaryRangeFields extends StatelessWidget {
   final TextEditingController minController;
   final TextEditingController maxController;
 
-  String? _validator(String? value) {
+  String? _validator(BuildContext context, String? value) {
     final trimmed = value?.trim() ?? '';
     if (trimmed.isEmpty) return null;
     final parsed = int.tryParse(trimmed);
-    if (parsed == null || parsed < 0) return 'Geçerli tutar girin';
+    if (parsed == null || parsed < 0) return AppLocalizations.of(context)!.listingAmountInvalid;
     final min = int.tryParse(minController.text.trim());
     final max = int.tryParse(maxController.text.trim());
-    if (min != null && max != null && min > max) return 'Aralığı kontrol edin';
+    if (min != null && max != null && min > max) return AppLocalizations.of(context)!.listingSalaryRangeInvalid;
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: TextFormField(
             controller: minController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'En düşük maaş (TL)'),
-            validator: _validator,
+            decoration: InputDecoration(labelText: l10n.listingMinSalaryInput),
+            validator: (value) => _validator(context, value),
           ),
         ),
         const SizedBox(width: 12),
@@ -391,10 +395,10 @@ class SalaryRangeFields extends StatelessWidget {
           child: TextFormField(
             controller: maxController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'En yüksek maaş (TL)',
+            decoration: InputDecoration(
+              labelText: l10n.listingMaxSalaryInput,
             ),
-            validator: _validator,
+            validator: (value) => _validator(context, value),
           ),
         ),
       ],
@@ -478,7 +482,7 @@ class ListingHousingSection extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.add_photo_alternate_outlined),
           title: Text(l10n.housingPhotos),
-          subtitle: Text('$photoCount/5'),
+          subtitle: Text(l10n.listingPhotoCount(photoCount)),
           onTap: photoCount < 5 ? onAddPhotos : null,
         ),
       ],

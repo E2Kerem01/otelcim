@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/error/error_mapper.dart';
@@ -11,6 +12,7 @@ import '../../../shared/services/listing_service.dart';
 import '../../../shared/services/storage_service.dart';
 import '../../../shared/widgets/xfile_preview_image.dart';
 import '../domain/listing_model.dart';
+import 'listing_filter_labels.dart';
 import 'widgets/listing_form_fields.dart';
 
 class PositionFormData {
@@ -67,8 +69,9 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
 
   void _addPosition() {
     if (_positions.length >= 20) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('En fazla 20 pozisyon ekleyebilirsiniz.')),
+        SnackBar(content: Text(l10n.listingMaxPositions(20))),
       );
       return;
     }
@@ -79,8 +82,9 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
 
   void _removePosition(int index) {
     if (_positions.length <= 1) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('En az 1 pozisyon bulunmalıdır.')),
+        SnackBar(content: Text(l10n.listingMinPosition)),
       );
       return;
     }
@@ -91,9 +95,10 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
   }
 
   Future<void> _pickImages() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedImageFiles.length >= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('En fazla 5 fotoğraf ekleyebilirsiniz.')),
+        SnackBar(content: Text(l10n.listingMaxPhotos(5))),
       );
       return;
     }
@@ -111,9 +116,10 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen tüm pozisyon ve otel bilgilerini eksiksiz doldurun.')),
+        SnackBar(content: Text(l10n.listingRequiredFields)),
       );
       return;
     }
@@ -122,7 +128,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İlan yayınlamak için lütfen giriş yapın.')),
+          SnackBar(content: Text(l10n.listingPublishLoginRequired)),
         );
       }
       return;
@@ -176,7 +182,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
             content: Text(
               imageUploadFailed
                   ? imageUploadFailureMessage!
-                  : '${listingsToCreate.length} adet ilan başarıyla yayınlandı!',
+                  : l10n.listingBatchPublished(listingsToCreate.length),
             ),
             backgroundColor: imageUploadFailed ? Colors.orange.shade800 : null,
           ),
@@ -197,9 +203,10 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Toplu İlan Ver'),
+        title: Text(l10n.listingBatchTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -224,58 +231,58 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                         children: [
                           Icon(Icons.hotel_rounded, color: Theme.of(context).primaryColor),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Otel / İşletme Bilgileri',
+                          Text(
+                            l10n.listingBatchHotelInfo,
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      const ListingFieldLabel('Otel / İşletme Adı', isRequired: true),
+                      ListingFieldLabel(l10n.listingHotelNameLabel, isRequired: true),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _hotelNameController,
                         autofillHints: const <String>[],
-                        decoration: const InputDecoration(hintText: 'Örn. Grand Deluxe Hotel'),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Otel adı gereklidir' : null,
+                        decoration: InputDecoration(hintText: l10n.listingHotelNameHint),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? l10n.listingHotelNameRequired : null,
                       ),
                       const SizedBox(height: 16),
-                      const ListingFieldLabel('Konum (İl / İlçe)', isRequired: true),
+                      ListingFieldLabel(l10n.listingLocationLabel, isRequired: true),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _locationController,
                         autofillHints: const <String>[],
-                        decoration: const InputDecoration(hintText: 'Örn. Muğla / Bodrum'),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Konum gereklidir' : null,
+                        decoration: InputDecoration(hintText: l10n.listingLocationHint),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? l10n.listingLocationRequired : null,
                       ),
                       const SizedBox(height: 16),
-                      const ListingFieldLabel('Şehir', isRequired: true),
+                      ListingFieldLabel(l10n.listingCityLabel, isRequired: true),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         initialValue: _selectedCity,
-                        hint: const Text('Şehir seçin'),
+                        hint: Text(l10n.listingCitySelect),
                         items: turkishTourismCities
                             .map((city) => DropdownMenuItem(value: city, child: Text(city)))
                             .toList(),
                         onChanged: (value) => setState(() => _selectedCity = value),
-                        validator: (value) => value == null ? 'Şehir seçmeniz gerekiyor' : null,
+                        validator: (value) => value == null ? l10n.listingCityRequired : null,
                       ),
                       const SizedBox(height: 16),
-                      const ListingFieldLabel('İletişim Bilgisi', isRequired: true),
+                      ListingFieldLabel(l10n.listingContactInfoLabel, isRequired: true),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _contactController,
                         autofillHints: const <String>[],
-                        decoration: const InputDecoration(hintText: 'Örn. 0555 123 4567 / ik@hotel.com'),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'İletişim bilgisi gereklidir' : null,
+                        decoration: InputDecoration(hintText: l10n.listingContactHint),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? l10n.listingContactRequired : null,
                       ),
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Otel Fotoğrafları', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(l10n.listingPhotosLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
                           Text(
-                            '${_selectedImageFiles.length}/5',
+                            l10n.listingPhotoCount(_selectedImageFiles.length),
                             style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                           ),
                         ],
@@ -304,7 +311,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                                     children: [
                                       Icon(Icons.add_a_photo_outlined, color: Colors.grey, size: 20),
                                       SizedBox(height: 4),
-                                      Text('Ekle', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                      Text(l10n.listingAddPhoto, style: TextStyle(fontSize: 10, color: Colors.grey)),
                                     ],
                                   ),
                                 ),
@@ -357,13 +364,13 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Pozisyonlar (${_positions.length})',
+                    l10n.listingBatchPositionCount(_positions.length),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   OutlinedButton.icon(
                     onPressed: _positions.length < 20 ? _addPosition : null,
                     icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('Pozisyon Ekle'),
+                    label: Text(l10n.listingAddPosition),
                   ),
                 ],
               ),
@@ -401,57 +408,57 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                                       style: const TextStyle(color: Colors.white, fontSize: 12),
                                     ),
                                   ),
-                                  label: Text('Pozisyon #${index + 1}'),
+                                  label: Text(l10n.listingPositionNumber(index + 1)),
                                 ),
                                 if (_positions.length > 1)
                                   IconButton(
                                     icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                                    tooltip: 'Pozisyonu Sil',
+                                    tooltip: l10n.listingDeletePosition,
                                     onPressed: () => _removePosition(index),
                                   ),
                               ],
                             ),
                             const SizedBox(height: 12),
-                            const Text('Kategori', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(l10n.listingCategoryLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
                             DropdownButtonFormField<ListingCategory>(
                               initialValue: pos.selectedCategory,
                               items: ListingCategory.values
-                                  .map((c) => DropdownMenuItem(value: c, child: Text(listingCategoryLabels[c]!)))
+                                  .map((c) => DropdownMenuItem(value: c, child: Text(listingCategoryLabelFor(l10n, c.name))))
                                   .toList(),
                               onChanged: (val) {
                                 if (val != null) setState(() => pos.selectedCategory = val);
                               },
                             ),
                             const SizedBox(height: 12),
-                            const ListingFieldLabel('Pozisyon Başlığı', isRequired: true),
+                            ListingFieldLabel(l10n.listingBatchPositionLabel, isRequired: true),
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.titleController,
                               autofillHints: const <String>[],
-                              decoration: const InputDecoration(hintText: 'Örn. Resepsiyonist / Garson / Aşçı'),
-                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Başlık gereklidir' : null,
+                              decoration: InputDecoration(hintText: l10n.listingBatchPositionHint),
+                              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.listingBatchTitleRequired : null,
                             ),
                             const SizedBox(height: 12),
-                            const Text('Çalışma Tipi', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(l10n.listingEmploymentTypeLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
                             DropdownButtonFormField<EmploymentType>(
                               initialValue: pos.employmentType,
                               items: EmploymentType.values
-                                  .map((type) => DropdownMenuItem(value: type, child: Text(type.label)))
+                                  .map((type) => DropdownMenuItem(value: type, child: Text(employmentTypeLabel(l10n, type))))
                                   .toList(),
                               onChanged: (value) {
                                 if (value != null) setState(() => pos.employmentType = value);
                               },
                             ),
                             const SizedBox(height: 12),
-                            const ListingFieldLabel('Maaş Bilgisi', isRequired: true),
+                            ListingFieldLabel(l10n.listingSalaryInfoLabel, isRequired: true),
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.salaryController,
                               autofillHints: const <String>[],
-                              decoration: const InputDecoration(hintText: 'Örn. 35.000₺ + yemek + lojman'),
-                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Maaş bilgisi gereklidir' : null,
+                              decoration: InputDecoration(hintText: l10n.listingBatchSalaryHint),
+                              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.listingBatchSalaryRequired : null,
                             ),
                             const SizedBox(height: 12),
                             Row(
@@ -461,8 +468,8 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                                     controller: pos.minSalaryController,
                                     autofillHints: const <String>[],
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'En Düşük Maaş (TL)'),
-                                    validator: (v) => _salaryRangeValidator(pos),
+                                    decoration: InputDecoration(labelText: l10n.listingMinSalaryInput),
+                                    validator: (v) => _salaryRangeValidator(context, pos),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -471,21 +478,21 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                                     controller: pos.maxSalaryController,
                                     autofillHints: const <String>[],
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'En Yüksek Maaş (TL)'),
-                                    validator: (v) => _salaryRangeValidator(pos),
+                                    decoration: InputDecoration(labelText: l10n.listingMaxSalaryInput),
+                                    validator: (v) => _salaryRangeValidator(context, pos),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 12),
-                            const ListingFieldLabel('Pozisyon Açıklaması', isRequired: true),
+                            ListingFieldLabel(l10n.listingBatchDescriptionLabel, isRequired: true),
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: pos.descController,
                               autofillHints: const <String>[],
                               maxLines: 3,
-                              decoration: const InputDecoration(hintText: 'Pozisyon detayları ve aranan nitelikler...'),
-                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Açıklama gereklidir' : null,
+                              decoration: InputDecoration(hintText: l10n.listingBatchDescriptionHint),
+                              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.listingBatchDescriptionRequired : null,
                             ),
                           ],
                         ),
@@ -511,8 +518,8 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                       : const Icon(Icons.rocket_launch_rounded),
                   label: Text(
                     _submitting
-                        ? 'İlanlar Yayınlanıyor...'
-                        : '${_positions.length} İlanı Atomik Yayınla',
+                        ? l10n.listingBatchPublishLoading
+                        : l10n.listingBatchPublishAction(_positions.length),
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -525,11 +532,11 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
     );
   }
 
-  String? _salaryRangeValidator(PositionFormData pos) {
+  String? _salaryRangeValidator(BuildContext context, PositionFormData pos) {
     final minVal = int.tryParse(pos.minSalaryController.text.trim());
     final maxVal = int.tryParse(pos.maxSalaryController.text.trim());
     if (minVal != null && maxVal != null && minVal > maxVal) {
-      return 'Aralığı kontrol edin';
+      return AppLocalizations.of(context)!.listingSalaryRangeInvalid;
     }
     return null;
   }

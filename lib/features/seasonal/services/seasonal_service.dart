@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../domain/seasonal_subscription_model.dart';
 
 class SeasonalWindowInfo {
@@ -26,6 +27,58 @@ class SeasonalWindowInfo {
     required this.descriptionTr,
     required this.descriptionEn,
   });
+
+  String localizedTitle(AppLocalizations l10n) {
+    switch (seasonCode) {
+      case 'yaz_2025':
+        return l10n.coreSeasonSummer2025Title;
+      case 'kis_2025_26':
+        return l10n.coreSeasonWinter202526Title;
+      case 'tum_yil':
+        return l10n.coreSeasonYearRoundTitle;
+      default:
+        return titleTr;
+    }
+  }
+
+  String localizedRecruitmentPeriod(AppLocalizations l10n) {
+    switch (seasonCode) {
+      case 'yaz_2025':
+        return l10n.coreSeasonSummerRecruitmentPeriod;
+      case 'kis_2025_26':
+        return l10n.coreSeasonWinterRecruitmentPeriod;
+      case 'tum_yil':
+        return l10n.coreSeasonYearRoundRecruitmentPeriod;
+      default:
+        return recruitmentPeriodTr;
+    }
+  }
+
+  String localizedActiveMonths(AppLocalizations l10n) {
+    switch (seasonCode) {
+      case 'yaz_2025':
+        return l10n.coreSeasonSummerActiveMonths;
+      case 'kis_2025_26':
+        return l10n.coreSeasonWinterActiveMonths;
+      case 'tum_yil':
+        return l10n.coreSeasonYearRoundActiveMonths;
+      default:
+        return activeMonthsTr;
+    }
+  }
+
+  String localizedDescription(AppLocalizations l10n) {
+    switch (seasonCode) {
+      case 'yaz_2025':
+        return l10n.coreSeasonSummerDescription;
+      case 'kis_2025_26':
+        return l10n.coreSeasonWinterDescription;
+      case 'tum_yil':
+        return l10n.coreSeasonYearRoundDescription;
+      default:
+        return descriptionTr;
+    }
+  }
 }
 
 class SeasonalService {

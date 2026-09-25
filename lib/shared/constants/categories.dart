@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/app_localizations.dart';
+
 final selectedCategoryFilterProvider = StateProvider<ListingCategory?>((ref) => null);
 
 enum ListingCategory {
@@ -127,3 +129,38 @@ IconData listingCategoryIcon(String categoryName) =>
 
 Color listingCategoryColor(String categoryName) =>
     listingCategoryColors[listingCategoryFromName(categoryName)]!;
+
+String localizedCategoryLabel(AppLocalizations l10n, ListingCategory category) {
+  return switch (category) {
+    ListingCategory.resepsiyon => l10n.categoryReception,
+    ListingCategory.onburoIliskiler => l10n.coreCategoryFrontOffice,
+    ListingCategory.katHizmetleri => l10n.categoryHousekeeping,
+    ListingCategory.mutfakAsci => l10n.categoryKitchenChef,
+    ListingCategory.pastaneSteward => l10n.coreCategoryPastrySteward,
+    ListingCategory.servisGarson => l10n.categoryServiceWaiter,
+    ListingCategory.barBarmen => l10n.coreCategoryBarBartender,
+    ListingCategory.guvenlik => l10n.categorySecurity,
+    ListingCategory.saglik => l10n.coreCategoryHealthInfirmary,
+    ListingCategory.animasyon => l10n.categoryAnimation,
+    ListingCategory.cocukKulubu => l10n.coreCategoryKidsClub,
+    ListingCategory.spaWellness => l10n.coreCategorySpaWellness,
+    ListingCategory.havuzPlaj => l10n.coreCategoryPoolBeach,
+    ListingCategory.rezervasyonSatis => l10n.coreCategoryReservationSales,
+    ListingCategory.yonetim => l10n.categoryManagement,
+    ListingCategory.muhasebeIk => l10n.coreCategoryAccountingHr,
+    ListingCategory.depoAmbar => l10n.coreCategoryWarehouse,
+    ListingCategory.teknikServis => l10n.categoryTechnicalService,
+    ListingCategory.bahcePeyzaj => l10n.coreCategoryGardeningLandscaping,
+    ListingCategory.ulasimSofor => l10n.coreCategoryTransportationDriver,
+    ListingCategory.stajyer => l10n.coreCategoryIntern,
+    ListingCategory.diger => l10n.categoryOther,
+  };
+}
+
+String localizedListingCategoryName(AppLocalizations l10n, String categoryName) {
+  return localizedCategoryLabel(l10n, listingCategoryFromName(categoryName));
+}
+
+extension ListingCategoryL10nExtension on ListingCategory {
+  String localizedLabel(AppLocalizations l10n) => localizedCategoryLabel(l10n, this);
+}

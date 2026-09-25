@@ -6,6 +6,7 @@ import '../error/error_reporter.dart';
 import '../models/report.dart';
 import '../services/auth_service.dart';
 import '../services/report_service.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Dialog for reporting listings or users
 /// Shows reason selection dropdown, optional description field, and submit button
@@ -52,10 +53,11 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
 
       if (hasReported) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Bu bildirimi daha önce gönderdiniz.'),
+            SnackBar(
+              content: Text(l10n?.coreReportAlreadySubmitted ?? 'Bu bildirimi daha önce gönderdiniz.'),
               backgroundColor: Colors.orange,
             ),
           );
@@ -76,10 +78,11 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
       await ref.read(reportServiceProvider).submitReport(report);
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Bildiriminiz başarıyla gönderildi. Teşekkür ederiz.'),
+          SnackBar(
+            content: Text(l10n?.coreReportSubmittedSuccess ?? 'Bildiriminiz başarıyla gönderildi. Teşekkür ederiz.'),
             backgroundColor: Colors.green,
           ),
         );
@@ -101,23 +104,26 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final targetTypeLabel = widget.targetType == ReportTargetType.listing ? 'İlanı' : 'Kullanıcıyı';
+    final l10n = AppLocalizations.of(context)!;
+    final targetTypeLabel = widget.targetType == ReportTargetType.listing
+        ? l10n.coreReportListingTitle
+        : l10n.coreReportUserTitle;
 
     return AlertDialog(
-      title: Text('$targetTypeLabel Bildir'),
+      title: Text(targetTypeLabel),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Bildireceğiniz: ${widget.targetName}',
+              l10n.coreReportingTarget(widget.targetName),
               style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Bildirim Nedeni',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            Text(
+              l10n.coreReportReasonLabel,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<ReportReason>(
@@ -129,7 +135,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
               items: ReportReason.values
                   .map((reason) => DropdownMenuItem(
                         value: reason,
-                        child: Text(reason.label),
+                        child: Text(reason.localizedLabel(l10n)),
                       ))
                   .toList(),
               onChanged: (value) {
@@ -139,17 +145,17 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
               },
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Açıklama (İsteğe Bağlı)',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            Text(
+              l10n.coreReportDescriptionLabel,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Ek bilgi ekleyebilirsiniz...',
-                contentPadding: EdgeInsets.all(12),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: l10n.coreReportDescriptionHint,
+                contentPadding: const EdgeInsets.all(12),
               ),
               maxLines: 3,
               maxLength: 500,
@@ -160,7 +166,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
       actions: [
         TextButton(
           onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-          child: const Text('İptal'),
+          child: Text(l10n.cancelButton),
         ),
         ElevatedButton(
           onPressed: _submitting ? null : _submitReport,
@@ -170,7 +176,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Gönder'),
+              : Text(l10n.coreSubmitAction),
         ),
       ],
     );

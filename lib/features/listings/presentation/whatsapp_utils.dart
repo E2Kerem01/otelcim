@@ -27,12 +27,7 @@ String? parsePhoneNumber(String? raw) {
 
 String buildWhatsAppUrl({
   required String phone,
-  required String listingTitle,
-  required String posterName,
-  required String languageCode,
+  required String message,
 }) {
-  final message = languageCode == 'en'
-      ? 'Hello, I am writing regarding your listing "$listingTitle" ($posterName) on Otelcim.'
-      : 'Merhaba, Otelcim\'deki "$listingTitle" ($posterName) ilanınız için yazıyorum.';
   return 'https://wa.me/$phone?text=${Uri.encodeComponent(message)}';
 }

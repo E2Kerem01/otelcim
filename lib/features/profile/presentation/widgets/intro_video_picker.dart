@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/error/error_mapper.dart';
 import '../../../../shared/error/error_reporter.dart';
 import '../../../../shared/providers/profile_provider.dart';
@@ -35,6 +36,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
   XFile? _localVideoFile;
 
   Future<void> _showVideoSourceOptions() async {
+    final l10n = AppLocalizations.of(context)!;
     await showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -45,7 +47,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
           children: [
             ListTile(
               leading: const Icon(Icons.videocam_outlined),
-              title: const Text('Kameradan Çek (max 30sn)'),
+              title: Text(l10n.videoCameraAction),
               onTap: () {
                 Navigator.pop(context);
                 unawaited(_pickAndUploadVideo(ImageSource.camera));
@@ -53,7 +55,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
             ),
             ListTile(
               leading: const Icon(Icons.video_library_outlined),
-              title: const Text('Galeriden Seç (max 30sn)'),
+              title: Text(l10n.videoGalleryAction),
               onTap: () {
                 Navigator.pop(context);
                 unawaited(_pickAndUploadVideo(ImageSource.gallery));
@@ -66,6 +68,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
   }
 
   Future<void> _pickAndUploadVideo(ImageSource source) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final XFile? pickedFile = await _picker.pickVideo(
         source: source,
@@ -89,7 +92,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Video en fazla 30 saniye olmalıdır. (Seçilen: ${duration.inSeconds} sn)',
+              l10n.videoDurationSelected(duration.inSeconds),
             ),
             backgroundColor: Colors.orange.shade800,
           ),
@@ -113,8 +116,8 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
       widget.onVideoChanged(downloadUrl);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tanıtım videosu başarıyla yüklendi!'),
+        SnackBar(
+          content: Text(l10n.videoUploadSuccess),
           backgroundColor: Colors.green,
         ),
       );
@@ -123,7 +126,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -137,20 +140,21 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
   }
 
   Future<void> _removeVideo() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Videoyu Kaldır'),
-        content: const Text('Tanıtım videosunu silmek istediğinize emin misiniz?'),
+        title: Text(l10n.removeVideoAction),
+        content: Text(l10n.videoRemoveConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Vazgeç'),
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Kaldır'),
+            child: Text(l10n.removeVideoAction),
           ),
         ],
       ),
@@ -174,13 +178,13 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
       widget.onVideoChanged(null);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tanıtım videosu kaldırıldı.')),
+        SnackBar(content: Text(l10n.videoRemoveSuccess)),
       );
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'IntroVideoPicker._removeVideo');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mapToFailure(error).message)),
+        SnackBar(content: Text(mapToFailure(error, l10n).message)),
       );
     } finally {
       if (mounted) {
@@ -192,16 +196,18 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
   }
 
   void _watchVideo() {
+    final l10n = AppLocalizations.of(context)!;
     unawaited(VideoPlayerDialog.show(
       context,
       videoUrl: widget.videoUrl,
       videoFile: _localVideoFile,
-      title: 'Tanıtım Videosu',
+      title: l10n.introVideoTitle,
     ));
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasVideo = (widget.videoUrl != null && widget.videoUrl!.isNotEmpty) || _localVideoFile != null;
 
     return Card(
@@ -220,9 +226,9 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
               children: [
                 Icon(Icons.video_call_rounded, color: Theme.of(context).primaryColor),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    '15-30 Saniyelik Tanıtım Videosu',
+                    l10n.introVideoLabel,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                 ),
@@ -230,7 +236,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Kendinizi işverenlere tanıtan kısa bir video yükleyin.',
+              l10n.introVideoHint,
               style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
             ),
             const SizedBox(height: 12),
@@ -247,7 +253,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                       SizedBox(width: 12),
-                      Text('Video işleniyor...', style: TextStyle(fontSize: 13)),
+                      Text(l10n.videoProcessingLabel, style: TextStyle(fontSize: 13)),
                     ],
                   ),
                 ),
@@ -260,7 +266,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
                   ElevatedButton.icon(
                     onPressed: _watchVideo,
                     icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 20),
-                    label: const Text('Tanıtım Videosunu İzle'),
+                    label: Text(l10n.watchIntroVideo),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue.shade700,
                       foregroundColor: Colors.white,
@@ -269,12 +275,12 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
                   OutlinedButton.icon(
                     onPressed: _showVideoSourceOptions,
                     icon: const Icon(Icons.sync_rounded, size: 18),
-                    label: const Text('Değiştir'),
+                    label: Text(l10n.changeVideoAction),
                   ),
                   OutlinedButton.icon(
                     onPressed: _removeVideo,
                     icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.red),
-                    label: const Text('Kaldır', style: TextStyle(color: Colors.red)),
+                    label: Text(l10n.removeVideoAction, style: const TextStyle(color: Colors.red)),
                   ),
                 ],
               ),
@@ -284,7 +290,7 @@ class _IntroVideoPickerState extends ConsumerState<IntroVideoPicker> {
                 child: OutlinedButton.icon(
                   onPressed: _showVideoSourceOptions,
                   icon: const Icon(Icons.add_a_photo_outlined),
-                  label: const Text('Video Yükle (15-30sn)'),
+                  label: Text(l10n.videoUploadButton),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),

@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
@@ -45,11 +44,12 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
   }
 
   Future<void> _handlePurchase(Listing listing, List<ProductDetails> products) async {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lütfen önce giriş yapın.')),
+          SnackBar(content: Text(l10n.listingBoostLoginRequired)),
         );
       }
       return;
@@ -94,7 +94,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Satın alma mağazası şu an kullanılamıyor.')),
+            SnackBar(content: Text(l10n.listingBoostStoreUnavailable)),
           );
         }
         return;
@@ -124,13 +124,13 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: Colors.green.shade700,
-              content: const Row(
+              content: Row(
                 children: [
                   Icon(Icons.check_circle_outline, color: Colors.white),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Tebrikler! İlanınız başarıyla öne çıkarıldı.',
+                      l10n.listingBoostPurchaseSuccess,
                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -143,7 +143,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Satın alma işlemi tamamlanamadı veya iptal edildi.')),
+            SnackBar(content: Text(l10n.listingBoostPurchaseFailed)),
           );
         }
       }
@@ -151,7 +151,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
       logError(error, stackTrace, context: '_BoostPurchaseScreenState._handlePurchase');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mapToFailure(error).message)),
+          SnackBar(content: Text(l10n.listingBoostVerificationError)),
         );
       }
     } finally {
@@ -163,7 +163,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
 
   Future<void> _handleRedeemFreeBoost(String listingId) async {
     final user = ref.read(authServiceProvider).currentUser;
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     if (user == null) return;
 
     setState(() => _isRedeemingFreeBoost = true);
@@ -177,7 +177,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
           SnackBar(
             backgroundColor: Colors.green.shade700,
             content: Text(
-              l10n?.freeBoostRedeemedMessage ?? 'Ücretsiz boost uygulandı!',
+              l10n.freeBoostRedeemedMessage,
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
@@ -193,7 +193,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(mapToFailure(error).message),
+            content: Text(l10n.freeBoostRedeemFailedMessage),
           ),
         );
       }
@@ -211,22 +211,22 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final paymentService = ref.watch(paymentServiceProvider);
     final listingAsync = ref.watch(singleListingProvider(widget.listingId));
     final freeBoostCredits = ref.watch(currentUserProfileProvider).value?.freeBoostCredits ?? 0;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('İlanı Öne Çıkar'),
+        title: Text(l10n.listingBoostTitle),
         centerTitle: true,
       ),
       body: listingAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('İlan yüklenirken hata: $err')),
+        error: (err, stack) => Center(child: Text(l10n.listingBoostLoadingError('$err'))),
         data: (listing) {
           if (listing == null) {
-            return const Center(child: Text('İlan bulunamadı.'));
+            return Center(child: Text(l10n.listingNotFound));
           }
 
           final isCurrentlyBoosted = BoostBadge.isBoostActive(listing);
@@ -281,7 +281,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    'Bu ilan zaten öne çıkarılmıştır. Bitiş: ${listing.boostExpiresAt!.day}.${listing.boostExpiresAt!.month}.${listing.boostExpiresAt!.year}',
+                                    l10n.listingBoostAlreadyActive('${listing.boostExpiresAt!.day}.${listing.boostExpiresAt!.month}.${listing.boostExpiresAt!.year}'),
                                     style: TextStyle(fontSize: 12, color: Colors.amber.shade900, fontWeight: FontWeight.w500),
                                   ),
                                 ),
@@ -314,8 +314,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                l10n?.freeBoostBannerText(freeBoostCredits) ??
-                                    '$freeBoostCredits ücretsiz boost hakkınız var',
+                                l10n.freeBoostBannerText(freeBoostCredits),
                                 style: TextStyle(
                                   color: Colors.green.shade900,
                                   fontWeight: FontWeight.bold,
@@ -344,7 +343,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : Text(l10n?.useFreeBoostAction ?? 'Ücretsiz Kullan'),
+                                : Text(l10n.useFreeBoostAction),
                           ),
                         ),
                       ],
@@ -354,8 +353,8 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                 ],
 
                 // Benefits Header
-                const Text(
-                  'Neden Öne Çıkarmalısınız?',
+                Text(
+                  l10n.listingBoostBenefitsTitle,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
@@ -372,20 +371,20 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                     children: [
                       _buildBenefitItem(
                         icon: Icons.trending_up_rounded,
-                        title: 'Üst Sıralarda Görünün',
-                        subtitle: 'İlanınız tüm aramalarda ve kategorilerde en tepede yer alır.',
+                        title: l10n.listingBoostBenefitTop,
+                        subtitle: l10n.listingBoostBenefitTopBody,
                       ),
                       const Divider(height: 20),
                       _buildBenefitItem(
                         icon: Icons.visibility_rounded,
-                        title: '10 Kat Daha Fazla Etkileşim',
-                        subtitle: 'Daha fazla adaya ulaşın ve hızlıca aradığınız elemanı bulun.',
+                        title: l10n.listingBoostBenefitEngagement,
+                        subtitle: l10n.listingBoostBenefitEngagementBody,
                       ),
                       const Divider(height: 20),
                       _buildBenefitItem(
                         icon: Icons.stars_rounded,
-                        title: 'Özel Görsel Rozet',
-                        subtitle: 'İlan kartlarında dikkat çeken "Öne Çıkan" rozeti eklenir.',
+                        title: l10n.listingBoostBenefitBadge,
+                        subtitle: l10n.listingBoostBenefitBadgeBody,
                       ),
                     ],
                   ),
@@ -394,8 +393,8 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                 const SizedBox(height: 24),
 
                 // Package Selection Header
-                const Text(
-                  'Boost Paketini Seçin',
+                Text(
+                  l10n.listingBoostPackageSelect,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
@@ -415,27 +414,27 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                       children: [
                         _buildPackageOption(
                           productId: 'boost_7_days',
-                          title: '7 Günlük Öne Çıkarma',
-                          durationText: '7 Gün boyunca aktif',
+                          title: l10n.listingBoostPackage('7'),
+                          durationText: l10n.listingBoostDuration(7),
                           priceText: _getFormattedPrice(paymentService.products, 'boost_7_days', '₺49,99'),
                           badgeText: null,
                         ),
                         const SizedBox(height: 12),
                         _buildPackageOption(
                           productId: 'boost_14_days',
-                          title: '14 Günlük Öne Çıkarma',
-                          durationText: '14 Gün boyunca aktif',
+                          title: l10n.listingBoostPackage('14'),
+                          durationText: l10n.listingBoostDuration(14),
                           priceText: _getFormattedPrice(paymentService.products, 'boost_14_days', '₺89,99'),
-                          badgeText: 'EN POPÜLER',
+                          badgeText: l10n.listingBoostPopular,
                           isPopular: true,
                         ),
                         const SizedBox(height: 12),
                         _buildPackageOption(
                           productId: 'boost_30_days',
-                          title: '30 Günlük Öne Çıkarma',
-                          durationText: '30 Gün boyunca aktif',
+                          title: l10n.listingBoostPackage('30'),
+                          durationText: l10n.listingBoostDuration(30),
                           priceText: _getFormattedPrice(paymentService.products, 'boost_30_days', '₺149,99'),
-                          badgeText: 'EN AVANTAJLI',
+                          badgeText: l10n.listingBoostBestValue,
                         ),
                       ],
                     ),
@@ -463,13 +462,13 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                             height: 24,
                             child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.rocket_launch_rounded),
                               SizedBox(width: 8),
                               Text(
-                                'Satın Al ve Öne Çıkar',
+                                l10n.listingBoostPurchaseAction,
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -479,7 +478,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                 const SizedBox(height: 12),
                 Center(
                   child: Text(
-                    'Ödeme güvenli şekilde Google Play / App Store üzerinden tamamlanır.',
+                    l10n.listingBoostPaymentNotice,
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                     textAlign: TextAlign.center,
                   ),

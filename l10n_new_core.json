@@ -1,0 +1,1177 @@
+{
+  "appTitle": {
+    "tr": "Otelcim",
+    "en": "HospoJobs",
+    "de": "HospoJobs",
+    "ru": "HospoJobs",
+    "ar": "HospoJobs",
+    "description": "Application brand title"
+  },
+  "coreBrandSubtitle": {
+    "tr": "Turizm & Otel İş İlanları",
+    "en": "Hospitality & Tourism Jobs",
+    "de": "Hotellerie- & Tourismusstellen",
+    "ru": "Вакансии в отелях и туризме",
+    "ar": "وظائف السياحة والفنادق",
+    "description": "Subtitle under brand logo in navigation bar"
+  },
+  "coreFavoritesTooltip": {
+    "tr": "Favorilerim",
+    "en": "Favorites",
+    "de": "Favoriten",
+    "ru": "Избранное",
+    "ar": "المفضلة",
+    "description": "Tooltip for favorites button in navigation bar"
+  },
+  "coreCategoryFrontOffice": {
+    "tr": "Misafir İlişkileri / Önbüro",
+    "en": "Guest Relations / Front Desk",
+    "de": "Gästebetreuung / Rezeption",
+    "ru": "Работа с гостями / Ресепшн",
+    "ar": "علاقات النزلاء / الاستقبال",
+    "description": "Category: Guest Relations / Front Desk"
+  },
+  "coreCategoryPastrySteward": {
+    "tr": "Pastane / Steward",
+    "en": "Pastry / Steward",
+    "de": "Konditorei / Steward",
+    "ru": "Кондитерская / Стюард",
+    "ar": "حلويات / مضيف",
+    "description": "Category: Pastry / Steward"
+  },
+  "coreCategoryBarBartender": {
+    "tr": "Bar / Barmen",
+    "en": "Bar / Bartender",
+    "de": "Bar / Barmixer",
+    "ru": "Бар / Бармен",
+    "ar": "بار / نادل بار",
+    "description": "Category: Bar / Bartender"
+  },
+  "coreCategoryHealthInfirmary": {
+    "tr": "Sağlık / Revir",
+    "en": "Health / Infirmary",
+    "de": "Gesundheit / Sanitätsraum",
+    "ru": "Здоровье / Медпункт",
+    "ar": "الصحة / العيادة",
+    "description": "Category: Health / Infirmary"
+  },
+  "coreCategoryKidsClub": {
+    "tr": "Çocuk Kulübü / Bakıcı",
+    "en": "Kids Club / Childcare",
+    "de": "Kinderclub / Betreuung",
+    "ru": "Детский клуб / Аниматор",
+    "ar": "نادي الأطفال / جليسة أطفال",
+    "description": "Category: Kids Club / Childcare"
+  },
+  "coreCategorySpaWellness": {
+    "tr": "SPA & Wellness",
+    "en": "SPA & Wellness",
+    "de": "SPA & Wellness",
+    "ru": "SPA и велнес",
+    "ar": "سبا وعافية",
+    "description": "Category: SPA & Wellness"
+  },
+  "coreCategoryPoolBeach": {
+    "tr": "Havuz & Plaj",
+    "en": "Pool & Beach",
+    "de": "Pool & Strand",
+    "ru": "Бассейн и пляж",
+    "ar": "المسبح والشاطئ",
+    "description": "Category: Pool & Beach"
+  },
+  "coreCategoryReservationSales": {
+    "tr": "Rezervasyon / Satış",
+    "en": "Reservations / Sales",
+    "de": "Reservierung / Verkauf",
+    "ru": "Бронирование / Продажи",
+    "ar": "الحجوزات / المبيعات",
+    "description": "Category: Reservations / Sales"
+  },
+  "coreCategoryAccountingHr": {
+    "tr": "Muhasebe / İnsan Kaynakları",
+    "en": "Accounting / Human Resources",
+    "de": "Buchhaltung / Personalwesen",
+    "ru": "Бухгалтерия / Отдел кадров",
+    "ar": "المحاسبة / الموارد البشرية",
+    "description": "Category: Accounting / Human Resources"
+  },
+  "coreCategoryWarehouse": {
+    "tr": "Depo / Ambar",
+    "en": "Warehouse / Storage",
+    "de": "Lager / Magazin",
+    "ru": "Склад / Кладовая",
+    "ar": "المستودع / المخزن",
+    "description": "Category: Warehouse / Storage"
+  },
+  "coreCategoryGardeningLandscaping": {
+    "tr": "Bahçe & Peyzaj",
+    "en": "Gardening & Landscaping",
+    "de": "Garten & Landschaftsbau",
+    "ru": "Сад и ландшафт",
+    "ar": "الحدائق والمناظر الطبيعية",
+    "description": "Category: Gardening & Landscaping"
+  },
+  "coreCategoryTransportationDriver": {
+    "tr": "Ulaşım / Şoför",
+    "en": "Transportation / Driver",
+    "de": "Transport / Fahrer",
+    "ru": "Транспорт / Водитель",
+    "ar": "المواصلات / سائق",
+    "description": "Category: Transportation / Driver"
+  },
+  "coreCategoryIntern": {
+    "tr": "Stajyer",
+    "en": "Intern",
+    "de": "Praktikant",
+    "ru": "Стажёр",
+    "ar": "متدرب",
+    "description": "Category: Intern"
+  },
+  "coreSmsCodeSentMessage": {
+    "tr": "SMS doğrulama kodu gönderildi.",
+    "en": "SMS verification code sent.",
+    "de": "SMS-Bestätigungscode gesendet.",
+    "ru": "SMS-код подтверждения отправлен.",
+    "ar": "تم إرسال رمز التحقق عبر الرسائل القصيرة.",
+    "description": "Snackbar message when SMS verification code is sent"
+  },
+  "coreNoAccountPrompt": {
+    "tr": "Hesabın yok mu?",
+    "en": "Don't have an account?",
+    "de": "Noch kein Konto?",
+    "ru": "Нет аккаунта?",
+    "ar": "ليس لديك حساب؟",
+    "description": "Question asking if user has an account on login screen"
+  },
+  "coreChangePhoneOrResendCode": {
+    "tr": "Numarayı Değiştir / Tekrar Kod Gönder",
+    "en": "Change Number / Resend Code",
+    "de": "Nummer ändern / Code erneut senden",
+    "ru": "Изменить номер / Отправить код повторно",
+    "ar": "تغيير الرقم / إعادة إرسال الرمز",
+    "description": "Button text to change phone number or resend SMS verification code"
+  },
+  "coreFullNameLabel": {
+    "tr": "Ad Soyad",
+    "en": "Full Name",
+    "de": "Vor- und Nachname",
+    "ru": "Имя и фамилия",
+    "ar": "الاسم الكامل",
+    "description": "Full name label for user registration"
+  },
+  "coreFullNameHint": {
+    "tr": "Örn. Ayşe Yılmaz",
+    "en": "e.g. Jane Doe",
+    "de": "z. B. Anna Schmidt",
+    "ru": "напр. Анна Иванова",
+    "ar": "مثال: فاطمة علي",
+    "description": "Full name placeholder example"
+  },
+  "coreFullNameRequired": {
+    "tr": "Ad soyad girin",
+    "en": "Enter full name",
+    "de": "Vor- und Nachnamen eingeben",
+    "ru": "Введите имя и фамилию",
+    "ar": "أدخل الاسم الكامل",
+    "description": "Validation error when full name is empty"
+  },
+  "coreFullNameValidation": {
+    "tr": "Geçerli bir ad soyad girin",
+    "en": "Enter a valid full name",
+    "de": "Gültigen Namen eingeben",
+    "ru": "Введите корректное имя и фамилию",
+    "ar": "أدخل اسماً كاملاً صحيحاً",
+    "description": "Validation error when full name is too short"
+  },
+  "coreBusinessNameLabel": {
+    "tr": "Otel / İşletme Adı",
+    "en": "Hotel / Business Name",
+    "de": "Hotel- / Betriebsname",
+    "ru": "Название отеля / компании",
+    "ar": "اسم الفندق / المنشأة",
+    "description": "Business or hotel name label"
+  },
+  "coreBusinessNameHint": {
+    "tr": "Örn. Bodrum Bay Resort",
+    "en": "e.g. Grand Resort Hotel",
+    "de": "z. B. Grand Resort Hotel",
+    "ru": "напр. Grand Resort Hotel",
+    "ar": "مثال: فندق جراند ريزورت",
+    "description": "Business or hotel name hint example"
+  },
+  "coreBusinessNameRequired": {
+    "tr": "İşletme adını girin",
+    "en": "Enter business name",
+    "de": "Betriebsnamen eingeben",
+    "ru": "Введите название компании",
+    "ar": "أدخل اسم المنشأة",
+    "description": "Validation error when business name is empty"
+  },
+  "coreAlreadyHaveAccountPrompt": {
+    "tr": "Zaten hesabın var mı?",
+    "en": "Already have an account?",
+    "de": "Bereits ein Konto?",
+    "ru": "Уже есть аккаунт?",
+    "ar": "هل لديك حساب بالفعل؟",
+    "description": "Prompt asking if user already has an account on register screen"
+  },
+  "coreAccountTypeLabel": {
+    "tr": "Hesap türü",
+    "en": "Account type",
+    "de": "Kontotyp",
+    "ru": "Тип аккаунта",
+    "ar": "نوع الحساب",
+    "description": "Account type selector label"
+  },
+  "coreRegisterJobSeekerShortDesc": {
+    "tr": "Otel ve turizm ilanlarını gör, başvur.",
+    "en": "Browse hotel & tourism jobs, apply.",
+    "de": "Hotel- und Tourismusstellen durchsuchen und bewerben.",
+    "ru": "Просматривайте вакансии в туризме и откликайтесь.",
+    "ar": "تصفح وظائف الفنادق والسياحة وتقدم بطلبك.",
+    "description": "Short description for job seeker role on register screen"
+  },
+  "coreRegisterEmployerShortDesc": {
+    "tr": "İşletmen için ilan ver, aday bul.",
+    "en": "Post job openings for your business, find candidates.",
+    "de": "Inserate für Ihren Betrieb schalten, Kandidaten finden.",
+    "ru": "Публикуйте вакансии для своего заведения, находите кандидатов.",
+    "ar": "انشر إعلانات وظائف لمنشأتك واعثر على مرشحين.",
+    "description": "Short description for employer role on register screen"
+  },
+  "corePleaseSelectAccountType": {
+    "tr": "Lütfen bir hesap türü seçin",
+    "en": "Please select an account type",
+    "de": "Bitte wählen Sie einen Kontotyp",
+    "ru": "Пожалуйста, выберите тип аккаунта",
+    "ar": "يرجى اختيار نوع الحساب",
+    "description": "Error when no account type is selected"
+  },
+  "coreAccountBannedTitle": {
+    "tr": "Hesabınız Yasaklandı",
+    "en": "Your Account Has Been Banned",
+    "de": "Ihr Konto wurde gesperrt",
+    "ru": "Ваш аккаунт заблокирован",
+    "ar": "تم حظر حسابك",
+    "description": "Title when user account is permanently banned"
+  },
+  "coreAccountSuspendedTitle": {
+    "tr": "Hesabınız Askıya Alındı",
+    "en": "Your Account Has Been Suspended",
+    "de": "Ihr Konto wurde vorübergehend gesperrt",
+    "ru": "Ваш аккаунт временно приостановлен",
+    "ar": "تم تعليق حسابك",
+    "description": "Title when user account is temporarily suspended"
+  },
+  "coreSuspensionEndAt": {
+    "tr": "Askı bitiş: {date}",
+    "en": "Suspension ends: {date}",
+    "de": "Sperre endet am: {date}",
+    "ru": "Окончание блокировки: {date}",
+    "ar": "انتهاء التعليق: {date}",
+    "description": "Suspension expiration date label",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "coreAccountRestrictedTitle": {
+    "tr": "Hesabınıza erişim kısıtlandı",
+    "en": "Access to your account has been restricted",
+    "de": "Der Zugriff auf Ihr Konto wurde eingeschränkt",
+    "ru": "Доступ к вашему аккаунту ограничен",
+    "ar": "تم تقييد الوصول إلى حسابك",
+    "description": "Fallback title when account access is restricted"
+  },
+  "coreAccountSuspendedContactSupport": {
+    "tr": "Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin.",
+    "en": "If you believe this is a mistake, please contact our support team.",
+    "de": "Wenn Sie glauben, dass dies ein Fehler ist, kontaktieren Sie bitte unseren Support.",
+    "ru": "Если вы считаете, что это ошибка, обратитесь в службу поддержки.",
+    "ar": "إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع فريق الدعم لدينا.",
+    "description": "Contact support hint on account suspended screen"
+  },
+  "coreOnboardingSkip": {
+    "tr": "Geç",
+    "en": "Skip",
+    "de": "Überspringen",
+    "ru": "Пропустить",
+    "ar": "تخطي",
+    "description": "Skip onboarding button"
+  },
+  "coreOnboardingGetStarted": {
+    "tr": "Başlayalım",
+    "en": "Get Started",
+    "de": "Loslegen",
+    "ru": "Начать",
+    "ar": "لنبدأ",
+    "description": "Get started button on last onboarding slide"
+  },
+  "coreOnboardingNext": {
+    "tr": "Sonraki",
+    "en": "Next",
+    "de": "Weiter",
+    "ru": "Далее",
+    "ar": "التالي",
+    "description": "Next button on onboarding slide"
+  },
+  "coreOnboardingSlide1Title": {
+    "tr": "Kategorilere Göre İş İlanlarına Göz Atın",
+    "en": "Browse Jobs by Category",
+    "de": "Jobs nach Kategorien durchsuchen",
+    "ru": "Ищите вакансии по категориям",
+    "ar": "تصفح الوظائف حسب الفئات",
+    "description": "Title for first onboarding slide"
+  },
+  "coreOnboardingSlide1Desc": {
+    "tr": "Otel sektöründeki binlerce iş ilanını kategorilere göre kolayca inceleyin. Mutfak, ön büro, kat hizmetleri ve daha fazlası!",
+    "en": "Easily explore thousands of hotel job listings by category. Kitchen, front desk, housekeeping and more!",
+    "de": "Entdecken Sie mühelos tausende Hotelstellen nach Kategorien. Küche, Rezeption, Housekeeping und mehr!",
+    "ru": "Легко просматривайте тысячи вакансий в отелях по категориям. Кухня, ресепшн, обслуживание номеров и многое другое!",
+    "ar": "استكشف بسهولة آلاف الوظائف الفندقية حسب الفئة: المطبخ، الاستقبال، خدمات الغرف والمزيد!",
+    "description": "Description for first onboarding slide"
+  },
+  "coreOnboardingSlide2Title": {
+    "tr": "İşverenlere Doğrudan Mesaj Gönderin",
+    "en": "Message Employers Directly",
+    "de": "Arbeitgeber direkt kontaktieren",
+    "ru": "Пишите работодателям напрямую",
+    "ar": "راسل أصحاب العمل مباشرة",
+    "description": "Title for second onboarding slide"
+  },
+  "coreOnboardingSlide2Desc": {
+    "tr": "Her ilan için ayrı sohbet özelliği ile işverenlere anında ulaşın. Sorularınızı sorun, detayları öğrenin.",
+    "en": "Connect instantly with employers through dedicated chat for each listing. Ask questions, learn details.",
+    "de": "Erreichen Sie Arbeitgeber sofort über einen Chat für jedes Inserat. Stellen Sie Fragen und erfahren Sie Details.",
+    "ru": "Мгновенно связывайтесь с работодателями в чате по каждой вакансии. Задавайте вопросы и уточняйте детали.",
+    "ar": "تواصل فوراً مع أصحاب العمل عبر ميزة الدردشة لكل إعلان. اطرح أسئلتك واعرف التفاصيل.",
+    "description": "Description for second onboarding slide"
+  },
+  "coreOnboardingSlide3Title": {
+    "tr": "Otelinizin İş İlanlarını Yayınlayın",
+    "en": "Post Jobs for Your Hotel",
+    "de": "Stellenangebote für Ihr Hotel veröffentlichen",
+    "ru": "Публикуйте вакансии вашего отеля",
+    "ar": "انشر إعلانات وظائف لفندقك",
+    "description": "Title for third onboarding slide"
+  },
+  "coreOnboardingSlide3Desc": {
+    "tr": "İşveren misiniz? Otelinizin açık pozisyonlarını kolayca yayınlayın ve nitelikli adaylarla hemen iletişime geçin.",
+    "en": "Are you an employer? Easily post your hotel's open positions and connect with qualified candidates immediately.",
+    "de": "Sind Sie Arbeitgeber? Veröffentlichen Sie offene Stellen Ihres Hotels und erreichen Sie qualifizierte Bewerber.",
+    "ru": "Вы работодатель? Легко публикуйте открытые вакансии отеля и сразу находите квалифицированных кандидатов.",
+    "ar": "هل أنت صاحب عمل؟ انشر شواغر فندقك بسهولة وتواصل مع المرشحين المؤهلين فوراً.",
+    "description": "Description for third onboarding slide"
+  },
+  "coreTimeJustNow": {
+    "tr": "şimdi",
+    "en": "now",
+    "de": "jetzt",
+    "ru": "сейчас",
+    "ar": "الآن",
+    "description": "Relative timestamp for right now"
+  },
+  "coreTimeMinutesAgo": {
+    "tr": "{count}dk",
+    "en": "{count}m",
+    "de": "{count}m",
+    "ru": "{count}м",
+    "ar": "{count}د",
+    "description": "Minutes ago timestamp short",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coreTimeHoursAgo": {
+    "tr": "{count}sa",
+    "en": "{count}h",
+    "de": "{count}h",
+    "ru": "{count}ч",
+    "ar": "{count}س",
+    "description": "Hours ago timestamp short",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coreTimeDaysAgo": {
+    "tr": "{count}g",
+    "en": "{count}d",
+    "de": "{count}t",
+    "ru": "{count}д",
+    "ar": "{count}ي",
+    "description": "Days ago timestamp short",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coreMyMessagesTitle": {
+    "tr": "Mesajlarım",
+    "en": "My Messages",
+    "de": "Meine Nachrichten",
+    "ru": "Мои сообщения",
+    "ar": "رسائلي",
+    "description": "Title for chat list screen"
+  },
+  "coreLoginToChatTitle": {
+    "tr": "Mesajlaşmak İçin Giriş Yapın",
+    "en": "Sign In to Message",
+    "de": "Anmelden, um Nachrichten zu senden",
+    "ru": "Войдите, чтобы переписываться",
+    "ar": "سجل الدخول للمراسلة",
+    "description": "Heading on empty unauthenticated chat screen"
+  },
+  "coreLoginToChatDesc": {
+    "tr": "İlan sahipleriyle iletişime geçmek ve gelen mesajlarınızı görmek için lütfen hesabınıza giriş yapın.",
+    "en": "Please sign in to contact listing owners and view incoming messages.",
+    "de": "Bitte melden Sie sich an, um Inserenten zu kontaktieren und Ihre Nachrichten zu sehen.",
+    "ru": "Пожалуйста, войдите в аккаунт, чтобы связаться с авторами объявлений и просматривать сообщения.",
+    "ar": "يرجى تسجيل الدخول إلى حسابك للتواصل مع أصحاب الإعلانات والاطلاع على رسائلك.",
+    "description": "Description on empty unauthenticated chat screen"
+  },
+  "coreLoginOrRegisterAction": {
+    "tr": "Giriş Yap / Kayıt Ol",
+    "en": "Sign In / Register",
+    "de": "Anmelden / Registrieren",
+    "ru": "Войти / Зарегистрироваться",
+    "ar": "تسجيل الدخول / إنشاء حساب",
+    "description": "Button on empty chat screen to sign in or register"
+  },
+  "coreGenericErrorWithDetail": {
+    "tr": "Hata: {error}",
+    "en": "Error: {error}",
+    "de": "Fehler: {error}",
+    "ru": "Ошибка: {error}",
+    "ar": "خطأ: {error}",
+    "description": "Error prefix with details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "coreNoMessagesTitle": {
+    "tr": "Henüz Mesajınız Yok",
+    "en": "No Messages Yet",
+    "de": "Noch keine Nachrichten",
+    "ru": "Пока нет сообщений",
+    "ar": "لا توجد رسائل بعد",
+    "description": "Title when conversation list is empty"
+  },
+  "coreNoMessagesDesc": {
+    "tr": "İlan detay sayfasından ilan sahibine mesaj göndererek hemen iletişim başlatabilirsiniz.",
+    "en": "You can start communicating right away by sending a message to the listing owner from the listing detail page.",
+    "de": "Sie können sofort Kontakt aufnehmen, indem Sie dem Inserenten auf der Detailseite eine Nachricht senden.",
+    "ru": "Вы можете сразу начать общение, отправив сообщение автору на странице объявления.",
+    "ar": "يمكنك بدء التواصل فوراً بإرسال رسالة إلى صاحب الإعلان من صفحة تفاصيل الإعلان.",
+    "description": "Description when conversation list is empty"
+  },
+  "coreNoMessagesYet": {
+    "tr": "Henüz mesaj yok",
+    "en": "No messages yet",
+    "de": "Noch keine Nachrichten",
+    "ru": "Сообщений пока нет",
+    "ar": "لا توجد رسائل بعد",
+    "description": "Placeholder text when conversation has no messages"
+  },
+  "coreChatTitle": {
+    "tr": "Sohbet",
+    "en": "Chat",
+    "de": "Chat",
+    "ru": "Чат",
+    "ar": "الدردشة",
+    "description": "AppBar title for chat detail screen"
+  },
+  "coreMarkHiredDialogTitle": {
+    "tr": "İşe alındı olarak işaretle",
+    "en": "Mark as Hired",
+    "de": "Als eingestellt markieren",
+    "ru": "Отметить как нанятого",
+    "ar": "تحديد كتم التوظيف",
+    "description": "Dialog title for marking candidate as hired"
+  },
+  "coreMarkHiredDialogDesc": {
+    "tr": "Bu görüşmede işe alımın gerçekleştiğini onaylıyor musunuz?",
+    "en": "Do you confirm that the hiring took place in this conversation?",
+    "de": "Bestätigen Sie, dass die Einstellung in diesem Gespräch stattgefunden hat?",
+    "ru": "Вы подтверждаете, что кандидат был нанят по итогам этой беседы?",
+    "ar": "هل تؤكد أنه تم التوظيف في هذه المحادثة؟",
+    "description": "Dialog confirmation message for marking candidate as hired"
+  },
+  "coreConfirmAction": {
+    "tr": "Onayla",
+    "en": "Confirm",
+    "de": "Bestätigen",
+    "ru": "Подтвердить",
+    "ar": "تأكيد",
+    "description": "Generic confirmation button label"
+  },
+  "coreConversationMarkedHiredSuccess": {
+    "tr": "Görüşme işe alındı olarak işaretlendi.",
+    "en": "Conversation marked as hired.",
+    "de": "Gespräch als eingestellt markiert.",
+    "ru": "Беседа отмечена как успешный наём.",
+    "ar": "تم تحديد المحادثة كتم التوظيف.",
+    "description": "Snackbar message when conversation is marked as hired"
+  },
+  "coreMessageSendFailed": {
+    "tr": "Mesaj gönderilemedi: {error}",
+    "en": "Could not send message: {error}",
+    "de": "Nachricht konnte nicht gesendet werden: {error}",
+    "ru": "Не удалось отправить сообщение: {error}",
+    "ar": "تعذر إرسال الرسالة: {error}",
+    "description": "Error when sending message fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "coreUserLabel": {
+    "tr": "Kullanıcı",
+    "en": "User",
+    "de": "Benutzer",
+    "ru": "Пользователь",
+    "ar": "المستخدم",
+    "description": "Generic user label"
+  },
+  "coreCandidateLabel": {
+    "tr": "Aday",
+    "en": "Candidate",
+    "de": "Kandidat",
+    "ru": "Кандидат",
+    "ar": "المرشح",
+    "description": "Default candidate name fallback"
+  },
+  "coreAddToTalentPoolPrompt": {
+    "tr": "{candidateName} kişisini gelecek sezon yetenek havuzunuza eklemek üzeresiniz.",
+    "en": "You are about to add {candidateName} to your talent pool for next season.",
+    "de": "Sie sind im Begriff, {candidateName} zu Ihrem Talentpool für die nächste Saison hinzuzufügen.",
+    "ru": "Вы собираетесь добавить {candidateName} в свой пул талантов на следующий сезон.",
+    "ar": "أنت على وشك إضافة {candidateName} إلى مجمع المواهب للموسم القادم.",
+    "description": "Confirmation prompt before adding candidate to talent pool",
+    "placeholders": {
+      "candidateName": {
+        "type": "String"
+      }
+    }
+  },
+  "coreAddNoteOptional": {
+    "tr": "Not Ekle (İsteğe Bağlı)",
+    "en": "Add Note (Optional)",
+    "de": "Notiz hinzufügen (optional)",
+    "ru": "Добавить заметку (необязательно)",
+    "ar": "إضافة ملاحظة (اختياري)",
+    "description": "Note label in dialog"
+  },
+  "coreAddNoteHint": {
+    "tr": "Örn: Resepsiyon için 2026 yaz dönemi adayı",
+    "en": "e.g. Candidate for front desk summer season 2026",
+    "de": "z. B. Kandidat für Rezeption Sommersaison 2026",
+    "ru": "напр. Кандидат на ресепшн на летний сезон 2026",
+    "ar": "مثال: مرشح لموسم صيف 2026 للاستقبال",
+    "description": "Hint text for adding note to talent pool"
+  },
+  "coreAddAction": {
+    "tr": "Ekle",
+    "en": "Add",
+    "de": "Hinzufügen",
+    "ru": "Добавить",
+    "ar": "إضافة",
+    "description": "Generic add button label"
+  },
+  "coreInterviewSlotsInstruction": {
+    "tr": "Adaya sunmak için 1-3 adet tarih ve saat önerisi ekleyin:",
+    "en": "Add 1-3 date and time suggestions to propose to the candidate:",
+    "de": "Fügen Sie 1-3 Datums- und Uhrzeitvorschläge für den Kandidaten hinzu:",
+    "ru": "Добавьте 1-3 варианта даты и времени для предложения кандидату:",
+    "ar": "أضف 1-3 اقتراحات للتاريخ والوقت لعرضها على المرشح:",
+    "description": "Instruction for proposing interview slots"
+  },
+  "coreAddDateTimeAction": {
+    "tr": "Tarih/Saat Ekle",
+    "en": "Add Date/Time",
+    "de": "Datum/Uhrzeit hinzufügen",
+    "ru": "Добавить дату/время",
+    "ar": "إضافة تاريخ/وقت",
+    "description": "Button to pick date and time slot"
+  },
+  "coreSendProposalsAction": {
+    "tr": "Önerileri Gönder",
+    "en": "Send Proposals",
+    "de": "Vorschläge senden",
+    "ru": "Отправить предложения",
+    "ar": "إرسال الاقتراحات",
+    "description": "Button to submit proposed interview slots"
+  },
+  "coreMarkAsHiredAction": {
+    "tr": "İşe Alındı Olarak İşaretle",
+    "en": "Mark as Hired",
+    "de": "Als eingestellt markieren",
+    "ru": "Отметить как нанятого",
+    "ar": "تحديد كتم التوظيف",
+    "description": "Action menu item to mark candidate as hired"
+  },
+  "coreReportUserAction": {
+    "tr": "Kullanıcıyı Bildir",
+    "en": "Report User",
+    "de": "Benutzer melden",
+    "ru": "Пожаловаться на пользователя"
+    ,"ar": "الإبلاغ عن المستخدم",
+    "description": "Action menu item to report user"
+  },
+  "coreHiredBannerMessage": {
+    "tr": "Bu görüşmede işe alım gerçekleşti.",
+    "en": "Hiring was completed in this conversation.",
+    "de": "Die Einstellung wurde in diesem Gespräch abgeschlossen.",
+    "ru": "В этой беседе был завершён наём.",
+    "ar": "تم التوظيف بنجاح في هذه المحادثة.",
+    "description": "Banner message indicating hiring completed"
+  },
+  "coreRateExperienceAction": {
+    "tr": "Deneyimini Değerlendir",
+    "en": "Rate Your Experience",
+    "de": "Erfahrung bewerten",
+    "ru": "Оцените ваш опыт",
+    "ar": "قيّم تجربتك",
+    "description": "Button to rate the hiring experience"
+  },
+  "coreAppointmentTimeLabel": {
+    "tr": "Randevu Zamanı: {time}",
+    "en": "Appointment Time: {time}",
+    "de": "Terminzeit: {time}",
+    "ru": "Время встречи: {time}",
+    "ar": "موعد المقابلة: {time}",
+    "description": "Confirmed appointment time label",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "coreSelectInterviewSlotInstruction": {
+    "tr": "Lütfen uygun olduğunuz mülakat saatini seçin:",
+    "en": "Please select an interview time that works for you:",
+    "de": "Bitte wählen Sie eine passende Interviewzeit:",
+    "ru": "Пожалуйста, выберите удобное время для интервью:",
+    "ar": "يرجى اختيار وقت المقابلة المناسب لك:",
+    "description": "Instruction for candidate to choose interview slot"
+  },
+  "coreConfirmSlotTitle": {
+    "tr": "Mülakat Saatini Onayla",
+    "en": "Confirm Interview Time",
+    "de": "Interviewzeit bestätigen",
+    "ru": "Подтвердить время интервью",
+    "ar": "تأكيد وقت المقابلة",
+    "description": "Dialog title to confirm chosen slot"
+  },
+  "coreConfirmSlotPrompt": {
+    "tr": "{time} zamanını onaylıyor musunuz?",
+    "en": "Do you confirm {time} as your interview time?",
+    "de": "Bestätigen Sie {time} als Ihre Interviewzeit?",
+    "ru": "Подтверждаете время {time} для интервью?",
+    "ar": "هل تؤكد موعد {time} للمقابلة؟",
+    "description": "Dialog content to confirm chosen slot",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "coreNoMessagesSendFirst": {
+    "tr": "Henüz mesaj yok, ilk mesajı gönderin.",
+    "en": "No messages yet, send the first message.",
+    "de": "Noch keine Nachrichten, senden Sie die erste Nachricht.",
+    "ru": "Сообщений пока нет, отправьте первое сообщение.",
+    "ar": "لا توجد رسائل بعد، أرسل الرسالة الأولى.",
+    "description": "Empty state text in chat detail screen"
+  },
+  "coreTypeMessageHint": {
+    "tr": "Mesajınızı yazın...",
+    "en": "Type your message...",
+    "de": "Nachricht eingeben...",
+    "ru": "Введите сообщение...",
+    "ar": "اكتب رسالتك...",
+    "description": "Chat input field hint"
+  },
+  "coreSendMessageTooltip": {
+    "tr": "Gönder",
+    "en": "Send",
+    "de": "Senden",
+    "ru": "Отправить",
+    "ar": "إرسال",
+    "description": "Send button tooltip"
+  },
+  "coreSeasonalAddAlertModalTitle": {
+    "tr": "Sezon İlanı Hatırlatıcı Ekle",
+    "en": "Add Seasonal Hiring Alert",
+    "de": "Saison-Jobbenachrichtigung hinzufügen",
+    "ru": "Добавить сезонное уведомление",
+    "ar": "إضافة تنبيه توظيف موسمي",
+    "description": "Modal title to add seasonal alert"
+  },
+  "coreRegionOrCityLabel": {
+    "tr": "Bölge / Şehir",
+    "en": "Region / City",
+    "de": "Region / Stadt",
+    "ru": "Регион / Город",
+    "ar": "المنطقة / المدينة",
+    "description": "Label for region or city filter"
+  },
+  "coreAllRegionsOption": {
+    "tr": "Tüm Bölgeler",
+    "en": "All Regions",
+    "de": "Alle Regionen",
+    "ru": "Все регионы",
+    "ar": "جميع المناطق",
+    "description": "Option for all regions in dropdown"
+  },
+  "coreCategoryLabel": {
+    "tr": "Kategori",
+    "en": "Category",
+    "de": "Kategorie",
+    "ru": "Категория",
+    "ar": "الفئة",
+    "description": "Category dropdown label"
+  },
+  "coreAllCategoriesOption": {
+    "tr": "Tüm Kategoriler",
+    "en": "All Categories",
+    "de": "Alle Kategorien",
+    "ru": "Все категории",
+    "ar": "جميع الفئات",
+    "description": "Option for all categories in dropdown"
+  },
+  "coreTargetSeasonLabel": {
+    "tr": "Hedef Sezon",
+    "en": "Target Season",
+    "de": "Zielsaison",
+    "ru": "Целевой сезон",
+    "ar": "الموسم المستهدف",
+    "description": "Target season dropdown label"
+  },
+  "coreCreateAlertAction": {
+    "tr": "Hatırlatıcı Oluştur",
+    "en": "Create Alert",
+    "de": "Erinnerung erstellen",
+    "ru": "Создать уведомление",
+    "ar": "إنشاء تنبيه",
+    "description": "Button to create seasonal alert"
+  },
+  "coreSeasonalIntroTitle": {
+    "tr": "Turizm Sezonu İşe Alım Dönemleri",
+    "en": "Tourism Season Hiring Periods",
+    "de": "Einstellungszeiträume der Tourismussaison",
+    "ru": "Периоды сезонного найма в туризме",
+    "ar": "فترات التوظيف للموسم السياحي",
+    "description": "Intro card title for seasonal calendar"
+  },
+  "coreSeasonalIntroDesc": {
+    "tr": "Yoğun işe alım dönemlerini takip edin ve bölge/kategori bazlı sezon hatırlatıcıları kurun.",
+    "en": "Track peak recruitment windows and set alerts for your preferred region & job category.",
+    "de": "Verfolgen Sie Haupteinstellungsphasen und richten Sie Benachrichtigungen nach Region und Kategorie ein.",
+    "ru": "Следите за пиковыми периодами найма и настраивайте уведомления по регионам и категориям.",
+    "ar": "تابع فترات ذروة التوظيف واضبط التنبيهات حسب منطقتك وفئتك المفضلة.",
+    "description": "Intro card description for seasonal calendar"
+  },
+  "coreSeasonalWindowsHeading": {
+    "tr": "Sezonluk İşe Alım Dönemleri",
+    "en": "Seasonal Recruitment Windows",
+    "de": "Saisonale Einstellungszeiträume",
+    "ru": "Периоды сезонного найма",
+    "ar": "مراحل التوظيف الموسمية",
+    "description": "Heading for seasonal recruitment windows section"
+  },
+  "coreSeasonalSummer2025Title": {
+    "tr": "Yaz Sezonu 2025",
+    "en": "Summer Season 2025",
+    "de": "Sommersaison 2025",
+    "ru": "Летний сезон 2025",
+    "ar": "موسم صيف 2025",
+    "description": "Summer 2025 season title"
+  },
+  "coreSeasonalSummer2025Recruitment": {
+    "tr": "Nisan - Haziran",
+    "en": "April - June",
+    "de": "April - Juni",
+    "ru": "Апрель - Июнь",
+    "ar": "أبريل - يونيو",
+    "description": "Summer 2025 recruitment period"
+  },
+  "coreSeasonalSummer2025Active": {
+    "tr": "Mayıs - Ekim",
+    "en": "May - October",
+    "de": "Mai - Oktober",
+    "ru": "Май - Октябрь",
+    "ar": "مايو - أكتوبر",
+    "description": "Summer 2025 active work period"
+  },
+  "coreSeasonalSummer2025Desc": {
+    "tr": "Ege ve Akdeniz otellerinde en yoğun işe alım dönemi. Erken başvurular Nisan ayı başında başlar.",
+    "en": "Peak hiring period in Aegean and Mediterranean hotels. Early applications start in early April.",
+    "de": "Haupteinstellungszeit in Hotels der Ägäis und des Mittelmeers. Frühe Bewerbungen beginnen Anfang April.",
+    "ru": "Пиковый период найма в отелях Эгейского и Средиземноморского регионов. Ранняя подача заявок начинается в начале апреля.",
+    "ar": "فترة ذروة التوظيف في فنادق بحر إيجة والبحر الأبيض المتوسط. تبدأ التقديمات المبكرة في أوائل أبريل.",
+    "description": "Summer 2025 description"
+  },
+  "coreSeasonalWinter202526Title": {
+    "tr": "Kış Sezonu 2025-26",
+    "en": "Winter Season 2025-26",
+    "de": "Wintersaison 2025-26",
+    "ru": "Зимний сезон 2025-26",
+    "ar": "موسم شتاء 2025-26",
+    "description": "Winter 2025-26 season title"
+  },
+  "coreSeasonalWinter202526Recruitment": {
+    "tr": "Ekim - Aralık",
+    "en": "October - December",
+    "de": "Oktober - Dezember",
+    "ru": "Октябрь - Декабрь",
+    "ar": "أكتوبر - ديسمبر",
+    "description": "Winter 2025-26 recruitment period"
+  },
+  "coreSeasonalWinter202526Active": {
+    "tr": "Kasım - Nisan",
+    "en": "November - April",
+    "de": "November - April",
+    "ru": "Ноябрь - Апрель",
+    "ar": "نوفمبر - أبريل",
+    "description": "Winter 2025-26 active work period"
+  },
+  "coreSeasonalWinter202526Desc": {
+    "tr": "Kayak merkezleri (Uludağ, Palandöken, Erciyes) ve termal tesislerde işe alım dönemi.",
+    "en": "Hiring season for ski resorts (Uludağ, Palandöken, Erciyes) and thermal facilities.",
+    "de": "Einstellungssaison für Skigebiete (Uludağ, Palandöken, Erciyes) und Thermalanlagen.",
+    "ru": "Сезон найма на горнолыжных курортах (Улудаг, Паландокен, Эрджиес) и термальных комплексах.",
+    "ar": "موسم التوظيف لمنتجعات التزلج (أولوداغ، بالاندوكين، إرجيس) والمنشآت الحرارية.",
+    "description": "Winter 2025-26 description"
+  },
+  "coreSeasonalYearRoundTitle": {
+    "tr": "Tüm Yıl Sürekli İşe Alım",
+    "en": "Year-Round Hiring",
+    "de": "Ganzjährige Einstellung",
+    "ru": "Круглогодичный найм",
+    "ar": "توظيف على مدار العام",
+    "description": "Year-round season title"
+  },
+  "coreSeasonalYearRoundRecruitment": {
+    "tr": "Sürekli Açık",
+    "en": "Always Open",
+    "de": "Immer geöffnet",
+    "ru": "Открыто постоянно",
+    "ar": "مفتوح دائماً",
+    "description": "Year-round recruitment period"
+  },
+  "coreSeasonalYearRoundActive": {
+    "tr": "12 Ay",
+    "en": "12 Months",
+    "de": "12 Monate",
+    "ru": "12 месяцев",
+    "ar": "12 شهراً",
+    "description": "Year-round active work period"
+  },
+  "coreSeasonalYearRoundDesc": {
+    "tr": "Şehir otelleri (İstanbul, Ankara, İzmir) ve yıl boyu açık tesisler için kesintisiz personel alımı.",
+    "en": "Continuous recruitment for city hotels (Istanbul, Ankara, Izmir) and year-round facilities.",
+    "de": "Kontinuierliche Rekrutierung für Stadthotels (Istanbul, Ankara, Izmir) und ganzjährig geöffnete Betriebe.",
+    "ru": "Непрерывный подбор персонала для городских отелей (Стамбул, Анкара, Измир) и круглогодичных объектов.",
+    "ar": "توظيف مستمر لفنادق المدن (إسطنبول، أنقرة، إزمير) والمنشآت العاملة طوال العام.",
+    "description": "Year-round description"
+  },
+  "coreSeasonalRecruitmentPeakLabel": {
+    "tr": "İşe Alım Yoğunluğu",
+    "en": "Recruitment Peak",
+    "de": "Einstellungshöhepunkt",
+    "ru": "Пик найма",
+    "ar": "ذروة التوظيف",
+    "description": "Column label for recruitment peak period"
+  },
+  "coreSeasonalActivePeriodLabel": {
+    "tr": "Çalışma Dönemi",
+    "en": "Active Work Period",
+    "de": "Arbeitszeitraum",
+    "ru": "Период работы",
+    "ar": "فترة العمل",
+    "description": "Column label for active working period"
+  },
+  "coreSeasonalSignInPrompt": {
+    "tr": "Sezonluk işe alım hatırlatıcıları kurmak için lütfen giriş yapın.",
+    "en": "Please sign in to set seasonal hiring reminders.",
+    "de": "Bitte melden Sie sich an, um Saison-Erinnerungen einzurichten.",
+    "ru": "Пожалуйста, войдите, чтобы настроить сезонные напоминания.",
+    "ar": "يرجى تسجيل الدخول لتعيين تنبيهات التوظيف الموسمي.",
+    "description": "Prompt asking user to sign in to set seasonal alerts"
+  },
+  "coreSeasonalNoAlerts": {
+    "tr": "Henüz kurulmuş bir sezon hatırlatıcısı yok.",
+    "en": "No active seasonal alerts set yet.",
+    "de": "Noch keine aktiven Saison-Benachrichtigungen eingerichtet.",
+    "ru": "Активных сезонных напоминаний пока нет.",
+    "ar": "لم يتم تعيين أي تنبيهات موسمية نشطة حتى الآن.",
+    "description": "Empty state message when user has no seasonal alerts"
+  },
+  "coreSeasonalCreateFirstAlert": {
+    "tr": "İlk Hatırlatıcıyı Oluştur",
+    "en": "Create First Alert",
+    "de": "Erste Erinnerung erstellen",
+    "ru": "Создать первое напоминание",
+    "ar": "إنشاء أول تنبيه",
+    "description": "Button label to create first seasonal alert"
+  },
+  "coreSeasonalAlertsLoadError": {
+    "tr": "Hatırlatıcılar yüklenemedi: {error}",
+    "en": "Error loading alerts: {error}",
+    "de": "Fehler beim Laden der Benachrichtigungen: {error}",
+    "ru": "Ошибка при загрузке напоминаний: {error}",
+    "ar": "خطأ في تحميل التنبيهات: {error}",
+    "description": "Error message when seasonal alerts fail to load",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "coreReportAlreadySubmitted": {
+    "tr": "Bu bildirimi daha önce gönderdiniz.",
+    "en": "You have already submitted this report.",
+    "de": "Sie haben diese Meldung bereits gesendet.",
+    "ru": "Вы уже отправляли эту жалобу.",
+    "ar": "لقد أرسلت هذا البلاغ من قبل.",
+    "description": "Snackbar when report was already submitted"
+  },
+  "coreReportSubmittedSuccess": {
+    "tr": "Bildiriminiz başarıyla gönderildi. Teşekkür ederiz.",
+    "en": "Your report has been submitted successfully. Thank you.",
+    "de": "Ihre Meldung wurde erfolgreich gesendet. Vielen Dank.",
+    "ru": "Ваша жалоба успешно отправлена. Спасибо.",
+    "ar": "تم إرسال بلاغك بنجاح. شكراً لك.",
+    "description": "Snackbar when report is successfully submitted"
+  },
+  "coreReportListingTitle": {
+    "tr": "İlanı Bildir",
+    "en": "Report Listing",
+    "de": "Inserat melden",
+    "ru": "Пожаловаться на объявление",
+    "ar": "الإبلاغ عن الإعلان",
+    "description": "Dialog title for reporting a listing"
+  },
+  "coreReportUserTitle": {
+    "tr": "Kullanıcıyı Bildir",
+    "en": "Report User",
+    "de": "Benutzer melden",
+    "ru": "Пожаловаться на пользователя",
+    "ar": "الإبلاغ عن المستخدم",
+    "description": "Dialog title for reporting a user"
+  },
+  "coreReportingTarget": {
+    "tr": "Bildireceğiniz: {target}",
+    "en": "Reporting: {target}",
+    "de": "Gemeldet wird: {target}",
+    "ru": "Объект жалобы: {target}",
+    "ar": "البلاغ عن: {target}",
+    "description": "Label showing the reported target",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "coreReportReasonLabel": {
+    "tr": "Bildirim Nedeni",
+    "en": "Reason for Report",
+    "de": "Grund der Meldung",
+    "ru": "Причина жалобы",
+    "ar": "سبب الإبلاغ",
+    "description": "Label for report reason dropdown"
+  },
+  "coreReportReasonScam": {
+    "tr": "Dolandırıcılık / Sahtekarlık",
+    "en": "Scam / Fraud",
+    "de": "Betrug / Täuschung",
+    "ru": "Мошенничество / Обман",
+    "ar": "احتيال / نصب",
+    "description": "Report reason: scam or fraud"
+  },
+  "coreReportReasonSpam": {
+    "tr": "Spam",
+    "en": "Spam",
+    "de": "Spam",
+    "ru": "Спам",
+    "ar": "رسائل غير مرغوب فيها",
+    "description": "Report reason: spam"
+  },
+  "coreReportReasonInappropriate": {
+    "tr": "Uygunsuz İçerik",
+    "en": "Inappropriate Content",
+    "de": "Unangemessener Inhalt",
+    "ru": "Неподобающий контент",
+    "ar": "محتوى غير لائق",
+    "description": "Report reason: inappropriate content"
+  },
+  "coreReportReasonMisleading": {
+    "tr": "Yanıltıcı Bilgi",
+    "en": "Misleading Information",
+    "de": "Irreführende Informationen",
+    "ru": "Вводящая в заблуждение информация",
+    "ar": "معلومات مضللة",
+    "description": "Report reason: misleading information"
+  },
+  "coreReportReasonOther": {
+    "tr": "Diğer",
+    "en": "Other",
+    "de": "Sonstiges",
+    "ru": "Другое",
+    "ar": "أخرى",
+    "description": "Report reason: other"
+  },
+  "coreReportDescriptionLabel": {
+    "tr": "Açıklama (İsteğe Bağlı)",
+    "en": "Description (Optional)",
+    "de": "Beschreibung (optional)",
+    "ru": "Описание (необязательно)",
+    "ar": "الوصف (اختياري)",
+    "description": "Report description field label"
+  },
+  "coreReportDescriptionHint": {
+    "tr": "Ek bilgi ekleyebilirsiniz...",
+    "en": "You can provide additional details...",
+    "de": "Sie können zusätzliche Details angeben...",
+    "ru": "Вы можете указать дополнительные сведения...",
+    "ar": "يمكنك إضافة تفاصيل إضافية...",
+    "description": "Report description field hint"
+  },
+  "coreSubmitAction": {
+    "tr": "Gönder",
+    "en": "Submit",
+    "de": "Absenden",
+    "ru": "Отправить",
+    "ar": "إرسال",
+    "description": "Submit button label"
+  },
+  "coreVideoLoadError": {
+    "tr": "Video yüklenemedi",
+    "en": "Could not load video",
+    "de": "Video konnte nicht geladen werden",
+    "ru": "Не удалось загрузить видео",
+    "ar": "تعذر تحميل الفيديو",
+    "description": "Error message when video playback fails"
+  },
+  "coreVideoPreparing": {
+    "tr": "Video hazırlanıyor...",
+    "en": "Preparing video...",
+    "de": "Video wird vorbereitet...",
+    "ru": "Видео подготавливается...",
+    "ar": "جاري إعداد الفيديو...",
+    "description": "Loading state while video initializes"
+  },
+  "coreAuthErrorInvalidCredentials": {
+    "tr": "E-posta veya şifre hatalı. Hesabınız yoksa lütfen aşağıdan Kayıt Ol butonuna basın.",
+    "en": "Invalid email or password. If you don't have an account, please tap Register below.",
+    "de": "Ungültige E-Mail oder Passwort. Wenn Sie noch kein Konto haben, tippen Sie unten auf Registrieren.",
+    "ru": "Неверный e-mail или пароль. Если у вас нет аккаунта, нажмите «Зарегистрироваться» ниже.",
+    "ar": "البريد الإلكتروني أو كلمة المرور غير صحيحة. إذا لم يكن لديك حساب، يرجى الضغط على تسجيل أدناه.",
+    "description": "Auth error message for invalid email or password"
+  },
+  "coreAuthErrorInvalidPhoneNumber": {
+    "tr": "Geçersiz telefon numarası. Lütfen kontrol edip tekrar deneyin.",
+    "en": "Invalid phone number. Please check and try again.",
+    "de": "Ungültige Telefonnummer. Bitte überprüfen und erneut versuchen.",
+    "ru": "Недействительный номер телефона. Проверьте и попробуйте снова.",
+    "ar": "رقم الهاتف غير صحيح. يرجى التحقق والمحاولة مرة أخرى.",
+    "description": "Auth error message for invalid phone number"
+  },
+  "coreAuthErrorInvalidVerificationCode": {
+    "tr": "SMS doğrulama kodu hatalı veya süresi dolmuş.",
+    "en": "SMS verification code is incorrect or expired.",
+    "de": "SMS-Bestätigungscode ist falsch oder abgelaufen.",
+    "ru": "SMS-код подтверждения неверен или истёк.",
+    "ar": "رمز التحقق عبر الرسائل القصيرة غير صحيح أو منتهي الصلاحية.",
+    "description": "Auth error message for invalid SMS code"
+  },
+  "coreAuthErrorEmailAlreadyInUse": {
+    "tr": "Bu e-posta adresi zaten kayıtlı. Lütfen Giriş Yap butonunu kullanın.",
+    "en": "This email address is already registered. Please sign in.",
+    "de": "Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich an.",
+    "ru": "Этот e-mail адрес уже зарегистрирован. Пожалуйста, войдите.",
+    "ar": "عنوان البريد الإلكتروني هذا مسجل بالفعل. يرجى تسجيل الدخول.",
+    "description": "Auth error message when email is already in use"
+  },
+  "coreAuthErrorOperationNotAllowed": {
+    "tr": "Firebase girişi henüz aktif değil.",
+    "en": "Sign-in operation is not enabled.",
+    "de": "Anmeldevorgang ist nicht aktiviert.",
+    "ru": "Вход в систему ещё не активирован.",
+    "ar": "عملية تسجيل الدخول غير مفعلة بعد.",
+    "description": "Auth error message when operation is not allowed"
+  },
+  "coreAuthErrorUnauthorizedDomain": {
+    "tr": "Bu web adresi (domain) Firebase izin listesinde ekli değil.",
+    "en": "This web domain is not authorized for authentication.",
+    "de": "Diese Web-Domain ist nicht autorisiert.",
+    "ru": "Этот веб-домен не авторизован для аутентификации.",
+    "ar": "هذا النطاق غير مصرح به لتسجيل الدخول.",
+    "description": "Auth error message when domain is not authorized"
+  },
+  "coreErrorGeneric": {
+    "tr": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+    "en": "Something went wrong. Please try again.",
+    "de": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "ru": "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+    "ar": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "description": "Generic failure message"
+  },
+  "coreErrorNetwork": {
+    "tr": "İnternet bağlantınızı kontrol edip tekrar deneyin.",
+    "en": "Check your internet connection and try again.",
+    "de": "Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+    "ru": "Проверьте подключение к интернету и попробуйте снова.",
+    "ar": "تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
+    "description": "Network error message"
+  },
+  "coreErrorPermissionDenied": {
+    "tr": "Bu işlem için yetkiniz yok.",
+    "en": "You do not have permission for this action.",
+    "de": "Sie haben keine Berechtigung für diese Aktion.",
+    "ru": "У вас нет прав для этого действия.",
+    "ar": "ليس لديك إذن للقيام بهذا الإجراء.",
+    "description": "Permission denied error message"
+  },
+  "coreErrorNotFound": {
+    "tr": "Aradığınız kayıt bulunamadı.",
+    "en": "The requested record was not found.",
+    "de": "Der gesuchte Datensatz wurde nicht gefunden.",
+    "ru": "Запрашиваемая запись не найдена.",
+    "ar": "لم يتم العثور على السجل المطلوب.",
+    "description": "Not found error message"
+  },
+  "coreErrorAlreadyExists": {
+    "tr": "Bu kayıt zaten mevcut.",
+    "en": "This record already exists.",
+    "de": "Dieser Datensatz existiert bereits.",
+    "ru": "Эта запись уже существует.",
+    "ar": "هذا السجل موجود بالفعل.",
+    "description": "Conflict error message"
+  },
+  "coreErrorResourceExhausted": {
+    "tr": "Çok fazla istek gönderildi. Lütfen biraz sonra tekrar deneyin.",
+    "en": "Too many requests. Please try again later.",
+    "de": "Zu viele Anfragen. Bitte versuchen Sie es später noch einmal.",
+    "ru": "Слишком много запросов. Пожалуйста, повторите попытку позже.",
+    "ar": "طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً.",
+    "description": "Rate limit error message"
+  },
+  "coreErrorInvalidArgument": {
+    "tr": "Girilen bilgiler geçersiz.",
+    "en": "The entered information is invalid.",
+    "de": "Die eingegebenen Informationen sind ungültig.",
+    "ru": "Введённые данные недействительны.",
+    "ar": "المعلومات المدخلة غير صحيحة.",
+    "description": "Validation error message"
+  }
+}

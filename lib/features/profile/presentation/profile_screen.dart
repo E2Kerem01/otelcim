@@ -25,22 +25,20 @@ import 'talent_pool_screen.dart';
 import 'widgets/profile_screen_widgets.dart';
 
 Future<bool?> confirmSignOut(BuildContext context) {
-  final l10n = AppLocalizations.of(context);
+  final l10n = AppLocalizations.of(context)!;
   return showDialog<bool>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      // TODO(l10n): add logoutConfirmationTitle (TR: "Çıkış Yap", EN: "Sign out").
-      title: Text(l10n?.signOut ?? 'Çıkış Yap'),
-      // TODO(l10n): add logoutConfirmationMessage (TR: "Çıkış yapmak istediğinize emin misiniz?", EN: "Are you sure you want to sign out?").
-      content: const Text('Çıkış yapmak istediğinize emin misiniz?'),
+      title: Text(l10n.signOut),
+      content: Text(l10n.profileSignOutConfirmation),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(dialogContext, false),
-          child: Text(l10n?.cancelButton ?? 'Vazgeç'),
+          child: Text(l10n.cancelButton),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(dialogContext, true),
-          child: Text(l10n?.signOut ?? 'Çıkış Yap'),
+          child: Text(l10n.signOut),
         ),
       ],
     ),
@@ -68,6 +66,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(authStateProvider).valueOrNull;
     final email = user?.email ?? '';
     // .valueOrNull, not .value: an AsyncError's .value getter rethrows the
@@ -121,7 +120,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      displayName?.isNotEmpty == true ? displayName! : (email.isNotEmpty ? email : 'Kullanıcı'),
+                                      displayName?.isNotEmpty == true ? displayName! : (email.isNotEmpty ? email : l10n.profileUserFallback),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -143,7 +142,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
-                                        profile?.userType == 'employer' ? 'İşveren' : 'İş Arayan',
+                                        profile?.userType == 'employer' ? l10n.profileEmployerRole : l10n.profileJobSeekerRole,
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
@@ -170,86 +169,86 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 ProfileSidebarItem(
                                   icon: Icons.admin_panel_settings_outlined,
                                   title: AppLocalizations.of(context)!.adminPanelEntry,
-                                  subtitle: 'Kullanıcılar, ilanlar ve raporlar',
+                                  subtitle: l10n.profileAdminSubtitle,
                                   isSelected: false,
                                   onTap: () => context.push('/admin'),
                                 ),
                               ProfileSidebarItem(
                                 icon: Icons.grid_view_rounded,
-                                title: 'Genel Bakış',
-                                subtitle: 'Profil özeti ve istatistikler',
+                                title: l10n.profileOverviewTitle,
+                                subtitle: l10n.profileOverviewSubtitle,
                                 isSelected: _selectedSection == 'overview',
                                 onTap: () => setState(() => _selectedSection = 'overview'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.edit_outlined,
-                                title: 'Profili Düzenle',
-                                subtitle: 'Kişisel bilgiler, fotoğraf ve cv',
+                                title: l10n.editProfile,
+                                subtitle: l10n.profileEditSubtitle,
                                 isSelected: _selectedSection == 'edit',
                                 onTap: () => setState(() => _selectedSection = 'edit'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.verified_outlined,
-                                title: 'Belgelerim / Sertifika Cüzdanı',
-                                subtitle: 'Hijyen, ehliyet, sertifika yönetimi',
+                                title: l10n.profileCertificatesTitle,
+                                subtitle: l10n.profileCertificatesSubtitle,
                                 badgeCount: approvedCerts?.length,
                                 isSelected: _selectedSection == 'certificates',
                                 onTap: () => setState(() => _selectedSection = 'certificates'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.favorite_outline_rounded,
-                                title: 'Favorilerim',
-                                subtitle: 'Kaydedilen ilanlar',
+                                title: l10n.profileFavoritesTitle,
+                                subtitle: l10n.profileFavoritesSubtitle,
                                 isSelected: _selectedSection == 'favorites',
                                 onTap: () => setState(() => _selectedSection = 'favorites'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.list_alt_rounded,
-                                title: 'İlanlarım',
-                                subtitle: 'Yayındaki ve pasif ilanlar',
+                                title: l10n.myListings,
+                                subtitle: l10n.profileListingsSubtitle,
                                 isSelected: _selectedSection == 'my_listings',
                                 onTap: () => setState(() => _selectedSection = 'my_listings'),
                               ),
                               if (profile?.userType == 'employer')
                                 ProfileSidebarItem(
                                   icon: Icons.folder_shared_outlined,
-                                  title: 'Yetenek Havuzum',
-                                  subtitle: 'Aday listesi ve notlar',
+                                  title: l10n.talentPoolMyPool,
+                                  subtitle: l10n.talentPoolSubtitle,
                                   isSelected: _selectedSection == 'talent_pool',
                                   onTap: () => setState(() => _selectedSection = 'talent_pool'),
                                 ),
                               ProfileSidebarItem(
                                 icon: Icons.rocket_launch_rounded,
-                                title: 'Öne Çıkarılan İlanlarım',
-                                subtitle: 'Doping ve öne çıkarma paketleri',
+                                title: l10n.profileBoostsTitle,
+                                subtitle: l10n.profileBoostsSubtitle,
                                 isSelected: _selectedSection == 'boosts',
                                 onTap: () => setState(() => _selectedSection = 'boosts'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.notifications_outlined,
-                                title: 'Bildirim Ayarları',
-                                subtitle: 'Sohbet ve duyuru tercihleri',
+                                title: l10n.profileNotificationsTitle,
+                                subtitle: l10n.profileNotificationsSubtitle,
                                 isSelected: _selectedSection == 'notifications',
                                 onTap: () => setState(() => _selectedSection = 'notifications'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.security_rounded,
-                                title: 'Gizlilik ve Veri Ayarları',
-                                subtitle: 'KVKK ve hesap ayarları',
+                                title: l10n.profilePrivacyTitle,
+                                subtitle: l10n.profilePrivacySubtitle,
                                 isSelected: _selectedSection == 'privacy',
                                 onTap: () => setState(() => _selectedSection = 'privacy'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.card_giftcard_rounded,
-                                title: 'Arkadaşını Davet Et',
-                                subtitle: 'Referans kodu ve ücretsiz boost',
+                                title: l10n.inviteFriendsTitle,
+                                subtitle: l10n.profileInviteSubtitle,
                                 isSelected: _selectedSection == 'invite',
                                 onTap: () => setState(() => _selectedSection = 'invite'),
                               ),
                               ProfileSidebarItem(
                                 icon: Icons.language_rounded,
-                                title: 'Uygulama Dili',
-                                subtitle: 'Türkçe, English, Русский, Deutsch, العربية',
+                                title: l10n.languageSettingsTitle,
+                                subtitle: l10n.profileLanguageSubtitle,
                                 isSelected: _selectedSection == 'language',
                                 onTap: () => setState(() => _selectedSection = 'language'),
                               ),
@@ -267,7 +266,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               OutlinedButton.icon(
                                 onPressed: _handleLogout,
                                 icon: const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
-                                label: const Text('Çıkış Yap', style: TextStyle(color: Colors.red, fontSize: 13)),
+                                label: Text(l10n.signOut, style: const TextStyle(color: Colors.red, fontSize: 13)),
                                 style: OutlinedButton.styleFrom(
                                   side: BorderSide(color: Colors.red.shade200),
                                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -307,7 +306,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
         // Mobile Single Column Layout
         return Scaffold(
-          appBar: AppBar(title: const Text('Hesabım')),
+          appBar: AppBar(title: Text(l10n.profileTitle)),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -354,7 +353,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      (profile?.availableImmediately ?? false) ? 'Hemen Başlayabilir' : 'Müsait Değil',
+                                      (profile?.availableImmediately ?? false)
+                                          ? l10n.availableImmediatelyBadge
+                                          : l10n.notAvailableBadge,
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -384,7 +385,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         Icon(Icons.verified_rounded, size: 12, color: Colors.blue.shade700),
                                         const SizedBox(width: 4),
                                         Text(
-                                          cert.title ?? cert.type.label,
+                                          cert.title ?? certificateTypeLabel(l10n, cert.type),
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -414,12 +415,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         backgroundColor: Colors.blue.shade100,
                         child: Icon(Icons.play_arrow_rounded, color: Colors.blue.shade800),
                       ),
-                      title: const Text('Tanıtım Videosu', style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: const Text('15-30 saniyelik profil videonuz'),
+                      title: Text(l10n.introVideoTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(l10n.profileIntroVideoSubtitle),
                       trailing: OutlinedButton.icon(
                         onPressed: () => VideoPlayerDialog.show(context, videoUrl: profile.introVideoUrl!),
                         icon: const Icon(Icons.play_circle_outline_rounded, size: 18),
-                        label: const Text('İzle'),
+                        label: Text(l10n.watchIntroVideo),
                       ),
                     ),
                   ),
@@ -442,7 +443,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             '${average.toStringAsFixed(1)} / 5',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text('${items.length} değerlendirme'),
+                          subtitle: Text(l10n.profileRatingsCount(items.length)),
                         ),
                       ),
                     );
@@ -457,27 +458,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
               ProfileMenuTile(
                 icon: Icons.edit_outlined,
-                title: 'Profili Düzenle',
+                title: l10n.editProfile,
                 onTap: () => context.push('/profile/edit'),
               ),
               const SizedBox(height: 12),
               ProfileMenuTile(
                 icon: Icons.verified_outlined,
                 iconColor: Colors.blue,
-                title: 'Belgelerim / Sertifika Cüzdanı',
-                subtitle: 'Hijyen, cankurtaran, ehliyet ve dil belgelerinizi yönetin',
+                title: l10n.profileCertificatesTitle,
+                subtitle: l10n.profileCertificatesSubtitle,
                 onTap: () => context.push('/profile/certificates'),
               ),
               const SizedBox(height: 12),
               ProfileMenuTile(
                 icon: Icons.favorite_outline_rounded,
-                title: 'Favorilerim',
+                title: l10n.profileFavoritesTitle,
                 onTap: () => context.push('/favorites'),
               ),
               const SizedBox(height: 12),
               ProfileMenuTile(
                 icon: Icons.list_alt_rounded,
-                title: 'İlanlarım',
+                title: l10n.myListings,
                 onTap: () => context.push('/my-listings'),
               ),
               if (profile?.userType == 'employer') ...[
@@ -485,8 +486,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ProfileMenuTile(
                   icon: Icons.folder_shared_outlined,
                   iconColor: Colors.indigo,
-                  title: 'Yetenek Havuzum',
-                  subtitle: 'Gelecek sezon adayları ve notlar',
+                  title: l10n.talentPoolMyPool,
+                  subtitle: l10n.talentPoolSubtitle,
                   onTap: () => context.push('/profile/talent-pool'),
                 ),
               ],
@@ -494,43 +495,43 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ProfileMenuTile(
                 icon: Icons.rocket_launch_rounded,
                 iconColor: Colors.amber.shade800,
-                title: 'Öne Çıkarılan İlanlarım',
+                title: l10n.profileBoostsTitle,
                 onTap: () => context.push('/my-boosts'),
               ),
               const SizedBox(height: 12),
               ProfileMenuTile(
                 icon: Icons.notifications_outlined,
-                title: 'Bildirim Ayarları',
-                subtitle: 'Mesaj, ilan ve duyuru bildirimleri',
+                title: l10n.profileNotificationsTitle,
+                subtitle: l10n.profileNotificationsSubtitle,
                 onTap: () => context.push('/profile/notifications'),
               ),
               const SizedBox(height: 12),
               ProfileMenuTile(
                 icon: Icons.security_rounded,
-                title: 'Gizlilik ve Veri Ayarları',
-                subtitle: 'KVKK, veri indirme ve hesap silme',
+                title: l10n.profilePrivacyTitle,
+                subtitle: l10n.profilePrivacySubtitle,
                 onTap: () => context.push('/profile/privacy'),
               ),
               const SizedBox(height: 12),
               ProfileMenuTile(
                 icon: Icons.card_giftcard_rounded,
                 iconColor: Theme.of(context).primaryColor,
-                title: 'Arkadaşını Davet Et',
-                subtitle: 'Referans kodu ve ücretsiz boost',
+                title: l10n.inviteFriendsTitle,
+                subtitle: l10n.profileInviteSubtitle,
                 onTap: () => context.push('/profile/invite'),
               ),
               const SizedBox(height: 12),
               ProfileMenuTile(
                 icon: Icons.language_rounded,
-                title: 'Uygulama Dili',
-                subtitle: 'Türkçe, English, Русский, Deutsch, العربية',
+                title: l10n.languageSettingsTitle,
+                subtitle: l10n.profileLanguageSubtitle,
                 onTap: () => context.push('/profile/language'),
               ),
               const SizedBox(height: 20),
               OutlinedButton.icon(
                 onPressed: _handleLogout,
                 icon: const Icon(Icons.logout_rounded, color: Colors.red),
-                label: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
+                label: Text(l10n.signOut, style: const TextStyle(color: Colors.red)),
               ),
             ],
           ),
@@ -601,13 +602,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     AsyncValue<List<Rating>>? ratings,
     List<Certificate>? approvedCerts,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil Genel Bakışı'),
+        title: Text(l10n.profileOverviewTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Profili Düzenle',
+            tooltip: l10n.editProfile,
             onPressed: () {
               setState(() {
                 _selectedSection = 'edit';
@@ -642,7 +644,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Row(
                           children: [
                             Text(
-                              displayName?.isNotEmpty == true ? displayName! : (email.isNotEmpty ? email : 'Kullanıcı'),
+                              displayName?.isNotEmpty == true ? displayName! : (email.isNotEmpty ? email : l10n.profileUserFallback),
                               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(width: 10),
@@ -660,7 +662,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 ),
                               ),
                               child: Text(
-                                profile?.userType == 'employer' ? 'İşveren Profili' : 'İş Arayan Profili',
+                                profile?.userType == 'employer' ? l10n.profileEmployerLabel : l10n.profileJobSeekerLabel,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -718,7 +720,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      (profile?.availableImmediately ?? false) ? 'Hemen Başlayabilir' : 'Müsait Değil',
+                                      (profile?.availableImmediately ?? false)
+                                          ? l10n.availableImmediatelyBadge
+                                          : l10n.notAvailableBadge,
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -743,7 +747,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                       Icon(Icons.verified_rounded, size: 14, color: Colors.blue.shade700),
                                       const SizedBox(width: 6),
                                       Text(
-                                        cert.title ?? cert.type.label,
+                                        cert.title ?? certificateTypeLabel(l10n, cert.type),
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
@@ -777,12 +781,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   backgroundColor: Colors.blue.shade100,
                   child: Icon(Icons.play_arrow_rounded, color: Colors.blue.shade800, size: 28),
                 ),
-                title: const Text('Tanıtım Videonuz Yüklendi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                subtitle: const Text('İşverenler profilinizi incelerken bu videoyu izleyebilir.'),
+                title: Text(l10n.profileIntroVideoUploadedTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                subtitle: Text(l10n.profileIntroVideoUploadedSubtitle),
                 trailing: FilledButton.icon(
                   onPressed: () => VideoPlayerDialog.show(context, videoUrl: profile.introVideoUrl!),
                   icon: const Icon(Icons.play_circle_outline_rounded, size: 20),
-                  label: const Text('Videoyu İzle'),
+                  label: Text(l10n.watchIntroVideo),
                 ),
               ),
             ),
@@ -790,7 +794,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ],
 
           // Quick Section Shortcut Grid Cards
-          Text('Hızlı Erişim', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text(l10n.profileQuickAccessTitle, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           GridView.count(
             crossAxisCount: 3,
@@ -803,50 +807,50 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ProfileShortcutCard(
                 icon: Icons.edit_outlined,
                 color: Colors.purple,
-                title: 'Profili Düzenle',
-                subtitle: 'Kişisel ve iş detayları',
+                title: l10n.editProfile,
+                subtitle: l10n.profileShortcutEditSubtitle,
                 onTap: () => setState(() => _selectedSection = 'edit'),
               ),
               ProfileShortcutCard(
                 icon: Icons.verified_outlined,
                 color: Colors.blue,
-                title: 'Sertifika Cüzdanı',
-                subtitle: '${approvedCerts?.length ?? 0} onaylı belge',
+                title: l10n.profileCertificatesTitle,
+                subtitle: l10n.profileApprovedCertificateCount(approvedCerts?.length ?? 0),
                 onTap: () => setState(() => _selectedSection = 'certificates'),
               ),
               ProfileShortcutCard(
                 icon: Icons.list_alt_rounded,
                 color: Colors.teal,
-                title: 'İlanlarım',
-                subtitle: 'İlanlarınızı yönetin',
+                title: l10n.myListings,
+                subtitle: l10n.profileListingsShortcutSubtitle,
                 onTap: () => setState(() => _selectedSection = 'my_listings'),
               ),
               ProfileShortcutCard(
                 icon: Icons.favorite_outline_rounded,
                 color: Colors.red,
-                title: 'Favorilerim',
-                subtitle: 'Kayıtlı ilanlar',
+                title: l10n.profileFavoritesTitle,
+                subtitle: l10n.profileFavoritesShortcutSubtitle,
                 onTap: () => setState(() => _selectedSection = 'favorites'),
               ),
               ProfileShortcutCard(
                 icon: Icons.notifications_outlined,
                 color: Colors.amber.shade900,
-                title: 'Bildirim Ayarları',
-                subtitle: 'Sessiz saatler ve tercihler',
+                title: l10n.profileNotificationsTitle,
+                subtitle: l10n.profileNotificationsShortcutSubtitle,
                 onTap: () => setState(() => _selectedSection = 'notifications'),
               ),
               ProfileShortcutCard(
                 icon: Icons.security_rounded,
                 color: Colors.indigo,
-                title: 'Gizlilik ve Veri',
-                subtitle: 'Güvenlik ve KVKK',
+                title: l10n.profilePrivacyShortcutTitle,
+                subtitle: l10n.profilePrivacyShortcutSubtitle,
                 onTap: () => setState(() => _selectedSection = 'privacy'),
               ),
               ProfileShortcutCard(
                 icon: Icons.card_giftcard_rounded,
                 color: Colors.pink,
-                title: 'Arkadaşını Davet Et',
-                subtitle: 'Referans kodu ve ücretsiz boost',
+                title: l10n.inviteFriendsTitle,
+                subtitle: l10n.profileInviteSubtitle,
                 onTap: () => setState(() => _selectedSection = 'invite'),
               ),
             ],

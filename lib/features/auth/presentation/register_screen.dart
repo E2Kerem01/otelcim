@@ -89,9 +89,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           context: '_RegisterScreenState._submit.createInitialProfile',
         );
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(mapToFailure(error).message),
+              content: Text(mapToFailure(error, l10n).message),
             ),
           );
         }
@@ -99,8 +100,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: '_RegisterScreenState._submit');
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mapToFailure(error).message)),
+          SnackBar(content: Text(mapToFailure(error, l10n).message)),
         );
       }
     } finally {
@@ -161,7 +163,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final mediaWidth = MediaQuery.of(context).size.width;
     final isWide = mediaWidth > 840;
 
@@ -176,7 +178,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const Icon(Icons.card_travel_rounded, size: 48, color: otelcimBlue),
             const SizedBox(height: 8),
             Text(
-              l10n?.registerTitle ?? 'Kayıt Ol',
+              l10n.registerTitle,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -193,14 +195,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                labelText: l10n?.emailLabel ?? 'E-posta',
-                hintText: l10n?.emailHint ?? 'ornek@eposta.com',
+                labelText: l10n.emailLabel,
+                hintText: l10n.emailHint,
                 prefixIcon: const Icon(Icons.email_outlined),
               ),
               validator: (value) {
                 final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
                 if (value == null || value.trim().isEmpty || !emailRegex.hasMatch(value.trim())) {
-                  return l10n?.emailValidation ?? 'Geçerli bir e-posta girin';
+                  return l10n.emailValidation;
                 }
                 return null;
               },
@@ -210,12 +212,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _passwordController,
               obscureText: true,
               decoration: InputDecoration(
-                labelText: l10n?.passwordLabel ?? 'Şifre',
+                labelText: l10n.passwordLabel,
                 prefixIcon: const Icon(Icons.lock_outline),
               ),
               validator: (value) {
                 if (value == null || value.length < 8 || !RegExp(r'[0-9]').hasMatch(value)) {
-                  return l10n?.passwordValidation ?? 'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
+                  return l10n.passwordValidation;
                 }
                 return null;
               },
@@ -224,17 +226,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             TextFormField(
               controller: _fullNameController,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Ad Soyad',
-                hintText: 'Örn. Ayşe Yılmaz',
-                prefixIcon: Icon(Icons.person_outline),
+              decoration: InputDecoration(
+                labelText: l10n.coreFullNameLabel,
+                hintText: l10n.coreFullNameHint,
+                prefixIcon: const Icon(Icons.person_outline),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Ad soyad girin';
+                  return l10n.coreFullNameRequired;
                 }
                 if (value.trim().length < 3) {
-                  return 'Geçerli bir ad soyad girin';
+                  return l10n.coreFullNameValidation;
                 }
                 return null;
               },
@@ -244,15 +246,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               TextFormField(
                 controller: _hotelNameController,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                  labelText: 'Otel / İşletme Adı',
-                  hintText: 'Örn. Bodrum Bay Resort',
-                  prefixIcon: Icon(Icons.business_outlined),
+                decoration: InputDecoration(
+                  labelText: l10n.coreBusinessNameLabel,
+                  hintText: l10n.coreBusinessNameHint,
+                  prefixIcon: const Icon(Icons.business_outlined),
                 ),
                 validator: (value) {
                   if (_role != RegistrationRole.employer) return null;
                   if (value == null || value.trim().isEmpty) {
-                    return 'İşletme adını girin';
+                    return l10n.coreBusinessNameRequired;
                   }
                   return null;
                 },
@@ -263,8 +265,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _referralCodeController,
               textCapitalization: TextCapitalization.characters,
               decoration: InputDecoration(
-                labelText: l10n?.referralCodeLabel ?? 'Referans Kodu (opsiyonel)',
-                hintText: l10n?.referralCodeHint ?? 'Arkadaşının kodu',
+                labelText: l10n.referralCodeLabel,
+                hintText: l10n.referralCodeHint,
                 prefixIcon: const Icon(Icons.card_giftcard_outlined),
               ),
             ),
@@ -277,18 +279,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : Text(l10n?.registerButton ?? 'Kayıt Ol'),
+                  : Text(l10n.registerButton),
             ),
             const SizedBox(height: 24),
             Wrap(
               alignment: WrapAlignment.center,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                const Text('Zaten hesabın var mı?'),
+                Text(l10n.coreAlreadyHaveAccountPrompt),
                 TextButton(
                   onPressed: () => context.go('/login'),
                   child: Text(
-                    l10n?.loginButton ?? 'Giriş yap',
+                    l10n.loginButton,
                     style: const TextStyle(fontWeight: FontWeight.bold, color: otelcimBlue),
                   ),
                 ),
@@ -367,28 +369,29 @@ class _RoleSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Hesap türü',
+          l10n.coreAccountTypeLabel,
           style: theme.textTheme.labelLarge?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
         _RoleCard(
-          title: 'İş Arıyorum',
-          description: 'Otel ve turizm ilanlarını gör, başvur.',
+          title: l10n.roleJobSeeker,
+          description: l10n.coreRegisterJobSeekerShortDesc,
           icon: Icons.work_outline,
           isSelected: selected == RegistrationRole.jobseeker,
           onTap: () => onSelect(RegistrationRole.jobseeker),
         ),
         const SizedBox(height: 8),
         _RoleCard(
-          title: 'Personel Arıyorum',
-          description: 'İşletmen için ilan ver, aday bul.',
+          title: l10n.roleEmployer,
+          description: l10n.coreRegisterEmployerShortDesc,
           icon: Icons.business_outlined,
           isSelected: selected == RegistrationRole.employer,
           onTap: () => onSelect(RegistrationRole.employer),
@@ -396,7 +399,7 @@ class _RoleSelector extends StatelessWidget {
         if (showError) ...[
           const SizedBox(height: 8),
           Text(
-            'Lütfen bir hesap türü seçin',
+            l10n.corePleaseSelectAccountType,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.error,
             ),

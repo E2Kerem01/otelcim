@@ -260,7 +260,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       Icons.clear_rounded,
                                       size: 20,
                                     ),
-                                    tooltip: 'Aramayı Temizle',
+                                    tooltip: l10n.listingHomeClearSearch,
                                     constraints: const BoxConstraints(
                                       minWidth: 48,
                                       minHeight: 48,
@@ -432,7 +432,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     final category = ListingCategory.values[index - 1];
                     final isSelected = category == selectedCategory;
                     return ChoiceChip(
-                      label: Text(listingCategoryLabels[category]!),
+                      label: Text(listingCategoryLabelFor(l10n, category.name)),
                       selected: isSelected,
                       onSelected: (_) =>
                           ref

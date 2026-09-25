@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 enum CertificateType {
   hijyen,
   cankurtaran,
@@ -39,6 +41,16 @@ enum CertificateType {
   }
 }
 
+String certificateTypeLabel(AppLocalizations l10n, CertificateType type) {
+  return switch (type) {
+    CertificateType.hijyen => l10n.certificateTypeHygiene,
+    CertificateType.cankurtaran => l10n.certificateTypeCankurtaran,
+    CertificateType.ehliyet => l10n.certificateTypeEhliyet,
+    CertificateType.dil => l10n.certificateTypeDil,
+    CertificateType.diger => l10n.certificateTypeDiger,
+  };
+}
+
 enum CertificateStatus {
   pending,
   approved,
@@ -66,6 +78,14 @@ enum CertificateStatus {
         return CertificateStatus.pending;
     }
   }
+}
+
+String certificateStatusLabel(AppLocalizations l10n, CertificateStatus status) {
+  return switch (status) {
+    CertificateStatus.pending => l10n.certificateStatusPending,
+    CertificateStatus.approved => l10n.certificateStatusApproved,
+    CertificateStatus.rejected => l10n.certificateStatusRejected,
+  };
 }
 
 class Certificate {

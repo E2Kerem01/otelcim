@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/onboarding_slide_data.dart';
 import 'widgets/onboarding_slide.dart';
 
@@ -71,6 +72,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final slides = OnboardingSlideData.localizedSlides(l10n);
 
     return Scaffold(
       body: SafeArea(
@@ -88,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   TextButton(
                     onPressed: _skipOnboarding,
                     child: Text(
-                      'Geç',
+                      l10n.coreOnboardingSkip,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: theme.colorScheme.primary,
                       ),
@@ -103,10 +106,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: PageView.builder(
                 controller: _pageController,
                 onPageChanged: _onPageChanged,
-                itemCount: OnboardingSlideData.slides.length,
+                itemCount: slides.length,
                 itemBuilder: (context, index) {
                   return OnboardingSlide(
-                    slideData: OnboardingSlideData.slides[index],
+                    slideData: slides[index],
                   );
                 },
               ),
@@ -139,8 +142,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   child: Text(
                     _currentPage == _totalSlides - 1
-                        ? 'Başlayalım'
-                        : 'Sonraki',
+                        ? l10n.coreOnboardingGetStarted
+                        : l10n.coreOnboardingNext,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.w600,

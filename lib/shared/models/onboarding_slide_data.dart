@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// Onboarding slide data model
 ///
 /// Represents the content for a single onboarding slide including:
@@ -23,6 +25,25 @@ class OnboardingSlideData {
     required this.description,
     required this.icon,
   });
+
+  /// Localized list of onboarding slides
+  static List<OnboardingSlideData> localizedSlides(AppLocalizations l10n) => [
+        OnboardingSlideData(
+          title: l10n.coreOnboardingSlide1Title,
+          description: l10n.coreOnboardingSlide1Desc,
+          icon: Icons.search,
+        ),
+        OnboardingSlideData(
+          title: l10n.coreOnboardingSlide2Title,
+          description: l10n.coreOnboardingSlide2Desc,
+          icon: Icons.chat_bubble_outline,
+        ),
+        OnboardingSlideData(
+          title: l10n.coreOnboardingSlide3Title,
+          description: l10n.coreOnboardingSlide3Desc,
+          icon: Icons.work_outline,
+        ),
+      ];
 
   /// Static list of all onboarding slides
   ///

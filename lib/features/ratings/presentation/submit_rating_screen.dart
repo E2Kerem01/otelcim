@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
@@ -31,10 +32,11 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_stars == 0 || _submitting) {
       if (_stars == 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lütfen bir yıldız puanı seçin.')),
+          SnackBar(content: Text(l10n.listingRatingSelectStar)),
         );
       }
       return;
@@ -47,7 +49,7 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
     if (!mounted) return;
     if (uid == null || conversation == null || !conversation.hired) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bu görüşme değerlendirilemiyor.')),
+        SnackBar(content: Text(l10n.listingRatingUnavailable)),
       );
       return;
     }
@@ -71,7 +73,7 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
           );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Değerlendirmeniz kaydedildi.')),
+          SnackBar(content: Text(l10n.listingRatingSaved)),
         );
         context.pop();
       }
@@ -95,26 +97,27 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Deneyimini Değerlendir')),
+      appBar: AppBar(title: Text(l10n.listingRatingTitle)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            'Deneyimin nasıldı?',
+            l10n.listingExperienceQuestion,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
           const SizedBox(height: 8),
-          const Text('1 ile 5 arasında bir puan seçin.'),
+          Text(l10n.listingRatingPrompt),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {
               final value = index + 1;
               return IconButton(
-                tooltip: '$value yıldız',
+                tooltip: l10n.listingRatingStar(value),
                 iconSize: 42,
                 onPressed: () => setState(() => _stars = value),
                 icon: Icon(
@@ -129,9 +132,9 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
             controller: _reviewController,
             maxLength: 500,
             maxLines: 6,
-            decoration: const InputDecoration(
-              labelText: 'Yorum (isteğe bağlı)',
-              hintText: 'Deneyiminizi kısaca paylaşın',
+            decoration: InputDecoration(
+              labelText: l10n.listingRatingCommentLabel,
+              hintText: l10n.listingRatingCommentHint,
               alignLabelWithHint: true,
             ),
           ),
@@ -144,7 +147,7 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.send_rounded),
-            label: Text(_submitting ? 'Gönderiliyor...' : 'Değerlendirmeyi Gönder'),
+            label: Text(_submitting ? l10n.listingRatingSubmitting : l10n.listingRatingSubmit),
           ),
         ],
       ),

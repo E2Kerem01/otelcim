@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
@@ -17,6 +18,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
   const PrivacySettingsScreen({super.key});
 
   Future<void> _exportUserData(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) return;
 
@@ -64,25 +66,26 @@ class PrivacySettingsScreen extends ConsumerWidget {
 
       await SharePlus.instance.share(ShareParams(
         text: jsonString,
-        subject: 'Otelcim_Kisisel_Verilerim.json',
+        subject: l10n.privacyDataExportFileName,
       ));
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kişisel verileriniz hazırlandı.')),
+          SnackBar(content: Text(l10n.privacyExportSuccessMessage)),
         );
       }
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'PrivacySettingsScreen._exportUserData');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mapToFailure(error).message)),
+          SnackBar(content: Text(mapToFailure(error, l10n).message)),
         );
       }
     }
   }
 
   void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final passwordController = TextEditingController();
     final confirmTextController = TextEditingController();
     bool isDeleting = false;
@@ -95,13 +98,13 @@ class PrivacySettingsScreen extends ConsumerWidget {
           builder: (context, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Row(
+              title: Row(
                 children: [
                   Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Hesabınızı Silin',
+                      l10n.deleteAccountTitle,
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
                     ),
                   ),
@@ -112,34 +115,36 @@ class PrivacySettingsScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'BU İŞLEM GERİ ALINAMAZ!\n\nHesabınız, oluşturduğunuz tüm ilanlar, mesaj geçmişiniz, öne çıkarma ve doğrulama kayıtlarınız kalıcı olarak silinecektir.',
+                    Text(
+                      l10n.deleteAccountWarning,
                       style: TextStyle(fontSize: 13, height: 1.4, color: Colors.black87),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Doğrulama için hesap şifrenizi girin:',
+                    Text(
+                      l10n.deleteAccountPasswordPrompt,
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: passwordController,
                       obscureText: true,
-                      decoration: const InputDecoration(
-                        hintText: 'Şifreniz',
+                      decoration: InputDecoration(
+                        hintText: l10n.passwordHint,
                         isDense: true,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Onaylamak için aşağıya "SİL" yazın:',
+                    Text(
+                      l10n.deleteAccountConfirmPrompt(
+                        l10n.deleteAccountConfirmationWord,
+                      ),
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: confirmTextController,
-                      decoration: const InputDecoration(
-                        hintText: 'SİL',
+                      decoration: InputDecoration(
+                        hintText: l10n.deleteAccountConfirmationWord,
                         isDense: true,
                       ),
                     ),
@@ -149,7 +154,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
               actions: [
                 TextButton(
                   onPressed: isDeleting ? null : () => Navigator.of(dialogContext).pop(),
-                  child: const Text('İptal'),
+                  child: Text(l10n.cancelButton),
                 ),
                 ElevatedButton(
                   onPressed: isDeleting
@@ -160,14 +165,20 @@ class PrivacySettingsScreen extends ConsumerWidget {
 
                           if (password.isEmpty) {
                             ScaffoldMessenger.of(dialogContext).showSnackBar(
-                              const SnackBar(content: Text('Lütfen şifrenizi girin.')),
+                              SnackBar(content: Text(l10n.deleteAccountPasswordRequired)),
                             );
                             return;
                           }
 
-                          if (confirmText != 'SİL') {
+                          if (confirmText != l10n.deleteAccountConfirmationWord) {
                             ScaffoldMessenger.of(dialogContext).showSnackBar(
-                              const SnackBar(content: Text('Lütfen onay kutusuna büyük harflerle "SİL" yazın.')),
+                              SnackBar(
+                                content: Text(
+                                  l10n.deleteAccountConfirmationRequired(
+                                    l10n.deleteAccountConfirmationWord,
+                                  ),
+                                ),
+                              ),
                             );
                             return;
                           }
@@ -180,9 +191,9 @@ class PrivacySettingsScreen extends ConsumerWidget {
                             if (dialogContext.mounted) {
                               Navigator.of(dialogContext).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   backgroundColor: Colors.red,
-                                  content: Text('Hesabınız ve tüm verileriniz kalıcı olarak silindi.'),
+                                  content: Text(l10n.deleteAccountSuccess),
                                 ),
                               );
                               context.go('/login');
@@ -196,7 +207,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
                             setDialogState(() => isDeleting = false);
                             if (dialogContext.mounted) {
                               ScaffoldMessenger.of(dialogContext).showSnackBar(
-                              SnackBar(content: Text(mapToFailure(error).message)),
+                              SnackBar(content: Text(mapToFailure(error, l10n).message)),
                               );
                             }
                           }
@@ -211,7 +222,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : const Text('Hesabımı Kalıcı Olarak Sil'),
+                      : Text(l10n.deleteAccountPermanentAction),
                 ),
               ],
             );
@@ -223,9 +234,10 @@ class PrivacySettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gizlilik ve Veri Ayarları'),
+        title: Text(l10n.privacySettingsTitle),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -243,15 +255,15 @@ class PrivacySettingsScreen extends ConsumerWidget {
                     children: [
                       Icon(Icons.shield_outlined, color: Theme.of(context).primaryColor),
                       const SizedBox(width: 10),
-                      const Text(
-                        'Kişisel Verileriniz ve KVKK',
+                      Text(
+                        l10n.privacyDataSummaryTitle,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'KVKK (6698 Sayılı Kanun) kapsamında Otelcim uygulamasında profil bilgileriniz, yayınladığınız ilanlar ve mesaj geçmişiniz güvenle saklanır. Verileriniz izniniz olmadan üçüncü taraflarla paylaşılmaz.',
+                    l10n.privacyDataSummaryDescription,
                     style: TextStyle(fontSize: 13, height: 1.4, color: Colors.grey.shade800),
                   ),
                 ],
@@ -265,8 +277,8 @@ class PrivacySettingsScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.description_outlined),
-              title: const Text('KVKK ve Gizlilik Politikası'),
-              subtitle: const Text('Veri işleme ilkeleri ve yasal haklarınız'),
+              title: Text(l10n.privacyPolicyTitle),
+              subtitle: Text(l10n.privacyPolicySubtitle),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => context.push('/profile/privacy/policy'),
             ),
@@ -278,8 +290,8 @@ class PrivacySettingsScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: Icon(Icons.download_rounded, color: Theme.of(context).primaryColor),
-              title: const Text('Verilerimi İndir / Dışa Aktar'),
-              subtitle: const Text('Profil, ilan ve mesaj bilgilerinizi JSON olarak aktarın'),
+              title: Text(l10n.privacyExportTitle),
+              subtitle: Text(l10n.privacyExportSubtitle),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => _exportUserData(context, ref),
             ),
@@ -304,14 +316,14 @@ class PrivacySettingsScreen extends ConsumerWidget {
                       const Icon(Icons.delete_forever_rounded, color: Colors.red, size: 24),
                       const SizedBox(width: 10),
                       Text(
-                        'Hesabımı Kalıcı Olarak Sil',
+                        l10n.deleteAccountSectionTitle,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red.shade900),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Hesabınızı sildiğinizde profiliniz, oluşturduğunuz tüm ilanlar, mesajlaşmalarınız ve sistem kayıtlarınız kalıcı olarak silinir.',
+                    l10n.deleteAccountSectionDescription,
                     style: TextStyle(fontSize: 12, color: Colors.red.shade900),
                   ),
                   const SizedBox(height: 14),
@@ -320,7 +332,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => _showDeleteAccountDialog(context, ref),
                       icon: const Icon(Icons.delete_forever_rounded, size: 18),
-                      label: const Text('Hesabımı Sil'),
+                      label: Text(l10n.deleteAccountAction),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/error/error_mapper.dart';
 import '../../../../shared/error/error_reporter.dart';
 import '../../../../shared/providers/profile_provider.dart';
@@ -43,6 +44,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
 
   /// Shows a bottom sheet with camera and gallery options
   Future<void> _showPhotoSourceOptions() async {
+    final l10n = AppLocalizations.of(context)!;
     await showModalBottomSheet<void>(
       context: context,
       builder: (context) => SafeArea(
@@ -50,7 +52,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Kamera'),
+              title: Text(l10n.photoCameraAction),
               onTap: () {
                 Navigator.pop(context);
                 unawaited(_pickImage(ImageSource.camera));
@@ -58,7 +60,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Galeri'),
+              title: Text(l10n.photoGalleryAction),
               onTap: () {
                 Navigator.pop(context);
                 unawaited(_pickImage(ImageSource.gallery));
@@ -67,8 +69,8 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
             if (widget.photoUrl != null)
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Fotoğrafı Kaldır',
-                    style: TextStyle(color: Colors.red)),
+                title: Text(l10n.photoRemoveAction,
+                    style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   unawaited(_removePhoto());
@@ -82,6 +84,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
 
   /// Picks an image from the specified source and uploads it
   Future<void> _pickImage(ImageSource source) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: source,
@@ -98,7 +101,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -107,6 +110,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
 
   /// Uploads the selected photo to Firebase Storage
   Future<void> _uploadPhoto(XFile imageFile) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isUploading = true;
     });
@@ -123,8 +127,8 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
       widget.onPhotoUploaded(photoUrl);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profil fotoğrafı güncellendi'),
+        SnackBar(
+          content: Text(l10n.photoUpdatedMessage),
           backgroundColor: Colors.green,
         ),
       );
@@ -133,7 +137,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );
@@ -148,6 +152,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
 
   /// Removes the current profile photo
   Future<void> _removePhoto() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isUploading = true;
     });
@@ -161,8 +166,8 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
       widget.onPhotoUploaded(''); // Empty string indicates no photo
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profil fotoğrafı kaldırıldı'),
+        SnackBar(
+          content: Text(l10n.photoRemovedMessage),
           backgroundColor: Colors.green,
         ),
       );
@@ -171,7 +176,7 @@ class _ProfilePhotoPickerState extends ConsumerState<ProfilePhotoPicker> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mapToFailure(error).message),
+          content: Text(mapToFailure(error, l10n).message),
           backgroundColor: Colors.red,
         ),
       );

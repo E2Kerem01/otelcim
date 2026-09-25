@@ -18,7 +18,6 @@ class RegionsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final listings = ref.watch(activeRegionListingsProvider);
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +46,7 @@ class RegionsScreen extends ConsumerWidget {
               clipBehavior: Clip.antiAlias,
               child: ListTile(
                 leading: CircleAvatar(child: Text('${index + 1}')),
-                title: Text(isEnglish ? region.nameEn : region.nameTr),
+                title: Text(localizedTourismRegionName(l10n, region)),
                 subtitle: Text(l10n.activeListingCount(count)),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push('/regions/${region.id}'),

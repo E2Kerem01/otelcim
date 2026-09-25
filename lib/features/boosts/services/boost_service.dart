@@ -54,11 +54,11 @@ class BoostService {
       final error = body['error'] as Map<String, dynamic>?;
       if (response.statusCode == 200) {
         if (error != null) {
-          throw Exception(error['message'] as String? ?? 'Sunucu doğrulaması başarısız oldu.');
+          throw Exception(error['message'] as String? ?? 'boost_purchase_verification_failed');
         }
         debugPrint('Boost purchase verified and processed via Cloud Function.');
       } else {
-        final msg = error?['message'] as String? ?? 'HTTP ${response.statusCode}: Boost doğrulama hatası.';
+        final msg = error?['message'] as String? ?? 'boost_purchase_verification_failed';
         throw Exception(msg);
       }
     } catch (error, stackTrace) {

@@ -25,6 +25,7 @@ class _NotificationSettingsScreenState
     bool value,
     UserProfile profile,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final currentPrefs = Map<String, bool>.from(
       profile.notificationPreferences,
     );
@@ -45,8 +46,8 @@ class _NotificationSettingsScreenState
       }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Bildirim tercihleri güncellendi.'),
+          SnackBar(
+            content: Text(l10n.notificationsUpdatedMessage),
             duration: Duration(seconds: 2),
           ),
         );
@@ -55,7 +56,7 @@ class _NotificationSettingsScreenState
       logError(error, stackTrace, context: 'NotificationSettingsScreen._updatePreference');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mapToFailure(error).message)),
+          SnackBar(content: Text(mapToFailure(error, l10n).message)),
         );
       }
     } finally {
@@ -69,6 +70,7 @@ class _NotificationSettingsScreenState
     bool isStart,
     UserProfile profile,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final currentString = isStart
         ? profile.quietHoursStart
         : profile.quietHoursEnd;
@@ -91,10 +93,10 @@ class _NotificationSettingsScreenState
       context: context,
       initialTime: initialTime,
       helpText: isStart
-          ? 'Sessiz Saat Başlangıcı Seçin'
-          : 'Sessiz Saat Bitişi Seçin',
-      confirmText: 'SEÇ',
-      cancelText: 'İPTAL',
+          ? l10n.quietHoursStartPickerTitle
+          : l10n.quietHoursEndPickerTitle,
+      confirmText: l10n.selectSlot,
+      cancelText: l10n.cancelButton,
     );
 
     if (picked != null) {
@@ -115,8 +117,8 @@ class _NotificationSettingsScreenState
             .updateUserProfile(updatedProfile);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Sessiz saatler güncellendi.'),
+            SnackBar(
+              content: Text(l10n.quietHoursUpdatedMessage),
               duration: Duration(seconds: 2),
             ),
           );
@@ -126,7 +128,7 @@ class _NotificationSettingsScreenState
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(mapToFailure(error).message),
+              content: Text(mapToFailure(error, l10n).message),
             ),
           );
         }
@@ -139,6 +141,7 @@ class _NotificationSettingsScreenState
   }
 
   Future<void> _clearQuietHours(UserProfile profile) async {
+    final l10n = AppLocalizations.of(context)!;
     final updatedProfile = profile.copyWith(
       quietHoursStart: null,
       quietHoursEnd: null,
@@ -150,8 +153,8 @@ class _NotificationSettingsScreenState
       await ref.read(profileServiceProvider).updateUserProfile(updatedProfile);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sessiz saatler temizlendi.'),
+          SnackBar(
+            content: Text(l10n.quietHoursClearedMessage),
             duration: Duration(seconds: 2),
           ),
         );
@@ -161,7 +164,7 @@ class _NotificationSettingsScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(mapToFailure(error).message)));
+        ).showSnackBar(SnackBar(content: Text(mapToFailure(error, l10n).message)));
       }
     } finally {
       if (mounted) {
@@ -172,16 +175,17 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(currentUserProfileProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Bildirim Ayarları')),
+      appBar: AppBar(title: Text(l10n.notificationsTitle)),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Hata: $err')),
+        error: (err, stack) => Center(child: Text(l10n.notificationsLoadError)),
         data: (profile) {
           if (profile == null) {
-            return const Center(child: Text('Kullanıcı profili bulunamadı.'));
+            return Center(child: Text(l10n.profileNotFoundError));
           }
 
           final prefs = profile.notificationPreferences;
@@ -215,9 +219,9 @@ class _NotificationSettingsScreenState
                           size: 28,
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'Almak istediğiniz bildirim türlerini ve sessiz saatlerinizi buradan yönetebilirsiniz.',
+                            l10n.notificationsDescription,
                             style: TextStyle(
                               fontSize: 13,
                               height: 1.4,
@@ -233,7 +237,7 @@ class _NotificationSettingsScreenState
 
                 // Category Title
                 Text(
-                  'Bildirim Tercihleri',
+                  l10n.notificationPreferencesTitle,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -254,15 +258,15 @@ class _NotificationSettingsScreenState
                           Icons.chat_bubble_outline_rounded,
                           color: Theme.of(context).primaryColor,
                         ),
-                        title: const Text(
-                          'Mesajlar',
+                        title: Text(
+                          l10n.notificationMessagesTitle,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
-                        subtitle: const Text(
-                          'Yeni sohbet mesajları için bildirim al',
+                        subtitle: Text(
+                          l10n.notificationMessagesSubtitle,
                         ),
                         value: messagesEnabled,
                         onChanged: (val) =>
@@ -274,15 +278,15 @@ class _NotificationSettingsScreenState
                           Icons.notifications_active_outlined,
                           color: Theme.of(context).primaryColor,
                         ),
-                        title: const Text(
-                          'İlan Bildirimleri',
+                        title: Text(
+                          l10n.notificationListingsTitle,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
-                        subtitle: const Text(
-                          'İlgilendiğiniz kategorilerde yeni ilanlar eklendiğinde haberiniz olsun',
+                        subtitle: Text(
+                          l10n.notificationListingsSubtitle,
                         ),
                         value: listingAlertsEnabled,
                         onChanged: (val) =>
@@ -294,15 +298,15 @@ class _NotificationSettingsScreenState
                           Icons.calendar_month_outlined,
                           color: Theme.of(context).primaryColor,
                         ),
-                        title: const Text(
-                          'Sezonluk Hatırlatıcılar',
+                        title: Text(
+                          l10n.notificationSeasonalTitle,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
-                        subtitle: const Text(
-                          'Sezonluk iş fırsatları ve öne çıkan dönemler hakkında bilgilendirmeler',
+                        subtitle: Text(
+                          l10n.notificationSeasonalSubtitle,
                         ),
                         value: seasonalRemindersEnabled,
                         onChanged: (val) => _updatePreference(
@@ -318,18 +322,14 @@ class _NotificationSettingsScreenState
                           color: Colors.deepOrange.shade700,
                         ),
                         title: Text(
-                          AppLocalizations.of(
-                            context,
-                          )!.urgentNotificationsTitle,
+                          l10n.urgentNotificationsTitle,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
                         subtitle: Text(
-                          AppLocalizations.of(
-                            context,
-                          )!.urgentNotificationsDescription,
+                          l10n.urgentNotificationsDescription,
                         ),
                         value: urgentListingsEnabled,
                         onChanged: (val) =>
@@ -341,15 +341,15 @@ class _NotificationSettingsScreenState
                           Icons.campaign_outlined,
                           color: Theme.of(context).primaryColor,
                         ),
-                        title: const Text(
-                          'Pazarlama ve Duyurular',
+                        title: Text(
+                          l10n.notificationMarketingTitle,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
-                        subtitle: const Text(
-                          'Kampanyalar, yenilikler ve özel teklifler hakkında bilgi al',
+                        subtitle: Text(
+                          l10n.notificationMarketingSubtitle,
                         ),
                         value: marketingEnabled,
                         onChanged: (val) =>
@@ -363,7 +363,7 @@ class _NotificationSettingsScreenState
 
                 // Quiet Hours Section Title
                 Text(
-                  'Sessiz Saatler (Quiet Hours)',
+                  l10n.quietHoursSectionTitle,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -371,8 +371,8 @@ class _NotificationSettingsScreenState
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Belirlediğiniz zaman diliminde rahatsız edilmemek için sessiz saatler ayarlayabilirsiniz.',
+                Text(
+                  l10n.quietHoursDescription,
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 10),
@@ -389,9 +389,9 @@ class _NotificationSettingsScreenState
                           Icons.bedtime_outlined,
                           color: Colors.indigo,
                         ),
-                        title: const Text('Sessiz Saat Başlangıcı'),
+                        title: Text(l10n.quietHoursStartTitle),
                         subtitle: Text(
-                          profile.quietHoursStart ?? 'Belirtilmedi',
+                          profile.quietHoursStart ?? l10n.notSpecified,
                           style: TextStyle(
                             fontWeight: profile.quietHoursStart != null
                                 ? FontWeight.bold
@@ -410,9 +410,9 @@ class _NotificationSettingsScreenState
                           Icons.wb_sunny_outlined,
                           color: Colors.orange,
                         ),
-                        title: const Text('Sessiz Saat Bitişi'),
+                        title: Text(l10n.quietHoursEndTitle),
                         subtitle: Text(
-                          profile.quietHoursEnd ?? 'Belirtilmedi',
+                          profile.quietHoursEnd ?? l10n.notSpecified,
                           style: TextStyle(
                             fontWeight: profile.quietHoursEnd != null
                                 ? FontWeight.bold
@@ -432,8 +432,8 @@ class _NotificationSettingsScreenState
                             Icons.clear_rounded,
                             color: Colors.red,
                           ),
-                          title: const Text(
-                            'Sessiz Saatleri Temizle',
+                          title: Text(
+                            l10n.clearQuietHoursAction,
                             style: TextStyle(color: Colors.red),
                           ),
                           onTap: () => _clearQuietHours(profile),

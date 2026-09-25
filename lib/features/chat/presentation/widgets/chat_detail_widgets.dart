@@ -22,7 +22,9 @@ class ChatAppBarTitle extends StatelessWidget {
   final UserProfile? otherProfile;
 
   @override
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profile = otherProfile;
     final isOtherAvailableImmediately = profile != null &&
         profile.userType != 'employer' &&
@@ -32,7 +34,7 @@ class ChatAppBarTitle extends StatelessWidget {
 
     return Row(
       children: [
-        const Text('Sohbet'),
+        Text(l10n.coreChatTitle),
         if (isOtherAvailableImmediately) ...[
           const SizedBox(width: 8),
           Container(
@@ -41,14 +43,14 @@ class ChatAppBarTitle extends StatelessWidget {
               color: const Color(0xFF15803D),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.bolt_rounded, size: 14, color: Colors.white),
-                SizedBox(width: 2),
+                const Icon(Icons.bolt_rounded, size: 14, color: Colors.white),
+                const SizedBox(width: 2),
                 Text(
-                  'Hemen Başlayabilir',
-                  style: TextStyle(
+                  l10n.availableImmediatelyBadge,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -64,7 +66,7 @@ class ChatAppBarTitle extends StatelessWidget {
             onTap: () => VideoPlayerDialog.show(
               context,
               videoUrl: profile.introVideoUrl!,
-              title: '${profile.displayName ?? "Tanıtım"} - Video',
+              title: '${profile.displayName ?? l10n.coreIntroLabel} - ${l10n.coreVideoLabel}',
             ),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -72,14 +74,14 @@ class ChatAppBarTitle extends StatelessWidget {
                 color: const Color(0xFF1D4ED8),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.play_circle_fill_rounded, size: 14, color: Colors.white),
-                  SizedBox(width: 3),
+                  const Icon(Icons.play_circle_fill_rounded, size: 14, color: Colors.white),
+                  const SizedBox(width: 3),
                   Text(
-                    'Tanıtım Videosu',
-                    style: TextStyle(
+                    l10n.coreIntroVideoTitle,
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -104,6 +106,7 @@ class ChatHiredBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Material(
       color: Theme.of(context).colorScheme.primaryContainer,
       child: Padding(
@@ -118,8 +121,8 @@ class ChatHiredBanner extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
-                  child: Text('Bu görüşmede işe alım gerçekleşti.'),
+                Expanded(
+                  child: Text(l10n.coreHiredBannerMessage),
                 ),
               ],
             ),
@@ -129,7 +132,7 @@ class ChatHiredBanner extends StatelessWidget {
                 onPressed: () async {
                   await context.push('/chat/$conversationId/rate');
                 },
-                child: const Text('Deneyimini Değerlendir'),
+                child: Text(l10n.coreRateExperienceAction),
               ),
             ),
           ],
@@ -196,7 +199,8 @@ class InterviewSlotBanner extends ConsumerWidget {
               const SizedBox(height: 8),
               if (isConfirmed && latest.selectedSlot != null)
                 Text(
-                  'Randevu Zamanı: ${DateFormat('dd MMMM yyyy - HH:mm').format(latest.selectedSlot!)}',
+                  l10n?.coreAppointmentTimeLabel(DateFormat('dd MMMM yyyy - HH:mm').format(latest.selectedSlot!)) ??
+                      'Randevu Zamanı: ${DateFormat('dd MMMM yyyy - HH:mm').format(latest.selectedSlot!)}',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -209,9 +213,9 @@ class InterviewSlotBanner extends ConsumerWidget {
                   style: TextStyle(fontSize: 13, color: Colors.blue.shade900),
                 )
               else ...[
-                const Text(
-                  'Lütfen uygun olduğunuz mülakat saatini seçin:',
-                  style: TextStyle(fontSize: 13),
+                Text(
+                  l10n?.coreSelectInterviewSlotInstruction ?? 'Lütfen uygun olduğunuz mülakat saatini seçin:',
+                  style: const TextStyle(fontSize: 13),
                 ),
                 const SizedBox(height: 8),
                 Wrap(
@@ -226,8 +230,8 @@ class InterviewSlotBanner extends ConsumerWidget {
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text(l10n?.interviewConfirmedTitle ?? 'Mülakat Saatini Onayla'),
-                            content: Text('$label zamanını onaylıyor musunuz?'),
+                            title: Text(l10n?.coreConfirmSlotTitle ?? l10n?.interviewConfirmedTitle ?? 'Mülakat Saatini Onayla'),
+                            content: Text(l10n?.coreConfirmSlotPrompt(label) ?? '$label zamanını onaylıyor musunuz?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
@@ -235,7 +239,7 @@ class InterviewSlotBanner extends ConsumerWidget {
                               ),
                               FilledButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: const Text('Onayla'),
+                                child: Text(l10n?.coreConfirmAction ?? 'Onayla'),
                               ),
                             ],
                           ),
@@ -273,6 +277,7 @@ class ChatMessageList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return StreamBuilder<List<Message>>(
       stream: ref.watch(chatServiceProvider).watchMessages(conversationId),
       builder: (context, snapshot) {
@@ -281,7 +286,7 @@ class ChatMessageList extends ConsumerWidget {
         }
         final messages = snapshot.data ?? [];
         if (messages.isEmpty) {
-          return const Center(child: Text('Henüz mesaj yok, ilk mesajı gönderin.'));
+          return Center(child: Text(l10n?.coreNoMessagesSendFirst ?? 'Henüz mesaj yok, ilk mesajı gönderin.'));
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -325,6 +330,7 @@ class ChatMessageComposer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: const BoxDecoration(
@@ -336,16 +342,16 @@ class ChatMessageComposer extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'Mesajınızı yazın...',
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: InputDecoration(
+                hintText: l10n?.coreTypeMessageHint ?? 'Mesajınızı yazın...',
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
               onSubmitted: (_) => onSend(),
             ),
           ),
           const SizedBox(width: 8),
           IconButton(
-            tooltip: 'Gönder',
+            tooltip: l10n?.coreSendMessageTooltip ?? 'Gönder',
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: Icon(Icons.send_rounded, color: Theme.of(context).primaryColor),
             onPressed: onSend,

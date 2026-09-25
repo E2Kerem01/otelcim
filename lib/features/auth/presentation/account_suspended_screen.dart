@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../admin/services/admin_service.dart';
@@ -24,6 +25,7 @@ class AccountSuspendedScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final uid = ref.watch(authStateProvider).value?.uid;
     final profileAsync =
         uid == null ? null : ref.watch(_restrictedProfileProvider(uid));
@@ -44,27 +46,27 @@ class AccountSuspendedScreen extends ConsumerWidget {
                         data: (profile) {
                           if (profile?.isBanned ?? false) {
                             return _Message(
-                              title: 'Hesabınız Yasaklandı',
+                              title: l10n.coreAccountBannedTitle,
                               reason: profile?.banReason,
                             );
                           }
                           final end = profile?.suspensionEnd;
                           return _Message(
-                            title: 'Hesabınız Askıya Alındı',
+                            title: l10n.coreAccountSuspendedTitle,
                             reason: profile?.suspensionReason,
                             extra: end != null
-                                ? 'Askı bitiş: ${DateFormat('dd.MM.yyyy HH:mm').format(end)}'
+                                ? l10n.coreSuspensionEndAt(DateFormat('dd.MM.yyyy HH:mm').format(end))
                                 : null,
                           );
                         },
                         loading: () => const CircularProgressIndicator(),
                         error: (_, _) =>
-                            const _Message(title: 'Hesabınıza erişim kısıtlandı'),
+                            _Message(title: l10n.coreAccountRestrictedTitle),
                       ) ??
-                      const _Message(title: 'Hesabınıza erişim kısıtlandı'),
+                      _Message(title: l10n.coreAccountRestrictedTitle),
                   const SizedBox(height: 28),
                   Text(
-                    'Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin.',
+                    l10n.coreAccountSuspendedContactSupport,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
                   ),
@@ -72,7 +74,7 @@ class AccountSuspendedScreen extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: () => ref.read(authServiceProvider).signOut(),
                     icon: const Icon(Icons.logout_rounded),
-                    label: const Text('Çıkış Yap'),
+                    label: Text(l10n.signOut),
                   ),
                 ],
               ),

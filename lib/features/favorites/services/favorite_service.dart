@@ -54,7 +54,7 @@ class FavoriteService {
               id: id,
               posterId: '',
               posterName: '',
-              title: 'Bu ilan artık mevcut değil',
+              title: '',
               description: '',
               category: 'diger',
               location: '',

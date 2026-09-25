@@ -56,13 +56,13 @@ class UrgentListingService {
       if (response.statusCode == 200) {
         if (error != null) {
           throw Exception(
-            error['message'] as String? ?? 'Sunucu doğrulaması başarısız oldu.',
+            error['message'] as String? ?? 'urgent_listing_verification_failed',
           );
         }
         debugPrint('Urgent listing purchase verified and processed.');
       } else {
         final msg = error?['message'] as String? ??
-            'HTTP ${response.statusCode}: Acil ilan doğrulama hatası.';
+            'urgent_listing_verification_failed';
         throw Exception(msg);
       }
     } catch (error, stackTrace) {

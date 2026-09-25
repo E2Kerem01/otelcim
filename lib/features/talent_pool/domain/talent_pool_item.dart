@@ -36,7 +36,7 @@ class TalentPoolItem {
     return TalentPoolItem(
       id: doc.id,
       candidateId: data['candidateId'] as String? ?? doc.id,
-      candidateName: data['candidateName'] as String? ?? 'Aday',
+      candidateName: data['candidateName'] as String? ?? '',
       note: data['note'] as String?,
       conversationId: data['conversationId'] as String?,
       addedAt: timestamp?.toDate(),

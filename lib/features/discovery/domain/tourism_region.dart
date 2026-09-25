@@ -1,3 +1,5 @@
+import '../../../l10n/app_localizations.dart';
+
 class TourismRegion {
   const TourismRegion({
     required this.id,
@@ -13,6 +15,21 @@ class TourismRegion {
   final double latitude;
   final double longitude;
 }
+
+String localizedTourismRegionName(AppLocalizations l10n, TourismRegion region) =>
+    switch (region.id) {
+      'antalya' => l10n.listingRegionAntalya,
+      'bodrum' => l10n.listingRegionBodrum,
+      'fethiye' => l10n.listingRegionFethiye,
+      'marmaris' => l10n.listingRegionMarmaris,
+      'kusadasi' => l10n.listingRegionKusadasi,
+      'kapadokya' => l10n.listingRegionCappadocia,
+      'istanbul' => l10n.listingRegionIstanbul,
+      'izmir' => l10n.listingRegionIzmir,
+      'trabzon' => l10n.listingRegionTrabzon,
+      'cesme' => l10n.listingRegionCesme,
+      _ => region.nameTr,
+    };
 
 const tourismRegions = <TourismRegion>[
   TourismRegion(

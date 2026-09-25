@@ -6,8 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/constants/categories.dart';
-import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/report.dart';
@@ -21,6 +19,7 @@ import '../../chat/presentation/widgets/message_template_sheet.dart';
 import '../../favorites/services/favorite_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../domain/listing_model.dart';
+import 'listing_filter_labels.dart';
 import 'whatsapp_utils.dart';
 import 'widgets/listing_detail_widgets.dart';
 
@@ -49,13 +48,12 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
   bool _revealContactInfo = false;
 
   Future<void> _messageOwner(Listing listing) async {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mesaj göndermek için lütfen giriş yapın.'),
-          ),
+          SnackBar(content: Text(l10n.listingLoginToMessage)),
         );
         unawaited(context.push('/login'));
       }
@@ -65,9 +63,7 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
     if (listing.posterId == user.uid) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kendi ilanınıza mesaj gönderemezsiniz.'),
-          ),
+          SnackBar(content: Text(l10n.listingOwnMessageError)),
         );
       }
       return;
@@ -112,12 +108,13 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
   Future<void> _openWhatsApp(Listing listing) async {
     final phone = parsePhoneNumber(listing.contactInfo);
     if (phone == null) return;
-    final localeCode = Localizations.localeOf(context).languageCode;
     final url = buildWhatsAppUrl(
       phone: phone,
-      listingTitle: listing.title,
-      posterName: listing.posterName,
-      languageCode: localeCode,
+      message: AppLocalizations.of(context)!.listingWhatsAppMessage(
+        AppLocalizations.of(context)!.appName,
+        listing.title,
+        listing.posterName,
+      ),
     );
     final uri = Uri.parse(url);
     try {
@@ -143,18 +140,19 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
   }
 
   Future<void> _shareListing(Listing listing) async {
+    final l10n = AppLocalizations.of(context)!;
     final text =
         '''
 ${listing.title}
 
 📍 ${listing.location}
 💰 ${listing.salary}
-📂 ${listingCategoryLabel(listing.category)}
+📂 ${listingCategoryLabelFor(l10n, listing.category)}
 
 ${listing.description}
 
-İlan sahibi: ${listing.posterName}
-İletişim bilgilerini görmek ve başvurmak için Otelcim'de giriş yapın.
+${l10n.listingShareOwner(listing.posterName)}
+${l10n.listingShareLoginPrompt(l10n.appName)}
 
 🔗 https://otelcim.vercel.app/#/listing/${listing.id}
 ''';
@@ -194,6 +192,7 @@ ${listing.description}
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final listingAsync = ref.watch(_listingProvider(widget.listingId));
     final myUid = ref.watch(authStateProvider).value?.uid;
     final isFavorite = myUid == null
@@ -206,13 +205,13 @@ ${listing.description}
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('İlan Detayı'),
+        title: Text(l10n.listingDetailTitle),
         actions: [
           AnimatedScale(
             scale: isFavorite ? 1.15 : 1,
             duration: const Duration(milliseconds: 180),
             child: IconButton(
-              tooltip: isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle',
+              tooltip: isFavorite ? l10n.removeFromFavorites : l10n.addToFavorites,
               onPressed: () {
                 if (myUid == null) {
                   unawaited(context.push('/login'));
@@ -258,7 +257,7 @@ ${listing.description}
                       children: [
                         Icon(Icons.flag_outlined, color: Colors.red),
                         SizedBox(width: 12),
-                        Text('İlanı Bildir'),
+                        Text(l10n.listingReportAction),
                       ],
                     ),
                   ),
@@ -272,7 +271,7 @@ ${listing.description}
       body: listingAsync.when(
         data: (listing) {
           if (listing == null) {
-            return const Center(child: Text('İlan bulunamadı.'));
+            return Center(child: Text(l10n.listingNotFound));
           }
           final isBoostedActive = BoostBadge.isBoostActive(listing);
           final experience = ExperienceLevel.fromName(listing.experienceLevel);
@@ -415,7 +414,7 @@ ${listing.description}
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Hata: $error')),
+        error: (error, stack) => Center(child: Text(l10n.listingGenericError('$error'))),
       ),
       bottomNavigationBar: MediaQuery.sizeOf(context).width >= 800
           ? null
@@ -448,8 +447,8 @@ ${listing.description}
                             icon: const Icon(Icons.rocket_launch_rounded),
                             label: Text(
                               isBoostedActive
-                                  ? 'Öne Çıkarma'
-                                  : 'İlanı Öne Çıkar',
+                                  ? l10n.listingBoostActionShort
+                                  : l10n.listingBoostAction,
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.amber.shade700,
@@ -494,7 +493,7 @@ ${listing.description}
                               ? null
                               : () => _messageOwner(listing),
                           icon: const Icon(Icons.message_outlined),
-                          label: const Text('Mesaj Gönder'),
+                          label: Text(l10n.listingMessageSend),
                         ),
                       ),
                       if (hasWhatsApp) ...[

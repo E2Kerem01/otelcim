@@ -4,10 +4,10 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/constants/categories.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/listing_service.dart';
+import 'listing_filter_labels.dart';
 
 class ListingQrPosterScreen extends ConsumerWidget {
   const ListingQrPosterScreen({super.key, required this.listingId});
@@ -17,11 +17,12 @@ class ListingQrPosterScreen extends ConsumerWidget {
   String getPublicListingUrl(String id) => 'https://otelcim.app/listing/$id';
 
   Future<void> _sharePoster(BuildContext context, String title, String posterName, String id) async {
+    final l10n = AppLocalizations.of(context)!;
     final publicUrl = getPublicListingUrl(id);
-    final text = '$title ($posterName)\n\nİlanı görüntülemek için tıklayın:\n$publicUrl';
+    final text = l10n.listingQrPosterShareMessage(title, posterName, publicUrl);
     try {
       await SharePlus.instance.share(
-        ShareParams(text: text, subject: '$title - QR Poster'),
+        ShareParams(text: text, subject: l10n.listingQrPosterShareSubject(title)),
       );
     } catch (error, stackTrace) {
       logError(error, stackTrace, context: 'ListingQrPosterScreen._sharePoster');
@@ -45,7 +46,7 @@ class ListingQrPosterScreen extends ConsumerWidget {
       body: listingAsync.when(
         data: (listing) {
           if (listing == null) {
-            return const Center(child: Text('İlan bulunamadı.'));
+            return Center(child: Text(l10n.listingNotFound));
           }
 
           final publicUrl = getPublicListingUrl(listing.id);
@@ -77,7 +78,7 @@ class ListingQrPosterScreen extends ConsumerWidget {
                           Icon(Icons.hotel_rounded, color: Theme.of(context).primaryColor, size: 28),
                           const SizedBox(width: 8),
                           Text(
-                            'OTELCİM İŞ İLANI',
+                            l10n.listingQrPosterHeadline(l10n.appName),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -116,7 +117,7 @@ class ListingQrPosterScreen extends ConsumerWidget {
                         children: [
                           Chip(
                             avatar: const Icon(Icons.category_outlined, size: 16),
-                            label: Text(listingCategoryLabel(listing.category)),
+                            label: Text(listingCategoryLabelFor(l10n, listing.category)),
                           ),
                           Chip(
                             avatar: const Icon(Icons.location_on_outlined, size: 16),
@@ -185,7 +186,7 @@ class ListingQrPosterScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Hata: $err')),
+        error: (err, stack) => Center(child: Text(l10n.listingGenericError('$err'))),
       ),
     );
   }

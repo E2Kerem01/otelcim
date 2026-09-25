@@ -81,8 +81,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _triggerRateLimitLockout();
     }
     if (mounted) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mapToFailure(e).message)),
+        SnackBar(content: Text(mapToFailure(e, l10n).message)),
       );
     }
   }
@@ -279,8 +280,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _phoneCodeSent = true;
       });
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('SMS doğrulama kodu gönderildi.')),
+          SnackBar(content: Text(l10n?.coreSmsCodeSentMessage ?? 'SMS doğrulama kodu gönderildi.')),
         );
       }
     } catch (error, stackTrace) {
@@ -296,8 +298,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (_verificationId == null) return;
     final code = _smsCodeController.text.trim();
     if (code.length != 6 || !RegExp(r'^[0-9]{6}$').hasMatch(code)) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen 6 haneli geçerli doğrulama kodunu girin.')),
+        SnackBar(content: Text(l10n?.smsCodeValidation ?? 'Lütfen 6 haneli geçerli doğrulama kodunu girin.')),
       );
       return;
     }
@@ -319,7 +322,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final mediaWidth = MediaQuery.of(context).size.width;
     final isWide = mediaWidth > 840;
 
@@ -333,7 +336,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const Icon(Icons.card_travel_rounded, size: 48, color: otelcimBlue),
           const SizedBox(height: 8),
           Text(
-            l10n?.appName ?? 'Otelcim',
+            l10n.appName,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -346,12 +349,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             segments: [
               ButtonSegment<int>(
                 value: 0,
-                label: Text(l10n?.loginWithEmail ?? 'E-posta ile Giriş'),
+                label: Text(l10n.loginWithEmail),
                 icon: const Icon(Icons.email_outlined, size: 18),
               ),
               ButtonSegment<int>(
                 value: 1,
-                label: Text(l10n?.loginWithPhone ?? 'Telefon ile Giriş'),
+                label: Text(l10n.loginWithPhone),
                 icon: const Icon(Icons.phone_android_outlined, size: 18),
               ),
             ],
@@ -387,8 +390,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      l10n?.tooManyAttempts(_lockoutSeconds) ??
-                          'Çok fazla başarısız deneme. Lütfen $_lockoutSeconds saniye bekleyin.',
+                      l10n.tooManyAttempts(_lockoutSeconds),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onErrorContainer,
                         fontWeight: FontWeight.w600,
@@ -419,7 +421,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 activeColor: otelcimBlue,
               ),
               Text(
-                l10n?.rememberMe ?? 'Beni Hatırla',
+                l10n.rememberMe,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -432,13 +434,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                l10n?.noAccountPrompt.split('?').first ?? 'Hesabın yok mu',
+                l10n.coreNoAccountPrompt,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               TextButton(
                 onPressed: () => context.go('/register'),
                 child: Text(
-                  l10n?.registerButton ?? 'Kayıt Ol',
+                  l10n.registerButton,
                   style: const TextStyle(fontWeight: FontWeight.bold, color: otelcimBlue),
                 ),
               ),
@@ -498,7 +500,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ));
   }
 
-  Widget _buildEmailForm(AppLocalizations? l10n) {
+  Widget _buildEmailForm(AppLocalizations l10n) {
     return Form(
       key: _emailFormKey,
       child: Column(
@@ -508,14 +510,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              labelText: l10n?.emailLabel ?? 'E-posta',
-              hintText: l10n?.emailHint ?? 'ornek@eposta.com',
+              labelText: l10n.emailLabel,
+              hintText: l10n.emailHint,
               prefixIcon: const Icon(Icons.email_outlined),
             ),
             validator: (value) {
               final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
               if (value == null || value.trim().isEmpty || !emailRegex.hasMatch(value.trim())) {
-                return l10n?.emailValidation ?? 'Geçerli bir e-posta girin';
+                return l10n.emailValidation;
               }
               return null;
             },
@@ -525,12 +527,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             controller: _passwordController,
             obscureText: true,
             decoration: InputDecoration(
-              labelText: l10n?.passwordLabel ?? 'Şifre',
+              labelText: l10n.passwordLabel,
               prefixIcon: const Icon(Icons.lock_outline),
             ),
             validator: (value) {
               if (value == null || value.length < 8 || !RegExp(r'[0-9]').hasMatch(value)) {
-                return l10n?.passwordValidation ?? 'Şifre en az 8 karakter ve en az 1 rakam içermelidir';
+                return l10n.passwordValidation;
               }
               return null;
             },
@@ -544,20 +546,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
-                : Text(l10n?.loginButton ?? 'Giriş Yap'),
+                : Text(l10n.loginButton),
           ),
           TextButton(
             onPressed: (_loading || _lockoutSeconds > 0)
                 ? null
                 : _showPasswordResetDialog,
-            child: Text(l10n?.forgotPasswordLink ?? 'Şifremi unuttum?'),
+            child: Text(l10n.forgotPasswordLink),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPhoneForm(AppLocalizations? l10n) {
+  Widget _buildPhoneForm(AppLocalizations l10n) {
     return Form(
       key: _phoneFormKey,
       child: Column(
@@ -568,19 +570,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             keyboardType: TextInputType.phone,
             enabled: !_phoneCodeSent && !_loading && _lockoutSeconds == 0,
             decoration: InputDecoration(
-              labelText: l10n?.phoneLabel ?? 'Telefon Numarası',
-              hintText: l10n?.phoneHint ?? '5XX XXX XX XX',
+              labelText: l10n.phoneLabel,
+              hintText: l10n.phoneHint,
               prefixIcon: const Icon(Icons.phone_outlined),
               prefixText: '+90 ',
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return l10n?.phoneValidation ?? 'Geçerli bir telefon numarası girin';
+                return l10n.phoneValidation;
               }
               final normalized = _normalizePhoneNumber(value);
               final phoneRegex = RegExp(r'^\+90[0-9]{10}$');
               if (!phoneRegex.hasMatch(normalized)) {
-                return l10n?.phoneValidation ?? 'Geçerli bir telefon numarası girin (ör: 5551234567)';
+                return l10n.phoneValidation;
               }
               return null;
             },
@@ -592,8 +594,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               keyboardType: TextInputType.number,
               maxLength: 6,
               decoration: InputDecoration(
-                labelText: l10n?.smsCodeLabel ?? 'SMS Doğrulama Kodu',
-                hintText: l10n?.smsCodeHint ?? '6 haneli kod',
+                labelText: l10n.smsCodeLabel,
+                hintText: l10n.smsCodeHint,
                 prefixIcon: const Icon(Icons.pin_outlined),
                 counterText: '',
               ),
@@ -609,7 +611,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : Text(l10n?.sendSmsCode ?? 'Kod Gönder'),
+                  : Text(l10n.sendSmsCode),
             )
           else ...[
             ElevatedButton(
@@ -620,7 +622,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : Text(l10n?.verifySmsCode ?? 'Doğrula ve Giriş Yap'),
+                  : Text(l10n.verifySmsCode),
             ),
             const SizedBox(height: 8),
             TextButton(
@@ -632,7 +634,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         _smsCodeController.clear();
                       });
                     },
-              child: const Text('Numarayı Değiştir / Tekrar Kod Gönder'),
+              child: Text(l10n.coreChangePhoneOrResendCode),
             ),
           ],
         ],

@@ -8,31 +8,21 @@ import '../../../shared/services/locale_service.dart';
 
 /// Lets the user pick the app language. The choice is persisted
 /// (SharedPreferences via [LocaleController]) and applied app-wide through
-/// [MaterialApp.locale]. Strings not yet translated for the chosen language
-/// fall back to Turkish.
+/// [MaterialApp.locale].
 class LanguageSettingsScreen extends ConsumerWidget {
   const LanguageSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final current = ref.watch(localeControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.languageSettingsTitle ?? 'Uygulama Dili'),
+        title: Text(l10n.languageSettingsTitle),
       ),
       body: ListView(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              l10n?.languageSettingsSubtitle ??
-                  'Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe '
-                      'gösterilir.',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-            ),
-          ),
           RadioGroup<String>(
             groupValue: current.languageCode,
             onChanged: (code) {

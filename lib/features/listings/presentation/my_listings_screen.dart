@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../shared/constants/categories.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
@@ -18,6 +18,7 @@ class MyListingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final uid = ref.watch(authStateProvider).value?.uid;
     if (uid == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -26,16 +27,16 @@ class MyListingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('İlanlarım'),
+        title: Text(l10n.listingMyListingsTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.library_add_outlined),
-            tooltip: 'Toplu İlan Ver',
+            tooltip: l10n.batchCreateButton,
             onPressed: () => context.push('/batch-create-listing'),
           ),
           IconButton(
             icon: const Icon(Icons.rocket_launch_outlined),
-            tooltip: 'Öne Çıkarılanlarım',
+            tooltip: l10n.listingMyBoostsTitle,
             onPressed: () => context.push('/my-boosts'),
           ),
         ],
@@ -43,7 +44,7 @@ class MyListingsScreen extends ConsumerWidget {
       body: listingsAsync.when(
         data: (listings) {
           if (listings.isEmpty) {
-            return const Center(child: Text('Henüz ilan vermediniz.'));
+            return Center(child: Text(l10n.listingMyListingsEmpty));
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -88,10 +89,10 @@ class MyListingsScreen extends ConsumerWidget {
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
-                      '${listingCategoryLabel(listing.category)} · ${switch (listing.status) {
-                        ListingStatus.active => 'Aktif',
-                        ListingStatus.closed => 'Kapalı',
-                        ListingStatus.removed => 'Yönetici tarafından kaldırıldı',
+                      '${listingCategoryLabelFor(l10n, listing.category)} · ${switch (listing.status) {
+                        ListingStatus.active => l10n.listingStatusActive,
+                        ListingStatus.closed => l10n.listingStatusClosed,
+                        ListingStatus.removed => l10n.listingStatusRemoved,
                       }}',
                     ),
                   ),
@@ -104,18 +105,18 @@ class MyListingsScreen extends ConsumerWidget {
                             Icons.rocket_launch_rounded,
                             color: isBoostedActive ? Colors.amber.shade800 : Theme.of(context).primaryColor,
                           ),
-                          tooltip: isBoostedActive ? 'Öne Çıkarıldı (Yönet)' : 'Öne Çıkar',
+                          tooltip: isBoostedActive ? l10n.listingBoostManage : l10n.listingBoostActionShort,
                           onPressed: () => context.push('/listing/${listing.id}/boost'),
                         ),
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
-                        tooltip: 'Düzenle',
+                        tooltip: l10n.listingEditAction,
                         onPressed: () => context.push('/listing/${listing.id}/edit'),
                       ),
                       if (listing.status == ListingStatus.active)
                         TextButton(
                           onPressed: () => ref.read(listingServiceProvider).closeListing(listing.id),
-                          child: const Text('Kapat'),
+                          child: Text(l10n.listingCloseAction),
                         ),
                     ],
                   ),
@@ -126,7 +127,7 @@ class MyListingsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Hata: $error')),
+        error: (error, stack) => Center(child: Text(l10n.listingGenericError('$error'))),
       ),
     );
   }

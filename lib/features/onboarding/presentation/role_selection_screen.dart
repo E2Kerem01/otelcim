@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/providers/onboarding_provider.dart';
 
 enum UserRole {
@@ -46,8 +47,9 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
   /// Confirm role selection and finish onboarding
   void _confirmRoleSelection() {
     if (_selectedRole == null) {
+      final l10n = AppLocalizations.of(context);
       setState(() {
-        _errorMessage = 'Lütfen bir rol seçin';
+        _errorMessage = l10n?.roleSelectionError ?? 'Lütfen bir rol seçin';
       });
       return;
     }
@@ -60,6 +62,7 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -72,7 +75,7 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
 
               // Title
               Text(
-                'Otelcim\'e Hoş Geldiniz!',
+                l10n.onboardingWelcome,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -84,7 +87,7 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
 
               // Subtitle
               Text(
-                'Size en uygun deneyimi sunabilmemiz için lütfen rolünüzü seçin:',
+                l10n.onboardingRolePrompt,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -101,9 +104,8 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
                     // Job Seeker option
                     _RoleCard(
                       role: UserRole.jobSeeker,
-                      title: 'İş Arıyorum',
-                      description:
-                          'Otel ve turizm sektöründe iş arıyorum. İlanları görmek ve başvurmak istiyorum.',
+                      title: l10n.roleJobSeeker,
+                      description: l10n.roleJobSeekerDescription,
                       icon: Icons.work_outline,
                       isSelected: _selectedRole == UserRole.jobSeeker,
                       onTap: () => _selectRole(UserRole.jobSeeker),
@@ -114,9 +116,8 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
                     // Employer option
                     _RoleCard(
                       role: UserRole.employer,
-                      title: 'Personel Arıyorum',
-                      description:
-                          'Otelim veya işletmem için çalışan arıyorum. İlan vermek istiyorum.',
+                      title: l10n.roleEmployer,
+                      description: l10n.roleEmployerDescription,
                       icon: Icons.business_outlined,
                       isSelected: _selectedRole == UserRole.employer,
                       onTap: () => _selectRole(UserRole.employer),
@@ -172,12 +173,12 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
                     ),
                   ),
                   child: Text(
-                          'Devam Et',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    l10n.continueButton,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
 

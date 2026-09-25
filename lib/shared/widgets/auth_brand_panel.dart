@@ -11,7 +11,7 @@ class AuthBrandPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(40),
       decoration: const BoxDecoration(
@@ -32,7 +32,7 @@ class AuthBrandPanel extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            l10n?.brandTitle ?? "Türkiye'nin Otel & Turizm İş Platformu",
+            l10n.brandTitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
@@ -42,8 +42,7 @@ class AuthBrandPanel extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            l10n?.brandDescription ??
-                'Otel ve turizm sektöründe hayalinizdeki işi veya personeli hızlıca bulun.',
+            l10n.brandDescription,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.9),

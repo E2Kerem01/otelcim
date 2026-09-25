@@ -106,10 +106,11 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   }
 
   Future<void> _pickNewImages() async {
+    final l10n = AppLocalizations.of(context)!;
     final totalCount = _existingImageUrls.length + _newImageFiles.length;
     if (totalCount >= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('En fazla 5 fotoğraf ekleyebilirsiniz.')),
+        SnackBar(content: Text(l10n.listingMaxPhotos(5))),
       );
       return;
     }
@@ -225,7 +226,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('İlan güncellendi.')));
+        ).showSnackBar(SnackBar(content: Text(l10n.listingChangesSaved)));
         Navigator.of(context).pop();
       }
     } catch (error, stackTrace) {
@@ -269,17 +270,17 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     final currentUid = ref.watch(authStateProvider).value?.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('İlanı Düzenle')),
+      appBar: AppBar(title: Text(l10n.listingEditTitle)),
       body: listingAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Hata: $error')),
+        error: (error, stack) => Center(child: Text(l10n.listingGenericError('$error'))),
         data: (listing) {
           if (listing == null) {
-            return const Center(child: Text('İlan bulunamadı.'));
+            return Center(child: Text(l10n.listingNotFound));
           }
           if (currentUid == null || listing.posterId != currentUid) {
             return const Center(
-              child: Text('Bu ilanı düzenleme yetkiniz yok.'),
+              child: Text(l10n.listingEditForbidden),
             );
           }
 
@@ -331,8 +332,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                   children: [
                                     Text(
                                       isBoostedActive
-                                          ? 'İlan Öne Çıkarıldı'
-                                          : 'İlanınızı Öne Çıkarın',
+                                          ? l10n.listingBoostedNotice
+                                          : l10n.listingBoostPrompt,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15,
@@ -350,8 +351,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   isBoostedActive
-                                      ? 'Bitiş Tarihi: ${listing.boostExpiresAt!.day}.${listing.boostExpiresAt!.month}.${listing.boostExpiresAt!.year}'
-                                      : 'İlanınızı en üste taşıyarak daha fazla adaya ulaşın.',
+                                      ? l10n.listingBoostExpiryNotice('${listing.boostExpiresAt!.day}.${listing.boostExpiresAt!.month}.${listing.boostExpiresAt!.year}')
+                                      : l10n.listingBoostPromptBody,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.black87,
@@ -369,7 +370,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                               foregroundColor: Colors.white,
                               visualDensity: VisualDensity.compact,
                             ),
-                            child: Text(isBoostedActive ? 'Uzat' : 'Öne Çıkar'),
+                            child: Text(isBoostedActive ? l10n.listingBoostExtend : l10n.listingBoostActionShort),
                           ),
                         ],
                       ),
@@ -380,10 +381,10 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Durum: ${switch (listing.status) {
-                          ListingStatus.active => 'Aktif',
-                          ListingStatus.closed => 'Kapalı',
-                          ListingStatus.removed => 'Yönetici tarafından kaldırıldı',
+                        '${l10n.listingStatusActive}: ${switch (listing.status) {
+                          ListingStatus.active => l10n.listingStatusActive,
+                          ListingStatus.closed => l10n.listingStatusClosed,
+                          ListingStatus.removed => l10n.listingStatusRemoved,
                         }}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -394,15 +395,15 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                               : () => _toggleStatus(listing),
                           child: Text(
                             listing.status == ListingStatus.active
-                                ? 'Kapat'
-                                : 'Tekrar Aktifleştir',
+                                ? l10n.listingCloseAction
+                                : l10n.listingReactivateAction,
                           ),
                         ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Kategori',
+                  Text(
+                    l10n.listingCategoryLabel,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
@@ -413,12 +414,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  const ListingFieldLabel('İlan Başlığı', isRequired: true),
+                  ListingFieldLabel(l10n.listingTitleLabel, isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _titleController,
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Başlık gerekli'
+                        ? l10n.listingTitleRequired
                         : null,
                   ),
                   const SizedBox(height: 16),
@@ -427,12 +428,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'İlan Fotoğrafları',
+                      Text(
+                        l10n.listingPhotosLabel,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '$totalImageCount/5',
+                        l10n.listingPhotoCount(totalImageCount),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade600,
@@ -469,7 +470,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Fotoğraf Ekle',
+                                    l10n.listingAddPhoto,
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: Colors.grey,
@@ -569,12 +570,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                   ),
 
                   const SizedBox(height: 16),
-                  const ListingFieldLabel('Konum (İl / İlçe)', isRequired: true),
+                  ListingFieldLabel(l10n.listingLocationLabel, isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _locationController,
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Konum gerekli'
+                        ? l10n.listingLocationRequired
                         : null,
                   ),
                   const SizedBox(height: 16),
@@ -592,21 +593,21 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  const ListingFieldLabel('Şehir', isRequired: true),
+                  ListingFieldLabel(l10n.listingCityLabel, isRequired: true),
                   const SizedBox(height: 8),
                   TourismCityDropdown(
                     value: _selectedCity,
                     onChanged: (value) => setState(() => _selectedCity = value),
                     validator: (value) =>
-                        value == null ? 'Şehir seçmeniz gerekiyor' : null,
+                        value == null ? l10n.listingCityRequired : null,
                   ),
                   const SizedBox(height: 16),
-                  const ListingFieldLabel('Maaş', isRequired: true),
+                  ListingFieldLabel(l10n.listingSalaryLabel, isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _salaryController,
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Maaş bilgisi gerekli'
+                        ? l10n.listingSalaryRequired
                         : null,
                   ),
                   const SizedBox(height: 12),
@@ -615,8 +616,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     maxController: _maxSalaryController,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Çalışma tipi',
+                  Text(
+                    l10n.listingEmploymentTypeLabel,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
@@ -699,28 +700,28 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     maxLines: 2,
                   ),
                   const SizedBox(height: 16),
-                  const ListingFieldLabel('İletişim', isRequired: true),
+                  ListingFieldLabel(l10n.listingContactLabel, isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _contactController,
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'İletişim bilgisi gerekli'
+                        ? l10n.listingContactRequired
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  const ListingFieldLabel('İlan Açıklaması', isRequired: true),
+                  ListingFieldLabel(l10n.listingDescriptionLabel, isRequired: true),
                   const SizedBox(height: 8),
                   ListingTextFormField(
                     controller: _descController,
                     maxLines: 4,
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Açıklama gerekli'
+                        ? l10n.listingDescriptionRequired
                         : null,
                   ),
                   const SizedBox(height: 24),
                   ListingSubmitButton(
                     isSubmitting: _submitting,
-                    label: 'Değişiklikleri Kaydet',
+                    label: l10n.listingSaveChanges,
                     onPressed: () => _submit(listing),
                   ),
                 ],

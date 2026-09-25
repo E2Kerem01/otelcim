@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../l10n/app_localizations.dart';
+
 enum ReportTargetType { listing, user }
 
 enum ReportReason {
@@ -8,6 +10,21 @@ enum ReportReason {
   inappropriate,
   misleading,
   other;
+
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case ReportReason.scam:
+        return l10n.coreReportReasonScam;
+      case ReportReason.spam:
+        return l10n.coreReportReasonSpam;
+      case ReportReason.inappropriate:
+        return l10n.coreReportReasonInappropriate;
+      case ReportReason.misleading:
+        return l10n.coreReportReasonMisleading;
+      case ReportReason.other:
+        return l10n.coreReportReasonOther;
+    }
+  }
 
   String get label {
     switch (this) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../talent_pool/domain/talent_pool_item.dart';
 import '../../talent_pool/services/talent_pool_service.dart';
@@ -17,17 +18,19 @@ class TalentPoolScreen extends ConsumerWidget {
     String employerId,
     TalentPoolItem item,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+    final candidateName = item.candidateName.isNotEmpty
+        ? item.candidateName
+        : l10n.profileUserFallback;
     unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Adayı Havuzdan Çıkar'),
-        content: Text(
-          '${item.candidateName} kişisini yetenek havuzunuzdan çıkarmak istediğinize emin misiniz?',
-        ),
+        title: Text(l10n.removeFromPoolConfirmTitle),
+        content: Text(l10n.removeFromTalentPoolConfirmation(candidateName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Vazgeç'),
+          child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () async {
@@ -38,13 +41,13 @@ class TalentPoolScreen extends ConsumerWidget {
                   );
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Aday yetenek havuzundan çıkarıldı.'),
+                    SnackBar(
+                    content: Text(l10n.removedFromTalentPool),
                   ),
                 );
               }
             },
-            child: const Text('Çıkar'),
+            child: Text(l10n.talentPoolRemoveAction),
           ),
         ],
       ),
@@ -53,11 +56,12 @@ class TalentPoolScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(authStateProvider).value;
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Yetenek Havuzu')),
-        body: const Center(child: Text('Giriş yapmanız gerekiyor.')),
+        appBar: AppBar(title: Text(l10n.talentPoolTitle)),
+        body: Center(child: Text(l10n.loginRequiredMessage)),
       );
     }
 
@@ -65,7 +69,7 @@ class TalentPoolScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Yetenek Havuzu'),
+        title: Text(l10n.talentPoolTitle),
       ),
       body: talentPoolAsync.when(
         data: (items) {
@@ -82,8 +86,8 @@ class TalentPoolScreen extends ConsumerWidget {
                       color: Colors.grey.shade400,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Henüz Yetenek Havuzunuzda Aday Yok',
+                    Text(
+                      l10n.emptyTalentPool,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -91,7 +95,7 @@ class TalentPoolScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'İş arayanlarla yaptığınız sohbetlerde detay menüsünden "Yetenek Havuzuna Ekle" seçeneği ile adayları buraya kaydedebilirsiniz.',
+                      l10n.emptyTalentPoolSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                     ),
@@ -107,9 +111,10 @@ class TalentPoolScreen extends ConsumerWidget {
             separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final item = items[index];
-              final initial = item.candidateName.isNotEmpty
-                  ? item.candidateName[0].toUpperCase()
-                  : '?';
+              final candidateName = item.candidateName.isNotEmpty
+                  ? item.candidateName
+                  : l10n.profileUserFallback;
+              final initial = candidateName[0].toUpperCase();
               final formattedDate = item.addedAt != null
                   ? '${item.addedAt!.day.toString().padLeft(2, '0')}.${item.addedAt!.month.toString().padLeft(2, '0')}.${item.addedAt!.year}'
                   : '';
@@ -144,7 +149,7 @@ class TalentPoolScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.candidateName,
+                                  candidateName,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -152,7 +157,7 @@ class TalentPoolScreen extends ConsumerWidget {
                                 ),
                                 if (formattedDate.isNotEmpty)
                                   Text(
-                                    'Eklenme: $formattedDate',
+                                    l10n.talentPoolAddedDate(formattedDate),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey.shade600,
@@ -166,7 +171,7 @@ class TalentPoolScreen extends ConsumerWidget {
                               Icons.delete_outline_rounded,
                               color: Colors.redAccent,
                             ),
-                            tooltip: 'Havuzdan Çıkar',
+                            tooltip: l10n.talentPoolRemoveAction,
                             onPressed: () => _confirmRemove(
                               context,
                               ref,
@@ -221,7 +226,7 @@ class TalentPoolScreen extends ConsumerWidget {
                               Icons.chat_bubble_outline_rounded,
                               size: 16,
                             ),
-                            label: const Text('Sohbete Dön'),
+                            label: Text(l10n.backToChat),
                           ),
                         ),
                       ],
@@ -234,7 +239,7 @@ class TalentPoolScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(
-          child: Text('Yetenek havuzu yüklenirken hata oluştu: $err'),
+          child: Text(l10n.talentPoolLoadError),
         ),
       ),
     );

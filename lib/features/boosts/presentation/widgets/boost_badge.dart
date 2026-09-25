@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../listings/domain/listing_model.dart';
 
 class BoostBadge extends StatelessWidget {
@@ -27,7 +28,9 @@ class BoostBadge extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final displayText = customText ?? (isCompact ? 'Öne Çıkan' : 'Öne Çıkarılan İlan');
+    final l10n = AppLocalizations.of(context)!;
+    final displayText = customText ??
+        (isCompact ? l10n.listingBoostBadgeCompact : l10n.listingBoostBadgeFull);
 
     if (isCompact) {
       return Container(

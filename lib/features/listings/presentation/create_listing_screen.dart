@@ -70,9 +70,10 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   }
 
   Future<void> _pickImages() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedImageFiles.length >= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('En fazla 5 fotoğraf ekleyebilirsiniz.')),
+        SnackBar(content: Text(l10n.listingMaxPhotos(5))),
       );
       return;
     }
@@ -100,13 +101,13 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen kırmızı ile işaretli alanları doldurun.')),
+        SnackBar(content: Text(l10n.listingRequiredFields)),
       );
       return;
     }
-    final l10n = AppLocalizations.of(context)!;
     if (isSeasonalContract(_season) &&
         (_contractStartDate == null || _contractEndDate == null)) {
       ScaffoldMessenger.of(
@@ -127,7 +128,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('İlan yayınlamak için lütfen giriş yapın.'),
+            content: Text(l10n.listingPublishLoginRequired),
           ),
         );
       }
@@ -228,7 +229,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
             content: Text(
               imageUploadFailed
                   ? imageUploadFailureMessage!
-                  : 'İlanınız başarıyla yayınlandı!',
+                  : l10n.listingCreatedSuccess,
             ),
             backgroundColor: imageUploadFailed ? Colors.orange.shade800 : null,
           ),
@@ -309,26 +310,24 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     if (authUser == null) {
       return _buildAccessDenied(
         context,
-        // TODO(l10n): add listingCreateLoginRequired (TR: "İlan vermek için lütfen giriş yapın.", EN: "Please sign in to create a listing.").
-        'İlan vermek için lütfen giriş yapın.',
+        l10n.listingCreateLoginRequired,
       );
     }
     if (profileAsync.isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Yeni İlan Aç')),
+        appBar: AppBar(title: Text(l10n.listingCreateTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     if (!canCreateListing) {
       return _buildAccessDenied(
         context,
-        // TODO(l10n): add listingCreateEmployerOnly (TR: "İlan vermek yalnızca işveren hesapları için kullanılabilir.", EN: "Only employer accounts can create listings.").
-        'İlan vermek yalnızca işveren hesapları için kullanılabilir.',
+        l10n.listingEmployerOnly,
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Yeni İlan Aç')),
+      appBar: AppBar(title: Text(l10n.listingCreateTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -353,23 +352,23 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                     Icons.library_add_rounded,
                     color: Theme.of(context).primaryColor,
                   ),
-                  title: const Text(
-                    'Birden fazla pozisyon mu gireceksiniz?',
+                  title: Text(
+                    l10n.listingBatchPromptTitle,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
-                  subtitle: const Text(
-                    'Tek otel bilgisiyle toplu ilan açabilirsiniz.',
+                  subtitle: Text(
+                    l10n.listingBatchPromptBody,
                     style: TextStyle(fontSize: 12),
                   ),
                   trailing: TextButton(
                     onPressed: () => context.push('/batch-create-listing'),
-                    child: const Text('Toplu İlan Ver'),
+                    child: Text(l10n.batchCreateButton),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Kategori',
+              Text(
+                l10n.listingCategoryLabel,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -380,13 +379,13 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              const ListingFieldLabel('İlan Başlığı', isRequired: true),
+              ListingFieldLabel(l10n.listingTitleLabel, isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _titleController,
-                hintText: 'Örn. Bodrum Resort Resepsiyon Görevlisi',
+                hintText: l10n.listingTitleHint,
                 validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Başlık gerekli' : null,
+                    (v == null || v.trim().isEmpty) ? l10n.listingTitleRequired : null,
               ),
               const SizedBox(height: 16),
 
@@ -394,12 +393,12 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'İlan Fotoğrafları',
+                  Text(
+                    l10n.listingPhotosLabel,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    '${_selectedImageFiles.length}/5',
+                    l10n.listingPhotoCount(_selectedImageFiles.length),
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                 ],
@@ -425,7 +424,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: Colors.grey.shade300),
                           ),
-                          child: const Column(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
@@ -434,7 +433,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                'Fotoğraf Ekle',
+                                l10n.listingAddPhoto,
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: Colors.grey,
@@ -487,13 +486,13 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               ),
 
               const SizedBox(height: 16),
-              const ListingFieldLabel('Konum (İl / İlçe)', isRequired: true),
+              ListingFieldLabel(l10n.listingLocationLabel, isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _locationController,
-                hintText: 'Örn. Muğla / Bodrum',
+                hintText: l10n.listingLocationHint,
                 validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Konum gerekli' : null,
+                    (v == null || v.trim().isEmpty) ? l10n.listingLocationRequired : null,
               ),
               const SizedBox(height: 8),
               ListTile(
@@ -559,10 +558,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                                       .valueOrNull
                                       ?.hasUsedFreeUrgentListing ??
                                   false)
-                              ? 'Ücretsiz acil ilan hakkınızı kullandınız. '
-                                    'Yayınladıktan sonra bu ilanı acil yapmak '
-                                    'için tek seferlik ücret alınır.'
-                              : 'İlk acil ilanınız ücretsiz.',
+                              ? l10n.listingUrgentFreeUsedBody
+                              : l10n.listingUrgentFreeFirst,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.deepOrange.shade900,
@@ -573,22 +570,22 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   ),
                 ),
               const SizedBox(height: 16),
-              const ListingFieldLabel('Şehir', isRequired: true),
+              ListingFieldLabel(l10n.listingCityLabel, isRequired: true),
               const SizedBox(height: 8),
               TourismCityDropdown(
                 value: _selectedCity,
                 onChanged: (value) => setState(() => _selectedCity = value),
                 validator: (value) =>
-                    value == null ? 'Şehir seçmeniz gerekiyor' : null,
+                    value == null ? l10n.listingCityRequired : null,
               ),
               const SizedBox(height: 16),
-              const ListingFieldLabel('Maaş', isRequired: true),
+              ListingFieldLabel(l10n.listingSalaryLabel, isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _salaryController,
-                hintText: 'Örn. 35.000₺ + yemek',
+                hintText: l10n.listingSalaryHint,
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Maaş bilgisi gerekli'
+                    ? l10n.listingSalaryRequired
                     : null,
               ),
               const SizedBox(height: 12),
@@ -597,8 +594,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 maxController: _maxSalaryController,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Çalışma tipi',
+              Text(
+                l10n.listingEmploymentTypeLabel,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -673,29 +670,29 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 maxLines: 2,
               ),
               const SizedBox(height: 16),
-              const ListingFieldLabel('İletişim', isRequired: true),
+              ListingFieldLabel(l10n.listingContactLabel, isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _contactController,
-                hintText: 'Örn. 0555 123 4567',
+                hintText: l10n.listingContactHint,
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'İletişim bilgisi gerekli'
+                    ? l10n.listingContactRequired
                     : null,
               ),
               const SizedBox(height: 16),
-              const ListingFieldLabel('İlan Açıklaması', isRequired: true),
+              ListingFieldLabel(l10n.listingDescriptionLabel, isRequired: true),
               const SizedBox(height: 8),
               ListingTextFormField(
                 controller: _descController,
                 maxLines: 4,
-                hintText: 'İlanınızla ilgili tüm detayları açıklayın...',
+                hintText: l10n.listingDescriptionHint,
                 validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Açıklama gerekli' : null,
+                    (v == null || v.trim().isEmpty) ? l10n.listingDescriptionRequired : null,
               ),
               const SizedBox(height: 24),
               ListingSubmitButton(
                 isSubmitting: _submitting,
-                label: 'İlanı Yayınla',
+                label: l10n.listingPublishAction,
                 onPressed: _submit,
               ),
             ],
@@ -707,7 +704,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
 
   Widget _buildAccessDenied(BuildContext context, String message) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Yeni İlan Aç')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.listingCreateTitle)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -720,8 +717,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
               const SizedBox(height: 20),
               FilledButton(
                 onPressed: () => context.go('/'),
-                // TODO(l10n): add returnHome (TR: "Ana Sayfaya Dön", EN: "Return home").
-                child: const Text('Ana Sayfaya Dön'),
+                child: Text(AppLocalizations.of(context)!.listingReturnHome),
               ),
             ],
           ),

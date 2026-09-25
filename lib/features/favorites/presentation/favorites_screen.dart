@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../shared/constants/categories.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../boosts/presentation/widgets/boost_badge.dart';
 import '../../listings/domain/listing_model.dart';
+import '../../listings/presentation/listing_filter_labels.dart';
 import '../services/favorite_service.dart';
 
 class FavoritesScreen extends ConsumerWidget {
@@ -14,11 +15,12 @@ class FavoritesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final uid = ref.watch(authStateProvider).value?.uid;
     return Scaffold(
-      appBar: AppBar(title: const Text('Favorilerim')),
+      appBar: AppBar(title: Text(l10n.listingFavoriteTitle)),
       body: uid == null
-          ? const Center(child: Text('Favorilerinizi görmek için giriş yapın.'))
+          ? Center(child: Text(l10n.listingFavoriteLogin))
           : ref.watch(favoriteListingsProvider(uid)).when(
                 data: (listings) => listings.isEmpty
                     ? const _EmptyFavorites()
@@ -29,7 +31,7 @@ class FavoritesScreen extends ConsumerWidget {
                         itemBuilder: (_, index) => _FavoriteCard(listing: listings[index], uid: uid),
                       ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, _) => const Center(child: Text('Favoriler yüklenemedi. Lütfen tekrar deneyin.')),
+                error: (_, _) => Center(child: Text(l10n.listingFavoriteLoadError)),
               ),
     );
   }
@@ -39,7 +41,9 @@ class _EmptyFavorites extends StatelessWidget {
   const _EmptyFavorites();
 
   @override
-  Widget build(BuildContext context) => Center(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -47,10 +51,10 @@ class _EmptyFavorites extends StatelessWidget {
             children: [
               Icon(Icons.favorite_border_rounded, size: 64, color: Colors.grey.shade400),
               const SizedBox(height: 16),
-              const Text('Henüz favori ilanınız yok', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(l10n.listingFavoriteEmpty, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Text(
-                'Beğendiğiniz ilanlardaki kalp simgesine dokunarak buraya ekleyebilirsiniz.',
+                l10n.listingFavoritesBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey.shade600),
               ),
@@ -58,6 +62,7 @@ class _EmptyFavorites extends StatelessWidget {
           ),
         ),
       );
+  }
 }
 
 class _FavoriteCard extends ConsumerWidget {
@@ -68,6 +73,7 @@ class _FavoriteCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final closed = listing.status == ListingStatus.closed;
     final deleted = closed && listing.posterId.isEmpty;
     final boosted = !closed && BoostBadge.isBoostActive(listing);
@@ -93,7 +99,7 @@ class _FavoriteCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  listingCategoryLabel(listing.category),
+                  listingCategoryLabelFor(l10n, listing.category),
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
                 ),
               ),
@@ -103,7 +109,7 @@ class _FavoriteCard extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(6)),
-                  child: Text('Kapandı', style: TextStyle(color: Colors.red.shade700, fontSize: 11, fontWeight: FontWeight.bold)),
+                  child: Text(l10n.listingClosed, style: TextStyle(color: Colors.red.shade700, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
               ],
               const Spacer(),
@@ -112,7 +118,7 @@ class _FavoriteCard extends ConsumerWidget {
                 duration: const Duration(milliseconds: 180),
                 child: IconButton(
                   visualDensity: VisualDensity.compact,
-                  tooltip: 'Favorilerden çıkar',
+                  tooltip: l10n.removeFromFavorites,
                   onPressed: () => ref.read(favoriteServiceProvider).toggleFavorite(uid, listing.id),
                   icon: const Icon(Icons.favorite_rounded, color: Colors.red),
                 ),
@@ -135,7 +141,7 @@ class _FavoriteCard extends ConsumerWidget {
                 const SizedBox(width: 10),
               ],
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(listing.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text(listing.title.isEmpty ? l10n.listingFavoriteMissing : listing.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 if (listing.location.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Row(children: [

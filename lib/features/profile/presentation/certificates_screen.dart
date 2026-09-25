@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/providers/profile_provider.dart';
@@ -20,11 +21,12 @@ class CertificatesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(authStateProvider).value;
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Belgelerim')),
-        body: const Center(child: Text('Giriş yapmanız gerekiyor.')),
+        appBar: AppBar(title: Text(l10n.certificateScreenTitle)),
+        body: Center(child: Text(l10n.loginRequiredMessage)),
       );
     }
 
@@ -32,12 +34,12 @@ class CertificatesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Belge Cüzdanı'),
+        title: Text(l10n.certificateWalletTitle),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showUploadSheet(context, ref, user.uid),
         icon: const Icon(Icons.upload_file_rounded),
-        label: const Text('Belge Yükle'),
+        label: Text(l10n.certificateUploadAction),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -68,9 +70,9 @@ class CertificatesScreen extends ConsumerWidget {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            'Sertifika ve Belgelerinizi Doğrulayın',
+                            l10n.certificateIntroTitle,
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -78,7 +80,7 @@ class CertificatesScreen extends ConsumerWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Hijyen belgesi, cankurtaran sertifikası, ehliyet veya dil belgenizi yükleyin. Admin onayından sonra profilinizde onay rozeti görünsün.',
+                            l10n.certificateIntroDescription,
                             style: TextStyle(fontSize: 12),
                           ),
                         ],
@@ -90,7 +92,7 @@ class CertificatesScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Yüklenen Belgeler',
+              l10n.certificateUploadedSectionTitle,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -104,7 +106,7 @@ class CertificatesScreen extends ConsumerWidget {
               error: (err, stack) => Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text('Belgeler yüklenirken hata oluştu: $err'),
+                  child: Text(l10n.certificateLoadError),
                 ),
               ),
               data: (items) {
@@ -120,13 +122,13 @@ class CertificatesScreen extends ConsumerWidget {
                             color: Colors.grey.shade400,
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            'Henüz yüklenmiş belgeniz yok.',
+                          Text(
+                            l10n.certificateEmptyTitle,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Aşağıdaki "Belge Yükle" butonuna tıklayarak ilk sertifikanızı ekleyebilirsiniz.',
+                          Text(
+                            l10n.certificateEmptyDescription,
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
@@ -188,30 +190,34 @@ class _CertificateItemCard extends ConsumerWidget {
   }
 
   Future<void> _openDocument(BuildContext context, String url) async {
+    final l10n = AppLocalizations.of(context)!;
     final uri = Uri.tryParse(url);
     if (uri == null || !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Belge açılamadı.')),
+          SnackBar(content: Text(l10n.certificateOpenError)),
         );
       }
     }
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Belgeyi Sil'),
-        content: Text('${cert.title ?? cert.type.label} belgesi silinsin mi?'),
+        title: Text(l10n.certificateDeleteTitle),
+        content: Text(l10n.certificateDeleteConfirmation(
+          cert.title ?? certificateTypeLabel(l10n, cert.type),
+        )),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Vazgeç'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sil'),
+            child: Text(l10n.certificateDeleteAction),
           ),
         ],
       ),
@@ -222,14 +228,14 @@ class _CertificateItemCard extends ConsumerWidget {
         await ref.read(certificateServiceProvider).deleteCertificate(certId: cert.id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Belge silindi.')),
+            SnackBar(content: Text(l10n.certificateDeletedMessage)),
           );
         }
       } catch (error, stackTrace) {
         logError(error, stackTrace, context: 'CertificateItemCard._confirmDelete');
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(mapToFailure(error).message)),
+            SnackBar(content: Text(mapToFailure(error, l10n).message)),
           );
         }
       }
@@ -238,6 +244,7 @@ class _CertificateItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     Color statusColor;
     IconData statusIcon;
     switch (cert.status) {
@@ -276,7 +283,7 @@ class _CertificateItemCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        cert.title ?? cert.type.label,
+                        cert.title ?? certificateTypeLabel(l10n, cert.type),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -284,7 +291,7 @@ class _CertificateItemCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        cert.type.label,
+                        certificateTypeLabel(l10n, cert.type),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade700,
@@ -306,7 +313,7 @@ class _CertificateItemCard extends ConsumerWidget {
                       Icon(statusIcon, size: 14, color: statusColor),
                       const SizedBox(width: 4),
                       Text(
-                        cert.status.label,
+                        certificateStatusLabel(l10n, cert.status),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -320,7 +327,9 @@ class _CertificateItemCard extends ConsumerWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Yüklenme Tarihi: ${DateFormat('dd.MM.yyyy HH:mm').format(cert.createdAt)}',
+              l10n.certificateUploadDate(
+                DateFormat('dd.MM.yyyy HH:mm').format(cert.createdAt),
+              ),
               style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
             if (cert.isRejected && cert.rejectionReason != null) ...[
@@ -340,7 +349,7 @@ class _CertificateItemCard extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Red Gerekçesi: ${cert.rejectionReason}',
+                        l10n.certificateRejectionReason(cert.rejectionReason!),
                         style: TextStyle(fontSize: 12, color: Colors.red.shade900),
                       ),
                     ),
@@ -355,12 +364,12 @@ class _CertificateItemCard extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: () => _openDocument(context, cert.fileUrl),
                   icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                  label: const Text('Görüntüle'),
+                  label: Text(l10n.certificateViewAction),
                 ),
                 IconButton(
                   onPressed: () => _confirmDelete(context, ref),
                   icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                  tooltip: 'Belgeyi Sil',
+                  tooltip: l10n.certificateDeleteTitle,
                 ),
               ],
             ),
@@ -397,6 +406,7 @@ class __UploadCertificateSheetState
   }
 
   Future<void> _pickFile() async {
+    final l10n = AppLocalizations.of(context)!;
     await showModalBottomSheet<void>(
       context: context,
       builder: (context) => SafeArea(
@@ -404,7 +414,7 @@ class __UploadCertificateSheetState
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Galeriden Fotoğraf Seç'),
+              title: Text(l10n.certificateGalleryAction),
               onTap: () async {
                 Navigator.pop(context);
                 final picker = ImagePicker();
@@ -420,7 +430,7 @@ class __UploadCertificateSheetState
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Kamera ile Çek'),
+              title: Text(l10n.certificateCameraAction),
               onTap: () async {
                 Navigator.pop(context);
                 final picker = ImagePicker();
@@ -436,7 +446,7 @@ class __UploadCertificateSheetState
             ),
             ListTile(
               leading: const Icon(Icons.picture_as_pdf_outlined),
-              title: const Text('Dosya Seç (PDF / Resim)'),
+              title: Text(l10n.certificateFileAction),
               onTap: () async {
                 Navigator.pop(context);
                 final result = await FilePicker.platform.pickFiles(
@@ -463,8 +473,9 @@ class __UploadCertificateSheetState
   }
 
   Future<void> _upload() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedFile == null) {
-      setState(() => _error = 'Lütfen bir belge veya fotoğraf seçin.');
+      setState(() => _error = l10n.certificateSelectionRequired);
       return;
     }
 
@@ -485,14 +496,14 @@ class __UploadCertificateSheetState
             file: _selectedFile!,
             type: _selectedType,
             title: _titleController.text.trim().isEmpty
-                ? _selectedType.label
+                ? null
                 : _titleController.text.trim(),
           );
 
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Belge yüklendi, admin onayına sunuldu.')),
+          SnackBar(content: Text(l10n.certificateUploadSubmitted)),
         );
       }
     } catch (error, stackTrace) {
@@ -500,7 +511,7 @@ class __UploadCertificateSheetState
       if (mounted) {
         setState(() {
           _isUploading = false;
-          _error = mapToFailure(error).message;
+          _error = mapToFailure(error, l10n).message;
         });
       }
     }
@@ -508,6 +519,7 @@ class __UploadCertificateSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Padding(
@@ -526,7 +538,7 @@ class __UploadCertificateSheetState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Yeni Belge Yükle',
+                  l10n.certificateNewTitle,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -540,8 +552,8 @@ class __UploadCertificateSheetState
             const SizedBox(height: 16),
             DropdownButtonFormField<CertificateType>(
               initialValue: _selectedType,
-              decoration: const InputDecoration(
-                labelText: 'Belge Türü',
+              decoration: InputDecoration(
+                labelText: l10n.certificateTypeFieldLabel,
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.category_outlined),
               ),
@@ -549,7 +561,7 @@ class __UploadCertificateSheetState
                   .map(
                     (type) => DropdownMenuItem(
                       value: type,
-                      child: Text(type.label),
+                      child: Text(certificateTypeLabel(l10n, type)),
                     ),
                   )
                   .toList(),
@@ -563,8 +575,8 @@ class __UploadCertificateSheetState
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                labelText: 'Belge Başlığı / Açıklama (İsteğe Bağlı)',
-                hintText: _selectedType.label,
+                labelText: l10n.certificateTitleFieldLabel,
+                hintText: certificateTypeLabel(l10n, _selectedType),
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.title_rounded),
               ),
@@ -600,7 +612,7 @@ class __UploadCertificateSheetState
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      _selectedFileName ?? 'Fotoğraf veya PDF Belgesi Seçin',
+                      _selectedFileName ?? l10n.certificateFilePickerPrompt,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: _selectedFile != null
@@ -609,8 +621,8 @@ class __UploadCertificateSheetState
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'PDF, JPG, PNG formatları desteklenir',
+                    Text(
+                      l10n.certificateSupportedFormats,
                       style: TextStyle(fontSize: 11, color: Colors.grey),
                     ),
                   ],
@@ -636,7 +648,9 @@ class __UploadCertificateSheetState
                       ),
                     )
                   : const Icon(Icons.send_rounded),
-              label: Text(_isUploading ? 'Yükleniyor...' : 'Onaya Gönder'),
+              label: Text(
+                _isUploading ? l10n.uploadingAction : l10n.submitForReviewAction,
+              ),
             ),
           ],
         ),
