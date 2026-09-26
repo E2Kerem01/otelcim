@@ -118,5 +118,15 @@
   "passwordResetTooManyRequests": "Слишком много запросов. Повторите попытку позже.",
   "passwordResetNetworkError": "Проверьте подключение к интернету и повторите попытку.",
   "passwordResetGenericError": "Не удалось отправить ссылку. Повторите попытку.",
-  "adminPanelEntry": "Панель администратора"
+  "adminPanelEntry": "Панель администратора",
+  "listingPreviewOpenFullPage": "Открыть на всю страницу",
+  "listingPreviewClose": "Закрыть предпросмотр",
+  "listingPreviewShowMore": "Показать больше",
+  "listingPreviewShowLess": "Показать меньше",
+  "listingPreviewNotFound": "Объявление не найдено или удалено",
+  "listingPreviewEditListing": "Редактировать объявление",
+  "listingPreviewLoginToContact": "Войдите, чтобы связаться",
+  "listingPreviewSendMessage": "Отправить сообщение",
+  "listingPreviewError": "Произошла ошибка при загрузке объявления",
+  "listingPreviewRetry": "Повторить"
 }

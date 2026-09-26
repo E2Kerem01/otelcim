@@ -835,4 +835,35 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminPanelEntry => 'Yönetim Paneli';
+
+  @override
+  String get listingPreviewOpenFullPage => 'Tam sayfada aç';
+
+  @override
+  String get listingPreviewClose => 'Önizlemeyi kapat';
+
+  @override
+  String get listingPreviewShowMore => 'Devamını gör';
+
+  @override
+  String get listingPreviewShowLess => 'Daha az göster';
+
+  @override
+  String get listingPreviewNotFound => 'İlan bulunamadı veya kaldırılmış';
+
+  @override
+  String get listingPreviewEditListing => 'İlanı Düzenle';
+
+  @override
+  String get listingPreviewLoginToContact =>
+      'İletişime geçmek için giriş yapın';
+
+  @override
+  String get listingPreviewSendMessage => 'Mesaj Gönder';
+
+  @override
+  String get listingPreviewError => 'İlan yüklenirken bir hata oluştu';
+
+  @override
+  String get listingPreviewRetry => 'Tekrar dene';
 }

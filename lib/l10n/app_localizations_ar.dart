@@ -837,4 +837,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminPanelEntry => 'لوحة الإدارة';
+
+  @override
+  String get listingPreviewOpenFullPage => 'فتح في صفحة كاملة';
+
+  @override
+  String get listingPreviewClose => 'إغلاق المعاينة';
+
+  @override
+  String get listingPreviewShowMore => 'عرض المزيد';
+
+  @override
+  String get listingPreviewShowLess => 'عرض أقل';
+
+  @override
+  String get listingPreviewNotFound => 'الإعلان غير موجود أو تمت إزالته';
+
+  @override
+  String get listingPreviewEditListing => 'تعديل الإعلان';
+
+  @override
+  String get listingPreviewLoginToContact => 'سجل الدخول للتواصل';
+
+  @override
+  String get listingPreviewSendMessage => 'إرسال رسالة';
+
+  @override
+  String get listingPreviewError => 'حدث خطأ أثناء تحميل الإعلان';
+
+  @override
+  String get listingPreviewRetry => 'إعادة المحاولة';
 }

@@ -118,5 +118,15 @@
   "passwordResetTooManyRequests": "طلبات كثيرة جدًا. يرجى المحاولة لاحقًا.",
   "passwordResetNetworkError": "تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
   "passwordResetGenericError": "تعذر إرسال الرابط. يرجى المحاولة مرة أخرى.",
-  "adminPanelEntry": "لوحة الإدارة"
+  "adminPanelEntry": "لوحة الإدارة",
+  "listingPreviewOpenFullPage": "فتح في صفحة كاملة",
+  "listingPreviewClose": "إغلاق المعاينة",
+  "listingPreviewShowMore": "عرض المزيد",
+  "listingPreviewShowLess": "عرض أقل",
+  "listingPreviewNotFound": "الإعلان غير موجود أو تمت إزالته",
+  "listingPreviewEditListing": "تعديل الإعلان",
+  "listingPreviewLoginToContact": "سجل الدخول للتواصل",
+  "listingPreviewSendMessage": "إرسال رسالة",
+  "listingPreviewError": "حدث خطأ أثناء تحميل الإعلان",
+  "listingPreviewRetry": "إعادة المحاولة"
 }

@@ -193,12 +193,27 @@ class ListingRequirementsCard extends StatelessWidget {
 }
 
 class ListingDescriptionSection extends StatelessWidget {
-  const ListingDescriptionSection({super.key, required this.listing});
+  const ListingDescriptionSection({
+    super.key,
+    required this.listing,
+    this.maxLines,
+    this.isExpanded = false,
+    this.onToggleExpand,
+    this.expandLabel,
+    this.collapseLabel,
+  });
 
   final Listing listing;
+  final int? maxLines;
+  final bool isExpanded;
+  final VoidCallback? onToggleExpand;
+  final String? expandLabel;
+  final String? collapseLabel;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveMaxLines = isExpanded ? null : maxLines;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -210,7 +225,31 @@ class ListingDescriptionSection extends StatelessWidget {
         Text(
           listing.description,
           style: const TextStyle(fontSize: 14, height: 1.5),
+          maxLines: effectiveMaxLines,
+          overflow: effectiveMaxLines != null
+              ? TextOverflow.ellipsis
+              : TextOverflow.clip,
         ),
+        if (maxLines != null && onToggleExpand != null) ...[
+          const SizedBox(height: 4),
+          InkWell(
+            onTap: onToggleExpand,
+            borderRadius: BorderRadius.circular(4),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                isExpanded
+                    ? (collapseLabel ?? 'Daha az göster')
+                    : (expandLabel ?? 'Devamını gör'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -437,7 +476,7 @@ class ListingPosterCard extends StatelessWidget {
                         fontSize: 13,
                       ),
                     )
-                  else
+                    else
                     InkWell(
                       onTap: onRevealContact,
                       child: Row(
@@ -448,12 +487,16 @@ class ListingPosterCard extends StatelessWidget {
                             color: Theme.of(context).primaryColor,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            'İletişim Bilgisini Göster',
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              'İletişim Bilgisini Göster',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],

@@ -118,5 +118,15 @@
   "passwordResetTooManyRequests": "Zu viele Anfragen. Bitte versuchen Sie es später erneut.",
   "passwordResetNetworkError": "Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
   "passwordResetGenericError": "Der Link konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
-  "adminPanelEntry": "Adminbereich"
+  "adminPanelEntry": "Adminbereich",
+  "listingPreviewOpenFullPage": "Vollständige Seite öffnen",
+  "listingPreviewClose": "Vorschau schließen",
+  "listingPreviewShowMore": "Mehr anzeigen",
+  "listingPreviewShowLess": "Weniger anzeigen",
+  "listingPreviewNotFound": "Anzeige nicht gefunden oder entfernt",
+  "listingPreviewEditListing": "Anzeige bearbeiten",
+  "listingPreviewLoginToContact": "Anmelden, um Kontakt aufzunehmen",
+  "listingPreviewSendMessage": "Nachricht senden",
+  "listingPreviewError": "Fehler beim Laden der Anzeige",
+  "listingPreviewRetry": "Erneut versuchen"
 }

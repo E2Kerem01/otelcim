@@ -837,4 +837,34 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminPanelEntry => 'Панель администратора';
+
+  @override
+  String get listingPreviewOpenFullPage => 'Открыть на всю страницу';
+
+  @override
+  String get listingPreviewClose => 'Закрыть предпросмотр';
+
+  @override
+  String get listingPreviewShowMore => 'Показать больше';
+
+  @override
+  String get listingPreviewShowLess => 'Показать меньше';
+
+  @override
+  String get listingPreviewNotFound => 'Объявление не найдено или удалено';
+
+  @override
+  String get listingPreviewEditListing => 'Редактировать объявление';
+
+  @override
+  String get listingPreviewLoginToContact => 'Войдите, чтобы связаться';
+
+  @override
+  String get listingPreviewSendMessage => 'Отправить сообщение';
+
+  @override
+  String get listingPreviewError => 'Произошла ошибка при загрузке объявления';
+
+  @override
+  String get listingPreviewRetry => 'Повторить';
 }
