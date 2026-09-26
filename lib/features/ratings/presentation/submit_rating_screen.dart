@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
@@ -97,9 +99,11 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Deneyimini Değerlendir')),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
           Text(
             'Deneyimin nasıldı?',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -146,7 +150,8 @@ class _SubmitRatingScreenState extends ConsumerState<SubmitRatingScreen> {
                 : const Icon(Icons.send_rounded),
             label: Text(_submitting ? 'Gönderiliyor...' : 'Değerlendirmeyi Gönder'),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

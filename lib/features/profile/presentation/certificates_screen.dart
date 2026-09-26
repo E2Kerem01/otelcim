@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/providers/profile_provider.dart';
@@ -39,7 +41,9 @@ class CertificatesScreen extends ConsumerWidget {
         icon: const Icon(Icons.upload_file_rounded),
         label: const Text('Belge Yükle'),
       ),
-      body: RefreshIndicator(
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(userCertificatesProvider(user.uid));
         },
@@ -152,8 +156,9 @@ class CertificatesScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   static void _showUploadSheet(BuildContext context, WidgetRef ref, String userId) {
     unawaited(showModalBottomSheet(
@@ -264,10 +269,10 @@ class _CertificateItemCard extends ConsumerWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Theme.of(context).primaryColor.withAlpha(25),
+                  backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(25),
                   child: Icon(
                     _getIconForType(cert.type),
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -287,7 +292,7 @@ class _CertificateItemCard extends ConsumerWidget {
                         cert.type.label,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade700,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -509,136 +514,140 @@ class __UploadCertificateSheetState
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: bottomInset + 20,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Yeni Belge Yükle',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                IconButton(
-                  onPressed: _isUploading ? null : () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<CertificateType>(
-              initialValue: _selectedType,
-              decoration: const InputDecoration(
-                labelText: 'Belge Türü',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.category_outlined),
-              ),
-              items: CertificateType.values
-                  .map(
-                    (type) => DropdownMenuItem(
-                      value: type,
-                      child: Text(type.label),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _selectedType = val);
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                labelText: 'Belge Başlığı / Açıklama (İsteğe Bağlı)',
-                hintText: _selectedType.label,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.title_rounded),
-              ),
-            ),
-            const SizedBox(height: 16),
-            InkWell(
-              onTap: _isUploading ? null : _pickFile,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _selectedFile != null
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey.shade400,
-                    width: _selectedFile != null ? 2 : 1,
+    return MaxWidthContainer(
+      maxWidth: AppBreakpoints.formMaxWidth,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: bottomInset + 20,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Yeni Belge Yükle',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                  color: _selectedFile != null
-                      ? Theme.of(context).primaryColor.withAlpha(15)
-                      : Colors.grey.shade50,
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      _selectedFile != null
-                          ? Icons.check_circle_rounded
-                          : Icons.cloud_upload_outlined,
-                      size: 40,
-                      color: _selectedFile != null
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey.shade600,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _selectedFileName ?? 'Fotoğraf veya PDF Belgesi Seçin',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: _selectedFile != null
-                            ? Theme.of(context).primaryColor
-                            : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'PDF, JPG, PNG formatları desteklenir',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ],
-                ),
+                  IconButton(
+                    onPressed: _isUploading ? null : () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
               ),
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                _error!,
-                style: const TextStyle(color: Colors.red, fontSize: 13),
-              ),
-            ],
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              onPressed: _isUploading ? null : _upload,
-              icon: _isUploading
-                  ? const SizedBox.square(
-                      dimension: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+              const SizedBox(height: 16),
+              DropdownButtonFormField<CertificateType>(
+                initialValue: _selectedType,
+                decoration: const InputDecoration(
+                  labelText: 'Belge Türü',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.category_outlined),
+                ),
+                items: CertificateType.values
+                    .map(
+                      (type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(type.label),
                       ),
                     )
-                  : const Icon(Icons.send_rounded),
-              label: Text(_isUploading ? 'Yükleniyor...' : 'Onaya Gönder'),
-            ),
-          ],
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() => _selectedType = val);
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: 'Belge Başlığı / Açıklama (İsteğe Bağlı)',
+                  hintText: _selectedType.label,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.title_rounded),
+                ),
+              ),
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: _isUploading ? null : _pickFile,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: _selectedFile != null
+                          ? colorScheme.primary
+                          : colorScheme.outlineVariant,
+                      width: _selectedFile != null ? 2 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    color: _selectedFile != null
+                        ? colorScheme.primary.withAlpha(15)
+                        : colorScheme.surfaceContainerHighest,
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        _selectedFile != null
+                            ? Icons.check_circle_rounded
+                            : Icons.cloud_upload_outlined,
+                        size: 40,
+                        color: _selectedFile != null
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _selectedFileName ?? 'Fotoğraf veya PDF Belgesi Seçin',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: _selectedFile != null
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'PDF, JPG, PNG formatları desteklenir',
+                        style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _error!,
+                  style: TextStyle(color: colorScheme.error, fontSize: 13),
+                ),
+              ],
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed: _isUploading ? null : _upload,
+                icon: _isUploading
+                    ? SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colorScheme.onPrimary,
+                        ),
+                      )
+                    : const Icon(Icons.send_rounded),
+                label: Text(_isUploading ? 'Yükleniyor...' : 'Onaya Gönder'),
+              ),
+            ],
+          ),
         ),
       ),
     );

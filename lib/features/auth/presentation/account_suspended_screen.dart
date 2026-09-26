@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/theme.dart';
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../admin/services/admin_service.dart';
@@ -24,17 +26,18 @@ class AccountSuspendedScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final uid = ref.watch(authStateProvider).value?.uid;
     final profileAsync =
         uid == null ? null : ref.watch(_restrictedProfileProvider(uid));
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -66,7 +69,7 @@ class AccountSuspendedScreen extends ConsumerWidget {
                   Text(
                     'Bunun bir hata olduğunu düşünüyorsanız destek ekibimizle iletişime geçin.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
                   ),
                   const SizedBox(height: 24),
                   OutlinedButton.icon(
@@ -93,6 +96,8 @@ class _Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Text(
@@ -109,7 +114,7 @@ class _Message extends StatelessWidget {
           Text(
             reason!,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade700),
+            style: TextStyle(color: colorScheme.onSurfaceVariant),
           ),
         ],
         if (extra != null) ...[
@@ -117,7 +122,7 @@ class _Message extends StatelessWidget {
           Text(
             extra!,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+            style: TextStyle(color: colorScheme.outline, fontSize: 12),
           ),
         ],
       ],

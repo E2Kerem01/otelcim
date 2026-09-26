@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/providers/profile_provider.dart';
 import '../../../shared/services/auth_service.dart';
@@ -39,17 +41,20 @@ class InviteFriendsScreen extends ConsumerWidget {
         (currentUser != null ? generateReferralCode(currentUser.uid) : '');
     final referralCount = profile?.referralCount ?? 0;
     final freeBoostCredits = profile?.freeBoostCredits ?? 0;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n?.inviteFriendsTitle ?? 'Arkadaşını Davet Et'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Icon(
               Icons.card_giftcard_rounded,
               size: 48,
@@ -59,7 +64,7 @@ class InviteFriendsScreen extends ConsumerWidget {
             Text(
               l10n?.inviteFriendsDescription ??
                   'Kodunu arkadaşınla paylaş, o kaydolup ilk ilanını yayınladığında veya ilk sohbetini başlattığında sana ücretsiz bir boost hakkı kazandırsın.',
-              style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
+              style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14),
             ),
             const SizedBox(height: 24),
             Card(
@@ -70,7 +75,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                   children: [
                     Text(
                       l10n?.yourReferralCodeLabel ?? 'Referans Kodun',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -129,7 +134,8 @@ class InviteFriendsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -164,7 +170,10 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 12,
+              ),
             ),
           ],
         ),

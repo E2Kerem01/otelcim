@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/locale_service.dart';
 
@@ -17,20 +19,23 @@ class LanguageSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final current = ref.watch(localeControllerProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n?.languageSettingsTitle ?? 'Uygulama Dili'),
       ),
-      body: ListView(
-        children: [
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: ListView(
+          children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               l10n?.languageSettingsSubtitle ??
                   'Bazı metinler henüz çevrilmedi; çevrilmeyen yerler Türkçe '
                       'gösterilir.',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
             ),
           ),
           RadioGroup<String>(
@@ -55,7 +60,8 @@ class LanguageSettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

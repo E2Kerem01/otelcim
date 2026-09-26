@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
+
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('KVKK ve Gizlilik Politikası'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             _buildHeader(context, 'Kişisel Verilerin Korunması ve Aydınlatma Metni'),
             const SizedBox(height: 8),
             Text(
               'Son Güncelleme: ${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
@@ -78,7 +85,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   'Verilerinizin güvenliğini sağlamak amacıyla güncel teknik ve idari tedbirler uygulanmaktadır. Haklarınıza ilişkin taleplerinizi "Gizlilik ve Veri Ayarları" ekranından veya destek@otelcim.app adresi üzerinden iletebilirsiniz.',
             ),
             const SizedBox(height: 24),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -113,7 +121,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               content,
-              style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87),
+              style: TextStyle(
+                fontSize: 13,
+                height: 1.5,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),

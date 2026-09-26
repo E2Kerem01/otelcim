@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
@@ -83,6 +85,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
   }
 
   void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final passwordController = TextEditingController();
     final confirmTextController = TextEditingController();
     bool isDeleting = false;
@@ -112,9 +115,13 @@ class PrivacySettingsScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'BU İŞLEM GERİ ALINAMAZ!\n\nHesabınız, oluşturduğunuz tüm ilanlar, mesaj geçmişiniz, öne çıkarma ve doğrulama kayıtlarınız kalıcı olarak silinecektir.',
-                      style: TextStyle(fontSize: 13, height: 1.4, color: Colors.black87),
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.4,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -203,13 +210,16 @@ class PrivacySettingsScreen extends ConsumerWidget {
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
+                    foregroundColor: colorScheme.onError,
                   ),
                   child: isDeleting
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.onError,
+                          ),
                         )
                       : const Text('Hesabımı Kalıcı Olarak Sil'),
                 ),
@@ -223,13 +233,17 @@ class PrivacySettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gizlilik ve Veri Ayarları'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
           // Data Storage Summary Card
           Card(
             elevation: 2,
@@ -252,7 +266,11 @@ class PrivacySettingsScreen extends ConsumerWidget {
                   const SizedBox(height: 10),
                   Text(
                     'KVKK (6698 Sayılı Kanun) kapsamında Otelcim uygulamasında profil bilgileriniz, yayınladığınız ilanlar ve mesaj geçmişiniz güvenle saklanır. Verileriniz izniniz olmadan üçüncü taraflarla paylaşılmaz.',
-                    style: TextStyle(fontSize: 13, height: 1.4, color: Colors.grey.shade800),
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.4,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -323,7 +341,7 @@ class PrivacySettingsScreen extends ConsumerWidget {
                       label: const Text('Hesabımı Sil'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                        foregroundColor: colorScheme.onError,
                       ),
                     ),
                   ),
@@ -331,7 +349,8 @@ class PrivacySettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

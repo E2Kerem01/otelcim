@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
 import '../domain/boost_purchase_model.dart';
@@ -26,64 +28,69 @@ class MyBoostsScreen extends ConsumerWidget {
 
     final boostsAsync = ref.watch(_userBoostPurchasesProvider(userId));
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Öne Çıkarılanlarım'),
       ),
-      body: boostsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Hata: $err')),
-        data: (purchases) {
-          if (purchases.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.rocket_launch_outlined,
-                      size: 64,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Henüz Öne Çıkarılmış İlanınız Yok',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'İlanlarınızı öne çıkararak 10 kata kadar daha fazla görüntülenme ve başvuru alabilirsiniz.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => context.push('/my-listings'),
-                      icon: const Icon(Icons.list_alt_rounded),
-                      label: const Text('İlanlarıma Git ve Öne Çıkar'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: boostsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Hata: $err')),
+          data: (purchases) {
+            if (purchases.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.rocket_launch_outlined,
+                        size: 64,
+                        color: colorScheme.outlineVariant,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Henüz Öne Çıkarılmış İlanınız Yok',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'İlanlarınızı öne çıkararak 10 kata kadar daha fazla görüntülenme ve başvuru alabilirsiniz.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => context.push('/my-listings'),
+                        icon: const Icon(Icons.list_alt_rounded),
+                        label: const Text('İlanlarıma Git ve Öne Çıkar'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: purchases.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final purchase = purchases[index];
-              return _BoostPurchaseCard(purchase: purchase);
-            },
-          );
-        },
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: purchases.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final purchase = purchases[index];
+                return _BoostPurchaseCard(purchase: purchase);
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -102,6 +109,8 @@ class _BoostPurchaseCard extends ConsumerWidget {
     final dateStr = purchasedAt != null
         ? '${purchasedAt.day}.${purchasedAt.month}.${purchasedAt.year}'
         : '-';
+
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
       elevation: 2,
@@ -125,7 +134,7 @@ class _BoostPurchaseCard extends ConsumerWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Theme.of(context).primaryColor,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
@@ -155,10 +164,10 @@ class _BoostPurchaseCard extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: isBoostedActive ? Colors.green.shade50 : Colors.grey.shade100,
+                            color: isBoostedActive ? Colors.green.shade50 : colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                              color: isBoostedActive ? Colors.green.shade300 : Colors.grey.shade300,
+                              color: isBoostedActive ? Colors.green.shade300 : colorScheme.outlineVariant,
                             ),
                           ),
                           child: Text(
@@ -166,7 +175,7 @@ class _BoostPurchaseCard extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: isBoostedActive ? Colors.green.shade800 : Colors.grey.shade700,
+                              color: isBoostedActive ? Colors.green.shade800 : colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -175,7 +184,7 @@ class _BoostPurchaseCard extends ConsumerWidget {
                     const SizedBox(height: 6),
                     Text(
                       'Satın Alma Tarihi: $dateStr',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                     ),
                     if (listing.boostExpiresAt != null && isBoostedActive) ...[
                       const SizedBox(height: 2),

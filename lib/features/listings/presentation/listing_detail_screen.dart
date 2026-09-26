@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../app/design_tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
@@ -288,12 +289,14 @@ ${listing.description}
 
           return LayoutBuilder(
             builder: (context, constraints) {
-              final isWide = constraints.maxWidth >= 800;
+              final isWide = constraints.maxWidth >= AppBreakpoints.desktop;
 
               if (isWide) {
                 return Center(
                   child: Container(
-                    constraints: const BoxConstraints(maxWidth: 1140),
+                    constraints: const BoxConstraints(
+                      maxWidth: AppBreakpoints.contentMaxWidth,
+                    ),
                     padding: const EdgeInsets.all(24),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,21 +420,22 @@ ${listing.description}
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Hata: $error')),
       ),
-      bottomNavigationBar: MediaQuery.sizeOf(context).width >= 800
+      bottomNavigationBar: MediaQuery.sizeOf(context).width >= AppBreakpoints.desktop
           ? null
           : listingAsync.maybeWhen(
               data: (listing) {
                 if (listing == null) return null;
                 final isOwner = myUid == listing.posterId;
                 final l10n = AppLocalizations.of(context)!;
+                final colorScheme = Theme.of(context).colorScheme;
 
                 if (isOwner) {
                   final isBoostedActive = BoostBadge.isBoostActive(listing);
                   return Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      boxShadow: const [
                         BoxShadow(
                           color: Colors.black12,
                           blurRadius: 4,
@@ -476,9 +480,9 @@ ${listing.description}
 
                 return Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black12,
                         blurRadius: 4,

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/listing_service.dart';
 import '../../listings/domain/listing_model.dart';
@@ -106,7 +108,9 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<List<Listing>>(
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: StreamBuilder<List<Listing>>(
         stream: ref.read(listingServiceProvider).watchActiveListings(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -191,8 +195,9 @@ class _RegionMapScreenState extends ConsumerState<RegionMapScreen> {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildRegionList({
     required BuildContext context,

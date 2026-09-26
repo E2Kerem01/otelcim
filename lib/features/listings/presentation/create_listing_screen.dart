@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
@@ -313,9 +315,11 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
         'İlan vermek için lütfen giriş yapın.',
       );
     }
+    final isDesktop = MediaQuery.sizeOf(context).width >= 768;
+
     if (profileAsync.isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Yeni İlan Aç')),
+        appBar: isDesktop ? null : AppBar(title: const Text('Yeni İlan Aç')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -328,31 +332,45 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Yeni İlan Aç')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const RequiredFieldsLegend(),
-              const SizedBox(height: 12),
-              Card(
-                color: Theme.of(context).primaryColor.withAlpha(20),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: BorderSide(
-                    color: Theme.of(context).primaryColor.withAlpha(80),
+      appBar: isDesktop ? null : AppBar(title: const Text('Yeni İlan Aç')),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (isDesktop)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 20),
+                    child: Text(
+                      'Yeni İlan Aç',
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                    ),
                   ),
-                ),
-                child: ListTile(
-                  leading: Icon(
-                    Icons.library_add_rounded,
-                    color: Theme.of(context).primaryColor,
+                const RequiredFieldsLegend(),
+                const SizedBox(height: 12),
+                Card(
+                  color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(
+                      color:
+                          Theme.of(context).colorScheme.primary.withAlpha(80),
+                    ),
                   ),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.library_add_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   title: const Text(
                     'Birden fazla pozisyon mu gireceksiniz?',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
@@ -400,7 +418,10 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   ),
                   Text(
                     '${_selectedImageFiles.length}/5',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -421,23 +442,33 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                         child: Container(
                           width: 90,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .outlineVariant,
+                            ),
                           ),
-                          child: const Column(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.add_a_photo_outlined,
-                                color: Colors.grey,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
                                 'Fotoğraf Ekle',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: Colors.grey,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -702,28 +733,43 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
           ),
         ),
       ),
+      ),
     );
   }
 
   Widget _buildAccessDenied(BuildContext context, String message) {
+    final isDesktop = MediaQuery.sizeOf(context).width >= 768;
     return Scaffold(
-      appBar: AppBar(title: const Text('Yeni İlan Aç')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.lock_outline, size: 48),
-              const SizedBox(height: 16),
-              Text(message, textAlign: TextAlign.center),
-              const SizedBox(height: 20),
-              FilledButton(
-                onPressed: () => context.go('/'),
-                // TODO(l10n): add returnHome (TR: "Ana Sayfaya Dön", EN: "Return home").
-                child: const Text('Ana Sayfaya Dön'),
-              ),
-            ],
+      appBar: isDesktop ? null : AppBar(title: const Text('Yeni İlan Aç')),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isDesktop) ...[
+                  Text(
+                    'Yeni İlan Aç',
+                    style:
+                        Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                const Icon(Icons.lock_outline, size: 48),
+                const SizedBox(height: 16),
+                Text(message, textAlign: TextAlign.center),
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: () => context.go('/'),
+                  // TODO(l10n): add returnHome (TR: "Ana Sayfaya Dön", EN: "Return home").
+                  child: const Text('Ana Sayfaya Dön'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

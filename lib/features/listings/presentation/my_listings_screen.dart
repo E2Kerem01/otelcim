@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/services/listing_service.dart';
@@ -40,7 +42,9 @@ class MyListingsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: listingsAsync.when(
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: listingsAsync.when(
         data: (listings) {
           if (listings.isEmpty) {
             return const Center(child: Text('Henüz ilan vermediniz.'));
@@ -64,7 +68,7 @@ class MyListingsScreen extends ConsumerWidget {
                             width: 48,
                             height: 48,
                             fit: BoxFit.cover,
-                            placeholder: (_, _) => Container(color: Colors.grey.shade200, width: 48, height: 48),
+                            placeholder: (_, _) => Container(color: Theme.of(context).colorScheme.surfaceContainerHighest, width: 48, height: 48),
                             errorWidget: (_, _, _) => const Icon(Icons.broken_image, size: 20),
                           ),
                         )
@@ -102,7 +106,7 @@ class MyListingsScreen extends ConsumerWidget {
                         IconButton(
                           icon: Icon(
                             Icons.rocket_launch_rounded,
-                            color: isBoostedActive ? Colors.amber.shade800 : Theme.of(context).primaryColor,
+                            color: isBoostedActive ? Colors.amber.shade800 : Theme.of(context).colorScheme.primary,
                           ),
                           tooltip: isBoostedActive ? 'Öne Çıkarıldı (Yönet)' : 'Öne Çıkar',
                           onPressed: () => context.push('/listing/${listing.id}/boost'),
@@ -128,6 +132,7 @@ class MyListingsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Hata: $error')),
       ),
-    );
-  }
+    ),
+  );
+}
 }

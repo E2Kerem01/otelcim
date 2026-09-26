@@ -235,6 +235,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get signOut => 'Çıkış Yap';
 
   @override
+  String get desktopNavFavorites => 'Favoriler';
+
+  @override
+  String get desktopNavProfile => 'Profil';
+
+  @override
+  String get desktopNavSettings => 'Ayarlar';
+
+  @override
+  String get desktopNavLanguage => 'Dil';
+
+  @override
   String get categoryReception => 'Resepsiyon';
 
   @override

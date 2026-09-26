@@ -205,6 +205,10 @@
   "@signOut": {
     "description": "Sign out button text"
   },
+  "desktopNavFavorites": "Favoriler",
+  "desktopNavProfile": "Profil",
+  "desktopNavSettings": "Ayarlar",
+  "desktopNavLanguage": "Dil",
   "categoryReception": "Resepsiyon",
   "@categoryReception": {
     "description": "Reception category label"

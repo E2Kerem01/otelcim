@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
@@ -35,13 +37,15 @@ class _SeasonalCalendarScreenState
           return StatefulBuilder(
             builder: (context, setModalState) {
               final l10n = AppLocalizations.of(context)!;
-              return Padding(
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  16,
-                  20,
-                  MediaQuery.viewInsetsOf(context).bottom + 20,
-                ),
+              return MaxWidthContainer(
+                maxWidth: AppBreakpoints.formMaxWidth,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    16,
+                    20,
+                    MediaQuery.viewInsetsOf(context).bottom + 20,
+                  ),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -167,8 +171,9 @@ class _SeasonalCalendarScreenState
                     ],
                   ),
                 ),
-              );
-            },
+              ),
+            );
+          },
           );
         },
       ),
@@ -179,6 +184,7 @@ class _SeasonalCalendarScreenState
   Widget build(BuildContext context) {
     final user = ref.watch(authStateProvider).value;
     final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -186,28 +192,30 @@ class _SeasonalCalendarScreenState
           isEn ? 'Seasonal Hiring Calendar' : 'Sezonluk İşe Alım Takvimi',
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Intro Card
-            Card(
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_month_rounded,
-                      size: 40,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    const SizedBox(width: 16),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Intro Card
+              Card(
+                color: colorScheme.primaryContainer.withValues(alpha: 0.2),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_month_rounded,
+                        size: 40,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,16 +277,14 @@ class _SeasonalCalendarScreenState
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).primaryColor.withValues(alpha: 0.12),
+                              color: colorScheme.primary.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               isEn ? window.titleEn : window.titleTr,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).primaryColor,
+                                color: colorScheme.primary,
                               ),
                             ),
                           ),
@@ -517,9 +523,9 @@ class _SeasonalCalendarScreenState
                                     },
                                   ),
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.delete_outline,
-                                      color: Colors.red,
+                                      color: colorScheme.error,
                                     ),
                                     onPressed: () async {
                                       await ref
@@ -550,6 +556,7 @@ class _SeasonalCalendarScreenState
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

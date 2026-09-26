@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/models/verification_request.dart';
@@ -220,21 +222,22 @@ class _VerificationRequestScreenState
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(currentUserProfileProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Otel Doğrulama'),
         actions: [
           if (_isSubmitting)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: colorScheme.primary,
                   ),
                 ),
               ),
@@ -247,13 +250,15 @@ class _VerificationRequestScreenState
             ),
         ],
       ),
-      body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: profileAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 48, color: colorScheme.error),
               const SizedBox(height: 16),
               Text(
                 'Profil yüklenirken hata oluştu',
@@ -284,7 +289,7 @@ class _VerificationRequestScreenState
                 children: [
                   // Information card
                   Card(
-                    color: Colors.blue[50],
+                    color: colorScheme.primaryContainer.withAlpha(50),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -293,7 +298,7 @@ class _VerificationRequestScreenState
                           Row(
                             children: [
                               Icon(Icons.info_outline,
-                                  color: Colors.blue[700]),
+                                  color: colorScheme.primary),
                               const SizedBox(width: 8),
                               Text(
                                 'Doğrulama Hakkında',
@@ -302,7 +307,7 @@ class _VerificationRequestScreenState
                                     .titleMedium
                                     ?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.blue[700],
+                                      color: colorScheme.primary,
                                     ),
                               ),
                             ],
@@ -387,12 +392,12 @@ class _VerificationRequestScreenState
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
-                            leading: const Icon(Icons.insert_drive_file,
-                                color: Colors.blue),
+                            leading: Icon(Icons.insert_drive_file,
+                                color: colorScheme.primary),
                             title: Text(_documentNames[index]),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete,
-                                  color: Colors.red),
+                              icon: Icon(Icons.delete,
+                                  color: colorScheme.error),
                               onPressed: () => _removeDocument(index),
                             ),
                           ),
@@ -412,7 +417,7 @@ class _VerificationRequestScreenState
                           )
                         : const Icon(Icons.add),
                     label: Text(
-                      _isUploading ? 'Yükleniyor...' : 'Belge Ekle',
+                       _isUploading ? 'Yükleniyor...' : 'Belge Ekle',
                     ),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
@@ -428,12 +433,12 @@ class _VerificationRequestScreenState
                       padding: const EdgeInsets.all(16),
                     ),
                     child: _isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: colorScheme.onPrimary,
                             ),
                           )
                         : const Text('Doğrulama Talebini Gönder'),
@@ -444,6 +449,7 @@ class _VerificationRequestScreenState
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 }

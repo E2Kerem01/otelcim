@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/models/onboarding_slide_data.dart';
 import 'widgets/onboarding_slide.dart';
 
@@ -74,8 +76,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
+        child: MaxWidthContainer(
+          maxWidth: AppBreakpoints.formMaxWidth,
+          child: Column(
+            children: [
             // Skip button row
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -149,7 +153,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

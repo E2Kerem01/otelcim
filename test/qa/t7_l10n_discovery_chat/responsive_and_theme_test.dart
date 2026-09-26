@@ -9,6 +9,8 @@ import 'package:otelcim/core/responsive/max_width_container.dart';
 import 'package:otelcim/core/responsive/responsive_layout.dart';
 import 'package:otelcim/l10n/app_localizations.dart';
 import 'package:otelcim/shared/models/app_user.dart';
+import 'package:otelcim/shared/models/user_profile.dart';
+import 'package:otelcim/shared/providers/profile_provider.dart';
 import 'package:otelcim/shared/services/auth_service.dart';
 import 'package:otelcim/shared/widgets/desktop_top_nav_bar.dart';
 
@@ -202,12 +204,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Logged out: browse links plus login/register, no employer CTA.
       expect(find.text('Ana Sayfa'), findsOneWidget);
       expect(find.text('Kategoriler'), findsOneWidget);
-      expect(find.text('İlan Ver'), findsWidgets); // Nav item + CTA button
-      expect(find.text('Mesajlar'), findsOneWidget);
-      expect(find.text('Hesabım'), findsOneWidget);
-      expect(find.byIcon(Icons.favorite_outline_rounded), findsOneWidget);
+      expect(find.text('Giriş Yap'), findsOneWidget);
+      expect(find.text('Kayıt Ol'), findsOneWidget);
+      expect(find.text('İlan Ver'), findsNothing);
+      expect(find.text('Mesajlar'), findsNothing);
     });
 
     testWidgets('DesktopTopNavBar post ad button invokes goBranch(2) when logged in', (tester) async {
@@ -225,6 +228,17 @@ void main() {
         ProviderScope(
           overrides: [
             authServiceProvider.overrideWith((ref) => mockAuth),
+            currentUserProfileProvider.overrideWith(
+              (ref) => Stream.value(
+                UserProfile(
+                  id: 'user_1',
+                  email: 'test@hotel.com',
+                  userType: 'employer',
+                  createdAt: DateTime(2026),
+                  updatedAt: DateTime(2026),
+                ),
+              ),
+            ),
           ],
           child: MaterialApp(
             locale: const Locale('tr'),
@@ -238,8 +252,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find the ElevatedButton CTA with label 'İlan Ver'
-      final ctaButton = find.byType(ElevatedButton);
+      // Employers get exactly one 'İlan Ver' call to action.
+      expect(find.text('İlan Ver'), findsOneWidget);
+      final ctaButton = find.widgetWithText(FilledButton, 'İlan Ver');
       expect(ctaButton, findsOneWidget);
 
       await tester.tap(ctaButton);

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
@@ -221,7 +223,9 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
         title: const Text('İlanı Öne Çıkar'),
         centerTitle: true,
       ),
-      body: listingAsync.when(
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: listingAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('İlan yüklenirken hata: $err')),
         data: (listing) {
@@ -490,8 +494,9 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   String _getFormattedPrice(List<ProductDetails> products, String productId, String fallback) {
     try {
@@ -507,15 +512,16 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
     required String title,
     required String subtitle,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: Theme.of(context).primaryColor, size: 22),
+          child: Icon(icon, color: colorScheme.primary, size: 22),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -524,7 +530,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
             children: [
               Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 2),
-              Text(subtitle, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+              Text(subtitle, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
             ],
           ),
         ),
@@ -541,6 +547,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
     bool isPopular = false,
   }) {
     final isSelected = _selectedProductId == productId;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
       onTap: () => setState(() => _selectedProductId = productId),
@@ -549,10 +556,10 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.amber.shade50.withValues(alpha: 0.5) : Colors.white,
+          color: isSelected ? Colors.amber.shade50.withValues(alpha: 0.5) : colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Colors.amber.shade700 : Colors.grey.shade300,
+            color: isSelected ? Colors.amber.shade700 : colorScheme.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
@@ -577,7 +584,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
-                          color: isSelected ? Colors.amber.shade900 : Colors.black87,
+                          color: isSelected ? Colors.amber.shade900 : colorScheme.onSurface,
                         ),
                       ),
                       if (badgeText != null) ...[
@@ -603,7 +610,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
                   const SizedBox(height: 4),
                   Text(
                     durationText,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
                   ),
                 ],
               ),
@@ -613,7 +620,7 @@ class _BoostPurchaseScreenState extends ConsumerState<BoostPurchaseScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.amber.shade900 : Theme.of(context).primaryColor,
+                color: isSelected ? Colors.amber.shade900 : colorScheme.primary,
               ),
             ),
           ],

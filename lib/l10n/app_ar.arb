@@ -1,6 +1,10 @@
 {
   "@@locale": "ar",
   "appName": "HospoJobs",
+  "desktopNavFavorites": "المفضلة",
+  "desktopNavProfile": "الملف الشخصي",
+  "desktopNavSettings": "الإعدادات",
+  "desktopNavLanguage": "اللغة",
   "emailLabel": "البريد الإلكتروني",
   "emailHint": "example@email.com",
   "emailValidation": "أدخل بريدًا إلكترونيًا صالحًا",

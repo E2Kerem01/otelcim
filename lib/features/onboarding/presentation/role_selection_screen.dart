@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/providers/onboarding_provider.dart';
 
 enum UserRole {
@@ -62,7 +64,9 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: SafeArea(
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -186,8 +190,9 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 /// Individual role selection card widget

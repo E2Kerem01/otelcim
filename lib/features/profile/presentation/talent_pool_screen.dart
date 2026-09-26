@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../talent_pool/domain/talent_pool_item.dart';
 import '../../talent_pool/services/talent_pool_service.dart';
@@ -63,119 +65,123 @@ class TalentPoolScreen extends ConsumerWidget {
 
     final talentPoolAsync = ref.watch(talentPoolStreamProvider(user.uid));
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Yetenek Havuzu'),
       ),
-      body: talentPoolAsync.when(
-        data: (items) {
-          if (items.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.folder_shared_outlined,
-                      size: 64,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Henüz Yetenek Havuzunuzda Aday Yok',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'İş arayanlarla yaptığınız sohbetlerde detay menüsünden "Yetenek Havuzuna Ekle" seçeneği ile adayları buraya kaydedebilirsiniz.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: items.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final item = items[index];
-              final initial = item.candidateName.isNotEmpty
-                  ? item.candidateName[0].toUpperCase()
-                  : '?';
-              final formattedDate = item.addedAt != null
-                  ? '${item.addedAt!.day.toString().padLeft(2, '0')}.${item.addedAt!.month.toString().padLeft(2, '0')}.${item.addedAt!.year}'
-                  : '';
-
-              return Card(
-                elevation: 1.5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: talentPoolAsync.when(
+          data: (items) {
+            if (items.isEmpty) {
+              return Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 22,
-                            backgroundColor: Theme.of(context).primaryColor,
-                            child: Text(
-                              initial,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                      Icon(
+                        Icons.folder_shared_outlined,
+                        size: 64,
+                        color: colorScheme.outlineVariant,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Henüz Yetenek Havuzunuzda Aday Yok',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'İş arayanlarla yaptığınız sohbetlerde detay menüsünden "Yetenek Havuzuna Ekle" seçeneği ile adayları buraya kaydedebilirsiniz.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: items.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                final initial = item.candidateName.isNotEmpty
+                    ? item.candidateName[0].toUpperCase()
+                    : '?';
+                final formattedDate = item.addedAt != null
+                    ? '${item.addedAt!.day.toString().padLeft(2, '0')}.${item.addedAt!.month.toString().padLeft(2, '0')}.${item.addedAt!.year}'
+                    : '';
+
+                return Card(
+                  elevation: 1.5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 22,
+                              backgroundColor: colorScheme.primary,
+                              child: Text(
+                                initial,
+                                style: TextStyle(
+                                  color: colorScheme.onPrimary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.candidateName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                if (formattedDate.isNotEmpty)
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    'Eklenme: $formattedDate',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600,
+                                    item.candidateName,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                              ],
+                                  if (formattedDate.isNotEmpty)
+                                    Text(
+                                      'Eklenme: $formattedDate',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline_rounded,
-                              color: Colors.redAccent,
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline_rounded,
+                                color: colorScheme.error,
+                              ),
+                              tooltip: 'Havuzdan Çıkar',
+                              onPressed: () => _confirmRemove(
+                                context,
+                                ref,
+                                user.uid,
+                                item,
+                              ),
                             ),
-                            tooltip: 'Havuzdan Çıkar',
-                            onPressed: () => _confirmRemove(
-                              context,
-                              ref,
-                              user.uid,
-                              item,
-                            ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       if (item.note != null && item.note!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Container(
@@ -236,6 +242,7 @@ class TalentPoolScreen extends ConsumerWidget {
         error: (err, stack) => Center(
           child: Text('Yetenek havuzu yüklenirken hata oluştu: $err'),
         ),
+      ),
       ),
     );
   }

@@ -232,6 +232,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signOut => 'Sign Out';
 
   @override
+  String get desktopNavFavorites => 'Favorites';
+
+  @override
+  String get desktopNavProfile => 'Profile';
+
+  @override
+  String get desktopNavSettings => 'Settings';
+
+  @override
+  String get desktopNavLanguage => 'Language';
+
+  @override
   String get categoryReception => 'Reception';
 
   @override

@@ -273,6 +273,8 @@ class ChatMessageList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return StreamBuilder<List<Message>>(
       stream: ref.watch(chatServiceProvider).watchMessages(conversationId),
       builder: (context, snapshot) {
@@ -291,17 +293,23 @@ class ChatMessageList extends ConsumerWidget {
             final isMe = message.senderId == myUid;
             return Align(
               alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isMe ? Theme.of(context).primaryColor : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)],
-                ),
-                child: Text(
-                  message.text,
-                  style: TextStyle(color: isMe ? Colors.white : Colors.black87, fontSize: 14),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isMe ? colorScheme.primary : colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)],
+                  ),
+                  child: Text(
+                    message.text,
+                    style: TextStyle(
+                      color: isMe ? colorScheme.onPrimary : colorScheme.onSurface,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
               ),
             );
@@ -325,11 +333,13 @@ class ChatMessageComposer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
       ),
       child: Row(
         children: [
@@ -347,7 +357,7 @@ class ChatMessageComposer extends StatelessWidget {
           IconButton(
             tooltip: 'Gönder',
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            icon: Icon(Icons.send_rounded, color: Theme.of(context).primaryColor),
+            icon: Icon(Icons.send_rounded, color: colorScheme.primary),
             onPressed: onSend,
           ),
         ],

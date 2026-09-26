@@ -235,6 +235,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signOut => 'تسجيل الخروج';
 
   @override
+  String get desktopNavFavorites => 'المفضلة';
+
+  @override
+  String get desktopNavProfile => 'الملف الشخصي';
+
+  @override
+  String get desktopNavSettings => 'الإعدادات';
+
+  @override
+  String get desktopNavLanguage => 'اللغة';
+
+  @override
   String get categoryReception => 'الاستقبال';
 
   @override
