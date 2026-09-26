@@ -24,11 +24,33 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      # Release build is signed with the debug keystore (see
-      # android/app/build.gradle.kts) so it needs no secrets, and
+      # A stable test key (repository secrets) lets every new test APK install
+      # over the previous one. Without the secrets the build falls back to the
+      # runner's throwaway debug key (see android/app/build.gradle.kts).
+      - name: Restore test signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::No signing secrets; release APKs use a throwaway debug key"
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/otelcim-test.jks"
+          {
+            echo "storeFile=$RUNNER_TEMP/otelcim-test.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+
+      # The run number becomes the versionCode, so each build is newer than the
+      # last and its number is visible in Android's app info.
       # --split-per-abi keeps each APK small enough to share directly.
-      - name: Build release APKs (split per ABI, debug-signed)
-        run: flutter build apk --release --split-per-abi
+      - name: Build release APKs (split per ABI)
+        run: flutter build apk --release --split-per-abi --build-number=${{ github.run_number }}
 
       - name: Also build a universal debug APK
         run: flutter build apk --debug
