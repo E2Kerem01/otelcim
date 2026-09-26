@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:otelcim/features/admin/services/admin_service.dart';
 import 'package:otelcim/shared/constants/listing_filters.dart';
 import 'package:otelcim/features/ads/domain/banner_ad_model.dart';
 import 'package:otelcim/features/ads/services/banner_ad_service.dart';
@@ -290,6 +292,8 @@ void main() {
     () => _localizedApp(
       const ProfileScreen(),
       overrides: [
+        adminServiceProvider
+            .overrideWith((ref) => AdminService(FakeFirebaseFirestore())),
         authServiceProvider.overrideWith((ref) => auth),
         authStateProvider.overrideWith((ref) => Stream.value(null)),
         currentUserProfileProvider.overrideWith((ref) => Stream.value(null)),

@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:otelcim/features/admin/domain/admin_action_model.dart';
 import 'package:otelcim/features/admin/presentation/admin_dashboard_screen.dart';
+import 'package:otelcim/features/admin/services/admin_service.dart';
 import 'package:otelcim/features/admin/services/analytics_service.dart';
 import 'package:otelcim/l10n/app_localizations.dart';
+import 'package:otelcim/shared/providers/firestore_provider.dart';
 
 import 'admin_test_helper.dart';
 
@@ -17,9 +21,11 @@ void main() {
 
   group('AdminDashboardScreen Widget Tests', () {
     late MockAdminAnalyticsService mockAnalyticsService;
+    late MockAdminService mockAdminService;
 
     setUp(() {
       mockAnalyticsService = MockAdminAnalyticsService();
+      mockAdminService = MockAdminService();
     });
 
     Widget buildDashboardScreen({
@@ -87,9 +93,17 @@ void main() {
         routes: routes,
       );
 
+      when(() => mockAdminService.watchAuditLog(
+            adminId: any(named: 'adminId'),
+            actionType: any(named: 'actionType'),
+            limit: any(named: 'limit'),
+          )).thenAnswer((_) => Stream.value(<AdminAction>[]));
+
       return ProviderScope(
         overrides: [
           adminAnalyticsServiceProvider.overrideWith((ref) => analyticsService),
+          adminServiceProvider.overrideWith((ref) => mockAdminService),
+          firestoreProvider.overrideWithValue(FakeFirebaseFirestore()),
         ],
         child: MaterialApp.router(
           routerConfig: router,
@@ -108,14 +122,19 @@ void main() {
     testWidgets('renders header, all 7 management cards and loaded badge counts', (tester) async {
       await configureTestScreenSize(tester);
 
-      when(() => mockAnalyticsService.getDashboardMetrics()).thenAnswer(
-        (_) async => const DashboardMetrics(
-          activeListings: 42,
-          newUsers: 15,
-          openReports: 7,
-          pendingVerifications: 3,
+      when(() => mockAnalyticsService.getOverview()).thenAnswer(
+        (_) async => const AdminOverview(
+          {
+            'pendingReports': 7,
+            'pendingVerifications': 3,
+            'pendingCertificates': 1,
+            'users': 42,
+          },
+          recentDays: 7,
         ),
       );
+      when(() => mockAnalyticsService.getDailySeries())
+          .thenAnswer((_) async => const []);
 
       await tester.pumpWidget(buildDashboardScreen(analyticsService: mockAnalyticsService));
       await tester.pumpAndSettle();
@@ -129,7 +148,17 @@ void main() {
       expect(find.text('Kullanıcı Yönetimi'), findsOneWidget);
       expect(find.text('İlan Yönetimi'), findsOneWidget);
       expect(find.text('Belge Onay Kuyruğu'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Banner Reklamlar'),
+        500,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Banner Reklamlar'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('İşlem Geçmişi'),
+        500,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('İşlem Geçmişi'), findsOneWidget);
 
       expect(find.text('7'), findsOneWidget);
@@ -139,8 +168,10 @@ void main() {
     testWidgets('displays error text when metrics fail to load', (tester) async {
       await configureTestScreenSize(tester);
 
-      when(() => mockAnalyticsService.getDashboardMetrics())
+      when(() => mockAnalyticsService.getOverview())
           .thenThrow(Exception('Firestore connection error'));
+      when(() => mockAnalyticsService.getDailySeries())
+          .thenAnswer((_) async => const []);
 
       await tester.pumpWidget(buildDashboardScreen(analyticsService: mockAnalyticsService));
       await tester.pumpAndSettle();
@@ -157,14 +188,14 @@ void main() {
       await configureTestScreenSize(tester);
 
       final navigatedRoutes = <String>[];
-      when(() => mockAnalyticsService.getDashboardMetrics()).thenAnswer(
-        (_) async => const DashboardMetrics(
-          activeListings: 10,
-          newUsers: 5,
-          openReports: 2,
-          pendingVerifications: 1,
+      when(() => mockAnalyticsService.getOverview()).thenAnswer(
+        (_) async => const AdminOverview(
+          {'pendingReports': 2, 'pendingVerifications': 1},
+          recentDays: 7,
         ),
       );
+      when(() => mockAnalyticsService.getDailySeries())
+          .thenAnswer((_) async => const []);
 
       await tester.pumpWidget(
         buildDashboardScreen(
@@ -186,15 +217,15 @@ void main() {
       await configureTestScreenSize(tester);
 
       var fetchCount = 0;
-      when(() => mockAnalyticsService.getDashboardMetrics()).thenAnswer((_) async {
+      when(() => mockAnalyticsService.getOverview()).thenAnswer((_) async {
         fetchCount++;
-        return const DashboardMetrics(
-          activeListings: 10,
-          newUsers: 5,
-          openReports: 1,
-          pendingVerifications: 2,
+        return const AdminOverview(
+          {'pendingReports': 1, 'pendingVerifications': 2},
+          recentDays: 7,
         );
       });
+      when(() => mockAnalyticsService.getDailySeries())
+          .thenAnswer((_) async => const []);
 
       await tester.pumpWidget(buildDashboardScreen(analyticsService: mockAnalyticsService));
       await tester.pumpAndSettle();
@@ -202,7 +233,7 @@ void main() {
       expect(fetchCount, equals(1));
 
       // Trigger pull to refresh gesture on ListView
-      await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+      await tester.drag(find.byType(ListView), const Offset(0, 500));
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();

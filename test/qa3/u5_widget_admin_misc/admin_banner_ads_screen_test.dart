@@ -1,11 +1,12 @@
-import 'dart:async';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:otelcim/features/ads/domain/banner_ad_model.dart';
 import 'package:otelcim/features/ads/presentation/admin_banner_ads_screen.dart';
 import 'package:otelcim/features/ads/services/banner_ad_service.dart';
+import 'package:otelcim/shared/providers/firestore_provider.dart';
 
 import 'admin_test_helper.dart';
 
@@ -22,25 +23,33 @@ void main() {
     });
 
     Widget buildBannerAdsScreen({
-      required Stream<List<BannerAd>> bannersStream,
+      required FirebaseFirestore db,
     }) {
+      when(() => mockBannerAdService.adminQuery(filter: any(named: 'filter')))
+          .thenAnswer((invocation) {
+        final filter = invocation.namedArguments[#filter] as String;
+        return adminBannerAdsQuery(db, filter: filter);
+      });
+
       return createAdminTestApp(
         overrides: [
+          firestoreProvider.overrideWithValue(db),
           bannerAdServiceProvider.overrideWith((ref) => mockBannerAdService),
-          allBannerAdsProvider.overrideWith((ref) => bannersStream),
         ],
         child: const AdminBannerAdsScreen(),
       );
     }
 
+    Future<void> seedBanner(FakeFirebaseFirestore db, BannerAd banner) {
+      return db.collection('banner_ads').doc(banner.id).set(banner.toMap());
+    }
+
     testWidgets('displays loading indicator while banners are loading', (tester) async {
       await configureTestScreenSize(tester);
 
-      final controller = StreamController<List<BannerAd>>();
-      addTearDown(controller.close);
+      final db = FakeFirebaseFirestore();
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: controller.stream));
-      await tester.pump();
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
@@ -48,28 +57,40 @@ void main() {
     testWidgets('displays error message when stream emits error', (tester) async {
       await configureTestScreenSize(tester);
 
-      final errorStream = Stream<List<BannerAd>>.error(Exception('Firestore banner load failed'));
+      final db = FakeFirebaseFirestore();
+      await db.collection('banner_ads').doc('invalid_banner').set({
+        'title': 'Bozuk Banner',
+        'advertiserName': 'Test',
+        'imageUrl': 'https://example.com/banner.png',
+        'targetUrl': 'https://example.com',
+        'order': 'not-an-int',
+        'isActive': true,
+        'createdAt': Timestamp.fromDate(DateTime(2026, 6, 1)),
+      });
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: errorStream));
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Hata:'), findsOneWidget);
+      expect(find.text('Kayıtlar yüklenemedi.'), findsOneWidget);
     });
 
     testWidgets('displays empty state with add button when no banner ads exist', (tester) async {
       await configureTestScreenSize(tester);
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: Stream.value([])));
+      final db = FakeFirebaseFirestore();
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
       await tester.pumpAndSettle();
 
-      expect(find.text("Henüz Reklam Banner'ı Yok"), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, "İlk Banner'ı Ekle"), findsOneWidget);
+      expect(find.text('Bu filtreyle banner bulunamadı.'), findsOneWidget);
+      expect(find.widgetWithText(FloatingActionButton, 'Yeni Banner'), findsOneWidget);
     });
 
     testWidgets('renders list of banner ad cards with titles and active switches', (tester) async {
       await configureTestScreenSize(tester);
 
-      final banners = [
+      final db = FakeFirebaseFirestore();
+      await seedBanner(
+        db,
         createDummyBannerAd(
           id: 'banner_1',
           title: 'Erken Rezervasyon Kampanyası',
@@ -78,6 +99,9 @@ void main() {
           order: 1,
           isActive: true,
         ),
+      );
+      await seedBanner(
+        db,
         createDummyBannerAd(
           id: 'banner_2',
           title: 'Kış Sezonu İndirimi',
@@ -86,9 +110,12 @@ void main() {
           order: 2,
           isActive: false,
         ),
-      ];
+      );
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: Stream.value(banners)));
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Tümü'));
       await tester.pumpAndSettle();
 
       expect(find.text('Erken Rezervasyon Kampanyası'), findsOneWidget);
@@ -117,7 +144,10 @@ void main() {
       when(() => mockBannerAdService.toggleActive(any(), any()))
           .thenAnswer((_) async {});
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: Stream.value([banner])));
+      final db = FakeFirebaseFirestore();
+      await seedBanner(db, banner);
+
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
       await tester.pumpAndSettle();
 
       final switchFinder = find.byType(Switch);
@@ -140,14 +170,23 @@ void main() {
       when(() => mockBannerAdService.deleteBannerAd(any()))
           .thenAnswer((_) async {});
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: Stream.value([banner])));
+      final db = FakeFirebaseFirestore();
+      await seedBanner(db, banner);
+
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byTooltip('Sil'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Banner Silinsin mi?'), findsOneWidget);
-      expect(find.text('"Silinecek Reklam" reklam banner\'ı tamamen silinecek.'), findsOneWidget);
+      expect(find.text('Banner silinsin mi?'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('"Silinecek Reklam" reklam bannerı tamamen silinecek.'),
+        ),
+        findsOneWidget,
+      );
 
       await tester.tap(find.widgetWithText(ElevatedButton, 'Sil'));
       await tester.pumpAndSettle();
@@ -164,7 +203,10 @@ void main() {
         title: 'Kalacak Reklam',
       );
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: Stream.value([banner])));
+      final db = FakeFirebaseFirestore();
+      await seedBanner(db, banner);
+
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byTooltip('Sil'));
@@ -179,15 +221,16 @@ void main() {
     testWidgets('floating action button opens new banner bottom sheet form', (tester) async {
       await configureTestScreenSize(tester);
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: Stream.value([])));
+      final db = FakeFirebaseFirestore();
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
       await tester.pumpAndSettle();
 
       await tester.tap(find.widgetWithText(FloatingActionButton, 'Yeni Banner'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Yeni Reklam Banner\'ı'), findsOneWidget);
-      expect(find.widgetWithText(TextFormField, 'Banner Başlığı *'), findsOneWidget);
-      expect(find.widgetWithText(TextFormField, 'Hedef URL *'), findsOneWidget);
+      expect(find.text('Yeni Banner Ekle'), findsOneWidget);
+      expect(find.text('Banner Başlığı *'), findsOneWidget);
+      expect(find.text('Hedef Bağlantı (URL) *'), findsOneWidget);
     });
 
     testWidgets('edit button opens bottom sheet with existing banner data prefilled', (tester) async {
@@ -200,14 +243,20 @@ void main() {
         targetUrl: 'https://target.com',
       );
 
-      await tester.pumpWidget(buildBannerAdsScreen(bannersStream: Stream.value([banner])));
+      final db = FakeFirebaseFirestore();
+      await seedBanner(db, banner);
+
+      await tester.pumpWidget(buildBannerAdsScreen(db: db));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byTooltip('Düzenle'));
       await tester.pumpAndSettle();
 
       expect(find.text('Banner Düzenle'), findsOneWidget);
-      expect(find.widgetWithText(TextFormField, 'Mevcut Kampanya Başlığı'), findsOneWidget);
+      expect(
+        tester.widget<TextFormField>(find.byType(TextFormField).first).controller?.text,
+        'Mevcut Kampanya Başlığı',
+      );
     });
   });
 }

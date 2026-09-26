@@ -569,10 +569,13 @@ void main() {
       final listing = _listing(id: 'urgent-1', isUrgent: false);
       when(() => listings.getListing(listing.id))
           .thenAnswer((_) async => listing);
+      final owner = MockAuthService();
+      when(() => owner.currentUser).thenReturn(_user);
 
       await tester.pumpWidget(ProviderScope(
         overrides: [
           listingServiceProvider.overrideWith((ref) => listings),
+          authServiceProvider.overrideWith((ref) => owner),
           paymentServiceProvider.overrideWith((ref) => PaymentService(null)),
         ],
         child: _localized(
