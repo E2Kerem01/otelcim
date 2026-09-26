@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
@@ -267,21 +269,24 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
     final l10n = AppLocalizations.of(context)!;
     final listingAsync = ref.watch(_editListingProvider(widget.listingId));
     final currentUid = ref.watch(authStateProvider).value?.uid;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('İlanı Düzenle')),
-      body: listingAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Hata: $error')),
-        data: (listing) {
-          if (listing == null) {
-            return const Center(child: Text('İlan bulunamadı.'));
-          }
-          if (currentUid == null || listing.posterId != currentUid) {
-            return const Center(
-              child: Text('Bu ilanı düzenleme yetkiniz yok.'),
-            );
-          }
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: listingAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(child: Text('Hata: $error')),
+          data: (listing) {
+            if (listing == null) {
+              return const Center(child: Text('İlan bulunamadı.'));
+            }
+            if (currentUid == null || listing.posterId != currentUid) {
+              return const Center(
+                child: Text('Bu ilanı düzenleme yetkiniz yok.'),
+              );
+            }
 
           _initializeForm(listing);
           final isBoostedActive = BoostBadge.isBoostActive(listing);
@@ -435,7 +440,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         '$totalImageCount/5',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -456,23 +461,23 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                             child: Container(
                               width: 90,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
+                                color: colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey.shade300),
+                                border: Border.all(color: colorScheme.outlineVariant),
                               ),
-                              child: const Column(
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.add_a_photo_outlined,
-                                    color: Colors.grey,
+                                    color: colorScheme.onSurfaceVariant,
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
                                     'Fotoğraf Ekle',
                                     style: TextStyle(
                                       fontSize: 10,
-                                      color: Colors.grey,
+                                      color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
@@ -729,8 +734,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Future<void> _pickContractDate({required bool isStart}) async {
     final initialDate = isStart

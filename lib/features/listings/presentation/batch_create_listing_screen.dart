@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/constants/categories.dart';
 import '../../../shared/constants/listing_filters.dart';
 import '../../../shared/error/error_mapper.dart';
@@ -197,11 +199,15 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Toplu İlan Ver'),
       ),
-      body: SingleChildScrollView(
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
@@ -222,7 +228,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.hotel_rounded, color: Theme.of(context).primaryColor),
+                          Icon(Icons.hotel_rounded, color: colorScheme.primary),
                           const SizedBox(width: 8),
                           const Text(
                             'Otel / İşletme Bilgileri',
@@ -276,7 +282,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                           const Text('Otel Fotoğrafları', style: TextStyle(fontWeight: FontWeight.bold)),
                           Text(
                             '${_selectedImageFiles.length}/5',
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -295,16 +301,16 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                                 child: Container(
                                   width: 80,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
+                                    color: colorScheme.surfaceContainerHighest,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.grey.shade300),
+                                    border: Border.all(color: colorScheme.outlineVariant),
                                   ),
-                                  child: const Column(
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.add_a_photo_outlined, color: Colors.grey, size: 20),
-                                      SizedBox(height: 4),
-                                      Text('Ekle', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                      Icon(Icons.add_a_photo_outlined, color: colorScheme.onSurfaceVariant, size: 20),
+                                      const SizedBox(height: 4),
+                                      Text('Ekle', style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
                                     ],
                                   ),
                                 ),
@@ -383,7 +389,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                       elevation: 1,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: colorScheme.outlineVariant),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -395,7 +401,7 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
                               children: [
                                 Chip(
                                   avatar: CircleAvatar(
-                                    backgroundColor: Theme.of(context).primaryColor,
+                                    backgroundColor: colorScheme.primary,
                                     child: Text(
                                       '${index + 1}',
                                       style: const TextStyle(color: Colors.white, fontSize: 12),
@@ -522,8 +528,9 @@ class _BatchCreateListingScreenState extends ConsumerState<BatchCreateListingScr
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   String? _salaryRangeValidator(PositionFormData pos) {
     final minVal = int.tryParse(pos.minSalaryController.text.trim());

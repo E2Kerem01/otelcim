@@ -524,6 +524,30 @@ abstract class AppLocalizations {
   /// **'Çıkış Yap'**
   String get signOut;
 
+  /// No description provided for @desktopNavFavorites.
+  ///
+  /// In tr, this message translates to:
+  /// **'Favoriler'**
+  String get desktopNavFavorites;
+
+  /// No description provided for @desktopNavProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil'**
+  String get desktopNavProfile;
+
+  /// No description provided for @desktopNavSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlar'**
+  String get desktopNavSettings;
+
+  /// No description provided for @desktopNavLanguage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dil'**
+  String get desktopNavLanguage;
+
   /// Reception category label
   ///
   /// In tr, this message translates to:

@@ -1,6 +1,10 @@
 {
   "@@locale": "ru",
   "appName": "HospoJobs",
+  "desktopNavFavorites": "Избранное",
+  "desktopNavProfile": "Профиль",
+  "desktopNavSettings": "Настройки",
+  "desktopNavLanguage": "Язык",
   "emailLabel": "Электронная почта",
   "emailHint": "primer@pochta.com",
   "emailValidation": "Введите корректный адрес эл. почты",

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/providers/profile_provider.dart';
@@ -91,11 +93,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
         if (isDesktop) {
           return Scaffold(
-            body: Row(
-              children: [
-                // Desktop Master Navigation Sidebar
-                SizedBox(
-                  width: 320,
+            body: MaxWidthContainer(
+              maxWidth: AppBreakpoints.contentMaxWidth,
+              child: Row(
+                children: [
+                  // Desktop Master Navigation Sidebar
+                  SizedBox(
+                    width: 320,
                   child: Card(
                     margin: const EdgeInsets.all(12),
                     child: Column(
@@ -302,13 +306,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ],
             ),
+            ),
           );
         }
 
         // Mobile Single Column Layout
         return Scaffold(
           appBar: AppBar(title: const Text('Hesabım')),
-          body: ListView(
+          body: MaxWidthContainer(
+            maxWidth: AppBreakpoints.contentMaxWidth,
+            child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
               Card(
@@ -534,6 +541,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ],
           ),
+          ),
         );
       },
     );
@@ -601,24 +609,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     AsyncValue<List<Rating>>? ratings,
     List<Certificate>? approvedCerts,
   ) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil Genel Bakışı'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Profili Düzenle',
-            onPressed: () {
-              setState(() {
-                _selectedSection = 'edit';
-              });
-            },
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Profil Genel Bakışı',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Profili Düzenle',
+              onPressed: () {
+                setState(() {
+                  _selectedSection = 'edit';
+                });
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
           // Profile Banner Card
           Card(
             elevation: 2,
@@ -852,8 +866,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
           ),
         ],
-      ),
-    );
+      );
   }
 
 }

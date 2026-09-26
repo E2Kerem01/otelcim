@@ -235,6 +235,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get signOut => 'Abmelden';
 
   @override
+  String get desktopNavFavorites => 'Favoriten';
+
+  @override
+  String get desktopNavProfile => 'Profil';
+
+  @override
+  String get desktopNavSettings => 'Einstellungen';
+
+  @override
+  String get desktopNavLanguage => 'Sprache';
+
+  @override
   String get categoryReception => 'Rezeption';
 
   @override

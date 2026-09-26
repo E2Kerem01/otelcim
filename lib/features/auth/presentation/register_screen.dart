@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
@@ -272,10 +274,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ElevatedButton(
               onPressed: _loading ? null : _submit,
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     )
                   : Text(l10n?.registerButton ?? 'Kayıt Ol'),
             ),
@@ -301,26 +306,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     if (isWide) {
       return Scaffold(
-        body: Center(
+        body: MaxWidthContainer(
+          maxWidth: AppBreakpoints.formMaxWidth,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(32),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 960),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(child: formContent),
-                      const Expanded(child: AuthBrandPanel()),
-                    ],
-                  ),
-                ),
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(child: formContent),
+                  const Expanded(child: AuthBrandPanel()),
+                ],
               ),
             ),
           ),

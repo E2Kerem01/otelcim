@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
@@ -450,26 +452,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (isWide) {
       return _withBackToHome(Scaffold(
-        body: Center(
+        body: MaxWidthContainer(
+          maxWidth: AppBreakpoints.formMaxWidth,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(32),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 960),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(child: formContent),
-                      const Expanded(child: AuthBrandPanel()),
-                    ],
-                  ),
-                ),
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(child: formContent),
+                  const Expanded(child: AuthBrandPanel()),
+                ],
               ),
             ),
           ),
@@ -539,10 +537,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ElevatedButton(
             onPressed: (_loading || _lockoutSeconds > 0) ? null : _submitEmail,
             child: _loading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   )
                 : Text(l10n?.loginButton ?? 'Giriş Yap'),
           ),
@@ -604,10 +605,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ElevatedButton(
               onPressed: (_loading || _lockoutSeconds > 0) ? null : _sendSmsCode,
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     )
                   : Text(l10n?.sendSmsCode ?? 'Kod Gönder'),
             )
@@ -615,10 +619,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ElevatedButton(
               onPressed: (_loading || _lockoutSeconds > 0) ? null : _verifySmsCode,
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     )
                   : Text(l10n?.verifySmsCode ?? 'Doğrula ve Giriş Yap'),
             ),

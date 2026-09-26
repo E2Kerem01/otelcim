@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
@@ -399,25 +401,28 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
             ),
         ],
       ),
-      body: Column(
-        children: [
-          if (_conversation?.hired == true && _otherParticipantId != null)
-            ChatHiredBanner(conversationId: widget.conversationId),
-          InterviewSlotBanner(
-            conversationId: widget.conversationId,
-            myUid: myUid,
-          ),
-          Expanded(
-            child: ChatMessageList(
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: Column(
+          children: [
+            if (_conversation?.hired == true && _otherParticipantId != null)
+              ChatHiredBanner(conversationId: widget.conversationId),
+            InterviewSlotBanner(
               conversationId: widget.conversationId,
               myUid: myUid,
             ),
-          ),
-          ChatMessageComposer(
-            controller: _messageController,
-            onSend: _send,
-          ),
-        ],
+            Expanded(
+              child: ChatMessageList(
+                conversationId: widget.conversationId,
+                myUid: myUid,
+              ),
+            ),
+            ChatMessageComposer(
+              controller: _messageController,
+              onSend: _send,
+            ),
+          ],
+        ),
       ),
     );
   }

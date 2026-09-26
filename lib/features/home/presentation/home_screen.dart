@@ -15,6 +15,8 @@ import '../../../l10n/app_localizations.dart';
 import '../../discovery/domain/tourism_region.dart';
 import '../../listings/presentation/listing_filter_labels.dart';
 import '../../listings/presentation/season_utils.dart';
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../core/responsive/responsive_layout.dart';
 import 'widgets/home_screen_widgets.dart';
 import 'widgets/listing_feed_card.dart';
@@ -224,198 +226,252 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ],
             ),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: l10n.homeSearchHint,
-                            prefixIcon: const Icon(
-                              Icons.search_rounded,
-                              color: Color(0xFF495057),
-                            ),
-                            suffixIcon: _hasSearchText
-                                ? IconButton(
-                                    icon: const Icon(
-                                      Icons.clear_rounded,
-                                      size: 20,
-                                    ),
-                                    tooltip: 'Aramayı Temizle',
-                                    constraints: const BoxConstraints(
-                                      minWidth: 48,
-                                      minHeight: 48,
-                                    ),
-                                    onPressed: _clearSearch,
-                                  )
-                                : null,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 14,
-                            ),
-                          ),
-                          onChanged: _onSearchChanged,
-                        ),
-                      ),
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              if (isDesktop)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    child: Text(
+                      widget.initialRegion == null
+                          ? l10n.appName
+                          : ((Localizations.localeOf(context).languageCode ==
+                                        'en'
+                                    ? tourismRegionById(
+                                        widget.initialRegion,
+                                      )?.nameEn
+                                    : tourismRegionById(
+                                        widget.initialRegion,
+                                      )?.nameTr) ??
+                                l10n.regionsTitle),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(width: 10),
-                    Badge(
-                      isLabelVisible: _filters.activeCount > 0,
-                      label: Text(
-                        '${_filters.activeCount}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      child: IconButton.filledTonal(
-                        onPressed: _openFilters,
-                        tooltip: l10n.filtersTooltip,
-                        constraints: const BoxConstraints(
-                          minWidth: 48,
-                          minHeight: 48,
-                        ),
-                        icon: const Icon(Icons.tune_rounded),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: FilledButton.tonalIcon(
-                  onPressed: () => context.push('/nearby'),
-                  icon: const Icon(Icons.near_me_outlined),
-                  label: Text(AppLocalizations.of(context)!.nearMe),
-                ),
-              ),
-            ),
-            if (_filters.activeCount > 0)
               SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 44,
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      if (_filters.city != null)
-                        _filterChip(
-                          _filters.city!,
-                          () => setState(
-                            () => _filters = _filters.copyWith(clearCity: true),
-                          ),
-                        ),
-                      if (_filters.region != null)
-                        _filterChip(
-                          (Localizations.localeOf(context).languageCode == 'en'
-                                  ? tourismRegionById(_filters.region)?.nameEn
-                                  : tourismRegionById(
-                                      _filters.region,
-                                    )?.nameTr) ??
-                              _filters.region!,
-                          () => setState(
-                            () =>
-                                _filters = _filters.copyWith(clearRegion: true),
-                          ),
-                        ),
-                      if (_filters.minSalaryTl != null ||
-                          _filters.maxSalaryTl != null)
-                        _filterChip(
-                          _filters.salaryLabel(l10n),
-                          () => setState(
-                            () =>
-                                _filters = _filters.copyWith(clearSalary: true),
-                          ),
-                        ),
-                      if (_filters.dateFilter != ListingDateFilter.all)
-                        _filterChip(
-                          listingDateFilterLabel(l10n, _filters.dateFilter),
-                          () => setState(
-                            () => _filters = _filters.copyWith(
-                              dateFilter: ListingDateFilter.all,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: TextField(
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                  hintText: l10n.homeSearchHint,
+                                  prefixIcon: Icon(
+                                    Icons.search_rounded,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  suffixIcon: _hasSearchText
+                                      ? IconButton(
+                                          icon: const Icon(
+                                            Icons.clear_rounded,
+                                            size: 20,
+                                          ),
+                                          tooltip: 'Aramayı Temizle',
+                                          constraints: const BoxConstraints(
+                                            minWidth: 48,
+                                            minHeight: 48,
+                                          ),
+                                          onPressed: _clearSearch,
+                                        )
+                                      : null,
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                ),
+                                onChanged: _onSearchChanged,
+                              ),
                             ),
                           ),
-                        ),
-                      if (_filters.employmentType != null)
-                        _filterChip(
-                          employmentTypeLabel(l10n, _filters.employmentType!),
-                          () => setState(
-                            () => _filters = _filters.copyWith(
-                              clearEmploymentType: true,
+                          const SizedBox(width: 10),
+                          Badge(
+                            isLabelVisible: _filters.activeCount > 0,
+                            label: Text(
+                              '${_filters.activeCount}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            child: IconButton.filledTonal(
+                              onPressed: _openFilters,
+                              tooltip: l10n.filtersTooltip,
+                              constraints: const BoxConstraints(
+                                minWidth: 48,
+                                minHeight: 48,
+                              ),
+                              icon: const Icon(Icons.tune_rounded),
                             ),
                           ),
-                        ),
-                      if (_filters.season != null)
-                        _filterChip(
-                          listingSeasonLabel(l10n, _filters.season!.code),
-                          () => setState(
-                            () =>
-                                _filters = _filters.copyWith(clearSeason: true),
-                          ),
-                        ),
-                      if (_filters.sortOrder != ListingSortOrder.newest)
-                        _filterChip(
-                          listingSortOrderLabel(l10n, _filters.sortOrder),
-                          () => setState(
-                            () => _filters = _filters.copyWith(
-                              sortOrder: ListingSortOrder.newest,
-                            ),
-                          ),
-                        ),
-                      TextButton(
-                        onPressed: () => setState(
-                          () => _filters = const HomeAdvancedFilters(),
-                        ),
-                        child: Text(l10n.clearFiltersAction),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: BannerAdCarousel(),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: FilledButton.tonalIcon(
+                    onPressed: () => context.push('/nearby'),
+                    icon: const Icon(Icons.near_me_outlined),
+                    label: Text(AppLocalizations.of(context)!.nearMe),
+                  ),
+                ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 48,
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: ListingCategory.values.length + 1,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      final isSelected = selectedCategory == null;
+              if (_filters.activeCount > 0)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 44,
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        if (_filters.city != null)
+                          _filterChip(
+                            _filters.city!,
+                            () => setState(
+                              () =>
+                                  _filters = _filters.copyWith(clearCity: true),
+                            ),
+                          ),
+                        if (_filters.region != null)
+                          _filterChip(
+                            (Localizations.localeOf(context).languageCode ==
+                                        'en'
+                                    ? tourismRegionById(_filters.region)?.nameEn
+                                    : tourismRegionById(
+                                        _filters.region,
+                                      )?.nameTr) ??
+                                _filters.region!,
+                            () => setState(
+                              () => _filters = _filters.copyWith(
+                                clearRegion: true,
+                              ),
+                            ),
+                          ),
+                        if (_filters.minSalaryTl != null ||
+                            _filters.maxSalaryTl != null)
+                          _filterChip(
+                            _filters.salaryLabel(l10n),
+                            () => setState(
+                              () => _filters = _filters.copyWith(
+                                clearSalary: true,
+                              ),
+                            ),
+                          ),
+                        if (_filters.dateFilter != ListingDateFilter.all)
+                          _filterChip(
+                            listingDateFilterLabel(l10n, _filters.dateFilter),
+                            () => setState(
+                              () => _filters = _filters.copyWith(
+                                dateFilter: ListingDateFilter.all,
+                              ),
+                            ),
+                          ),
+                        if (_filters.employmentType != null)
+                          _filterChip(
+                            employmentTypeLabel(l10n, _filters.employmentType!),
+                            () => setState(
+                              () => _filters = _filters.copyWith(
+                                clearEmploymentType: true,
+                              ),
+                            ),
+                          ),
+                        if (_filters.season != null)
+                          _filterChip(
+                            listingSeasonLabel(l10n, _filters.season!.code),
+                            () => setState(
+                              () => _filters = _filters.copyWith(
+                                clearSeason: true,
+                              ),
+                            ),
+                          ),
+                        if (_filters.sortOrder != ListingSortOrder.newest)
+                          _filterChip(
+                            listingSortOrderLabel(l10n, _filters.sortOrder),
+                            () => setState(
+                              () => _filters = _filters.copyWith(
+                                sortOrder: ListingSortOrder.newest,
+                              ),
+                            ),
+                          ),
+                        TextButton(
+                          onPressed: () => setState(
+                            () => _filters = const HomeAdvancedFilters(),
+                          ),
+                          child: Text(l10n.clearFiltersAction),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: BannerAdCarousel(),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 48,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: ListingCategory.values.length + 1,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        final isSelected = selectedCategory == null;
+                        return ChoiceChip(
+                          label: Text(l10n.allFilterChip),
+                          selected: isSelected,
+                          onSelected: (_) =>
+                              ref
+                                      .read(
+                                        selectedCategoryFilterProvider.notifier,
+                                      )
+                                      .state =
+                                  null,
+                          selectedColor: Theme.of(context).primaryColor,
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black87,
+                          ),
+                        );
+                      }
+                      final category = ListingCategory.values[index - 1];
+                      final isSelected = category == selectedCategory;
                       return ChoiceChip(
-                        label: Text(l10n.allFilterChip),
+                        label: Text(listingCategoryLabels[category]!),
                         selected: isSelected,
                         onSelected: (_) =>
                             ref
@@ -423,73 +479,125 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       selectedCategoryFilterProvider.notifier,
                                     )
                                     .state =
-                                null,
+                                category,
                         selectedColor: Theme.of(context).primaryColor,
                         labelStyle: TextStyle(
                           color: isSelected ? Colors.white : Colors.black87,
                         ),
                       );
-                    }
-                    final category = ListingCategory.values[index - 1];
-                    final isSelected = category == selectedCategory;
-                    return ChoiceChip(
-                      label: Text(listingCategoryLabels[category]!),
-                      selected: isSelected,
-                      onSelected: (_) =>
-                          ref
-                                  .read(selectedCategoryFilterProvider.notifier)
-                                  .state =
-                              category,
-                      selectedColor: Theme.of(context).primaryColor,
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                      ),
-                    );
-                  },
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                child: Row(
-                  children: [
-                    Text(
-                      l10n.resultCount(paginationState.listings.length),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const Spacer(),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest
-                            .withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(8),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                  child: Row(
+                    children: [
+                      Text(
+                        l10n.resultCount(paginationState.listings.length),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 2,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ...availableColumnCounts.map((cols) {
-                            final isSelected =
-                                !_isTableView && _columnCount == cols;
-                            final tooltip = l10n.gridColumnsTooltip(cols);
-                            return Semantics(
+                      const Spacer(),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 2,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ...availableColumnCounts.map((cols) {
+                              final isSelected =
+                                  !_isTableView && _columnCount == cols;
+                              final tooltip = l10n.gridColumnsTooltip(cols);
+                              return Semantics(
+                                button: true,
+                                label: tooltip,
+                                child: Tooltip(
+                                  message: tooltip,
+                                  child: InkWell(
+                                    key: Key('grid_col_$cols'),
+                                    onTap: () => setState(() {
+                                      _isTableView = false;
+                                      _columnCount = cols;
+                                    }),
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                        minWidth: 48,
+                                        minHeight: 48,
+                                      ),
+                                      child: Center(
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                            milliseconds: 150,
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                cols == 1
+                                                    ? Icons.view_list_rounded
+                                                    : cols == 2
+                                                    ? Icons.grid_view_rounded
+                                                    : cols == 3
+                                                    ? Icons.grid_on_rounded
+                                                    : Icons.apps_rounded,
+                                                size: 16,
+                                                color: isSelected
+                                                    ? Colors.white
+                                                    : const Color(0xFF495057),
+                                              ),
+                                              const SizedBox(width: 3),
+                                              Text(
+                                                '$cols',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isSelected
+                                                      ? Colors.white
+                                                      : const Color(0xFF495057),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                            Semantics(
                               button: true,
-                              label: tooltip,
+                              label: l10n.tableViewTooltip,
                               child: Tooltip(
-                                message: tooltip,
+                                message: l10n.tableViewTooltip,
                                 child: InkWell(
-                                  key: Key('grid_col_$cols'),
-                                  onTap: () => setState(() {
-                                    _isTableView = false;
-                                    _columnCount = cols;
-                                  }),
+                                  key: const Key('grid_col_table'),
+                                  onTap: () =>
+                                      setState(() => _isTableView = true),
                                   borderRadius: BorderRadius.circular(6),
                                   child: ConstrainedBox(
                                     constraints: const BoxConstraints(
@@ -506,183 +614,124 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           vertical: 6,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: isSelected
+                                          color: _isTableView
                                               ? Theme.of(context).primaryColor
                                               : Colors.transparent,
                                           borderRadius: BorderRadius.circular(
                                             6,
                                           ),
                                         ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              cols == 1
-                                                  ? Icons.view_list_rounded
-                                                  : cols == 2
-                                                  ? Icons.grid_view_rounded
-                                                  : cols == 3
-                                                  ? Icons.grid_on_rounded
-                                                  : Icons.apps_rounded,
-                                              size: 16,
-                                              color: isSelected
-                                                  ? Colors.white
-                                                  : const Color(0xFF495057),
-                                            ),
-                                            const SizedBox(width: 3),
-                                            Text(
-                                              '$cols',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: isSelected
-                                                    ? Colors.white
-                                                    : const Color(0xFF495057),
-                                              ),
-                                            ),
-                                          ],
+                                        child: Icon(
+                                          Icons.table_rows_rounded,
+                                          size: 18,
+                                          color: _isTableView
+                                              ? Colors.white
+                                              : const Color(0xFF495057),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            );
-                          }),
-                          Semantics(
-                            button: true,
-                            label: l10n.tableViewTooltip,
-                            child: Tooltip(
-                              message: l10n.tableViewTooltip,
-                              child: InkWell(
-                                key: const Key('grid_col_table'),
-                                onTap: () =>
-                                    setState(() => _isTableView = true),
-                                borderRadius: BorderRadius.circular(6),
-                                child: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    minWidth: 48,
-                                    minHeight: 48,
-                                  ),
-                                  child: Center(
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 150,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _isTableView
-                                            ? Theme.of(context).primaryColor
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Icon(
-                                        Icons.table_rows_rounded,
-                                        size: 18,
-                                        color: _isTableView
-                                            ? Colors.white
-                                            : const Color(0xFF495057),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (paginationState.isLoading && paginationState.listings.isEmpty)
-              ListingsSkeletonSliver(
-                columnCount: _isTableView ? 1 : _columnCount,
-              )
-            else if (paginationState.error != null &&
-                paginationState.listings.isEmpty)
-              _buildErrorState(context)
-            else if (paginationState.listings.isEmpty)
-              _buildEmptyState(context)
-            else ...[
-              if (_isTableView)
-                const SliverToBoxAdapter(child: ListingTableHeader()),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: _isTableView
-                    ? SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: ListingTableRow(
-                              listing: paginationState.listings[index],
-                            ),
-                          ),
-                          childCount: paginationState.listings.length,
-                        ),
-                      )
-                    : _columnCount == 1
-                    ? SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: ListingFeedCard(
-                              listing: paginationState.listings[index],
-                            ),
-                          ),
-                          childCount: paginationState.listings.length,
-                        ),
-                      )
-                    // Text-first cards vary in height, so rows of equal-height
-                    // cells instead of a fixed-aspect SliverGrid.
-                    : SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, row) {
-                            final cells = paginationState.listings
-                                .skip(row * _columnCount)
-                                .take(_columnCount)
-                                .toList();
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: IntrinsicHeight(
-                                child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    for (var i = 0; i < _columnCount; i++) ...[
-                                      if (i > 0) const SizedBox(width: 12),
-                                      Expanded(
-                                        child: i < cells.length
-                                            ? ListingFeedCard(listing: cells[i])
-                                            : const SizedBox.shrink(),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                          childCount:
-                              (paginationState.listings.length +
-                                  _columnCount -
-                                  1) ~/
-                              _columnCount,
+                          ],
                         ),
                       ),
-              ),
-              if (paginationState.isLoading)
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Center(child: CircularProgressIndicator()),
+                    ],
                   ),
                 ),
+              ),
+              if (paginationState.isLoading && paginationState.listings.isEmpty)
+                ListingsSkeletonSliver(
+                  columnCount: _isTableView ? 1 : _columnCount,
+                )
+              else if (paginationState.error != null &&
+                  paginationState.listings.isEmpty)
+                _buildErrorState(context)
+              else if (paginationState.listings.isEmpty)
+                _buildEmptyState(context)
+              else ...[
+                if (_isTableView)
+                  const SliverToBoxAdapter(child: ListingTableHeader()),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: _isTableView
+                      ? SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: ListingTableRow(
+                                listing: paginationState.listings[index],
+                              ),
+                            ),
+                            childCount: paginationState.listings.length,
+                          ),
+                        )
+                      : _columnCount == 1
+                      ? SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: ListingFeedCard(
+                                listing: paginationState.listings[index],
+                              ),
+                            ),
+                            childCount: paginationState.listings.length,
+                          ),
+                        )
+                      // Text-first cards vary in height, so rows of equal-height
+                      // cells instead of a fixed-aspect SliverGrid.
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, row) {
+                              final cells = paginationState.listings
+                                  .skip(row * _columnCount)
+                                  .take(_columnCount)
+                                  .toList();
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      for (
+                                        var i = 0;
+                                        i < _columnCount;
+                                        i++
+                                      ) ...[
+                                        if (i > 0) const SizedBox(width: 12),
+                                        Expanded(
+                                          child: i < cells.length
+                                              ? ListingFeedCard(
+                                                  listing: cells[i],
+                                                )
+                                              : const SizedBox.shrink(),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount:
+                                (paginationState.listings.length +
+                                    _columnCount -
+                                    1) ~/
+                                _columnCount,
+                          ),
+                        ),
+                ),
+                if (paginationState.isLoading)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

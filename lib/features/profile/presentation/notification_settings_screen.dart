@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
@@ -173,16 +175,19 @@ class _NotificationSettingsScreenState
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(currentUserProfileProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Bildirim Ayarları')),
-      body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Hata: $err')),
-        data: (profile) {
-          if (profile == null) {
-            return const Center(child: Text('Kullanıcı profili bulunamadı.'));
-          }
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: profileAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Hata: $err')),
+          data: (profile) {
+            if (profile == null) {
+              return const Center(child: Text('Kullanıcı profili bulunamadı.'));
+            }
 
           final prefs = profile.notificationPreferences;
           final messagesEnabled = prefs['messages'] ?? true;
@@ -194,11 +199,11 @@ class _NotificationSettingsScreenState
           final hasQuietHours =
               profile.quietHoursStart != null || profile.quietHoursEnd != null;
 
-          return IgnorePointer(
-            ignoring: _isSaving,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
+            return IgnorePointer(
+              ignoring: _isSaving,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
                 // Info Card
                 Card(
                   elevation: 2,
@@ -215,13 +220,13 @@ class _NotificationSettingsScreenState
                           size: 28,
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Almak istediğiniz bildirim türlerini ve sessiz saatlerinizi buradan yönetebilirsiniz.',
                             style: TextStyle(
                               fontSize: 13,
                               height: 1.4,
-                              color: Colors.black87,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -371,9 +376,9 @@ class _NotificationSettingsScreenState
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Belirlediğiniz zaman diliminde rahatsız edilmemek için sessiz saatler ayarlayabilirsiniz.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 10),
 
@@ -397,8 +402,8 @@ class _NotificationSettingsScreenState
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                             color: profile.quietHoursStart != null
-                                ? Colors.black87
-                                : Colors.grey,
+                                ? colorScheme.onSurface
+                                : colorScheme.onSurfaceVariant,
                           ),
                         ),
                         trailing: const Icon(Icons.access_time_rounded),
@@ -418,8 +423,8 @@ class _NotificationSettingsScreenState
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                             color: profile.quietHoursEnd != null
-                                ? Colors.black87
-                                : Colors.grey,
+                                ? colorScheme.onSurface
+                                : colorScheme.onSurfaceVariant,
                           ),
                         ),
                         trailing: const Icon(Icons.access_time_rounded),
@@ -442,10 +447,11 @@ class _NotificationSettingsScreenState
                     ],
                   ),
                 ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

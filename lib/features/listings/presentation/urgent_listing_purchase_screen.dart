@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../shared/error/error_mapper.dart';
 import '../../../shared/error/error_reporter.dart';
 import '../../../shared/services/auth_service.dart';
@@ -154,68 +156,71 @@ class _UrgentListingPurchaseScreenState
   Widget build(BuildContext context) {
     final paymentService = ref.watch(paymentServiceProvider);
     final listingAsync = ref.watch(singleListingProvider(widget.listingId));
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Acil İlan')),
-      body: listingAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('İlan yüklenirken hata: $err')),
-        data: (listing) {
-          if (listing == null) {
-            return const Center(child: Text('İlan bulunamadı.'));
-          }
-          final user = ref.watch(authServiceProvider).currentUser;
-          if (listing.isUrgent) {
-            return _buildGuardState(
-              // TODO(l10n): add urgentListingAlreadyActive (TR: "Bu ilan zaten acil.", EN: "This listing is already urgent.").
-              'Bu ilan zaten acil.',
-            );
-          }
-          if (user == null) {
-            return _buildGuardState('Lütfen önce giriş yapın.');
-          }
-          if (listing.posterId != user.uid) {
-            return _buildGuardState(
-              // TODO(l10n): add urgentListingOwnerOnly (TR: "Bu ilanı yalnızca sahibi acil yapabilir.", EN: "Only the owner can make this listing urgent.").
-              'Bu ilanı yalnızca sahibi acil yapabilir.',
-            );
-          }
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          listing.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.formMaxWidth,
+        child: listingAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(child: Text('İlan yüklenirken hata: $err')),
+          data: (listing) {
+            if (listing == null) {
+              return const Center(child: Text('İlan bulunamadı.'));
+            }
+            final user = ref.watch(authServiceProvider).currentUser;
+            if (listing.isUrgent) {
+              return _buildGuardState(
+                // TODO(l10n): add urgentListingAlreadyActive (TR: "Bu ilan zaten acil.", EN: "This listing is already urgent.").
+                'Bu ilan zaten acil.',
+              );
+            }
+            if (user == null) {
+              return _buildGuardState('Lütfen önce giriş yapın.');
+            }
+            if (listing.posterId != user.uid) {
+              return _buildGuardState(
+                // TODO(l10n): add urgentListingOwnerOnly (TR: "Bu ilanı yalnızca sahibi acil yapabilir.", EN: "Only the owner can make this listing urgent.").
+                'Bu ilanı yalnızca sahibi acil yapabilir.',
+              );
+            }
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            listing.title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${listing.location} · ${listing.salary}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 13,
+                          const SizedBox(height: 6),
+                          Text(
+                            '${listing.location} · ${listing.salary}',
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
@@ -260,7 +265,7 @@ class _UrgentListingPurchaseScreenState
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.deepOrange.shade300, width: 2),
                     ),
@@ -300,12 +305,12 @@ class _UrgentListingPurchaseScreenState
                       ),
                     ),
                     child: _isProcessing
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              color: Colors.white,
+                              color: colorScheme.onPrimary,
                             ),
                           )
                         : const Text(
@@ -329,7 +334,7 @@ class _UrgentListingPurchaseScreenState
                   child: Text(
                     'Ödeme güvenli şekilde Google Play / App Store üzerinden '
                     'tamamlanır.',
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -338,8 +343,9 @@ class _UrgentListingPurchaseScreenState
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildGuardState(String message) {
     return Center(

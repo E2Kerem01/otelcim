@@ -49,6 +49,7 @@ import '../features/profile/presentation/verification_request_screen.dart';
 import '../features/ratings/presentation/submit_rating_screen.dart';
 import '../features/seasonal/presentation/seasonal_calendar_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
+import '../core/responsive/desktop_page_frame.dart';
 import '../shared/services/auth_service.dart';
 import '../shared/widgets/desktop_top_nav_bar.dart';
 
@@ -60,6 +61,8 @@ Page<T> buildAppPage<T>({
   required GoRouterState state,
   required Widget child,
 }) {
+  child = _desktopFrameForRoute(state, child);
+
   // Only the CupertinoPage/MaterialPage branch matters here: CupertinoPage
   // brings CupertinoPageTransitionsBuilder's proper interactive swipe-back
   // gesture handling on iOS, which is what actually keeps the router state
@@ -88,6 +91,27 @@ Page<T> buildAppPage<T>({
     arguments: state.pathParameters,
     child: child,
   );
+}
+
+Widget _desktopFrameForRoute(GoRouterState state, Widget child) {
+  // Use the matched route path here rather than state.uri so lightweight
+  // GoRouterState fakes used by page-builder tests remain compatible.
+  final location = state.path ?? '';
+  final isFullScreenFlow = location == '/splash' ||
+      location == '/login' ||
+      location == '/register' ||
+      location.startsWith('/onboarding') ||
+      location == '/account-suspended' ||
+      location.startsWith('/admin') ||
+      location.endsWith('/qr-poster');
+  final isStatefulShellRoute = location == '/' ||
+      location == '/categories' ||
+      location == '/create-listing' ||
+      location == '/chat' ||
+      location == '/profile';
+
+  if (isFullScreenFlow || isStatefulShellRoute) return child;
+  return DesktopPageFrame(child: child);
 }
 
 bool isProtectedRoute(String location) {

@@ -235,6 +235,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get signOut => 'Выйти';
 
   @override
+  String get desktopNavFavorites => 'Избранное';
+
+  @override
+  String get desktopNavProfile => 'Профиль';
+
+  @override
+  String get desktopNavSettings => 'Настройки';
+
+  @override
+  String get desktopNavLanguage => 'Язык';
+
+  @override
   String get categoryReception => 'Стойка регистрации';
 
   @override

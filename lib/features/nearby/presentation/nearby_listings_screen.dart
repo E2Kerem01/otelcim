@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../app/design_tokens.dart';
+import '../../../core/responsive/max_width_container.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/listing_service.dart';
 import '../domain/nearby_listing.dart';
@@ -161,46 +163,49 @@ class _NearbyListingsScreenState extends ConsumerState<NearbyListingsScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
-              children: [
-                Text('${l10n.radiusLabel}:'),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SegmentedButton<double>(
-                    segments: _radii
-                        .map(
-                          (radius) => ButtonSegment(
-                            value: radius,
-                            label: Text('${radius.toInt()} km'),
-                          ),
-                        )
-                        .toList(),
-                    selected: {_radiusKm},
-                    onSelectionChanged: (selection) {
-                      if (mounted) {
-                        setState(() {
-                          _radiusKm = selection.first;
-                        });
-                        if (_position != null) {
-                          _mapController.move(
-                            LatLng(_position!.latitude, _position!.longitude),
-                            _zoomForRadius(_radiusKm),
-                          );
+      body: MaxWidthContainer(
+        maxWidth: AppBreakpoints.contentMaxWidth,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  Text('${l10n.radiusLabel}:'),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SegmentedButton<double>(
+                      segments: _radii
+                          .map(
+                            (radius) => ButtonSegment(
+                              value: radius,
+                              label: Text('${radius.toInt()} km'),
+                            ),
+                          )
+                          .toList(),
+                      selected: {_radiusKm},
+                      onSelectionChanged: (selection) {
+                        if (mounted) {
+                          setState(() {
+                            _radiusKm = selection.first;
+                          });
+                          if (_position != null) {
+                            _mapController.move(
+                              LatLng(_position!.latitude, _position!.longitude),
+                              _zoomForRadius(_radiusKm),
+                            );
+                          }
                         }
-                      }
-                    },
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Divider(height: 1, thickness: 1),
-          Expanded(child: _buildContent(l10n)),
-        ],
+            const Divider(height: 1, thickness: 1),
+            Expanded(child: _buildContent(l10n)),
+          ],
+        ),
       ),
     );
   }
@@ -385,7 +390,7 @@ class _NearbyListingsScreenState extends ConsumerState<NearbyListingsScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: colorScheme.primary,
-                  border: Border.all(color: Colors.white, width: 3),
+                  border: Border.all(color: colorScheme.surface, width: 3),
                   boxShadow: const [
                     BoxShadow(blurRadius: 6, color: Colors.black38),
                   ],
@@ -456,7 +461,7 @@ class _NearbyListingsScreenState extends ConsumerState<NearbyListingsScreen> {
                           ? colorScheme.primary
                           : colorScheme.secondaryContainer,
                       border: Border.all(
-                        color: isHovered ? Colors.white : colorScheme.surface,
+                        color: isHovered ? colorScheme.onPrimary : colorScheme.surface,
                         width: isHovered ? 2.5 : 1.5,
                       ),
                       boxShadow: [
