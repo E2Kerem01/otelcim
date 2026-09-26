@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="28" fill="#1976D2"/>
+  <!-- Hospitality Bell Top Button -->
+  <rect x="58" y="18" width="12" height="7" rx="3.5" fill="#FFFFFF"/>
+  <rect x="62" y="24" width="4" height="4" fill="#FFFFFF"/>
+  <!-- Stylised "O" Ring / Bell Dome Motif -->
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M64 26C43.013 26 26 43.013 26 64C26 84.987 43.013 102 64 102C84.987 102 102 84.987 102 64C102 43.013 84.987 26 64 26ZM64 41C51.297 41 41 51.297 41 64C41 76.703 51.297 87 64 87C76.703 87 87 76.703 87 64C87 51.297 76.703 41 64 41Z" fill="#FFFFFF"/>
+  <!-- Hospitality Bell Base Stand -->
+  <rect x="36" y="98" width="56" height="8" rx="4" fill="#FFFFFF"/>
+</svg>

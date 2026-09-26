@@ -1,14 +1,20 @@
 {
-    "name": "Otelcim | Otel & Turizm İş İlanları",
+    "name": "Otelcim",
     "short_name": "Otelcim",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#1976D2",
     "theme_color": "#1976D2",
     "description": "Otel ve turizm sektöründe hayalinizdeki işi veya aradığınız personeli Otelcim ile hızlıca bulun.",
-    "orientation": "portrait-primary",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
+        {
+            "src": "icons/logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
         {
             "src": "icons/Icon-192.png",
             "sizes": "192x192",

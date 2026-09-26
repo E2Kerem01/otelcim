@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -713,22 +714,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
               ),
               const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  await ref.read(listingServiceProvider).seedSampleListings();
-                },
-                icon: const Icon(Icons.download_rounded),
-                label: Text(l10n.seedSampleListingsAction),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
+              if (kDebugMode) ...[
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await ref.read(listingServiceProvider).seedSampleListings();
+                  },
+                  icon: const Icon(Icons.download_rounded),
+                  label: Text(l10n.seedSampleListingsAction),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 12),
+              ],
               OutlinedButton.icon(
                 onPressed: () => context.push('/create-listing'),
                 icon: const Icon(Icons.add_circle_outline),

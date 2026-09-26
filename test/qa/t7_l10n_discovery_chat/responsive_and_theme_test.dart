@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:otelcim/app/design_tokens.dart';
 import 'package:otelcim/app/theme.dart';
 import 'package:otelcim/core/responsive/max_width_container.dart';
 import 'package:otelcim/core/responsive/responsive_layout.dart';
@@ -250,8 +251,8 @@ void main() {
     test('otelcimTheme configuration and palette verification', () {
       expect(otelcimTheme.useMaterial3, isTrue);
       expect(otelcimTheme.colorScheme.primary, equals(otelcimBlue));
-      expect(otelcimTheme.scaffoldBackgroundColor, equals(const Color(0xFFF4F5F7)));
-      expect(otelcimTheme.appBarTheme.backgroundColor, equals(otelcimBlue));
+      expect(otelcimTheme.scaffoldBackgroundColor, equals(AppColors.backgroundLight));
+      expect(otelcimTheme.appBarTheme.backgroundColor, equals(otelcimTheme.colorScheme.surface));
       expect(otelcimTheme.appBarTheme.elevation, equals(0));
     });
 
