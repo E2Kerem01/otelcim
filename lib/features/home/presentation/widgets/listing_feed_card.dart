@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/design_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/constants/categories.dart';
 import '../../../../shared/providers/profile_provider.dart';
@@ -23,9 +24,16 @@ import '../../../listings/presentation/season_utils.dart';
 ///
 /// Used for both the single-column list and the multi-column grid.
 class ListingFeedCard extends ConsumerWidget {
-  const ListingFeedCard({super.key, required this.listing});
+  const ListingFeedCard({
+    super.key,
+    required this.listing,
+    this.onTap,
+    this.isSelected = false,
+  });
 
   final Listing listing;
+  final VoidCallback? onTap;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,13 +74,15 @@ class ListingFeedCard extends ConsumerWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: isBoosted
-            ? BorderSide(color: Colors.amber.shade600, width: 1.5)
+        side: isSelected
+            ? BorderSide(color: theme.colorScheme.primary, width: 2)
+            : isBoosted
+            ? BorderSide(color: theme.colorScheme.tertiary, width: 1.5)
             : BorderSide.none,
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push('/listing/${listing.id}'),
+        onTap: onTap ?? () => context.push('/listing/${listing.id}'),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
           child: Column(
@@ -138,8 +148,10 @@ class ListingFeedCard extends ConsumerWidget {
                               .toggleFavorite(uid, listing.id));
                         },
                         icon: Icon(
-                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: isFavorite ? Colors.red : theme.colorScheme.onSurfaceVariant,
+                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: isFavorite
+                              ? theme.colorScheme.error
+                              : theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                       if (created != null)
@@ -179,7 +191,7 @@ class ListingFeedCard extends ConsumerWidget {
                       Text(
                         '%$matchScore ${l10n.matchLabel}',
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: Colors.teal.shade700,
+                          color: AppColors.success,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -269,15 +281,20 @@ class _UrgentBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: Colors.deepOrange.shade700,
+        color: AppColors.error,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: theme.colorScheme.onError,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

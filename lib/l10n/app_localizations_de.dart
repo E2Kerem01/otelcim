@@ -837,4 +837,34 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get adminPanelEntry => 'Adminbereich';
+
+  @override
+  String get listingPreviewOpenFullPage => 'Vollständige Seite öffnen';
+
+  @override
+  String get listingPreviewClose => 'Vorschau schließen';
+
+  @override
+  String get listingPreviewShowMore => 'Mehr anzeigen';
+
+  @override
+  String get listingPreviewShowLess => 'Weniger anzeigen';
+
+  @override
+  String get listingPreviewNotFound => 'Anzeige nicht gefunden oder entfernt';
+
+  @override
+  String get listingPreviewEditListing => 'Anzeige bearbeiten';
+
+  @override
+  String get listingPreviewLoginToContact => 'Anmelden, um Kontakt aufzunehmen';
+
+  @override
+  String get listingPreviewSendMessage => 'Nachricht senden';
+
+  @override
+  String get listingPreviewError => 'Fehler beim Laden der Anzeige';
+
+  @override
+  String get listingPreviewRetry => 'Erneut versuchen';
 }

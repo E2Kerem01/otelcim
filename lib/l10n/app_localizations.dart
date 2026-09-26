@@ -1645,6 +1645,66 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yönetim Paneli'**
   String get adminPanelEntry;
+
+  /// Button to open listing in full page from preview pane
+  ///
+  /// In tr, this message translates to:
+  /// **'Tam sayfada aç'**
+  String get listingPreviewOpenFullPage;
+
+  /// Button to close preview pane
+  ///
+  /// In tr, this message translates to:
+  /// **'Önizlemeyi kapat'**
+  String get listingPreviewClose;
+
+  /// Button to expand clamped description in preview pane
+  ///
+  /// In tr, this message translates to:
+  /// **'Devamını gör'**
+  String get listingPreviewShowMore;
+
+  /// Button to collapse description in preview pane
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha az göster'**
+  String get listingPreviewShowLess;
+
+  /// Message shown when listing in preview pane is not found or removed
+  ///
+  /// In tr, this message translates to:
+  /// **'İlan bulunamadı veya kaldırılmış'**
+  String get listingPreviewNotFound;
+
+  /// Action button for employer to edit their own listing in preview pane
+  ///
+  /// In tr, this message translates to:
+  /// **'İlanı Düzenle'**
+  String get listingPreviewEditListing;
+
+  /// Prompt for unauthenticated user to log in before contacting employer
+  ///
+  /// In tr, this message translates to:
+  /// **'İletişime geçmek için giriş yapın'**
+  String get listingPreviewLoginToContact;
+
+  /// Action button for job seeker to send message to employer
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesaj Gönder'**
+  String get listingPreviewSendMessage;
+
+  /// Error message when listing preview fails to load
+  ///
+  /// In tr, this message translates to:
+  /// **'İlan yüklenirken bir hata oluştu'**
+  String get listingPreviewError;
+
+  /// Retry button when listing preview fails to load
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get listingPreviewRetry;
 }
 
 class _AppLocalizationsDelegate

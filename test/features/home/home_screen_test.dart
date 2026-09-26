@@ -144,7 +144,8 @@ void main() {
     testWidgets('renders search bar with hint and interactive clear button', (
       tester,
     ) async {
-      tester.view.physicalSize = const Size(1200, 2000);
+      // This test covers the pre-split feed/search composition.
+      tester.view.physicalSize = const Size(800, 2000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
@@ -175,7 +176,8 @@ void main() {
     testWidgets('renders grid column selector buttons (1, 2, 3, 4 columns)', (
       tester,
     ) async {
-      tester.view.physicalSize = const Size(1200, 2000);
+      // This test covers the pre-split feed/grid composition.
+      tester.view.physicalSize = const Size(800, 2000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
@@ -196,6 +198,11 @@ void main() {
     testWidgets('shows a retry state when the feed provider errors', (
       tester,
     ) async {
+      // Keep this feed-state regression test below the desktop split breakpoint.
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await tester.pumpWidget(buildErrorWidget());
       await tester.pump();
 

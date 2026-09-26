@@ -589,5 +589,45 @@
   "passwordResetTooManyRequests": "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.",
   "passwordResetNetworkError": "İnternet bağlantınızı kontrol edip tekrar deneyin.",
   "passwordResetGenericError": "Bağlantı gönderilemedi. Lütfen tekrar deneyin.",
-  "adminPanelEntry": "Yönetim Paneli"
+  "adminPanelEntry": "Yönetim Paneli",
+  "listingPreviewOpenFullPage": "Tam sayfada aç",
+  "@listingPreviewOpenFullPage": {
+    "description": "Button to open listing in full page from preview pane"
+  },
+  "listingPreviewClose": "Önizlemeyi kapat",
+  "@listingPreviewClose": {
+    "description": "Button to close preview pane"
+  },
+  "listingPreviewShowMore": "Devamını gör",
+  "@listingPreviewShowMore": {
+    "description": "Button to expand clamped description in preview pane"
+  },
+  "listingPreviewShowLess": "Daha az göster",
+  "@listingPreviewShowLess": {
+    "description": "Button to collapse description in preview pane"
+  },
+  "listingPreviewNotFound": "İlan bulunamadı veya kaldırılmış",
+  "@listingPreviewNotFound": {
+    "description": "Message shown when listing in preview pane is not found or removed"
+  },
+  "listingPreviewEditListing": "İlanı Düzenle",
+  "@listingPreviewEditListing": {
+    "description": "Action button for employer to edit their own listing in preview pane"
+  },
+  "listingPreviewLoginToContact": "İletişime geçmek için giriş yapın",
+  "@listingPreviewLoginToContact": {
+    "description": "Prompt for unauthenticated user to log in before contacting employer"
+  },
+  "listingPreviewSendMessage": "Mesaj Gönder",
+  "@listingPreviewSendMessage": {
+    "description": "Action button for job seeker to send message to employer"
+  },
+  "listingPreviewError": "İlan yüklenirken bir hata oluştu",
+  "@listingPreviewError": {
+    "description": "Error message when listing preview fails to load"
+  },
+  "listingPreviewRetry": "Tekrar dene",
+  "@listingPreviewRetry": {
+    "description": "Retry button when listing preview fails to load"
+  }
 }

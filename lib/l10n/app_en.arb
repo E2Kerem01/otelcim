@@ -290,5 +290,15 @@
   "passwordResetTooManyRequests": "Too many requests. Please try again later.",
   "passwordResetNetworkError": "Check your internet connection and try again.",
   "passwordResetGenericError": "The reset link could not be sent. Please try again.",
-  "adminPanelEntry": "Admin panel"
+  "adminPanelEntry": "Admin panel",
+  "listingPreviewOpenFullPage": "Open full page",
+  "listingPreviewClose": "Close preview",
+  "listingPreviewShowMore": "Show more",
+  "listingPreviewShowLess": "Show less",
+  "listingPreviewNotFound": "Listing not found or removed",
+  "listingPreviewEditListing": "Edit listing",
+  "listingPreviewLoginToContact": "Log in to contact",
+  "listingPreviewSendMessage": "Send message",
+  "listingPreviewError": "An error occurred while loading the listing",
+  "listingPreviewRetry": "Retry"
 }
