@@ -84,6 +84,7 @@ class _OtelcimAppState extends ConsumerState<OtelcimApp> {
           AppLocalizations.of(context)?.appName ?? 'Otelcim',
       debugShowCheckedModeBanner: false,
       theme: otelcimTheme,
+      darkTheme: otelcimDarkTheme,
       themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
