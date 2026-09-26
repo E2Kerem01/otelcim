@@ -1,0 +1,12 @@
+# BUG-M11-03: çevrimdışı feed hata yerine boş durum gösteriyor — PR #71 ile düzeltildi (_buildErrorState)
+# offline: true
+appId: com.example.otelcim
+name: "BUG-M11-03 - offline feed should offer retry"
+tags: [m11_resilience, offline]
+---
+- runFlow: ../../common/launch.yaml
+- extendedWaitUntil:
+    visible: ".*Tekrar dene.*"
+    timeout: 15000
+- assertVisible: ".*İlanlar yüklenemedi.*"
+- assertVisible: ".*Ana Sayfa.*"

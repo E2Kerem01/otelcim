@@ -1,7 +1,7 @@
-# BUG-m7-04: Admin şikayet yönetimi ekranına erişim ve R1 şikayetinin moderasyonu — beklenen: Admin kullanıcısı Hesabım > Yönetim Paneli > Şikâyetler ekranına girip R1 şikayetini ("Şüpheli ilan") görmeli, "Reddet" aksiyonu ile şikayeti kapatabilmeli / gerçek: Hesabım menüsünde Yönetim Paneli girişi bulunmadığı için admin kullanıcı şikayetler ekranına erişemiyor.
+# BUG-m7-04: Admin şikayet yönetimi ekranına erişim ve R1 şikayetinin moderasyonu — PR #72, #69, #66 ile düzeltildi.
 appId: com.example.otelcim
 name: "m7 bug - admin reviews and dismisses report r1 on listing l8"
-tags: [m7, bugs, admin, reports, moderation]
+tags: [m7, admin, reports, moderation]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:
@@ -12,14 +12,16 @@ tags: [m7, bugs, admin, reports, moderation]
 - extendedWaitUntil:
     visible: ".*Admin Yönetici.*"
     timeout: 10000
-# TAHMİN: profile_screen.dart içerisine admin paneli eklendiğinde
 - scrollUntilVisible:
     element: ".*Yönetim Paneli.*"
     direction: DOWN
 - tapOn: ".*Yönetim Paneli.*"
 - extendedWaitUntil:
-    visible: ".*Şikâyetler.*"
+    visible: ".*Genel Bakış.*"
     timeout: 10000
+- scrollUntilVisible:
+    element: ".*Şikâyetler.*"
+    direction: DOWN
 - tapOn: ".*Şikâyetler.*"
 - extendedWaitUntil:
     visible: ".*Hedef: İlan • L8.*"

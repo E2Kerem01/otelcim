@@ -40,6 +40,8 @@ tags: [chat, bug, talent-pool]
 - tapOn: ".*Ekle.*"
 
 # 5. Beklenen davranış assert edilir (mevcut firestore.rules eksikliği nedeniyle kırılır)
+- openLink: "otelcim-e2e://app/profile/talent-pool"
 - extendedWaitUntil:
-    visible: ".*Aday yetenek havuzunuza eklendi\\..*"
+    visible: ".*Yetenek Havuzum.*"
     timeout: 10000
+- assertVisible: ".*Ayşe Aday.*"

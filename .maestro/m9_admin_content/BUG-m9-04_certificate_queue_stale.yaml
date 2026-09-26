@@ -1,0 +1,28 @@
+# BUG-m9-04: Sertifika onayı sonrası kart kuyruktan kalkmıyor — PR #69 ile removeWhere eklenerek düzeltildi.
+appId: com.example.otelcim
+name: "BUG certificate review queue remains stale"
+tags: [m9_admin_content, admin, certificate]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../../common/login.yaml
+    env:
+      EMAIL: admin@e2e.test
+- openLink: "otelcim-e2e://app/admin/certificates"
+- extendedWaitUntil:
+    visible: ".*Belge Onay Kuyruğu.*"
+    timeout: 10000
+- assertVisible: ".*Hijyen Eğitimi Sertifikası.*"
+- tapOn: ".*Onayla.*"
+- extendedWaitUntil:
+    visible: ".*Belgeyi onayla.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Onayla.*"
+    index: -1
+- extendedWaitUntil:
+    visible: ".*Belge onaylandı\\..*"
+    timeout: 10000
+- extendedWaitUntil:
+    notVisible: ".*Hijyen Eğitimi Sertifikası.*"
+    timeout: 10000

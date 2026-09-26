@@ -1,7 +1,7 @@
-# BUG-m7-02: Yetenek havuzuna aday ekleme Firestore kuralı eksikliği yüzünden engelleniyor — beklenen: İşveren sohbet ekranından adayı yetenek havuzuna ekleyebilmeli ve aday Yetenek Havuzum ekranında listelenmeli / gerçek: firestore.rules içinde user_profiles/{userId}/talent_pool/{candidateId} alt koleksiyon kuralı bulunmadığı için yazma işlemi permission-denied ile başarısız oluyor.
+# BUG-m7-02: Yetenek havuzuna aday ekleme — PR #65 kuralları ile düzeltildi.
 appId: com.example.otelcim
 name: "m7 bug - add candidate to talent pool fails due to missing firestore rules"
-tags: [m7, bugs, talent_pool, permissions]
+tags: [m7, talent_pool, permissions]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:
@@ -14,23 +14,23 @@ tags: [m7, bugs, talent_pool, permissions]
     timeout: 10000
 - tapOn: ".*Resepsiyonist Aranıyor.*"
 - extendedWaitUntil:
-    visible: ".*Ayşe Aday.*"
+    visible: ".*Sohbet.*"
     timeout: 10000
 # AppBar sağındaki üç nokta / PopupMenu açılır
 - tapOn:
-    point: "92%,6%" # TAHMİN: Sohbet AppBar seçenekler menüsü
+    point: "92%,6%"
 - extendedWaitUntil:
     visible: ".*Yetenek Havuzuna Ekle.*"
     timeout: 5000
 - tapOn: ".*Yetenek Havuzuna Ekle.*"
 - extendedWaitUntil:
-    visible: ".*Adayı Yetenek Havuzuna Ekle.*"
+    visible: ".*kişisini gelecek sezon yetenek havuzunuza eklemek üzeresiniz.*"
     timeout: 5000
 - tapOn: ".*Ekle.*"
 - extendedWaitUntil:
-    visible: ".*Aday yetenek havuzunuza eklendi\\..*"
+    visible: ".*Aday yetenek havuzunuza eklendi.*"
     timeout: 10000
-- assertVisible: ".*Aday yetenek havuzunuza eklendi\\..*"
+- assertVisible: ".*Aday yetenek havuzunuza eklendi.*"
 - back
 - tapOn: ".*Hesabım.*"
 - scrollUntilVisible:

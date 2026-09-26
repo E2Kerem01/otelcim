@@ -1,0 +1,15 @@
+appId: com.example.otelcim
+name: "m10 bug zaten acil ilan tekrar satın alma"
+tags: [m10, urgent]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../_helpers/login_no_hide.yaml
+    env:
+      EMAIL: employer@e2e.test
+- openLink: "otelcim-e2e://app/listing/L3/urgent"
+- extendedWaitUntil:
+    visible: ".*Acil İlan.*"
+    timeout: 10000
+- assertVisible: ".*Bu ilan zaten acil.*"
+- assertNotVisible: ".*Satın Al ve Acil Yap.*"

@@ -1,7 +1,7 @@
-# BUG-m7-05: Admin kullanıcı yönetimi, arama ve yasaklama akışı — beklenen: Admin kullanıcısı Hesabım > Yönetim Paneli > Kullanıcı Yönetimi ekranında "Ayşe" arayıp bulabilmeli ve yasaklayabilmeli; ardından seeker hesabı kilitlenmeli / gerçek: Hesabım menüsünde Yönetim Paneli girişi bulunmadığı için admin kullanıcı kullanıcı yönetimi ekranına erişemiyor.
+# BUG-m7-05: Admin kullanıcı yönetimi, arama ve yasaklama akışı — PR #69, #71, #72 ile güncellendi.
 appId: com.example.otelcim
 name: "m7 bug - admin searches user bans seeker and verifies lockout"
-tags: [m7, bugs, admin, users, moderation]
+tags: [m7, admin, users, moderation]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:
@@ -12,19 +12,21 @@ tags: [m7, bugs, admin, users, moderation]
 - extendedWaitUntil:
     visible: ".*Admin Yönetici.*"
     timeout: 10000
-# TAHMİN: profile_screen.dart içerisine admin paneli eklendiğinde
 - scrollUntilVisible:
     element: ".*Yönetim Paneli.*"
     direction: DOWN
 - tapOn: ".*Yönetim Paneli.*"
 - extendedWaitUntil:
-    visible: ".*Kullanıcı Yönetimi.*"
+    visible: ".*Genel Bakış.*"
     timeout: 10000
+- scrollUntilVisible:
+    element: ".*Kullanıcı Yönetimi.*"
+    direction: DOWN
 - tapOn: ".*Kullanıcı Yönetimi.*"
 - extendedWaitUntil:
-    visible: ".*E-posta veya isimle ara.*"
+    visible: ".*İsim, e-posta, otel veya telefonla ara.*"
     timeout: 10000
-- tapOn: ".*E-posta veya isimle ara.*"
+- tapOn: ".*İsim, e-posta, otel veya telefonla ara.*"
 - inputText: "Ayşe"
 - hideKeyboard
 - extendedWaitUntil:
@@ -52,12 +54,22 @@ tags: [m7, bugs, admin, users, moderation]
     direction: DOWN
 - tapOn: ".*Çıkış Yap.*"
 - extendedWaitUntil:
-    visible: ".*Ana Sayfa.*"
+    visible: ".*Çıkış yapmak istediğinize emin misiniz.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Çıkış Yap.*"
+    index: 1
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
     timeout: 10000
-- runFlow:
-    file: ../../common/login.yaml
-    env:
-      EMAIL: seeker@e2e.test
+- tapOn: "E-posta"
+- inputText: "seeker@e2e.test"
+- tapOn: "Şifre"
+- inputText: "Test1234!"
+- hideKeyboard
+- tapOn:
+    text: "Giriş Yap"
+    index: -1
 - extendedWaitUntil:
     visible: ".*Hesabınız Yasaklandı.*"
     timeout: 10000

@@ -3,7 +3,7 @@
 # Gerçek: chat_detail_widgets.dart:349 satırındaki IconButton'da tooltip ve semantics etiketi bulunmuyor.
 appId: com.example.otelcim
 name: "bug - a11y missing chat send button tooltip"
-tags: [bug, m12, a11y, chat, tooltip]
+tags: [m12, a11y, chat, tooltip]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:
@@ -21,6 +21,5 @@ tags: [bug, m12, a11y, chat, tooltip]
     visible: ".*Merhaba, ilan hâlâ aktif mi?.*"
     timeout: 10000
 
-# TAHMİN: Erişilebilirlik standardına göre 'Gönder' veya 'Mesaj Gönder' tooltip'i beklenir
 - assertVisible:
     text: ".*Gönder.*"

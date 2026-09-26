@@ -18,7 +18,7 @@ tags: [m4, bug, skip]
     text: "Düzenle"
     index: 0
 - extendedWaitUntil:
-    visible: "Değişiklikleri Kaydet"
+    visible: ".*İlanı Düzenle.*"
     timeout: 10000
 # TAHMİN: labelsiz edit alanı mevcut başlık metniyle erişilebilir olur.
 - tapOn: ".*Acil Aşçı Yardımcısı.*"

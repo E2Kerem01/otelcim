@@ -18,8 +18,9 @@ tags: [m4, bug, skip, edit]
     text: "Düzenle"
     index: 2
 - extendedWaitUntil:
-    visible: "Değişiklikleri Kaydet"
+    visible: ".*İlanı Düzenle.*"
     timeout: 10000
+- assertVisible: ".*Antalya.*"
 # TAHMİN: EditListingScreen başlık TextFormField'ında label/hint yok; mevcut başlık semantik hedef olarak kullanılır.
 - tapOn: ".*Garson \\(Sezonluk\\).*"
 - eraseText: 100

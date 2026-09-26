@@ -24,6 +24,7 @@ tags: [m6, bugs, localization, rtl]
     visible: ".*Uygulama Dili.*"
     timeout: 10000
 - tapOn: ".*العربية.*"
+- back
 - extendedWaitUntil:
     visible: ".*الرئيسية.*"
     timeout: 10000

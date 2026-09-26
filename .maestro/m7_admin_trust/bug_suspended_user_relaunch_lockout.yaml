@@ -1,7 +1,7 @@
-# BUG-m7-06: Uygulama yeniden başlatıldığında kilit ekranında askı başlığı yerine loading kalıyor — beklenen: Uygulama yeniden başlatıldığında /account-suspended rotasında "Hesabınız Askıya Alındı" ve askı bitiş tarihi ("Askı bitiş: ...") görünmeli / gerçek: AccountSuspendedScreen build() içindeki FutureProvider inline üretimi nedeniyle ekran CircularProgressIndicator durumunda takılıyor.
+# BUG-m7-06: Uygulama yeniden başlatıldığında kilit ekranında askı başlığı yerine loading kalıyor — D22 (#66) ile düzeltildi.
 appId: com.example.otelcim
 name: "m7 bug - suspended user lockout screen title fails on relaunch"
-tags: [m7, bugs, auth, moderation, restart]
+tags: [m7, auth, moderation, restart]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:

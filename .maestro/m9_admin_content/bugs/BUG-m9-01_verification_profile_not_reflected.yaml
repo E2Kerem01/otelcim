@@ -10,17 +10,17 @@ tags: [m9_admin_content, bug, verification]
       EMAIL: admin@e2e.test
 - openLink: "otelcim-e2e://app/admin/verifications"
 - extendedWaitUntil:
-    visible: "Yeni Otel"
+    visible: ".*Yeni Otel.*"
     timeout: 10000
-- tapOn: "Onayla"
+- tapOn: ".*Onayla.*"
 - extendedWaitUntil:
-    visible: "Doğrulamayı onayla"
+    visible: ".*Doğrulamayı onayla.*"
     timeout: 5000
 - tapOn:
-    text: "Onayla"
+    text: ".*Onayla.*"
     index: -1
 - extendedWaitUntil:
-    visible: "Doğrulama onaylandı."
+    visible: ".*Doğrulama onaylandı\\..*"
     timeout: 10000
 - back
 - extendedWaitUntil:
@@ -28,21 +28,33 @@ tags: [m9_admin_content, bug, verification]
     timeout: 10000
 - tapOn: ".*Hesabım.*"
 - scrollUntilVisible:
-    element: "Çıkış Yap"
+    element: ".*Çıkış Yap.*"
     direction: DOWN
-- tapOn: "Çıkış Yap"
+- tapOn: ".*Çıkış Yap.*"
 - extendedWaitUntil:
-    visible: "Giriş Yap"
+    visible: ".*Çıkış yapmak istediğinize emin misiniz.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Çıkış Yap.*"
+    index: 1
+- extendedWaitUntil:
+    visible: ".*Giriş Yap.*"
     timeout: 10000
-- runFlow:
-    file: ../../common/login.yaml
-    env:
-      EMAIL: employer3@e2e.test
+- tapOn: "E-posta"
+- inputText: "employer3@e2e.test"
+- tapOn: "Şifre"
+- inputText: "Test1234!"
+- hideKeyboard
+- tapOn:
+    text: "Giriş Yap"
+    index: -1
+- extendedWaitUntil:
+    visible: ".*Ana Sayfa.*"
+    timeout: 10000
 - tapOn: ".*Hesabım.*"
 - extendedWaitUntil:
-    visible: "Can Başvuran"
+    visible: ".*Can Başvuran.*"
     timeout: 10000
-- assertVisible: "employer3@e2e.test"
+- assertVisible: ".*employer3@e2e\\.test.*"
 # TAHMİN: kaynakta doğrulama etiketi yok; beklenen ürün davranışı için kullanılan hedef metindir.
 - assertVisible: ".*Doğrulanmış.*"
-

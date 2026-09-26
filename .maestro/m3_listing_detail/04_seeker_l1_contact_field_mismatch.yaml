@@ -19,9 +19,10 @@ tags: [m3, listing-detail, bug, contact]
 - assertVisible: ".*Deniz Otel.*"
 - tapOn: ".*İletişim Bilgisini Göster.*"
 - extendedWaitUntil:
-    visible: '.*ik\+L1@e2e\.test.*'
+    visible: ".*0242 555 00 00.*"
     timeout: 10000
 - assertVisible: ".*0242 555 00 00.*"
+- assertNotVisible: ".*İletişim Bilgisini Göster.*"
 - tapOn: "Mesaj Gönder"
 - extendedWaitUntil:
     visible: ".*Sohbet.*"

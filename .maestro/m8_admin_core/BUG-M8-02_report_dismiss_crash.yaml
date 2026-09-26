@@ -1,7 +1,7 @@
-# BUG-M8-02: Rapor reddetme sonrası Flutter assertion ile uygulama çöküyor — beklenen: 'Şikayeti Reddet işlemi tamamlandı.' ve bekleyen rapor listesinin boşalması / gerçek: '_dependents.isEmpty' kırmızı hata ekranı.
+# BUG-M8-02: Rapor reddetme sonrası Flutter assertion çökmesi — D34 (#66) ile ReasonDialog düzeltildi.
 appId: com.example.otelcim
 name: "BUG m8 report dismiss crashes after applying action"
-tags: [m8_admin_core, bug, reports, crash]
+tags: [m8_admin_core, reports, crash]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:

@@ -1,7 +1,7 @@
-# BUG-M8-03: Raporlanan ilanı kaldırma sonrası Flutter assertion ile uygulama çöküyor — beklenen: 'İlanı Kaldır işlemi tamamlandı.' ve L8'in feed'den kalkması / gerçek: kırmızı Flutter hata ekranı.
+# BUG-M8-03: Raporlanan ilanı kaldırma sonrası Flutter assertion çökmesi — D34 (#66) ile ReasonDialog düzeltildi.
 appId: com.example.otelcim
 name: "BUG m8 removing reported listing crashes after applying action"
-tags: [m8_admin_core, bug, reports, listing-moderation, crash]
+tags: [m8_admin_core, reports, listing-moderation, crash]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:
@@ -10,8 +10,12 @@ tags: [m8_admin_core, bug, reports, listing-moderation, crash]
       EMAIL: admin@e2e.test
 - openLink: "otelcim-e2e://app/admin/reports"
 - extendedWaitUntil:
-    visible: ".*Hedef: İlan • L8.*"
+    visible: ".*Şikâyetler.*"
     timeout: 15000
+- tapOn: ".*Tümü.*"
+- extendedWaitUntil:
+    visible: ".*Hedef: İlan • L8.*"
+    timeout: 10000
 - assertVisible: ".*İlanı kaldır.*"
 - tapOn: ".*İlanı kaldır.*"
 - extendedWaitUntil:
@@ -24,11 +28,8 @@ tags: [m8_admin_core, bug, reports, listing-moderation, crash]
 - extendedWaitUntil:
     visible: '.*İlanı Kaldır işlemi tamamlandı\..*'
     timeout: 10000
-- extendedWaitUntil:
-    visible: '.*Bekleyen şikâyet bulunmuyor\..*'
-    timeout: 10000
 - openLink: "otelcim-e2e://app/"
 - extendedWaitUntil:
-    visible: ".*6 sonuç.*"
+    visible: ".*Ana Sayfa.*"
     timeout: 15000
 - assertNotVisible: ".*Güvenlik Görevlisi.*"

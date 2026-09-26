@@ -1,7 +1,7 @@
-# BUG-M8-04: Profilde Çıkış Yap sonrası uygulama login yerine ana sayfada kalıyor — beklenen: profile_screen.dart içindeki context.go('/login') nedeniyle 'Giriş Yap' / gerçek: 'Ana Sayfa'.
+# BUG-M8-04: Profilde Çıkış Yap sonrası uygulama login yerine ana sayfada kalıyor — PR #71 ile logout redirect ve onay diyaloğu eklendi.
 appId: com.example.otelcim
 name: "BUG m8 logout returns home instead of login"
-tags: [m8_admin_core, bug, users, suspension, access-control]
+tags: [m8_admin_core, users, suspension, access-control]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:
@@ -10,9 +10,9 @@ tags: [m8_admin_core, bug, users, suspension, access-control]
       EMAIL: admin@e2e.test
 - openLink: "otelcim-e2e://app/admin/users"
 - extendedWaitUntil:
-    visible: ".*E-posta veya isimle ara.*"
+    visible: ".*İsim, e-posta, otel veya telefonla ara.*"
     timeout: 15000
-- tapOn: "E-posta veya isimle ara"
+- tapOn: ".*İsim, e-posta, otel veya telefonla ara.*"
 - inputText: "Ayşe"
 - pressKey: Enter
 - extendedWaitUntil:
@@ -36,5 +36,12 @@ tags: [m8_admin_core, bug, users, suspension, access-control]
     timeout: 10000
 - tapOn: ".*Çıkış Yap.*"
 - extendedWaitUntil:
+    visible: ".*Çıkış yapmak istediğinize emin misiniz.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Çıkış Yap.*"
+    index: 1
+- extendedWaitUntil:
     visible: ".*Giriş Yap.*"
     timeout: 10000
+- assertVisible: ".*Giriş Yap.*"

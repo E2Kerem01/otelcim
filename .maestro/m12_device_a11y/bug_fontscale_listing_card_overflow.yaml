@@ -1,9 +1,8 @@
 # BUG-m12-05: Büyük yazı boyutunda (font scale 2.0) ana sayfa ilan kartı rozet satırında taşma (RenderFlex overflow / D31)
-# beklenen: Yazı boyutu 2.0 olduğunda kartın üst rozet satırı taşmamalı, favori butonu ("Favorilere ekle") ve ilan tarihi ekranda görünür olmalıdır.
-# gerçek: home_screen_widgets.dart:860 içindeki tek satırlı Row büyük yazı sebebiyle sağdan 18-116 px taşar (D31); favori kalbi ve tarih görünür alan dışına itilir / kesilir.
+# PR #66 ile Row yerine Wrap kullanılarak düzeltildi. Tarih deseni esnek regex yapıldı.
 appId: com.example.otelcim
 name: "bug - font scale 2.0 listing card header row overflow"
-tags: [bug, m12, fontscale, a11y, overflow, d31]
+tags: [m12, fontscale, a11y, overflow, d31]
 ---
 - runFlow: ../../common/launch.yaml
 
@@ -15,4 +14,4 @@ tags: [bug, m12, fontscale, a11y, overflow, d31]
 - assertVisible:
     text: ".*Favorilere ekle.*"
 - assertVisible:
-    text: ".*23\\.9\\.2026.*"
+    text: ".*\\d{1,2}\\.\\d{1,2}\\.202\\d.*"

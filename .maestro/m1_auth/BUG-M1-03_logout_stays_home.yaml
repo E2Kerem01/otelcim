@@ -15,9 +15,16 @@ tags: [m1_auth, access-control, bug, expected-failure]
 - scrollUntilVisible:
     element: ".*Çıkış Yap.*"
     direction: DOWN
-- tapOn: ".*Çıkış Yap.*"
+- tapOn:
+    text: "Çıkış Yap"
+    index: -1
+- extendedWaitUntil:
+    visible: ".*Çıkış yapmak istediğinize emin misiniz\\?.*"
+    timeout: 5000
+- tapOn:
+    text: "Çıkış Yap"
+    index: -1
 - extendedWaitUntil:
     visible: ".*Giriş Yap.*"
     timeout: 10000
 - assertNotVisible: ".*Ayşe Aday.*"
-

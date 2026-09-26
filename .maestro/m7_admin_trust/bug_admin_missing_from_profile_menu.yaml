@@ -1,7 +1,7 @@
-# BUG-m7-01: Admin rolü için Hesabım ekranında Yönetim Paneli menü öğesi eksik — beklenen: admin@e2e.test oturum açıp Hesabım'a gittiğinde "Yönetim Paneli" bağlantısı görünmeli ve tıklandığında /admin ekranı açılmalı / gerçek: profile_screen.dart içinde isAdmin kontrolü ve /admin ProfileMenuTile'ı tanımlanmamış, admin kullanıcı yönetim paneline erişemiyor.
+# BUG-m7-01: Admin rolü için Hesabım ekranında Yönetim Paneli menü öğesi — PR #72 (A2/D1) ve PR #69 ile düzeltildi.
 appId: com.example.otelcim
 name: "m7 bug - admin panel entry missing from profile menu"
-tags: [m7, bugs, admin]
+tags: [m7, admin]
 ---
 - runFlow: ../../common/launch.yaml
 - runFlow:
@@ -12,16 +12,18 @@ tags: [m7, bugs, admin]
 - extendedWaitUntil:
     visible: ".*Admin Yönetici.*"
     timeout: 10000
-# TAHMİN: profile_screen.dart içerisine admin girişi eklendiğinde "Yönetim Paneli" başlığını taşıyacaktır
 - scrollUntilVisible:
     element: ".*Yönetim Paneli.*"
     direction: DOWN
 - assertVisible: ".*Yönetim Paneli.*"
 - tapOn: ".*Yönetim Paneli.*"
 - extendedWaitUntil:
-    visible: ".*İçerik moderasyonu.*"
+    visible: ".*Genel Bakış.*"
     timeout: 10000
 - assertVisible: ".*Yönetim Paneli.*"
+- scrollUntilVisible:
+    element: ".*Şikâyetler.*"
+    direction: DOWN
 - assertVisible: ".*Şikâyetler.*"
 - assertVisible: ".*Kullanıcı Yönetimi.*"
 - assertVisible: ".*İlan Yönetimi.*"

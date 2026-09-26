@@ -1,0 +1,21 @@
+appId: com.example.otelcim
+name: "m10 bug çıkış onay diyaloğu yok"
+tags: [m10, profile, authorization]
+---
+- runFlow: ../../common/launch.yaml
+- runFlow:
+    file: ../_helpers/login_no_hide.yaml
+    env:
+      EMAIL: seeker@e2e.test
+- tapOn: ".*Hesabım.*"
+- extendedWaitUntil:
+    visible: ".*Ayşe Aday.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: ".*Çıkış Yap.*"
+    direction: DOWN
+- tapOn: ".*Çıkış Yap.*"
+- assertVisible: ".*Çıkış yapmak istediğinize emin misiniz.*"
+- assertVisible: ".*Vazgeç.*"
+- tapOn: ".*Vazgeç.*"
+- assertVisible: ".*Ayşe Aday.*"
